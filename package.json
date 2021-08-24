@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": ""
+    "deploy": "",
+    "format": "prettier --write ."
   },
   "browserslist": {
     "production": [
@@ -23,5 +24,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "prettier": "^2.3.2"
   }
 }
