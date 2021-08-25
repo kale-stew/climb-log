@@ -1,17 +1,21 @@
 {
   "name": "climb-log",
   "author": "Kylie Stewart <hello@kyliestewart.tech>",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "license": "MIT",
   "dependencies": {
     "@notionhq/client": "^0.3.0",
+    "next": "^11.1.0",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-scripts": "4.0.3"
+    "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.3.2"
   },
   "scripts": {
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
-    "deploy": "",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "format": "prettier --write ."
   },
   "browserslist": {
@@ -25,8 +29,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "prettier": "^2.3.2"
   }
 }
