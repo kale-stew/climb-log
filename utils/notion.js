@@ -1,4 +1,5 @@
 import { Client, LogLevel } from '@notionhq/client'
+import { formatDate, formatElevation } from './helpers'
 
 /**
  * Initialize Notion client & configure a default db query
@@ -12,8 +13,6 @@ const getDatabaseQueryConfig = () => {
     filter: {
       and: [{ property: 'date', date: { on_or_before: today } }],
     },
-    sorts: [{ property: 'date', direction: 'descending' }],
-    // page_size: 30, // @TODO - Add pagination
   }
 
   return config
@@ -21,14 +20,16 @@ const getDatabaseQueryConfig = () => {
 
 const formatField = (field) => {
   switch (field.type) {
-    case 'title':
-      return field?.title[0]?.plain_text
     case 'date':
       return field?.date?.start
-    case 'rich_text':
-      return field?.rich_text[0]?.plain_text
     case 'number':
       return field?.number
+    case 'rich_text':
+      return field?.rich_text[0]?.plain_text
+    case 'title':
+      return field?.title[0]?.plain_text
+    case 'url':
+      return field?.url
   }
 }
 
@@ -37,22 +38,24 @@ const formatField = (field) => {
  */
 export const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
+  config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
 
   return response.results.map((result) => {
     const {
       id,
       url,
-      properties: { date, area, hike_title, high_point },
+      properties: { date, area, high_point, hike_title, strava },
     } = result
 
     return {
       id,
       href: url,
-      date: formatField(date),
+      date: formatDate(formatField(date)),
       title: formatField(hike_title),
-      elevation: formatField(high_point),
+      elevation: formatElevation(formatField(high_point)),
       location: formatField(area),
+      strava: formatField(strava),
     }
   }, [])
 }
