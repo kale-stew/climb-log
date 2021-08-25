@@ -22,11 +22,13 @@ const getDatabaseQueryConfig = () => {
 const formatField = (field) => {
   switch (field.type) {
     case 'title':
-      return field?.title[0].plain_text
+      return field?.title[0]?.plain_text
     case 'date':
       return field?.date?.start
-    case 'select':
-      return field?.select?.name
+    case 'rich_text':
+      return field?.rich_text[0]?.plain_text
+    case 'number':
+      return field?.number
   }
 }
 
@@ -41,15 +43,16 @@ export const fetchAllClimbs = async () => {
     const {
       id,
       url,
-      properties: { date, state, hike_title },
+      properties: { date, area, hike_title, high_point },
     } = result
 
     return {
       id,
-      date: formatField(date),
-      state: formatField(state),
-      title: formatField(hike_title),
       href: url,
+      date: formatField(date),
+      title: formatField(hike_title),
+      elevation: formatField(high_point),
+      location: formatField(area),
     }
   }, [])
 }
