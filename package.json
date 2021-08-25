@@ -3,6 +3,7 @@
   "author": "Kylie Stewart <hello@kyliestewart.tech>",
   "version": "0.1.0",
   "dependencies": {
+    "@notionhq/client": "^0.3.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3"
