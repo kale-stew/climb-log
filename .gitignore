@@ -12,6 +12,7 @@ yarn-error.log*
 # production
 /build
 .next/
+out/
 
 # misc
 .DS_Store
