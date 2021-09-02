@@ -1,6 +1,6 @@
 module.exports = {
-  serverRuntimeConfig: {
-    notionKey: process.env.NOTION_KEY,
-    notionDatabaseId: process.env.NOTION_DATABASE_ID,
+  env: {
+    notionKey: process.env.NEXT_PUBLIC_NOTION_KEY,
+    notionDatabaseId: process.env.NEXT_PUBLIC_NOTION_DATABASE_ID,
   },
 }
