@@ -26,8 +26,8 @@ const Table = ({ data }) => {
           </a>
         </td>
       )
-    } else if (climb.strava && climb.elevation && key == 'elevation') {
-      // If there is an activity url, link it on the elevation
+    } else if (climb.strava && climb.stats && key == 'stats') {
+      // If there is an activity url, link it on the stats str
       return (
         <td key={climb.id}>
           <a href={climb.strava} alt={`View ${climb[key]} on Strava`}>
@@ -50,7 +50,9 @@ const Table = ({ data }) => {
           ))}
         </tr>
         {data.map((climb, i) => (
-          <tr key={i}>{Object.keys(climb).map((key, i) => buildTableRow(key, climb))}</tr>
+          <tr class="cursor-pointer" key={i}>
+            {Object.keys(climb).map((key, i) => buildTableRow(key, climb))}
+          </tr>
         ))}
       </tbody>
     </table>

@@ -1,5 +1,10 @@
 import { Client, LogLevel } from '@notionhq/client'
-import { formatDate, formatElevation } from './helpers'
+import {
+  feetToMeters,
+  formatDate,
+  formatStatsImperial,
+  formatStatsMetric,
+} from './helpers'
 
 /**
  * Initialize Notion client & configure a default db query
@@ -18,7 +23,11 @@ const getDatabaseQueryConfig = () => {
   return config
 }
 
-const formatField = (field) => {
+/**
+ * Massage data returned from the Notion API
+ * into a Table-friendly object
+ */
+const fmt = (field) => {
   switch (field.type) {
     case 'date':
       return field?.date?.start
@@ -45,17 +54,28 @@ export const fetchAllClimbs = async () => {
     const {
       id,
       url,
-      properties: { date, area, high_point, hike_title, strava },
+      properties: { area, date, distance, gain, high_point, hike_title, strava },
     } = result
 
     return {
       id,
       href: url,
-      date: formatDate(formatField(date)),
-      title: formatField(hike_title),
-      elevation: formatElevation(formatField(high_point)),
-      location: formatField(area),
-      strava: formatField(strava),
+      date: formatDate(fmt(date)),
+      title: fmt(hike_title),
+      'high point': feetToMeters(fmt(high_point)),
+      stats: formatStatsMetric(fmt(distance), fmt(gain)),
+      location: fmt(area),
+      strava: fmt(strava),
     }
   }, [])
 }
+
+/**
+ * Filter by a 'Select' option
+ */
+export const fetchClimbsByFilter = async () => {}
+
+/**
+ * Filter by an input str (Search functionality)
+ */
+export const fetchClimbsBySearchQuery = async () => {}
