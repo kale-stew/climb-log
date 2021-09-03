@@ -1,6 +1,6 @@
 module.exports = {
   env: {
-    NEXT_PUBLIC_NOTION_KEY: process.env.NEXT_PUBLIC_NOTION_KEY,
-    NEXT_PUBLIC_NOTION_DATABASE_ID: process.env.NEXT_PUBLIC_NOTION_DATABASE_ID,
+    notionAccessToken: process.env.NOTION_ACCESS_TOKEN,
+    notionDatabaseId: process.env.NOTION_DATABASE_ID,
   },
 }

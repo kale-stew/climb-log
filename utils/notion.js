@@ -9,12 +9,12 @@ import {
 /**
  * Initialize Notion client & configure a default db query
  */
-const notion = new Client({ auth: process.env.NEXT_PUBLIC_NOTION_KEY, logLevel: LogLevel.DEBUG })
+const notion = new Client({ auth: process.env.NOTION_ACCESS_TOKEN, logLevel: LogLevel.DEBUG })
 const getDatabaseQueryConfig = () => {
   let today = new Date().toISOString()
 
   const config = {
-    database_id: process.env.NEXT_PUBLIC_NOTION_DATABASE_ID,
+    database_id: process.env.NOTION_DATABASE_ID,
     filter: {
       and: [{ property: 'date', date: { on_or_before: today } }],
     },
