@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "npm run build && next export && gh-pages -d out",
+    "deploy": "npm run build && next export && touch ./out/.nojekyll && gh-pages -d out",
     "format": "prettier --write ."
   },
   "dependencies": {
