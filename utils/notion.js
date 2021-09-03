@@ -9,7 +9,10 @@ import {
 /**
  * Initialize Notion client & configure a default db query
  */
-const notion = new Client({ auth: process.env.NOTION_ACCESS_TOKEN, logLevel: LogLevel.DEBUG })
+const notion = new Client({
+  auth: process.env.NOTION_ACCESS_TOKEN,
+  logLevel: LogLevel.DEBUG,
+})
 const getDatabaseQueryConfig = () => {
   let today = new Date().toISOString()
 
