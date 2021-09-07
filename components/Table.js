@@ -34,7 +34,7 @@ const Table = ({ data }) => {
 
   return (
     <table>
-      <caption>Climb Log</caption>
+      <caption>Kylie's Climb Log</caption>
       <tbody>
         <tr>
           {headers.map((header, i) => (

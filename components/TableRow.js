@@ -1,35 +1,11 @@
 import React from 'react'
-import styled from 'styled-components'
+import Pill from './Pill'
 import {
   addCommas,
   feetToMeters,
   findMatchingSlug,
   milesToKilometers,
 } from '../utils/helpers'
-
-const Pill = styled.div`
-  font-size: 9px;
-  padding: 0.25em 1em;
-  border-radius: 3px;
-  color: ${(props) => props.color};
-  border: 2px solid ${(props) => props.color};
-`
-
-const ColorPill = ({ state }) => {
-  const selectColors = {
-    arizona: '', // red
-    california: '', // gold
-    colorado: '#F37610', // orange
-    oregon: '', // purple
-    utah: '', // yellow
-    washington: '', // pink
-    'new mexico': '', //
-  }
-
-  console.log(state, selectColors[state])
-
-  return <Pill color={selectColors[state]}>{state}</Pill>
-}
 
 const TableRow = ({ id, title, data, metric }) => {
   if (title == 'distance') {
@@ -57,7 +33,7 @@ const TableRow = ({ id, title, data, metric }) => {
   } else if (title == 'state') {
     return (
       <td key={id}>
-        <ColorPill state={data} />
+        <Pill state={data} />
       </td>
     )
   }
