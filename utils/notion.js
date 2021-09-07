@@ -1,10 +1,5 @@
 import { Client, LogLevel } from '@notionhq/client'
-import {
-  feetToMeters,
-  formatDate,
-  formatStatsImperial,
-  formatStatsMetric,
-} from './helpers'
+import { formatDate, getLocationData } from './helpers'
 
 /**
  * Initialize Notion client & configure a default db query
@@ -56,7 +51,7 @@ export const fetchAllClimbs = async () => {
   return response.results.map((result) => {
     const {
       id,
-      properties: { /* area, */ date, distance, gain, hike_title /* , state */ },
+      properties: { area, date, distance, gain, hike_title },
     } = result
 
     return {
@@ -66,8 +61,8 @@ export const fetchAllClimbs = async () => {
       // slug: url,
       distance: fmt(distance),
       gain: fmt(gain),
-      // state: fmt(state),
-      // area: fmt(area),
+      area: getLocationData(fmt(area)).area,
+      state: getLocationData(fmt(area)).state,
     }
   }, [])
 }
