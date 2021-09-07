@@ -56,19 +56,18 @@ export const fetchAllClimbs = async () => {
   return response.results.map((result) => {
     const {
       id,
-      url,
-      properties: { area, date, distance, gain, high_point, hike_title, strava },
+      properties: { /* area, */ date, distance, gain, hike_title /* , state */ },
     } = result
 
     return {
       id,
-      href: url,
       date: formatDate(fmt(date)),
       title: fmt(hike_title),
-      'high point': feetToMeters(fmt(high_point)),
-      stats: formatStatsMetric(fmt(distance), fmt(gain)),
-      location: fmt(area),
-      strava: fmt(strava),
+      // slug: url,
+      distance: fmt(distance),
+      gain: fmt(gain),
+      // state: fmt(state),
+      // area: fmt(area),
     }
   }, [])
 }
@@ -81,4 +80,9 @@ export const fetchClimbsByFilter = async () => {}
 /**
  * Filter by an input str (Search functionality)
  */
-export const fetchClimbsBySearchQuery = async () => {}
+export const fetchClimbsBySearchQuery = async (/* str */) => {}
+
+/**
+ * Fetch a single climb's data
+ */
+export const fetchClimbData = async (/* id */) => {}

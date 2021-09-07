@@ -1,3 +1,13 @@
+import React from 'react'
+
+/**
+ * TO-DO
+ * - [] button to switch between Imperial & Metric
+ * - [] onClick in-table event for filtering by range
+ * - [] onClick in-table event for filtering by state
+ * - [] react-table hook to sort asc/desc by header
+ */
+
 const Table = ({ data }) => {
   const alwaysExclude = ['href', 'strava', 'id']
 
@@ -26,16 +36,8 @@ const Table = ({ data }) => {
           </a>
         </td>
       )
-    } else if (climb.strava && climb.stats && key == 'stats') {
-      // If there is an activity url, link it on the stats str
-      return (
-        <td key={climb.id}>
-          <a href={climb.strava} alt={`View ${climb[key]} on Strava`}>
-            {climb[key]}
-          </a>
-        </td>
-      )
     }
+
     // Default data row for all else
     return <td key={climb.id}>{climb[key]}</td>
   }
