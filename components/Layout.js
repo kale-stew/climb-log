@@ -3,6 +3,8 @@ import Router from 'next/router'
 import Link from 'next/link'
 import Loading from './Loading'
 
+import styles from './Layout.module.css'
+
 const Navigation = () => (
   <header>
     <Link href="/blog">Blog</Link>
@@ -13,9 +15,9 @@ const Navigation = () => (
 )
 
 const LandingHeader = () => (
-  <div className="landingHeader">
+  <div className={styles.landingHeader}>
     <h1>KYLIE STEWART</h1>
-    <div className="landingNavigation">
+    <div className={styles.landingNavigation}>
       <Link href="/blog">Blog</Link>
       <Link href="/climb-log">Climb Log</Link>
       <Link href="/work">Work</Link>
@@ -30,13 +32,13 @@ export default function Layout({ children, home }) {
   Router.events.on('routeChangeComplete', (url) => setLoading(false))
 
   return (
-    <div className="wrapper">
+    <div className={styles.wrapper}>
       {home ? <LandingHeader /> : <Navigation />}
 
       <main>{!loading ? children : <Loading />}</main>
 
       {!home && (
-        <div className="backToHome">
+        <div className={styles.backToHome}>
           <Link href="/">
             <a>← Back to home</a>
           </Link>

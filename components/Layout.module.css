@@ -1,0 +1,38 @@
+.landingNavigation a {
+  font-size: 1.25rem;
+  z-index: 1;
+  padding: 1.5rem;
+  text-decoration: none;
+  color: white;
+}
+
+.landingNavigation a:hover {
+  text-decoration: underline;
+}
+
+.landingHeader {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.landingImage {
+  z-index: 0;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.backToHome {
+  margin: 3rem 0 0;
+}
+
+.backToHome a {
+  text-decoration: none;
+}
