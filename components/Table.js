@@ -33,7 +33,29 @@ const Table = ({ data }) => {
   }
 
   const logIt = (it) => {
-    console.log('HELLO:', it)
+    console.log("Clicked:", it)
+    switch(it) {
+      case 'date':
+        console.log("SORT DATE")
+        break
+      case 'title':
+        console.log("SORT TITLE")
+        break
+      case 'distance':
+        console.log("SORT DISTANCE")
+        break
+      case 'gain':
+        console.log("SORT GAIN")
+        break
+      case 'area':
+        console.log("SORT AREA")
+        break
+      case 'state':
+        console.log("SORT STATE")
+        break
+      default:
+        console.log("DEFAULT")
+    }
   }
 
   return (
