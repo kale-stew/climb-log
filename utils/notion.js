@@ -1,4 +1,4 @@
-import { Client, LogLevel } from '@notionhq/client'
+import { APIErrorCode, Client, LogLevel } from '@notionhq/client'
 import { formatDate, getLocationData } from './helpers'
 
 /**
@@ -43,9 +43,9 @@ const fmt = (field) => {
 /**
  * Fetch list of climbs from Notion db
  */
-export const fetchAllClimbs = async (property = 'date', direction = 'descending') => {
+export const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
-  config.sorts = [{ property: property, direction: direction }]
+  config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
 
   return response.results.map((result) => {
@@ -67,16 +67,37 @@ export const fetchAllClimbs = async (property = 'date', direction = 'descending'
   }, [])
 }
 
-/**
- * Sort by ascending, descending or default 
- */
-export const sortClimbsByAscDesc = async (property, direction) => {
-  const config = getDatabaseQueryConfig()
-  config.sorts = [{ property: property, direction: direction }]
-  let response = await notion.databases.query(config)
+// This breaks??
+export const sortAllClimbs = async (property = 'date', direction = 'descending') => {
+  console.log("SortAllClimbs")
+  let today = new Date().toISOString()
 
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_ID,
+    filter: {
+      and: [{ property: 'date', date: { on_or_before: today } }],
+    },
+    sorts: [{ property: property, direction: direction }]
+  })
+
+  return response.results.map((result) => {
+    const {
+      id,
+      properties: { area, date, distance, gain, hike_title },
+    } = result
+
+    return {
+      id,
+      date: formatDate(fmt(date)),
+      title: fmt(hike_title),
+      // slug: url,
+      distance: fmt(distance),
+      gain: fmt(gain),
+      area: getLocationData(fmt(area)).area,
+      state: getLocationData(fmt(area)).state,
+    }
+  }, [])
 }
-
 /**
  * Filter by a 'Select' option
  */

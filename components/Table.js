@@ -9,16 +9,16 @@ import TableRow from './TableRow'
  * - [] react-table hook to sort asc/desc by header
  */
 
-const Table = ({ data }) => {
+const Table = ({ data, filters, setFilters }) => {
   const alwaysExclude = ['href', 'strava', 'id']
 
   /**
    * Create an arr of Table Headers by mapping over
    * climb data so headers are never out of sync
    */
-  const headers = Object.keys(data[0]).filter(
+  const headers = data.length > 0 ? Object.keys(data[0]).filter(
     (header) => !alwaysExclude.find((el) => el == header)
-  )
+  ) : []
 
   /**
    * Form Table Rows based on data type
@@ -36,25 +36,25 @@ const Table = ({ data }) => {
     console.log("Clicked:", header)
     switch(header) {
       case 'date':
-        console.log("SORT DATE")
+        setFilters({property: 'date', direction: 'descending'})
         break
       case 'title':
-        console.log("SORT TITLE")
+        setFilters({property: 'title', direction: 'descending'})
         break
       case 'distance':
-        console.log("SORT DISTANCE")
+        setFilters({property: 'distance', direction: 'descending'})
         break
       case 'gain':
-        console.log("SORT GAIN")
+        setFilters({property: 'gain', direction: 'descending'})
         break
       case 'area':
-        console.log("SORT AREA")
+        setFilters({property: 'area', direction: 'descending'})
         break
       case 'state':
-        console.log("SORT STATE")
+        setFilters({property: 'state', direction: 'descending'})
         break
       default:
-        console.log("DEFAULT")
+        setFilters({property: 'date', direction: 'descending'})
     }
   }
 
