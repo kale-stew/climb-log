@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import { fetchAllClimbs, sortAllClimbs } from '../utils/notion'
@@ -27,7 +28,10 @@ const ClimbLog = ({ allClimbs }) => {
 
   return (
   <Layout>
-    <Table data={data} filters={filters} setFilters={setFilters}/>
+    <Head>
+      <title>Kylie Stewart | Climb Log</title>
+    </Head>
+    <Table data={data} filters={filters} setFilters={setFilters} />
   </Layout>
 )
 }
