@@ -18,11 +18,16 @@ a {
 }
 
 .header {
-  margin-bottom: 2rem;
+  margin: 1rem 0 2.5rem 0;
 }
 
 .header a {
-  padding: 0 1rem;
+  padding: 1.5rem;
+  text-decoration: none;
+}
+
+.header a:hover {
+  text-decoration: underline;
 }
 
 .wrapper {
@@ -34,6 +39,10 @@ a {
 
 .backToHome {
   margin: 3rem 0 0;
+}
+
+.backToHome a {
+  text-decoration: none;
 }
 
 table {

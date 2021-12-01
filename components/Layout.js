@@ -4,6 +4,7 @@ export default function Layout({ children, home }) {
   return (
     <div className="wrapper">
       <header className="header">
+        <Link href="/blog">Blog</Link>
         <Link href="/climb-log">Climb Log</Link>
         <Link href="/work">Work</Link>
         <Link href="/about">About</Link>
