@@ -32,13 +32,17 @@ const Table = ({ data }) => {
     return <TableRow id={climb.id} title={key} data={climb[key]} metric={false} />
   }
 
+  const logIt = (it) => {
+    console.log("HELLO:", it) 
+  }
+
   return (
     <table>
       <caption>Kylie's Climb Log</caption>
       <tbody>
         <tr>
           {headers.map((header, i) => (
-            <th key={i}>{header}</th>
+            <th key={i} onClick={() => logIt(header)}>{header}</th>
           ))}
         </tr>
         {data.map((climb, i) => (
