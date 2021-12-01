@@ -2,15 +2,15 @@
 
 This website serves as a public mirror of my private climbing calendar. It gets its data from a queried view of that calendar, which is then parsed and served through a React frontend. The page content itself serves as the trip report- everything down to the photos is being served through the [Notion client](https://developers.notion.com/reference).
 
-<!-- The public site can be seen here 👉 [kylies.photos](https://kylies.photos). -->
+The public site can be seen here 👉 [kylies.photos](https://climb-log.vercel.app).
 
 <!-- To read more about how I built this, check out [my blog post about it](@TODO). -->
 
 ## Technologies
 
-- [NextJS](http://nextjs.org)/[React](https://reactjs.org) on the frontend
+- [React](https://reactjs.org) on the frontend
+- [NextJS](http://nextjs.org) as a build system & for deployment
 - [Notion](https://developers.notion.com/) on the backend 😎
-<!-- - [Github Pages](https://pages.github.com) for deployment -->
 
 ### Prerequisites to Run Locally
 
