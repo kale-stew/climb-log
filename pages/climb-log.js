@@ -1,10 +1,11 @@
+import Layout from '../components/Layout'
 import Table from '../components/Table'
 import { fetchAllClimbs } from '../utils/notion'
 
 const ClimbLog = ({ allClimbs }) => (
-  <div className="wrapper">
+  <Layout>
     <Table data={allClimbs} />
-  </div>
+  </Layout>
 )
 
 export async function getStaticProps() {

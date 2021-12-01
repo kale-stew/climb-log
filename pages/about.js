@@ -1,3 +1,5 @@
-const AboutPage = () => <div className="wrapper">More About Kylie Stewart</div>
+import Layout from '../components/Layout'
+
+const AboutPage = () => <Layout>More About Kylie Stewart</Layout>
 
 export default AboutPage

@@ -1,3 +1,5 @@
-const HomePage = () => <div className="wrapper">Home Page</div>
+import Layout from '../components/Layout'
+
+const HomePage = () => <Layout home>Home Page</Layout>
 
 export default HomePage

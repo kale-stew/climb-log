@@ -17,6 +17,14 @@ a {
   color: #ff953d;
 }
 
+.header {
+  margin-bottom: 2rem;
+}
+
+.header a {
+  padding: 0 1rem;
+}
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -24,8 +32,11 @@ a {
   margin-bottom: 3rem;
 }
 
+.backToHome {
+  margin: 3rem 0 0;
+}
+
 table {
-  width: 80%;
   background-color: white;
   padding: 0.4rem 0.8rem;
   border: 1px gainsboro;
