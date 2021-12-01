@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,800;1,400;1,700&display=swap');
 
 body {
   margin: 0;
@@ -42,7 +42,7 @@ table {
 caption {
   padding: 1rem;
   font-size: 36px;
-  font-family: 'Lobster', cursive;
+  font-family: 'Playfair Display', serif;
 }
 
 tbody {

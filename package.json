@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rm -rf .next && next build",
     "start": "next start",
     "deploy": "npm run build && next export && touch ./out/.nojekyll && gh-pages -d out",
     "format": "prettier --write ."

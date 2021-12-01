@@ -16,6 +16,11 @@
   flex-direction: column;
   align-items: center;
   z-index: 1;
+  font-family: 'Playfair Display', serif;
+}
+
+.landingHeader h1 {
+  font-style: italic;
 }
 
 .landingImage {
