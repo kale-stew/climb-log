@@ -1,20 +1,5 @@
-import Table from '../components/Table'
-import { fetchAllClimbs } from '../utils/notion'
+import Layout from '../components/Layout'
 
-const HomePage = ({ allClimbs }) => (
-  <div className="wrapper">
-    <Table data={allClimbs} />
-  </div>
-)
-
-export async function getStaticProps() {
-  const response = await fetchAllClimbs()
-
-  return {
-    props: {
-      allClimbs: response,
-    },
-  }
-}
+const HomePage = () => <Layout home>Home Page</Layout>
 
 export default HomePage

@@ -12,6 +12,11 @@ This website serves as a public mirror of my private climbing calendar. It gets 
 - [Notion](https://developers.notion.com/) on the backend 😎
 <!-- - [Github Pages](https://pages.github.com) for deployment -->
 
+### Prerequisites to Run Locally
+
+- npm version 7.x
+- node version v16.x
+
 ## Data
 
 Data is handled through a connection to my personal calendar within Notion. If you'd like to replicate this connection, you'll need to [set up an integration](https://developers.notion.com/docs/getting-started) with a database within your own Notion workspace and update the [`.env.example`](./.env.example) accordingly.
