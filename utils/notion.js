@@ -43,9 +43,9 @@ const fmt = (field) => {
 /**
  * Fetch list of climbs from Notion db
  */
-export const fetchAllClimbs = async () => {
+export const fetchAllClimbs = async (property = 'date', direction = 'descending') => {
   const config = getDatabaseQueryConfig()
-  config.sorts = [{ property: 'date', direction: 'descending' }]
+  config.sorts = [{ property: property, direction: direction }]
   let response = await notion.databases.query(config)
 
   return response.results.map((result) => {
@@ -65,6 +65,16 @@ export const fetchAllClimbs = async () => {
       state: getLocationData(fmt(area)).state,
     }
   }, [])
+}
+
+/**
+ * Sort by ascending, descending or default 
+ */
+export const sortClimbsByAscDesc = async (property, direction) => {
+  const config = getDatabaseQueryConfig()
+  config.sorts = [{ property: property, direction: direction }]
+  let response = await notion.databases.query(config)
+
 }
 
 /**

@@ -29,12 +29,12 @@ const Table = ({ data }) => {
       return
     }
 
-    return <TableRow id={climb.id} title={key} data={climb[key]} metric={false} />
+    return <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={false} />
   }
 
-  const logIt = (it) => {
-    console.log("Clicked:", it)
-    switch(it) {
+  const sortRow = (header) => {
+    console.log("Clicked:", header)
+    switch(header) {
       case 'date':
         console.log("SORT DATE")
         break
@@ -64,7 +64,7 @@ const Table = ({ data }) => {
       <tbody>
         <tr>
           {headers.map((header, i) => (
-            <th key={i} onClick={() => logIt(header)}>
+            <th key={i} onClick={() => sortRow(header)}>
               {header}
             </th>
           ))}
