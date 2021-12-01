@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,800;1,400;1,700&display=swap');
 
 body {
   margin: 0;
@@ -31,45 +31,6 @@ header a:hover {
   text-decoration: underline;
 }
 
-.landingHeader {
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 1;
-}
-
-.landingNavigation a {
-  font-size: 1.25rem;
-  z-index: 1;
-  padding: 1.5rem;
-  text-decoration: none;
-  color: white;
-}
-
-.landingNavigation a:hover {
-  text-decoration: underline;
-}
-
-.landingImage {
-  z-index: 0;
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 3rem;
-}
-
-.backToHome {
-  margin: 3rem 0 0;
-}
-
-.backToHome a {
-  text-decoration: none;
-}
-
 table {
   background-color: white;
   padding: 0.4rem 0.8rem;
@@ -81,7 +42,7 @@ table {
 caption {
   padding: 1rem;
   font-size: 36px;
-  font-family: 'Lobster', cursive;
+  font-family: 'Playfair Display', serif;
 }
 
 tbody {
