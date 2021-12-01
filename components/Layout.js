@@ -1,6 +1,13 @@
+import React, { useState } from 'react'
+import Router from 'next/router'
 import Link from 'next/link'
+import Loading from './Loading'
 
 export default function Layout({ children, home }) {
+  const [loading, setLoading] = useState(false)
+  Router.events.on('routeChangeStart', url => setLoading(true))
+  Router.events.on('routeChangeComplete', url => setLoading(false))
+
   return (
     <div className="wrapper">
       <header className="header">
@@ -10,7 +17,8 @@ export default function Layout({ children, home }) {
         <Link href="/about">About</Link>
       </header>
 
-      <main>{children}</main>
+      <main>{!loading ? children : <Loading />}</main>
+
       {!home && (
         <div className="backToHome">
           <Link href="/">

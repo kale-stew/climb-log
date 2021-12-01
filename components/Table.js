@@ -33,7 +33,7 @@ const Table = ({ data }) => {
   }
 
   const logIt = (it) => {
-    console.log("HELLO:", it) 
+    console.log('HELLO:', it)
   }
 
   return (
@@ -42,7 +42,9 @@ const Table = ({ data }) => {
       <tbody>
         <tr>
           {headers.map((header, i) => (
-            <th key={i} onClick={() => logIt(header)}>{header}</th>
+            <th key={i} onClick={() => logIt(header)}>
+              {header}
+            </th>
           ))}
         </tr>
         {data.map((climb, i) => (
