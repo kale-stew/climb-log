@@ -34,6 +34,8 @@ const ClimbLog = ({ allClimbs }) => {
       // already sorted this way
       if(filters.property === 'date' && filters.direction === TABLE_SORT_ORDER.DESC) {
         setData(allClimbs)
+        // Force the data to update in the UI
+        refreshData()
         return
       }
       let sortedData = data.sort((a, b) => {
@@ -50,6 +52,8 @@ const ClimbLog = ({ allClimbs }) => {
         
       })
       setData(sortedData)
+      // Force the data to update in the UI
+      refreshData()
     }
 
     // We don't want this to cause the page to do too many re-renders,
@@ -61,8 +65,6 @@ const ClimbLog = ({ allClimbs }) => {
     }
 
     sortData()
-    // Force the data to update in the UI
-    refreshData()
   }, [filters])
 
   return (
