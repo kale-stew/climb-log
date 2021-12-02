@@ -1,4 +1,4 @@
-import { APIErrorCode, Client, LogLevel } from '@notionhq/client'
+import { Client, LogLevel } from '@notionhq/client'
 import { formatDate, getLocationData } from './helpers'
 
 /**
