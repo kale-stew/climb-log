@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Category from '../components/Category'
 import Date from '../components/Date'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -54,11 +55,11 @@ export default function BlogLandingPage({ allPostsData }) {
               }}
             >
               <Link href="/[category]/[id]" as={`/${category}/${id}`}>
-                <a>{title}</a>
+                <a className={`${utilStyles.blogPostHeading}`}>{title}</a>
               </Link>
               <br />
-              <small className={utilStyles.lightText}>
-                <Date dateString={date} />
+              <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
+                <Category category={category} /> <Date dateString={date} />
               </small>
             </li>
           ))}

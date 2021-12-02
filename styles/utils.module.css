@@ -50,3 +50,50 @@
 .lightText {
   color: #666;
 }
+
+.singleRow {
+  display: flex;
+  align-items: baseline;
+}
+
+.blogPostHeading {
+  font-size: 1.5rem;
+  color: #020202;
+}
+
+.blogPostHeading:hover {
+  text-decoration: underline;
+}
+
+.gearCategory {
+  background-color: #e4960498;
+  /* e49504 */
+  color: white;
+  border-radius: 1em;
+  margin: 0 0.5em 0 0;
+  padding: 0.2em 0.3em;
+  line-height: 1.3em;
+  font-size: 13px;
+}
+
+.thoughtsCategory {
+  background-color: #f1045f94;
+  /* f1045f */
+  color: white;
+  border-radius: 1em;
+  margin: 0 0.5em 0 0;
+  padding: 0.2em 0.3em;
+  line-height: 1.3em;
+  font-size: 13px;
+}
+
+.hikeCategory {
+  background-color: #bb03e993;
+  /* bb03e9 */
+  color: white;
+  border-radius: 1em;
+  margin: 0 0.5em 0 0;
+  padding: 0.2em 0.3em;
+  line-height: 1.3em;
+  font-size: 13px;
+}

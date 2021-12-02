@@ -16,12 +16,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-a {
-  color: #ff953d;
-}
-
 button {
-  background-color: #ff953d;
   display: inline-block;
   padding: 0.3em 1.2em;
   margin: 0 0.8em 0.8em 0;
@@ -42,7 +37,12 @@ button {
 }
 
 button:hover {
-  background-color: #d36b16;
+  background-color: #6d6d6d;
+}
+
+a {
+  color: #1b1b1b;
+  text-decoration: none;
 }
 
 header {
