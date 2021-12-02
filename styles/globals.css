@@ -20,6 +20,31 @@ a {
   color: #ff953d;
 }
 
+button {
+  background-color: #ff953d;
+  display: inline-block;
+  padding: 0.3em 1.2em;
+  margin: 0 0.8em 0.8em 0;
+  border-radius: 2em;
+  border: none;
+
+  text-decoration: none;
+  font-weight: 300;
+  font-size: 15px;
+  color: #fff;
+  text-align: center;
+  transition: all 0.2s;
+
+  @media all and (max-width: 30em) {
+    display: block;
+    margin: 0.2em auto;
+  }
+}
+
+button:hover {
+  background-color: #d36b16;
+}
+
 header {
   margin: 1rem 0 2.5rem 0;
   z-index: 1;
