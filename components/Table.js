@@ -1,4 +1,5 @@
 import React from 'react'
+import { TABLE_SORT_ORDER } from '../utils/constants'
 import TableRow from './TableRow'
 
 /**
@@ -7,6 +8,7 @@ import TableRow from './TableRow'
  * - [] onClick in-table event for filtering by range
  * - [] onClick in-table event for filtering by state
  * - [] react-table hook to sort asc/desc by header
+ * - [x] sort ascending/descending order on  header click
  */
 
 const Table = ({ data, filters, setFilters }) => {
@@ -33,29 +35,30 @@ const Table = ({ data, filters, setFilters }) => {
   }
 
   const sortRow = (header) => {
-    console.log("Clicked:", header)
-    switch(header) {
-      case 'date':
-        setFilters({property: 'date', direction: 'descending'})
-        break
-      case 'title':
-        setFilters({property: 'title', direction: 'descending'})
-        break
-      case 'distance':
-        setFilters({property: 'distance', direction: 'descending'})
-        break
-      case 'gain':
-        setFilters({property: 'gain', direction: 'descending'})
-        break
-      case 'area':
-        setFilters({property: 'area', direction: 'descending'})
-        break
-      case 'state':
-        setFilters({property: 'state', direction: 'descending'})
-        break
-      default:
-        setFilters({property: 'date', direction: 'descending'})
+    // User has clicked on a different header than what was previously being sorted
+    if(header != filters.property) {
+      setFilters({property: header, direction: TABLE_SORT_ORDER.DESC})
+      return
     }
+
+    if(filters.direction == TABLE_SORT_ORDER.DESC) {
+      setFilters({property: header, direction: TABLE_SORT_ORDER.ASC})
+    }
+    if(filters.direction == TABLE_SORT_ORDER.ASC) {
+      setFilters({property: header, direction: TABLE_SORT_ORDER.DESC})
+    }
+  }
+
+  const formatHeader = (header) => {
+    if(header === filters.property) {
+      if(filters.direction == TABLE_SORT_ORDER.ASC) {
+        return `${header} ▲`
+      }
+      if(filters.direction == TABLE_SORT_ORDER.DESC) {
+        return `${header} ▼`
+      }
+    }
+    return header
   }
 
   return (
@@ -65,7 +68,7 @@ const Table = ({ data, filters, setFilters }) => {
         <tr>
           {headers.map((header, i) => (
             <th key={i} onClick={() => sortRow(header)}>
-              {header}
+              {formatHeader(header)}
             </th>
           ))}
         </tr>
