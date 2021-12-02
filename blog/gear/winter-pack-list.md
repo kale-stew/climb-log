@@ -1,7 +1,6 @@
 ---
 title: 'Packing for a Winter Peak'
 date: '2021-12-01'
-category: 'gear'
 ---
 
 Winter hiking is fun, but also hard.

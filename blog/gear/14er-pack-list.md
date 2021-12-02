@@ -1,7 +1,6 @@
 ---
 title: 'Packing for a 14er'
 date: '2021-11-26'
-category: 'gear'
 ---
 
 Placeholder stuffs
