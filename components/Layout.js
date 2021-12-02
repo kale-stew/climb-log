@@ -7,7 +7,7 @@ import styles from './Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const Navigation = () => (
-  <header>
+  <header className={styles.navigation}>
     <Link href="/blog">Blog</Link>
     <Link href="/climb-log">Climb Log</Link>
     <Link href="/work">Work</Link>
@@ -33,9 +33,8 @@ export default function Layout({ children, home }) {
   Router.events.on('routeChangeComplete', (url) => setLoading(false))
 
   return (
-    <div className={styles.wrapper}>
+    <div className={!home ? `${styles.wrapper}` : `${styles.landingPage}`}>
       {home ? <LandingHeader /> : <Navigation />}
-
       <main>{!loading ? children : <Loading />}</main>
 
       {!home && (

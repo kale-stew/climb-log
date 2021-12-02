@@ -17,6 +17,7 @@ code {
 }
 
 button {
+  background-color: #c5c5c5;
   display: inline-block;
   padding: 0.3em 1.2em;
   margin: 0 0.8em 0.8em 0;
@@ -30,7 +31,7 @@ button {
   text-align: center;
   transition: all 0.2s;
 
-  @media all and (max-width: 30em) {
+  @media all and (max-width: 1024px) {
     display: block;
     margin: 0.2em auto;
   }
@@ -47,19 +48,19 @@ a {
 
 header {
   margin: 1rem 0 2.5rem 0;
-  z-index: 1;
 }
 
 header a {
-  padding: 1.5rem;
   text-decoration: none;
+  padding: 0.6rem;
 }
 
 header a:hover {
   text-decoration: underline;
 }
 
-h1, h2 {
+h1,
+h2 {
   font-family: 'Playfair Display', serif;
   font-weight: 300;
 }
@@ -73,9 +74,10 @@ table {
 }
 
 caption {
-  padding: 1rem;
-  font-size: 36px;
-  font-family: 'Playfair Display', serif;
+  padding: 0 0 1rem;
+  font-size: 16px;
+  text-align: left;
+  color: #494949;
 }
 
 tbody {
@@ -89,10 +91,36 @@ th {
 }
 
 td {
-  font-size: medium;
+  font-size: 15px;
 }
 
 td:not(:first-child),
 th:not(:first-child) {
   padding-left: 1.5rem;
+  word-wrap: break-word;
+}
+
+@media (max-width: 1024px) {
+  header a {
+    font-size: 14px;
+    padding: 0.4rem;
+  }
+
+  td:not(:first-child),
+  th:not(:first-child) {
+    padding: 0;
+  }
+
+  th {
+    font-size: 10px;
+  }
+
+  td {
+    font-size: 13px;
+  }
+
+  .stateHeader,
+  .areaHeader {
+    display: none;
+  }
 }

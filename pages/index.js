@@ -5,19 +5,16 @@ import CapitolCreek from '../public/photos/2021_capitol-creek.jpg'
 
 import styles from '../components/Layout.module.css'
 
-// use `home` var in Layout to custom target this screen
-// add a parallax image? rotate through a selection?
-// preview of blog posts, up to 3 for now
-
 const HomePage = () => (
   <Layout home>
     <Head>
       <title>Kylie Stewart | Photography, Hiking</title>
     </Head>
+    <br />
     <Image
       src={CapitolCreek}
-      className={styles.landingImage}
-      layout="fill"
+      alt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
+      layout="intrinsic"
       placeholder="blur"
     ></Image>
   </Layout>

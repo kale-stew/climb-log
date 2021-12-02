@@ -1,11 +1,12 @@
 import React from 'react'
-import Pill from './Pill'
 import {
   addCommas,
   feetToMeters,
   findMatchingSlug,
   milesToKilometers,
 } from '../utils/helpers'
+
+import styles from './Table.module.css'
 
 export default function TableRow({ id, title, data, metric }) {
   if (title == 'distance') {
@@ -30,10 +31,10 @@ export default function TableRow({ id, title, data, metric }) {
         </a>
       </td>
     )
-  } else if (title == 'state') {
+  } else if (title == 'state' || title == 'area') {
     return (
-      <td key={id}>
-        <Pill state={data} />
+      <td key={id} className={styles.hiddenRow}>
+        {data}
       </td>
     )
   }

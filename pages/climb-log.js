@@ -8,15 +8,18 @@ import { useRouter } from 'next/router'
 
 const ClimbLog = ({ allClimbs }) => {
   const [data, setData] = useState(allClimbs)
-  const [filters, setFilters] = useState({property: 'date', direction: TABLE_SORT_ORDER.DESC})
+  const [filters, setFilters] = useState({
+    property: 'date',
+    direction: TABLE_SORT_ORDER.DESC,
+  })
 
   const router = useRouter()
   const firstUpdate = useRef(true)
 
   /**
    * refreshData usalizes Next.js's router to replace the path with the current one,
-   * effectively going no where. But this does allow the page to re-render, because we're 
-   * now sending JSON to the React side of things instead of the full HTML like Next usually 
+   * effectively going no where. But this does allow the page to re-render, because we're
+   * now sending JSON to the React side of things instead of the full HTML like Next usually
    * does. It does cause a new API call, so maybe change this in the future?
    */
   const refreshData = () => router.replace(router.asPath)
@@ -31,20 +34,19 @@ const ClimbLog = ({ allClimbs }) => {
       let sortBy = filters.direction === TABLE_SORT_ORDER.ASC ? -1 : 1
 
       let sortedData = data.sort((a, b) => {
-        if(filters.property != 'date') {
-          if (a[filters.property] < b[filters.property]) return (-1 * sortBy)
-          if (a[filters.property] > b[filters.property]) return (1 * sortBy)
+        if (filters.property != 'date') {
+          if (a[filters.property] < b[filters.property]) return -1 * sortBy
+          if (a[filters.property] > b[filters.property]) return 1 * sortBy
           return 0
         } else {
           // Sort the date in ascending order
           let dateA = new Date(a[filters.property])
-          let dateB = new Date (b[filters.property])
+          let dateB = new Date(b[filters.property])
           return dateA - dateB
         }
-        
       })
       // If we want desc order with date, reverse the sorted data as it will be in ascending order
-      if(filters.property === 'date' && filters.direction === TABLE_SORT_ORDER.DESC) {
+      if (filters.property === 'date' && filters.direction === TABLE_SORT_ORDER.DESC) {
         sortedData.reverse()
       }
       setData(sortedData)
@@ -64,13 +66,13 @@ const ClimbLog = ({ allClimbs }) => {
   }, [filters])
 
   return (
-  <Layout>
-    <Head>
-      <title>Kylie Stewart | Climb Log</title>
-    </Head>
-    <Table data={data} filters={filters} setFilters={setFilters} />
-  </Layout>
-)
+    <Layout>
+      <Head>
+        <title>Kylie Stewart | Climb Log</title>
+      </Head>
+      <Table data={data} filters={filters} setFilters={setFilters} />
+    </Layout>
+  )
 }
 
 export async function getStaticProps() {

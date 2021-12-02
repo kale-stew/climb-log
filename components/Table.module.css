@@ -1,0 +1,9 @@
+.hiddenRow {
+  display: inside;
+}
+
+@media (max-width: 1024px) {
+  .hiddenRow {
+    display: none;
+  }
+}
