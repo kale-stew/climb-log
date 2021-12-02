@@ -9,7 +9,7 @@ import TableRow from './TableRow'
  * - [] react-table hook to sort asc/desc by header
  */
 
-const Table = ({ data }) => {
+export default function Table ({ data }) {
   const alwaysExclude = ['href', 'strava', 'id']
 
   /**
@@ -48,5 +48,3 @@ const Table = ({ data }) => {
     </table>
   )
 }
-
-export default Table

@@ -7,7 +7,7 @@ import {
   milesToKilometers,
 } from '../utils/helpers'
 
-const TableRow = ({ id, title, data, metric }) => {
+export default function TableRow({ id, title, data, metric }) {
   if (title == 'distance') {
     // Return either metric or imperial stats
     return (
@@ -40,5 +40,3 @@ const TableRow = ({ id, title, data, metric }) => {
 
   return <td key={id}>{data}</td>
 }
-
-export default TableRow
