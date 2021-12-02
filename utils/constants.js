@@ -1,9 +1,8 @@
 import path from 'path'
 
 export const TABLE_SORT_ORDER = {
-  DEFAULT: 'default',
-  ASC: 'asc',
-  DESC: 'desc',
+  ASC: 'ascending',
+  DESC: 'descending',
 }
 
 export const gearCategory = 'gear'

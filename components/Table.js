@@ -1,4 +1,5 @@
 import React from 'react'
+import { TABLE_SORT_ORDER } from '../utils/constants'
 import TableRow from './TableRow'
 
 /**
@@ -6,19 +7,19 @@ import TableRow from './TableRow'
  * - [] button to switch between Imperial & Metric
  * - [] onClick in-table event for filtering by range
  * - [] onClick in-table event for filtering by state
- * - [] react-table hook to sort asc/desc by header
+ * - [x] sort ascending/descending order on  header click
  */
 
-export default function Table ({ data }) {
+export default function Table ({ data, filters, setFilters }) {
   const alwaysExclude = ['href', 'strava', 'id']
 
   /**
    * Create an arr of Table Headers by mapping over
    * climb data so headers are never out of sync
    */
-  const headers = Object.keys(data[0]).filter(
+  const headers = data.length > 0 ? Object.keys(data[0]).filter(
     (header) => !alwaysExclude.find((el) => el == header)
-  )
+  ) : []
 
   /**
    * Form Table Rows based on data type
@@ -29,7 +30,34 @@ export default function Table ({ data }) {
       return
     }
 
-    return <TableRow id={climb.id} title={key} data={climb[key]} metric={false} />
+    return <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={false} />
+  }
+
+  const sortRow = (header) => {
+    // User has clicked on a different header than what was previously being sorted
+    if(header != filters.property) {
+      setFilters({property: header, direction: TABLE_SORT_ORDER.DESC})
+      return
+    }
+
+    if(filters.direction == TABLE_SORT_ORDER.DESC) {
+      setFilters({property: header, direction: TABLE_SORT_ORDER.ASC})
+    }
+    if(filters.direction == TABLE_SORT_ORDER.ASC) {
+      setFilters({property: header, direction: TABLE_SORT_ORDER.DESC})
+    }
+  }
+
+  const formatHeader = (header) => {
+    if(header === filters.property) {
+      if(filters.direction == TABLE_SORT_ORDER.ASC) {
+        return `${header} ▲`
+      }
+      if(filters.direction == TABLE_SORT_ORDER.DESC) {
+        return `${header} ▼`
+      }
+    }
+    return header
   }
 
   return (
@@ -38,7 +66,9 @@ export default function Table ({ data }) {
       <tbody>
         <tr>
           {headers.map((header, i) => (
-            <th key={i}>{header}</th>
+            <th key={i} onClick={() => sortRow(header)}>
+              {formatHeader(header)}
+            </th>
           ))}
         </tr>
         {data.map((climb, i) => (
