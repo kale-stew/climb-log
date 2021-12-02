@@ -67,37 +67,6 @@ export const fetchAllClimbs = async () => {
   }, [])
 }
 
-// This breaks??
-export const sortAllClimbs = async (property = 'date', direction = 'descending') => {
-  console.log("SortAllClimbs")
-  let today = new Date().toISOString()
-
-  const response = await notion.databases.query({
-    database_id: process.env.NOTION_DATABASE_ID,
-    filter: {
-      and: [{ property: 'date', date: { on_or_before: today } }],
-    },
-    sorts: [{ property: property, direction: direction }]
-  })
-
-  return response.results.map((result) => {
-    const {
-      id,
-      properties: { area, date, distance, gain, hike_title },
-    } = result
-
-    return {
-      id,
-      date: formatDate(fmt(date)),
-      title: fmt(hike_title),
-      // slug: url,
-      distance: fmt(distance),
-      gain: fmt(gain),
-      area: getLocationData(fmt(area)).area,
-      state: getLocationData(fmt(area)).state,
-    }
-  }, [])
-}
 /**
  * Filter by a 'Select' option
  */
