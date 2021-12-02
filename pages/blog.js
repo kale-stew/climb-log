@@ -17,6 +17,7 @@ export default function BlogLandingPage({ allPostsData }) {
       <Head>
         <title>Kylie Stewart | Hiking Blog</title>
       </Head>
+      <h1 className={utilStyles.headingXl}>Blog</h1>
 
       <section>
         <button
@@ -43,9 +44,8 @@ export default function BlogLandingPage({ allPostsData }) {
       </section>
 
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <h2 className={utilStyles.headingLg}>Blog</h2>
         <ul className={utilStyles.list}>
-          {allPostsData.map(({ id, category, date, title }) => (
+          {allPostsData.map(({ id, category, date, preview, title }) => (
             <li
               className={utilStyles.listItem}
               key={id}
@@ -61,6 +61,7 @@ export default function BlogLandingPage({ allPostsData }) {
               <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
                 <Category category={category} /> <Date dateString={date} />
               </small>
+              <small className={utilStyles.listItem}>{preview}...</small>
             </li>
           ))}
         </ul>

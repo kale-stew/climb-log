@@ -59,6 +59,11 @@ header a:hover {
   text-decoration: underline;
 }
 
+h1, h2 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+}
+
 table {
   background-color: white;
   padding: 0.4rem 0.8rem;

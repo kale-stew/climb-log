@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Loading from './Loading'
 
 import styles from './Layout.module.css'
+import utilStyles from '../styles/utils.module.css'
 
 const Navigation = () => (
   <header>
@@ -38,9 +39,9 @@ export default function Layout({ children, home }) {
       <main>{!loading ? children : <Loading />}</main>
 
       {!home && (
-        <div className={styles.backToHome}>
+        <div className={utilStyles.backToHome}>
           <Link href="/">
-            <a>← Back to home</a>
+            <a>📍🏠</a>
           </Link>
         </div>
       )}
