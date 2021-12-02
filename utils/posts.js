@@ -72,6 +72,7 @@ export function getSortedPostsData() {
 
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents)
+    const longPreview = matterResult.content
 
     // Set the category
     const category = gearCategory
@@ -80,6 +81,7 @@ export function getSortedPostsData() {
     return {
       id,
       category,
+      preview: longPreview.substring(0, 350),
       ...matterResult.data,
     }
   })
@@ -95,6 +97,7 @@ export function getSortedPostsData() {
 
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents)
+    const longPreview = matterResult.content
 
     // Set the category
     const category = thoughtsCategory
@@ -103,6 +106,7 @@ export function getSortedPostsData() {
     return {
       id,
       category,
+      preview: longPreview.substring(0, 350),
       ...matterResult.data,
     }
   })
@@ -118,6 +122,7 @@ export function getSortedPostsData() {
 
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents)
+    const longPreview = matterResult.content
 
     // Set the category
     const category = hikeCategory
@@ -126,6 +131,7 @@ export function getSortedPostsData() {
     return {
       id,
       category,
+      preview: longPreview.substring(0, 350),
       ...matterResult.data,
     }
   })
