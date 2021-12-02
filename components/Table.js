@@ -7,11 +7,10 @@ import TableRow from './TableRow'
  * - [] button to switch between Imperial & Metric
  * - [] onClick in-table event for filtering by range
  * - [] onClick in-table event for filtering by state
- * - [] react-table hook to sort asc/desc by header
  * - [x] sort ascending/descending order on  header click
  */
 
-const Table = ({ data, filters, setFilters }) => {
+export default function Table ({ data, filters, setFilters }) {
   const alwaysExclude = ['href', 'strava', 'id']
 
   /**
@@ -79,5 +78,3 @@ const Table = ({ data, filters, setFilters }) => {
     </table>
   )
 }
-
-export default Table
