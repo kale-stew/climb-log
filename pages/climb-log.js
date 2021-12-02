@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 
 const ClimbLog = ({ allClimbs }) => {
   const [data, setData] = useState(allClimbs)
-  const [filters, setFilters] = useState({property: 'date', direction: TABLE_SORT_ORDER.DEFAULT})
+  const [filters, setFilters] = useState({property: 'date', direction: TABLE_SORT_ORDER.DESC})
 
   const router = useRouter()
   const firstUpdate = useRef(true)
