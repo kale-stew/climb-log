@@ -30,14 +30,6 @@ const ClimbLog = ({ allClimbs }) => {
       // Check to see what direction we're sorting by
       let sortBy = filters.direction === TABLE_SORT_ORDER.ASC ? -1 : 1
 
-      // If we want desc order with date, we can use the origional data set because it's 
-      // already sorted this way
-      if(filters.property === 'date' && filters.direction === TABLE_SORT_ORDER.DESC) {
-        setData(allClimbs)
-        // Force the data to update in the UI
-        refreshData()
-        return
-      }
       let sortedData = data.sort((a, b) => {
         if(filters.property != 'date') {
           if (a[filters.property] < b[filters.property]) return (-1 * sortBy)
@@ -51,6 +43,10 @@ const ClimbLog = ({ allClimbs }) => {
         }
         
       })
+      // If we want desc order with date, reverse the sorted data as it will be in ascending order
+      if(filters.property === 'date' && filters.direction === TABLE_SORT_ORDER.DESC) {
+        sortedData.reverse()
+      }
       setData(sortedData)
       // Force the data to update in the UI
       refreshData()
