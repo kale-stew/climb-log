@@ -10,7 +10,7 @@ import utilStyles from '../../styles/utils.module.css'
 const Post = ({ postData }) => (
   <Layout>
     <Head>
-      <title>{postData.title}</title>
+      <title>{postData.title} | kylies.photos</title>
     </Head>
     <article>
       <h1 className={utilStyles.headingXl}>{postData.title}</h1>

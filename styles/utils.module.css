@@ -23,14 +23,6 @@
   line-height: 1.5;
 }
 
-.borderCircle {
-  border-radius: 9999px;
-}
-
-.colorInherit {
-  color: inherit;
-}
-
 .padding1px {
   padding-top: 1px;
 }
@@ -54,6 +46,18 @@
   align-items: baseline;
 }
 
+.socialIcons {
+  display: flex;
+  margin: 0 15rem;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+}
+
 .blogPostHeading {
   font-size: 1.5rem;
   color: #020202;
@@ -66,6 +70,16 @@
 .blogItemCategory {
   display: flex;
   align-items: center;
+}
+
+.aboutBlock {
+  display: flex;
+  align-items: flex-start;
+  max-width: 685px;
+}
+
+.aboutBlockText {
+  margin-left: 2rem;
 }
 
 .gearCategory {
@@ -112,4 +126,15 @@
 
 .categorySelected {
   background-color: #6d6d6d;
+}
+
+@media (max-width: 1024px) {
+  .aboutBlock {
+    flex-direction: column;
+  }
+
+  .aboutBlock img {
+    border-radius: 5rem;
+    margin: 0 20rem;
+  }
 }

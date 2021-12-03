@@ -10,7 +10,6 @@ const Navigation = () => (
   <header className={styles.navigation}>
     <Link href="/blog">Blog</Link>
     <Link href="/climb-log">Climb Log</Link>
-    <Link href="/work">Work</Link>
     <Link href="/about">About</Link>
   </header>
 )
@@ -21,7 +20,6 @@ const LandingHeader = () => (
     <div className={styles.landingNavigation}>
       <Link href="/blog">Blog</Link>
       <Link href="/climb-log">Climb Log</Link>
-      <Link href="/work">Work</Link>
       <Link href="/about">About</Link>
     </div>
   </div>

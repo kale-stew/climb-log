@@ -87,6 +87,14 @@ table {
   width: 9vw;
 }
 
+article {
+  max-width: 90vw;
+}
+
+img {
+  max-width: 75vw;
+}
+
 caption {
   padding: 0 0 1rem;
   font-size: 16px;
@@ -121,7 +129,7 @@ th:not(:first-child) {
   }
 
   table {
-    width: 90vw;
+    max-width: 75vw;
   }
 
   th {
