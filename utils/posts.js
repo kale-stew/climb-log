@@ -168,6 +168,7 @@ export async function getPostData(category, id) {
   return {
     id,
     contentHtml,
+    category,
     ...matterResult.data,
   }
 }

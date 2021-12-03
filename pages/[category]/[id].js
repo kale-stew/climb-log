@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Link from 'next/link'
+import Category from '../../components/Category'
 import Date from '../../components/Date'
 import Layout from '../../components/Layout'
 import { getAllPostIds, getPostData } from '../../utils/posts'
@@ -13,8 +14,8 @@ const Post = ({ postData }) => (
     </Head>
     <article>
       <h1 className={utilStyles.headingXl}>{postData.title}</h1>
-      <div className={utilStyles.lightText}>
-        <Date dateString={postData.date} />
+      <div className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
+        <Date dateString={postData.date} /> <Category category={postData.category} />
       </div>
       <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
     </article>
