@@ -1,11 +1,13 @@
-import styles from './Popover.module.css'
-import utilStyles from '../styles/utils.module.css'
+import FormattedDate from './Date'
 import {
   addCommas,
   feetToMeters,
   findMatchingSlug,
   milesToKilometers,
 } from '../utils/helpers'
+
+import styles from './Popover.module.css'
+import utilStyles from '../styles/utils.module.css'
 
 const CustomPopover = ({ climb, metric }) => {
   const buildTitle = () => {
@@ -32,7 +34,7 @@ const CustomPopover = ({ climb, metric }) => {
   return (
     <div className={styles.popoverContent}>
       <header>{buildTitle()}</header>
-      <Date dateString={climb.date} />
+      <FormattedDate dateString={climb.date} withDOW />
       <br />
       <p>
         Distance:{' '}

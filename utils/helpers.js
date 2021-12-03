@@ -1,9 +1,4 @@
-// Massage data from Notion
-const formatDate = (date) => {
-  const arr = date.split('-')
-  // toDateString returns as 'DayOfWeek MON DAY YEAR'
-  return new Date(arr[0], arr[1], arr[2]).toDateString()
-}
+import { format } from 'date-fns'
 
 const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
@@ -21,6 +16,10 @@ const getLocationData = (str) => {
 const findMatchingSlug = (str) => {
   return false
 }
+
+const formatDate = (date) => format(date, 'LLLL d, yyyy')
+
+const formatDateWithDayOfWeek = (date) => format(date, 'iiii, LLLL do, yyyy')
 
 // Metric to Imperial conversion
 const formatStatsImperial = (distance, gain) =>
@@ -40,6 +39,7 @@ export {
   feetToMeters,
   findMatchingSlug,
   formatDate,
+  formatDateWithDayOfWeek,
   formatStatsImperial,
   formatStatsMetric,
   getLocationData,

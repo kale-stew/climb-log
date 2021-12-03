@@ -87,16 +87,6 @@ table {
   width: 9vw;
 }
 
-.popover {
-  background-color: white;
-  border-color: black;
-  border-style: solid;
-  border-radius: 15px;
-  padding: 30px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-}
-
 article {
   max-width: 90vw;
 }
