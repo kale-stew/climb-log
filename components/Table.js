@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TABLE_SORT_ORDER } from '../utils/constants'
 import TableRow from './TableRow'
 
@@ -12,7 +12,7 @@ import TableRow from './TableRow'
 
 export default function Table({ data, filters, setFilters }) {
   const alwaysExclude = ['href', 'strava', 'id']
-
+  const [metric, setMetric] = useState(false)
   /**
    * Create an arr of Table Headers by mapping over
    * climb data so headers are never out of sync
@@ -32,7 +32,7 @@ export default function Table({ data, filters, setFilters }) {
     }
 
     return (
-      <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={false} />
+      <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={metric} />
     )
   }
 
@@ -52,15 +52,16 @@ export default function Table({ data, filters, setFilters }) {
   }
 
   const formatHeader = (header) => {
+    let formatted = header
     if (header === filters.property) {
       if (filters.direction == TABLE_SORT_ORDER.ASC) {
-        return `${header} ▲`
+        formatted = `${header} ▲`
       }
       if (filters.direction == TABLE_SORT_ORDER.DESC) {
-        return `${header} ▼`
+        formatted = `${header} ▼`
       }
     }
-    return header
+    return formatted
   }
 
   return (
@@ -70,6 +71,16 @@ export default function Table({ data, filters, setFilters }) {
         <caption>
           Click on a header to sort ascending by that value, again for the inverse.
         </caption>
+        <div>
+          <button className={metric ? utilStyles.categorySelected : "categoryButton"}
+          onClick={() => setMetric(false)}>
+          Imperial
+          </button>
+          <button className={metric ? utilStyles.categorySelected : "categoryButton"}
+          onClick={() => setMetric(true)}>
+          Metric
+          </button>
+        </div>
         <tbody>
           <tr>
             {headers.map((header, i) => (
@@ -79,7 +90,7 @@ export default function Table({ data, filters, setFilters }) {
             ))}
           </tr>
           {data.map((climb, i) => (
-            <tr key={i}>{Object.keys(climb).map((key) => buildTableRow(key, climb))}</tr>
+            <tr key={i}>{Object.keys(climb).map(key => buildTableRow(key, climb))}</tr>
           ))}
         </tbody>
       </table>
