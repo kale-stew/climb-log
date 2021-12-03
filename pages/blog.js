@@ -21,6 +21,17 @@ export default function BlogLandingPage({ allPostsData }) {
 
       <section>
         <button
+          className={
+            viewCategory === 'all' ? utilStyles.categorySelected : 'categoryButton'
+          }
+          onClick={() => setCategory('all')}
+        >
+          All
+        </button>
+        <button
+          className={
+            viewCategory === gearCategory ? utilStyles.categorySelected : 'categoryButton'
+          }
           onClick={() =>
             setCategory(viewCategory === gearCategory ? 'all' : gearCategory)
           }
@@ -28,6 +39,11 @@ export default function BlogLandingPage({ allPostsData }) {
           Gear
         </button>
         <button
+          className={
+            viewCategory === thoughtsCategory
+              ? utilStyles.categorySelected
+              : 'categoryButton'
+          }
           onClick={() =>
             setCategory(viewCategory === thoughtsCategory ? 'all' : thoughtsCategory)
           }
@@ -35,6 +51,9 @@ export default function BlogLandingPage({ allPostsData }) {
           Thoughts
         </button>
         <button
+          className={
+            viewCategory === hikeCategory ? utilStyles.categorySelected : 'categoryButton'
+          }
           onClick={() =>
             setCategory(viewCategory === hikeCategory ? 'all' : hikeCategory)
           }
@@ -58,7 +77,7 @@ export default function BlogLandingPage({ allPostsData }) {
                 <a className={`${utilStyles.blogPostHeading}`}>{title}</a>
               </Link>
               <br />
-              <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
+              <small className={`${utilStyles.lightText} ${utilStyles.blogItemCategory}`}>
                 <Date dateString={date} /> <Category category={category} />
               </small>
               <small className={utilStyles.listItem}>{preview}...</small>

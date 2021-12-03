@@ -19,7 +19,7 @@ export default function TableRow({ id, title, data, metric }) {
   } else if (title == 'gain') {
     return (
       <td key={id}>
-        {metric ? data && `${feetToMeters(data)} m` : data && `${addCommas(data)} ft`}
+        {metric ? data && `${feetToMeters(data)} m` : data && `${addCommas(data)}'`}
       </td>
     )
   } else if (title == 'title' && findMatchingSlug(data)) {

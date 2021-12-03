@@ -51,7 +51,7 @@
 
 .singleRow {
   display: flex;
-  align-items: center;
+  align-items: baseline;
 }
 
 .blogPostHeading {
@@ -61,6 +61,11 @@
 
 .blogPostHeading:hover {
   text-decoration: underline;
+}
+
+.blogItemCategory {
+  display: flex;
+  align-items: center;
 }
 
 .gearCategory {
@@ -103,4 +108,8 @@
 .backToHome a {
   text-decoration: none;
   color: #ff953d;
+}
+
+.categorySelected {
+  background-color: #6d6d6d;
 }

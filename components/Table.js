@@ -1,18 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TABLE_SORT_ORDER } from '../utils/constants'
 import TableRow from './TableRow'
-
-/**
- * TO-DO
- * - [] button to switch between Imperial & Metric
- * - [] onClick in-table event for filtering by range
- * - [] onClick in-table event for filtering by state
- * - [x] sort ascending/descending order on  header click
- */
+import utilStyles from '../styles/utils.module.css'
 
 export default function Table({ data, filters, setFilters }) {
   const alwaysExclude = ['href', 'strava', 'id']
-
+  const [metric, setMetric] = useState(false)
   /**
    * Create an arr of Table Headers by mapping over
    * climb data so headers are never out of sync
@@ -32,7 +25,7 @@ export default function Table({ data, filters, setFilters }) {
     }
 
     return (
-      <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={false} />
+      <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={metric} />
     )
   }
 
@@ -52,20 +45,35 @@ export default function Table({ data, filters, setFilters }) {
   }
 
   const formatHeader = (header) => {
+    let formatted = header
     if (header === filters.property) {
       if (filters.direction == TABLE_SORT_ORDER.ASC) {
-        return `${header} ▲`
+        formatted = `${header} ▲`
       }
       if (filters.direction == TABLE_SORT_ORDER.DESC) {
-        return `${header} ▼`
+        formatted = `${header} ▼`
       }
     }
-    return header
+    return formatted
   }
 
   return (
     <>
       <h1>Kylie's Climb Log</h1>
+      <div className={utilStyles.singleRow}>
+        <button
+          className={metric ? 'categoryButton' : utilStyles.categorySelected}
+          onClick={() => setMetric(false)}
+        >
+          Imperial
+        </button>
+        <button
+          className={metric ? utilStyles.categorySelected : 'categoryButton'}
+          onClick={() => setMetric(true)}
+        >
+          Metric
+        </button>
+      </div>
       <table>
         <caption>
           Click on a header to sort ascending by that value, again for the inverse.

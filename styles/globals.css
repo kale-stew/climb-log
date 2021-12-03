@@ -71,6 +71,20 @@ table {
   border: 1px gainsboro;
   border-radius: 1rem;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  table-layout: fixed;
+  width: 80vw;
+}
+
+.titleHeader {
+  width: 25vw;
+}
+
+.areaHeader {
+  width: 15vw;
+}
+
+.distanceHeader {
+  width: 9vw;
 }
 
 caption {
@@ -106,17 +120,27 @@ th:not(:first-child) {
     padding: 0.4rem;
   }
 
+  table {
+    width: 95vw;
+    table-layout: fixed;
+  }
+
   td:not(:first-child),
   th:not(:first-child) {
-    padding: 0;
+    padding: 1vw;
   }
 
   th {
     font-size: 10px;
+    padding: 8px;
   }
 
   td {
+    max-width: 25vw;
     font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .stateHeader,
