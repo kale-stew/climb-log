@@ -4,5 +4,14 @@
 
 /* .popoverCoverImage {} */
 
+/* basic styling for better viewing for now*/
 .popoverContent {
+  background-color: white;
+  border-color: black;
+  border-style: solid;
+  border-radius: 15px;
+  padding: 30px;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
+
