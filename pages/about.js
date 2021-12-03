@@ -16,7 +16,7 @@ const AboutPage = () => (
     <h1 className={utilStyles.headingXl}>More about Kylie Stewart</h1>
     <br />
     <div className={utilStyles.aboutBlock}>
-      <Image src={Headshot} height={1200} width={905} />
+      <Image src={Headshot} height={1200} width={905} layout="intrinsic" />
       <div className={`${utilStyles.vertical} ${utilStyles.aboutBlockText}`}>
         <p>
           Kylie Stewart is a web developer, avid hiker, amateur mountaineer and

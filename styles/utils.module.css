@@ -134,7 +134,11 @@
   }
 
   .aboutBlock img {
-    border-radius: 5rem;
-    margin: 0 20rem;
+    border-radius: 9999px;
+    width: 320px;
+  }
+
+  .socialIcons {
+    margin: 0 5rem;
   }
 }
