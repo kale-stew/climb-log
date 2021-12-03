@@ -3,14 +3,6 @@ import { TABLE_SORT_ORDER } from '../utils/constants'
 import TableRow from './TableRow'
 import utilStyles from '../styles/utils.module.css'
 
-/**
- * TO-DO
- * - [] button to switch between Imperial & Metric
- * - [] onClick in-table event for filtering by range
- * - [] onClick in-table event for filtering by state
- * - [x] sort ascending/descending order on  header click
- */
-
 export default function Table({ data, filters, setFilters }) {
   const alwaysExclude = ['href', 'strava', 'id']
   const [metric, setMetric] = useState(false)
