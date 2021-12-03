@@ -16,14 +16,14 @@ export default function Table({ data, filters, setFilters }) {
    */
   const headers =
     data.length > 0
-      ? Object.keys(data[0]).filter(header => !alwaysExclude.find(el => el == header))
+      ? Object.keys(data[0]).filter((header) => !alwaysExclude.find((el) => el == header))
       : []
 
   /**
    * Form Table Rows based on data type
    */
   const buildTableRow = (key, climb) => {
-    if (alwaysExclude.find(el => el == key)) {
+    if (alwaysExclude.find((el) => el == key)) {
       // Sanitize rows to exclude extra data
       return
     }
@@ -33,7 +33,7 @@ export default function Table({ data, filters, setFilters }) {
     )
   }
 
-  const togglePopOver = id => {
+  const togglePopOver = (id) => {
     if (isPopoverOpen) {
       setIsPopoverOpen(false)
       setRowClicked(null)
@@ -43,7 +43,7 @@ export default function Table({ data, filters, setFilters }) {
     }
   }
 
-  const sortRow = header => {
+  const sortRow = (header) => {
     // User has clicked on a different header than what was previously being sorted
     if (header != filters.property) {
       setFilters({ property: header, direction: TABLE_SORT_ORDER.DESC })
@@ -58,7 +58,7 @@ export default function Table({ data, filters, setFilters }) {
     }
   }
 
-  const formatHeader = header => {
+  const formatHeader = (header) => {
     let formatted = header
     if (header === filters.property) {
       if (filters.direction == TABLE_SORT_ORDER.ASC) {
@@ -105,7 +105,7 @@ export default function Table({ data, filters, setFilters }) {
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}
               positions={['top', 'bottom', 'left', 'right']} // preferred positions by priority
-              content={<CustomPopover climb={climb} metric={metric}/>}
+              content={<CustomPopover climb={climb} metric={metric} />}
             >
               <tr
                 key={i}
@@ -113,7 +113,7 @@ export default function Table({ data, filters, setFilters }) {
                   togglePopOver(i)
                 }}
               >
-                {Object.keys(climb).map(key => buildTableRow(key, climb))}
+                {Object.keys(climb).map((key) => buildTableRow(key, climb))}
               </tr>
             </Popover>
           ))}

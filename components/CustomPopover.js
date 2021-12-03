@@ -6,14 +6,6 @@ import {
   findMatchingSlug,
   milesToKilometers,
 } from '../utils/helpers'
-/**
- * Each Popover needs to have:
- *  - a button to close it (It can also be closed by clicking outside of the popover)
- *  - an icon, preferably pulled from the notion db item
- *  - [x] a large title
- *  - the rest of the climb data cleanly rendered in the content subsection
- *  - a header image?
- */
 
 const CustomPopover = ({ climb, metric }) => {
   const buildTitle = () => {
@@ -36,10 +28,10 @@ const CustomPopover = ({ climb, metric }) => {
       )
     }
   }
-  
+
   return (
     <div className={styles.popoverContent}>
-      <header className={styles.popoverHeader}>{buildTitle()}</header>
+      <header>{buildTitle()}</header>
       <Date dateString={climb.date} />
       <br />
       <p>
