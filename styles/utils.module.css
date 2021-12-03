@@ -51,7 +51,7 @@
 
 .singleRow {
   display: flex;
-  align-items: baseline;
+  align-items: center;
 }
 
 .blogPostHeading {
@@ -68,7 +68,7 @@
   /* e49504 */
   color: white;
   border-radius: 1em;
-  margin: 0 0.5em 0 0;
+  margin-left: 0.6rem;
   padding: 0.2em 0.3em;
   line-height: 1.3em;
   font-size: 13px;
@@ -79,7 +79,7 @@
   /* f1045f */
   color: white;
   border-radius: 1em;
-  margin: 0 0.5em 0 0;
+  margin-left: 0.6rem;
   padding: 0.2em 0.3em;
   line-height: 1.3em;
   font-size: 13px;
@@ -90,7 +90,7 @@
   /* bb03e9 */
   color: white;
   border-radius: 1em;
-  margin: 0 0.5em 0 0;
+  margin-left: 0.6rem;
   padding: 0.2em 0.3em;
   line-height: 1.3em;
   font-size: 13px;
