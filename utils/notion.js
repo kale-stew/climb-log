@@ -1,5 +1,5 @@
 import { Client, LogLevel } from '@notionhq/client'
-import { formatDate, getLocationData } from './helpers'
+import { getLocationData } from './helpers'
 
 /**
  * Initialize Notion client & configure a default db query
@@ -56,7 +56,7 @@ export const fetchAllClimbs = async () => {
 
     return {
       id,
-      date: formatDate(fmt(date)),
+      date: fmt(date),
       title: fmt(hike_title),
       // slug: url,
       distance: fmt(distance),

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Category from '../components/Category'
-import Date from '../components/Date'
+import FormattedDate from '../components/Date'
 import Head from 'next/head'
 import Link from 'next/link'
 import Layout from '../components/Layout'
@@ -78,7 +78,7 @@ export default function BlogLandingPage({ allPostsData }) {
               </Link>
               <br />
               <small className={`${utilStyles.lightText} ${utilStyles.blogItemCategory}`}>
-                <Date dateString={date} /> <Category category={category} />
+                <FormattedDate dateString={date} /> <Category category={category} />
               </small>
               <small className={utilStyles.listItem}>{preview}...</small>
             </li>

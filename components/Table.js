@@ -2,22 +2,24 @@ import React, { useState } from 'react'
 import { TABLE_SORT_ORDER } from '../utils/constants'
 import TableRow from './TableRow'
 import utilStyles from '../styles/utils.module.css'
+import { Popover } from 'react-tiny-popover'
+import CustomPopover from './CustomPopover'
 
 export default function Table({ data, filters, setFilters }) {
+  // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
+
   const [metric, setMetric] = useState(false)
-  /**
-   * Create an arr of Table Headers by mapping over
-   * climb data so headers are never out of sync
-   */
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const [rowClicked, setRowClicked] = useState(null)
+
+  // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =
     data.length > 0
       ? Object.keys(data[0]).filter((header) => !alwaysExclude.find((el) => el == header))
       : []
 
-  /**
-   * Form Table Rows based on data type
-   */
+  // Form Table Rows based on data type
   const buildTableRow = (key, climb) => {
     if (alwaysExclude.find((el) => el == key)) {
       // Sanitize rows to exclude extra data
@@ -27,6 +29,16 @@ export default function Table({ data, filters, setFilters }) {
     return (
       <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={metric} />
     )
+  }
+
+  const togglePopOver = (id) => {
+    if (isPopoverOpen) {
+      setIsPopoverOpen(false)
+      setRowClicked(null)
+    } else {
+      setIsPopoverOpen(true)
+      setRowClicked(id)
+    }
   }
 
   const sortRow = (header) => {
@@ -87,7 +99,21 @@ export default function Table({ data, filters, setFilters }) {
             ))}
           </tr>
           {data.map((climb, i) => (
-            <tr key={i}>{Object.keys(climb).map((key) => buildTableRow(key, climb))}</tr>
+            <Popover
+              onClickOutside={() => togglePopOver(i)}
+              isOpen={isPopoverOpen && rowClicked === i}
+              positions={['top', 'bottom', 'left', 'right']} // in order of priority
+              content={<CustomPopover climb={climb} metric={metric} />}
+            >
+              <tr
+                key={i}
+                onClick={() => {
+                  togglePopOver(i)
+                }}
+              >
+                {Object.keys(climb).map((key) => buildTableRow(key, climb))}
+              </tr>
+            </Popover>
           ))}
         </tbody>
       </table>
