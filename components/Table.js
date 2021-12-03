@@ -6,22 +6,20 @@ import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 
 export default function Table({ data, filters, setFilters }) {
+  // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
+
   const [metric, setMetric] = useState(false)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
-  /**
-   * Create an arr of Table Headers by mapping over
-   * climb data so headers are never out of sync
-   */
+
+  // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =
     data.length > 0
       ? Object.keys(data[0]).filter((header) => !alwaysExclude.find((el) => el == header))
       : []
 
-  /**
-   * Form Table Rows based on data type
-   */
+  // Form Table Rows based on data type
   const buildTableRow = (key, climb) => {
     if (alwaysExclude.find((el) => el == key)) {
       // Sanitize rows to exclude extra data
@@ -104,7 +102,7 @@ export default function Table({ data, filters, setFilters }) {
             <Popover
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}
-              positions={['top', 'bottom', 'left', 'right']} // preferred positions by priority
+              positions={['top', 'bottom', 'left', 'right']} // in order of priority
               content={<CustomPopover climb={climb} metric={metric} />}
             >
               <tr
