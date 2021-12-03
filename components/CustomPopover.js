@@ -6,7 +6,7 @@ import {
   milesToKilometers,
 } from '../utils/helpers'
 
-import styles from './Popover.module.css'
+import styles from './CustomPopover.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const CustomPopover = ({ climb, metric }) => {
@@ -37,19 +37,19 @@ const CustomPopover = ({ climb, metric }) => {
       <FormattedDate dateString={climb.date} withDOW />
       <br />
       <p>
-        Distance:{' '}
+        <strong>Distance:</strong>{' '}
         {metric
           ? climb && `${milesToKilometers(climb.distance)} km`
           : climb && `${climb.distance} mi`}
       </p>
       <p>
-        Elevation Gain:{' '}
+        <strong>Elevation Gain:</strong>{' '}
         {metric
           ? climb && `${feetToMeters(climb.gain)} m`
           : climb && `${addCommas(climb.gain)}'`}
       </p>
       <p>
-        Location: {climb.area}, {climb.state}
+        <strong>Location:</strong> {climb.area}, {climb.state}
       </p>
     </div>
   )
