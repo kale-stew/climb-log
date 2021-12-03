@@ -5,11 +5,10 @@ import utilStyles from '../styles/utils.module.css'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 
-export default function Table({ data, filters, setFilters }) {
+export default function Table({ data, filters, setFilters, metric, setMetric }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
 
-  const [metric, setMetric] = useState(false)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
 

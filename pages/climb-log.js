@@ -7,6 +7,7 @@ import { TABLE_SORT_ORDER } from '../utils/constants'
 import { useRouter } from 'next/router'
 
 const ClimbLog = ({ allClimbs }) => {
+  const [metric, setMetric] = useState(false)
   const [data, setData] = useState(allClimbs)
   const [filters, setFilters] = useState({
     property: 'date',
@@ -70,7 +71,7 @@ const ClimbLog = ({ allClimbs }) => {
       <Head>
         <title>Kylie Stewart | Climb Log</title>
       </Head>
-      <Table data={data} filters={filters} setFilters={setFilters} />
+      <Table data={data} filters={filters} setFilters={setFilters} metric={metric} setMetric={setMetric}/>
     </Layout>
   )
 }
