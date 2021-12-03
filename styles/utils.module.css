@@ -63,6 +63,11 @@
   text-decoration: underline;
 }
 
+.blogItemCategory {
+  display: flex;
+  align-items: baseline;
+}
+
 .gearCategory {
   background-color: #e4960498;
   /* e49504 */

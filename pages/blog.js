@@ -65,7 +65,7 @@ export default function BlogLandingPage({ allPostsData }) {
                 <a className={`${utilStyles.blogPostHeading}`}>{title}</a>
               </Link>
               <br />
-              <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
+              <small className={`${utilStyles.lightText} ${utilStyles.blogItemCategory}`}>
                 <Category category={category} /> <Date dateString={date} />
               </small>
               <small className={utilStyles.listItem}>{preview}...</small>

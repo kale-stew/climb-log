@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { TABLE_SORT_ORDER } from '../utils/constants'
 import TableRow from './TableRow'
+import utilStyles from '../styles/utils.module.css'
 
 /**
  * TO-DO
@@ -67,12 +68,8 @@ export default function Table({ data, filters, setFilters }) {
   return (
     <>
       <h1>Kylie's Climb Log</h1>
-      <table>
-        <caption>
-          Click on a header to sort ascending by that value, again for the inverse.
-        </caption>
-        <div>
-          <button className={metric ? utilStyles.categorySelected : "categoryButton"}
+      <div className={utilStyles.singleRow}>
+          <button className={metric ? "categoryButton" : utilStyles.categorySelected}
           onClick={() => setMetric(false)}>
           Imperial
           </button>
@@ -81,6 +78,10 @@ export default function Table({ data, filters, setFilters }) {
           Metric
           </button>
         </div>
+      <table>
+        <caption>
+          Click on a header to sort ascending by that value, again for the inverse.
+        </caption>
         <tbody>
           <tr>
             {headers.map((header, i) => (
