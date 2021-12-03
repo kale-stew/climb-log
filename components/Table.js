@@ -61,15 +61,19 @@ export default function Table({ data, filters, setFilters }) {
     <>
       <h1>Kylie's Climb Log</h1>
       <div className={utilStyles.singleRow}>
-          <button className={metric ? "categoryButton" : utilStyles.categorySelected}
-          onClick={() => setMetric(false)}>
+        <button
+          className={metric ? 'categoryButton' : utilStyles.categorySelected}
+          onClick={() => setMetric(false)}
+        >
           Imperial
-          </button>
-          <button className={metric ? utilStyles.categorySelected : "categoryButton"}
-          onClick={() => setMetric(true)}>
+        </button>
+        <button
+          className={metric ? utilStyles.categorySelected : 'categoryButton'}
+          onClick={() => setMetric(true)}
+        >
           Metric
-          </button>
-        </div>
+        </button>
+      </div>
       <table>
         <caption>
           Click on a header to sort ascending by that value, again for the inverse.
@@ -83,7 +87,7 @@ export default function Table({ data, filters, setFilters }) {
             ))}
           </tr>
           {data.map((climb, i) => (
-            <tr key={i}>{Object.keys(climb).map(key => buildTableRow(key, climb))}</tr>
+            <tr key={i}>{Object.keys(climb).map((key) => buildTableRow(key, climb))}</tr>
           ))}
         </tbody>
       </table>

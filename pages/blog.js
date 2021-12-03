@@ -20,28 +20,40 @@ export default function BlogLandingPage({ allPostsData }) {
       <h1 className={utilStyles.headingXl}>Blog</h1>
 
       <section>
-      <button className={viewCategory === 'all' ? utilStyles.categorySelected : "categoryButton"}
-          onClick={() =>
-            setCategory('all')
+        <button
+          className={
+            viewCategory === 'all' ? utilStyles.categorySelected : 'categoryButton'
           }
+          onClick={() => setCategory('all')}
         >
           All
         </button>
-        <button className={viewCategory === gearCategory ? utilStyles.categorySelected : "categoryButton"}
+        <button
+          className={
+            viewCategory === gearCategory ? utilStyles.categorySelected : 'categoryButton'
+          }
           onClick={() =>
             setCategory(viewCategory === gearCategory ? 'all' : gearCategory)
           }
         >
           Gear
         </button>
-        <button className={viewCategory === thoughtsCategory ? utilStyles.categorySelected : "categoryButton"}
+        <button
+          className={
+            viewCategory === thoughtsCategory
+              ? utilStyles.categorySelected
+              : 'categoryButton'
+          }
           onClick={() =>
             setCategory(viewCategory === thoughtsCategory ? 'all' : thoughtsCategory)
           }
         >
           Thoughts
         </button>
-        <button className={viewCategory === hikeCategory ? utilStyles.categorySelected : "categoryButton"}
+        <button
+          className={
+            viewCategory === hikeCategory ? utilStyles.categorySelected : 'categoryButton'
+          }
           onClick={() =>
             setCategory(viewCategory === hikeCategory ? 'all' : hikeCategory)
           }
