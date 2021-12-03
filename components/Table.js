@@ -99,6 +99,7 @@ export default function Table({ data, filters, setFilters, metric, setMetric }) 
           </tr>
           {data.map((climb, i) => (
             <Popover
+              key={climb.id}
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}
               positions={['top', 'bottom', 'left', 'right']} // in order of priority

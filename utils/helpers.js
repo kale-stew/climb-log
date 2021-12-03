@@ -17,7 +17,7 @@ const findMatchingSlug = (str) => {
   return false
 }
 
-const formatDate = (date) => format(date, 'LLLL d, yyyy')
+const formatDate = (date) => format(date, 'LLL d, yyyy')
 
 const formatDateWithDayOfWeek = (date) => format(date, 'iiii, LLLL do, yyyy')
 
