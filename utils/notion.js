@@ -53,7 +53,7 @@ export const fetchAllClimbs = async () => {
       id,
       properties: { area, date, distance, gain, hike_title },
     } = result
-
+    console.log("RESULTS:", fmt(gain))
     return {
       id,
       date: formatDate(fmt(date)),
