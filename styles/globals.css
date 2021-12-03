@@ -71,6 +71,12 @@ table {
   border: 1px gainsboro;
   border-radius: 1rem;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  table-layout: fixed;
+  width: 80vw;
+}
+
+.titleHeader {
+  width: 25vw;
 }
 
 caption {
