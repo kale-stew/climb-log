@@ -11,7 +11,7 @@ export default function Table({
   setSortOrder,
   metric,
   setMetric,
-  areaCategories,
+  allAreas,
   areaFilter,
   setAreaFilter,
 }) {
@@ -80,6 +80,8 @@ export default function Table({
   return (
     <>
       <h1>Kylie's Climb Log</h1>
+
+      {/* Buttons: Switch between Imperial and Metric num values */}
       <div className={utilStyles.singleRow}>
         <button
           className={metric ? 'categoryButton' : utilStyles.categorySelected}
@@ -94,18 +96,28 @@ export default function Table({
           Metric
         </button>
       </div>
-      <p>Filter Area:</p>
-      <select value={areaFilter} onChange={(e) => setAreaFilter(e.target.value)}>
-        <option value={'All'}>All</option>
-        {areaCategories.map((category) => (
-          <option key={category} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
+
+      {/* Filter: by Area */}
+      <div className={utilStyles.singleRow}>
+        <p>Filter by Area:</p>
+        <select
+          value={areaFilter}
+          onChange={(e) => setAreaFilter(e.target.value)}
+          placeholder="Filter by Area"
+        >
+          <option value={'All'}>All</option>
+          {allAreas.map((area) => (
+            <option key={area} value={area}>
+              {area}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <table>
         <caption>
-          Click on a header to sort ascending by that value, again for the inverse.
+          Click on a row to expand more details about that hike. Click on a header to sort
+          ascending by that value, again for the inverse.
         </caption>
         <tbody>
           <tr>

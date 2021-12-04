@@ -65,6 +65,11 @@ h2 {
   font-weight: 300;
 }
 
+select {
+  margin-left: 0.75rem;
+  font-size: 16px;
+}
+
 table {
   background-color: white;
   padding: 0.4rem 0.8rem;
@@ -96,10 +101,9 @@ img {
 }
 
 caption {
-  padding: 0 0 1rem;
-  font-size: 16px;
-  text-align: left;
-  color: #494949;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  color: #6b6b6b;
 }
 
 tbody {

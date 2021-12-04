@@ -13,7 +13,7 @@ const ClimbLog = ({ allClimbs }) => {
     property: 'date',
     direction: TABLE_SORT_ORDER.DESC,
   })
-  const [areaCategories, setAreaCategories] = useState([])
+  const [allAreas, setAllAreas] = useState([])
   const [areaFilter, setAreaFilter] = useState('All')
   const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
 
@@ -91,7 +91,7 @@ const ClimbLog = ({ allClimbs }) => {
       if (a > b) return 1
       return 0
     })
-    setAreaCategories(categories)
+    setAllAreas(categories)
   }
 
   /**
@@ -123,7 +123,7 @@ const ClimbLog = ({ allClimbs }) => {
         setSortOrder={setSortOrder}
         metric={metric}
         setMetric={setMetric}
-        areaCategories={areaCategories}
+        allAreas={allAreas}
         areaFilter={areaFilter}
         setAreaFilter={selectAreaFilter}
       />
