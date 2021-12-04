@@ -1,17 +1,15 @@
-import Head from 'next/head'
 import Link from 'next/link'
 import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import { getAllPostIds, getPostData } from '../../utils/posts'
+import CustomHead from '../../components/CustomHead'
 
 import utilStyles from '../../styles/utils.module.css'
 
 const Post = ({ postData }) => (
   <Layout>
-    <Head>
-      <title>{postData.title} | kylies.photos</title>
-    </Head>
+  <CustomHead title={`${postData.title} | kylies.photos`} />
     <article>
       <h1 className={utilStyles.headingXl}>{postData.title}</h1>
       <div className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>

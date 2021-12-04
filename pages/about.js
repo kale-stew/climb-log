@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Headshot from '../public/photos/headshot.jpg'
 import Image from 'next/image'
 import Layout from '../components/Layout'
@@ -7,27 +6,11 @@ import { MdOutlineMail } from 'react-icons/md'
 import { SocialLinks } from '../utils/socials'
 
 import utilStyles from '../styles/utils.module.css'
+import CustomHead from '../components/CustomHead'
 
 const AboutPage = () => (
   <Layout>
-    <Head>
-      <title>About Kylie Stewart</title>
-      <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8"
-        />
-
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
-            `,
-          }}
-        />
-    </Head>
+    <CustomHead title={'About Kylie Stewart'} />
     <h1 className={utilStyles.headingXl}>More about Kylie Stewart</h1>
     <br />
     <div className={utilStyles.aboutBlock}>

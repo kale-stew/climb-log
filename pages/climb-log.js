@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import { fetchAllClimbs } from '../utils/notion'
 import { TABLE_SORT_ORDER } from '../utils/constants'
 import { useRouter } from 'next/router'
+import CustomHead from '../components/CustomHead'
 
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
@@ -114,24 +114,7 @@ const ClimbLog = ({ allClimbs }) => {
 
   return (
     <Layout>
-      <Head>
-        <title>Kylie Stewart | Climb Log</title>
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8"
-        />
-
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
-            `,
-          }}
-        />
-      </Head>
+      <CustomHead title={'Kylie Stewart | Climb Log'} />
       <Table
         data={data}
         sortOrder={sortOrder}

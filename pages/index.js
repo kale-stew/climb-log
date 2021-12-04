@@ -1,30 +1,13 @@
-import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '../components/Layout'
 import CapitolCreek from '../public/photos/2021_capitol-creek.jpg'
+import CustomHead from '../components/CustomHead'
 
 import styles from '../components/Layout.module.css'
 
 const HomePage = () => (
   <Layout home>
-    <Head>
-      <title>Kylie Stewart | Photography, Hiking</title>
-      <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8"
-        />
-
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
-            `,
-          }}
-        />
-    </Head>
+    <CustomHead title={'Kylie Stewart | Photography, Hiking'} />
     <br />
     <Image
       src={CapitolCreek}

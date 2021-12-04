@@ -1,37 +1,20 @@
 import React, { useState } from 'react'
 import Category from '../components/Category'
 import FormattedDate from '../components/Date'
-import Head from 'next/head'
 import Link from 'next/link'
 import Layout from '../components/Layout'
 import { getSortedPostsData } from '../utils/posts'
 import { gearCategory, hikeCategory, thoughtsCategory } from '../utils/constants'
 
 import utilStyles from '../styles/utils.module.css'
+import CustomHead from '../components/CustomHead'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState('all')
 
   return (
     <Layout>
-      <Head>
-        <title>Kylie Stewart | Hiking Blog</title>
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8"
-        />
-
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
-            `,
-          }}
-        />
-      </Head>
+      <CustomHead title={'Kylie Stewart | Hiking Blog'} />
       <h1 className={utilStyles.headingXl}>Blog</h1>
 
       <section>
