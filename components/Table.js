@@ -14,6 +14,9 @@ export default function Table({
   allAreas,
   areaFilter,
   setAreaFilter,
+  stateFilter,
+  setStateFilter,
+  allStates
 }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
@@ -107,6 +110,22 @@ export default function Table({
         >
           <option value={'All'}>All</option>
           {allAreas.map((area) => (
+            <option key={area} value={area}>
+              {area}
+            </option>
+          ))}
+        </select>
+      </div>
+      {/* Filter: by State */}
+      <div className={utilStyles.singleRow}>
+        <p>Filter by State:</p>
+        <select
+          value={stateFilter}
+          onChange={(e) => setStateFilter(e.target.value)}
+          placeholder="Filter by State"
+        >
+          <option value={'All'}>All</option>
+          {allStates.map((area) => (
             <option key={area} value={area}>
               {area}
             </option>

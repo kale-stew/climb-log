@@ -14,7 +14,9 @@ const ClimbLog = ({ allClimbs }) => {
     direction: TABLE_SORT_ORDER.DESC,
   })
   const [allAreas, setAllAreas] = useState([])
+  const [allStates, setAllStates]  = useState([])
   const [areaFilter, setAreaFilter] = useState('All')
+  const [stateFilter, setStateFilter] = useState('All')
   const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
 
   const router = useRouter()
@@ -37,7 +39,7 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {Array} dataToSort
    * @param {string} area
    */
-  const sortData = (dataToSort = allClimbs, area = areaFilter) => {
+  const sortData = (dataToSort = allClimbs, area = areaFilter, state = stateFilter) => {
     // Check to see what direction we're sorting by
     let sortBy = sortOrder.direction === TABLE_SORT_ORDER.ASC ? -1 : 1
     let sortedData = dataToSort.sort((a, b) => {
@@ -80,18 +82,24 @@ const ClimbLog = ({ allClimbs }) => {
 
   // Build the area categories on the first load (populating dropdown)
   useEffect(() => {
-    // sortData()
     buildCategories()
   }, [])
 
   const buildCategories = () => {
     // Unique climb areas become a new category to sort by (these are sorted alphabetically)
-    let categories = [...new Set(allClimbs.map((climb) => climb.area))].sort((a, b) => {
+    let areaCategories = [...new Set(allClimbs.map((climb) => climb.area))].sort((a, b) => {
       if (a < b) return -1
       if (a > b) return 1
       return 0
     })
-    setAllAreas(categories)
+    // Unique climb states become a new category to sort by (these are sorted alphabetically)
+    let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))].sort((a, b) => {
+      if (a < b) return -1
+      if (a > b) return 1
+      return 0
+    })
+    setAllStates(stateCategories)
+    setAllAreas(areaCategories)
   }
 
   /**
@@ -99,8 +107,10 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
-    // If the area filter the user selects is "All", let's reset to allClimbs and make sure we sort based on the current order
     setAreaFilter(filter)
+    // Let's reset the state filter if the user sets the area filter, behavior could get messy otherwise (it is possible though)
+    setStateFilter('All')
+    // If the area filter the user selects is "All", let's reset to allClimbs and make sure we sort based on the current order
     if (filter == 'All') {
       setFilteredClimbs(allClimbs)
       sortData(allClimbs, 'All') // sortData helps us do the reset^
@@ -110,6 +120,20 @@ const ClimbLog = ({ allClimbs }) => {
     let filteredData = allClimbs.filter((climb) => climb.area.trim() == filter.trim())
     setFilteredClimbs(filteredData)
     sortData(filteredData, filter)
+  }
+
+  const selectStateFilter = (filter) => {
+    setStateFilter(filter)
+    // Let's reset the Area filter if the user sets the State filter, behavior could get messy otherwise (it is possible though)
+    setAreaFilter('All')
+    if (filter === 'All') {
+      setFilteredClimbs(allClimbs)
+      sortData(allClimbs, 'All')
+      return 
+    }
+    let filteredData = allClimbs.filter((climb) => climb.state.trim() == filter.trim())
+    setFilteredClimbs(filteredData)
+    sortData(filteredData, areaFilter, filter)
   }
 
   return (
@@ -126,6 +150,9 @@ const ClimbLog = ({ allClimbs }) => {
         allAreas={allAreas}
         areaFilter={areaFilter}
         setAreaFilter={selectAreaFilter}
+        stateFilter={stateFilter}
+        setStateFilter={selectStateFilter}
+        allStates={allStates}
       />
     </Layout>
   )
