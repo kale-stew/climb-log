@@ -8,6 +8,12 @@ import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/post
 import utilStyles from '../../styles/utils.module.css'
 
 const Post = ({ postData, postIds }) => {
+  /**
+   * buildNavigation uses the sorted posts data to find it's own index, the next post's,
+   * and the previous post's index (if they exist). Now that it knows where it is in the 
+   * sorted data, we can generate the nav links for the bottom of the page.
+   * @returns next js <Link/>
+   */
   const buildNavigation = () => {
     let selfPosition = postIds.findIndex((post) => post.id === postData.id)
     let nextPost = -1
@@ -15,6 +21,7 @@ const Post = ({ postData, postIds }) => {
     let nextPostLink
     let prevPostLink
 
+    // This means we have previous post, let's set it's index and create the link  
     if (selfPosition + 1 <= postIds.length - 1) {
       nextPost = selfPosition + 1
       nextPostLink = (
@@ -22,10 +29,11 @@ const Post = ({ postData, postIds }) => {
           href="/[category]/[id]"
           as={`/${postIds[nextPost].category}/${postIds[nextPost].id}`}
         >
-          <a>{postIds[nextPost].title} -></a>
+          <a>{postIds[nextPost].title} →</a>
         </Link>
       )
     }
+    // This means we have a next post, let's set it's index and create the link
     if (selfPosition - 1 >= 0) {
       prevPost = selfPosition - 1
       prevPostLink = (
@@ -33,7 +41,7 @@ const Post = ({ postData, postIds }) => {
           href="/[category]/[id]"
           as={`/${postIds[prevPost].category}/${postIds[prevPost].id}`}
         >
-          <a>←{postIds[prevPost].title}</a>
+          <a>← {postIds[prevPost].title}</a>
         </Link>
       )
     }
@@ -42,7 +50,6 @@ const Post = ({ postData, postIds }) => {
       return (
         <div className={utilStyles.backToHome}>
           {prevPostLink}
-          <br/>
           {nextPostLink}
         </div>
       )
@@ -54,21 +61,22 @@ const Post = ({ postData, postIds }) => {
           <Link href="/blog">
             <a>← Back to blog</a>
           </Link>
-          <br/>
           {nextPostLink}
         </div>
       )
     }
     // If there is no next post but a previous post, let's show that
     if (nextPost == -1 && prevPost != -1) {
-      return (<div className={utilStyles.backToHome}>
-        {prevPostLink}
-        <br/>
-        <Link href="/blog">
-          <a> Back to blog ->?</a>
-        </Link>
-      </div>)
+      return (
+        <div className={utilStyles.backToHome}>
+          {prevPostLink}
+          <Link href="/blog">
+            <a> Back to blog →</a>
+          </Link>
+        </div>
+      )
     }
+    // Always return something
     return (
       <div className={utilStyles.backToHome}>
         <Link href="/blog">
@@ -85,15 +93,13 @@ const Post = ({ postData, postIds }) => {
       </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
-        <div className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
+        <div className={`${utilStyles.lightText}`}>
           <FormattedDate dateString={postData.date} withDOW />{' '}
           <Category category={postData.category} />
         </div>
         <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
       </article>
-      <div className={utilStyles.backToHome}>
-        {buildNavigation()}
-      </div>
+      <div className={utilStyles.backToHome}>{buildNavigation()}</div>
     </Layout>
   )
 }
