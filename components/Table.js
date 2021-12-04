@@ -94,10 +94,13 @@ export default function Table({
           Metric
         </button>
       </div>
+      <p>Filter Area:</p>
       <select value={areaFilter} onChange={(e) => setAreaFilter(e.target.value)}>
         <option value={'All'}>All</option>
         {areaCategories.map((category) => (
-          <option value={category}>{category}</option>
+          <option key={category} value={category}>
+            {category}
+          </option>
         ))}
       </select>
       <table>
