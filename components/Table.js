@@ -5,7 +5,16 @@ import utilStyles from '../styles/utils.module.css'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 
-export default function Table({ data, filters, setFilters, metric, setMetric }) {
+export default function Table({
+  data,
+  sortOrder,
+  setSortOrder,
+  metric,
+  setMetric,
+  areaCategories,
+  areaFilter,
+  setAreaFilter,
+}) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
 
@@ -42,26 +51,26 @@ export default function Table({ data, filters, setFilters, metric, setMetric }) 
 
   const sortRow = (header) => {
     // User has clicked on a different header than what was previously being sorted
-    if (header != filters.property) {
-      setFilters({ property: header, direction: TABLE_SORT_ORDER.DESC })
+    if (header != sortOrder.property) {
+      setSortOrder({ property: header, direction: TABLE_SORT_ORDER.DESC })
       return
     }
 
-    if (filters.direction == TABLE_SORT_ORDER.DESC) {
-      setFilters({ property: header, direction: TABLE_SORT_ORDER.ASC })
+    if (sortOrder.direction == TABLE_SORT_ORDER.DESC) {
+      setSortOrder({ property: header, direction: TABLE_SORT_ORDER.ASC })
     }
-    if (filters.direction == TABLE_SORT_ORDER.ASC) {
-      setFilters({ property: header, direction: TABLE_SORT_ORDER.DESC })
+    if (sortOrder.direction == TABLE_SORT_ORDER.ASC) {
+      setSortOrder({ property: header, direction: TABLE_SORT_ORDER.DESC })
     }
   }
 
   const formatHeader = (header) => {
     let formatted = header
-    if (header === filters.property) {
-      if (filters.direction == TABLE_SORT_ORDER.ASC) {
+    if (header === sortOrder.property) {
+      if (sortOrder.direction == TABLE_SORT_ORDER.ASC) {
         formatted = `${header} ▲`
       }
-      if (filters.direction == TABLE_SORT_ORDER.DESC) {
+      if (sortOrder.direction == TABLE_SORT_ORDER.DESC) {
         formatted = `${header} ▼`
       }
     }
@@ -85,6 +94,12 @@ export default function Table({ data, filters, setFilters, metric, setMetric }) 
           Metric
         </button>
       </div>
+      <select value={areaFilter} onChange={(e) => setAreaFilter(e.target.value)}>
+        <option value={'All'}>All</option>
+        {areaCategories.map((category) => (
+          <option value={category}>{category}</option>
+        ))}
+      </select>
       <table>
         <caption>
           Click on a header to sort ascending by that value, again for the inverse.

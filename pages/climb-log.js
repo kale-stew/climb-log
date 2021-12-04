@@ -9,10 +9,13 @@ import { useRouter } from 'next/router'
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
   const [data, setData] = useState(allClimbs)
-  const [filters, setFilters] = useState({
+  const [sortOrder, setSortOrder] = useState({
     property: 'date',
     direction: TABLE_SORT_ORDER.DESC,
   })
+  const [areaCategories, setAreaCategories] = useState([])
+  const [areaFilter, setAreaFilter] = useState('All')
+  const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
 
   const router = useRouter()
   const firstUpdate = useRef(true)
@@ -26,35 +29,45 @@ const ClimbLog = ({ allClimbs }) => {
   const refreshData = () => router.replace(router.asPath)
 
   /**
-   * We want to use this useEffect to check and see if the filters state has changed,
+   * sortData allows us to sort the data by area selected with the areaFilter state, or pass one in ourselves.
+   * This is helpfull because it lets us persist sort orders along with whatever area filter the user selects.
+   * Future sortOrder could also be added, all we would need to do is pass in another parameter with
+   * it's corresponding state as a default value.
+   *
+   * @param {Array} dataToSort
+   * @param {string} area
+   */
+  const sortData = (dataToSort = allClimbs, area = areaFilter) => {
+    // Check to see what direction we're sorting by
+    let sortBy = sortOrder.direction === TABLE_SORT_ORDER.ASC ? -1 : 1
+    let sortedData = dataToSort.sort((a, b) => {
+      if (sortOrder.property != 'date') {
+        if (a[sortOrder.property] < b[sortOrder.property]) return -1 * sortBy
+        if (a[sortOrder.property] > b[sortOrder.property]) return 1 * sortBy
+        return 0
+      } else {
+        // Sort the date in ascending order
+        let dateA = new Date(a[sortOrder.property])
+        let dateB = new Date(b[sortOrder.property])
+        return dateA - dateB
+      }
+    })
+
+    // If we want desc order with date, reverse the sorted data as it will be in ascending order
+    if (sortOrder.property === 'date' && sortOrder.direction === TABLE_SORT_ORDER.DESC) {
+      sortedData.reverse()
+    }
+    buildCategories()
+    setData(sortedData)
+    // Force the data to update in the UI
+    refreshData()
+  }
+
+  /**
+   * We want to use this useEffect to check and see if the sort order state has changed,
    * that way we can properly sort the data and update the table.
    */
   useEffect(() => {
-    const sortData = () => {
-      // Check to see what direction we're sorting by
-      let sortBy = filters.direction === TABLE_SORT_ORDER.ASC ? -1 : 1
-
-      let sortedData = data.sort((a, b) => {
-        if (filters.property != 'date') {
-          if (a[filters.property] < b[filters.property]) return -1 * sortBy
-          if (a[filters.property] > b[filters.property]) return 1 * sortBy
-          return 0
-        } else {
-          // Sort the date in ascending order
-          let dateA = new Date(a[filters.property])
-          let dateB = new Date(b[filters.property])
-          return dateA - dateB
-        }
-      })
-      // If we want desc order with date, reverse the sorted data as it will be in ascending order
-      if (filters.property === 'date' && filters.direction === TABLE_SORT_ORDER.DESC) {
-        sortedData.reverse()
-      }
-      setData(sortedData)
-      // Force the data to update in the UI
-      refreshData()
-    }
-
     // We don't want this to cause the page to do too many re-renders,
     // so let's make sure we don't call the sorting function on the first
     // page load.
@@ -62,16 +75,57 @@ const ClimbLog = ({ allClimbs }) => {
       firstUpdate.current = false
       return
     }
+    sortData(filteredClimbs)
+  }, [sortOrder])
 
-    sortData()
-  }, [filters])
+  // Build the area categories on the first load (populating dropdown)
+  useEffect(() => {
+    // sortData()
+    buildCategories()
+  }, [])
+
+  const buildCategories = () => {
+    // Unique climb areas become a new category to sort by (these are sorted alphabetically)
+    let categories = [...new Set(allClimbs.map((climb) => climb.area))].sort((a, b) => {
+      if (a < b) return -1
+      if (a > b) return 1
+      return 0
+    })
+    setAreaCategories(categories)
+  }
+
+  /**
+   * When the user selects an area, let's set state accordingly
+   * @param {string} filter
+   */
+  const selectAreaFilter = (filter) => {
+    // If the area filter the user selects is "All", let's reset to allClimbs and make sure we sort based on the current order
+    setAreaFilter(filter)
+    if (filter == 'All') {
+      sortData(allClimbs, 'All') // sortData helps us do the reset^
+      return
+    }
+    // Otherwise let's filter down to what we want and sort it after.
+    let filteredData = allClimbs.filter((climb) => climb.area.trim() == filter.trim())
+    setFilteredClimbs(filteredData)
+    sortData(filteredData, filter)
+  }
 
   return (
     <Layout>
       <Head>
         <title>Kylie Stewart | Climb Log</title>
       </Head>
-      <Table data={data} filters={filters} setFilters={setFilters} metric={metric} setMetric={setMetric}/>
+      <Table
+        data={data}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+        metric={metric}
+        setMetric={setMetric}
+        areaCategories={areaCategories}
+        areaFilter={areaFilter}
+        setAreaFilter={selectAreaFilter}
+      />
     </Layout>
   )
 }
