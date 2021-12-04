@@ -46,6 +46,14 @@ a {
   text-decoration: none;
 }
 
+p a {
+  color: #005688;
+}
+
+p a:hover {
+  text-decoration: underline;
+}
+
 header {
   margin: 1rem 0 2.5rem 0;
 }

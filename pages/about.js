@@ -28,6 +28,10 @@ const AboutPage = () => (
           she's learned in the mountains. Living in the scenic Colorado Rockies, it's easy
           to find something worth taking a photo of.
         </p>
+        <p>
+          To see some of Kylie's other work, check out her{' '}
+          <a href="https://kylieis.online">website</a>.
+        </p>
       </div>
     </div>
     <br />
