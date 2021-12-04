@@ -12,6 +12,21 @@ const AboutPage = () => (
   <Layout>
     <Head>
       <title>About Kylie Stewart</title>
+      <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8"
+        />
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
+            `,
+          }}
+        />
     </Head>
     <h1 className={utilStyles.headingXl}>More about Kylie Stewart</h1>
     <br />

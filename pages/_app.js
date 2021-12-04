@@ -6,7 +6,7 @@ export default function App({ Component, pageProps }) {
   const router = useRouter()
 
   const handleRouteChange = (url) => {
-    window.gtag('config', '[Tracking ID]', {
+    window.gtag('config', 'G-W9WRKKHEN8', {
       page_path: url,
     })
   }
