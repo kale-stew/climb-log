@@ -102,6 +102,7 @@ const ClimbLog = ({ allClimbs }) => {
     // If the area filter the user selects is "All", let's reset to allClimbs and make sure we sort based on the current order
     setAreaFilter(filter)
     if (filter == 'All') {
+      setFilteredClimbs(allClimbs)
       sortData(allClimbs, 'All') // sortData helps us do the reset^
       return
     }
