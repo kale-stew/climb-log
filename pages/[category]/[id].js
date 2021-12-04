@@ -93,7 +93,7 @@ const Post = ({ postData, postIds }) => {
       </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
-        <div className={`${utilStyles.lightText}`}>
+        <div className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
           <FormattedDate dateString={postData.date} withDOW />{' '}
           <Category category={postData.category} />
         </div>
