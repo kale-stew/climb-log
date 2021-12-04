@@ -5,11 +5,19 @@ import utilStyles from '../styles/utils.module.css'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 
-export default function Table({ data, filters, setFilters }) {
+export default function Table({
+  data,
+  sortOrder,
+  setSortOrder,
+  metric,
+  setMetric,
+  allAreas,
+  areaFilter,
+  setAreaFilter,
+}) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
 
-  const [metric, setMetric] = useState(false)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
 
@@ -43,26 +51,26 @@ export default function Table({ data, filters, setFilters }) {
 
   const sortRow = (header) => {
     // User has clicked on a different header than what was previously being sorted
-    if (header != filters.property) {
-      setFilters({ property: header, direction: TABLE_SORT_ORDER.DESC })
+    if (header != sortOrder.property) {
+      setSortOrder({ property: header, direction: TABLE_SORT_ORDER.DESC })
       return
     }
 
-    if (filters.direction == TABLE_SORT_ORDER.DESC) {
-      setFilters({ property: header, direction: TABLE_SORT_ORDER.ASC })
+    if (sortOrder.direction == TABLE_SORT_ORDER.DESC) {
+      setSortOrder({ property: header, direction: TABLE_SORT_ORDER.ASC })
     }
-    if (filters.direction == TABLE_SORT_ORDER.ASC) {
-      setFilters({ property: header, direction: TABLE_SORT_ORDER.DESC })
+    if (sortOrder.direction == TABLE_SORT_ORDER.ASC) {
+      setSortOrder({ property: header, direction: TABLE_SORT_ORDER.DESC })
     }
   }
 
   const formatHeader = (header) => {
     let formatted = header
-    if (header === filters.property) {
-      if (filters.direction == TABLE_SORT_ORDER.ASC) {
+    if (header === sortOrder.property) {
+      if (sortOrder.direction == TABLE_SORT_ORDER.ASC) {
         formatted = `${header} ▲`
       }
-      if (filters.direction == TABLE_SORT_ORDER.DESC) {
+      if (sortOrder.direction == TABLE_SORT_ORDER.DESC) {
         formatted = `${header} ▼`
       }
     }
@@ -72,6 +80,8 @@ export default function Table({ data, filters, setFilters }) {
   return (
     <>
       <h1>Kylie's Climb Log</h1>
+
+      {/* Buttons: Switch between Imperial and Metric num values */}
       <div className={utilStyles.singleRow}>
         <button
           className={metric ? 'categoryButton' : utilStyles.categorySelected}
@@ -86,9 +96,28 @@ export default function Table({ data, filters, setFilters }) {
           Metric
         </button>
       </div>
+
+      {/* Filter: by Area */}
+      <div className={utilStyles.singleRow}>
+        <p>Filter by Area:</p>
+        <select
+          value={areaFilter}
+          onChange={(e) => setAreaFilter(e.target.value)}
+          placeholder="Filter by Area"
+        >
+          <option value={'All'}>All</option>
+          {allAreas.map((area) => (
+            <option key={area} value={area}>
+              {area}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <table>
         <caption>
-          Click on a header to sort ascending by that value, again for the inverse.
+          Click on a row to expand more details about that hike. Click on a header to sort
+          ascending by that value, again for the inverse.
         </caption>
         <tbody>
           <tr>
@@ -100,6 +129,7 @@ export default function Table({ data, filters, setFilters }) {
           </tr>
           {data.map((climb, i) => (
             <Popover
+              key={climb.id}
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}
               positions={['top', 'bottom', 'left', 'right']} // in order of priority
