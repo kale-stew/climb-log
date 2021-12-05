@@ -3,10 +3,10 @@ import { useRouter } from 'next/router'
 
 const CustomHead = ({ title }) => {
   const router = useRouter()
-  console.log("CUSTOM HEAD PATH:", router.asPath)
+
   return (
     <Head>
-        <script
+      <script
         dangerouslySetInnerHTML={{
           __html: `
           window.dataLayer = window.dataLayer || [];
@@ -16,13 +16,13 @@ const CustomHead = ({ title }) => {
             'pageTitle': '${title}',
             'visitorType': 'HARD CODED VISITOR'
           })
-          `}}/>
+          `,
+        }}
+      />
       <script
         dangerouslySetInnerHTML={{
           __html: `
       <!-- Google Tag Manager -->
-      
-      
       (function(w, d, s, l, i) {
         w[l] = w[l] || []
         w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })

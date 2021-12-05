@@ -9,7 +9,7 @@ import utilStyles from '../../styles/utils.module.css'
 
 const Post = ({ postData }) => (
   <Layout>
-  <CustomHead title={`${postData.title} | kylies.photos`} />
+    <CustomHead title={`${postData.title} | kylies.photos`} />
     <article>
       <h1 className={utilStyles.headingXl}>{postData.title}</h1>
       <div className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
