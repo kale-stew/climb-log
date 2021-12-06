@@ -20,6 +20,7 @@ export default function Table({
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
+  const [blanketEnabled, setBlanketEnabled] = useState(false)
 
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =
@@ -41,9 +42,11 @@ export default function Table({
 
   const togglePopOver = (id) => {
     if (isPopoverOpen) {
+      setBlanketEnabled(false)
       setIsPopoverOpen(false)
       setRowClicked(null)
     } else {
+      setBlanketEnabled(true)
       setIsPopoverOpen(true)
       setRowClicked(id)
     }
@@ -129,6 +132,7 @@ export default function Table({
           </tr>
           {data.map((climb, i) => (
             <Popover
+              containerClassName={'globalPopover'}
               key={climb.id}
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}
@@ -147,6 +151,7 @@ export default function Table({
           ))}
         </tbody>
       </table>
+      <div className={blanketEnabled ? 'blanket' : ''}/>
     </>
   )
 }
