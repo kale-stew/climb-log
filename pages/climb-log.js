@@ -14,7 +14,7 @@ const ClimbLog = ({ allClimbs }) => {
     direction: TABLE_SORT_ORDER.DESC,
   })
   const [allAreas, setAllAreas] = useState([])
-  const [areaFilter, setAreaFilter] = useState('All')
+  const [areaFilter, setAreaFilter] = useState('all')
   const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
 
   const router = useRouter()
@@ -104,7 +104,7 @@ const ClimbLog = ({ allClimbs }) => {
         return 0
       })
       .map((state) => {
-        return { text: `All ${state.trim()}`, value: state.trim(), type: 'state' }
+        return { text: `all ${state.trim()}`, value: state.trim(), type: 'state' }
       })
     // Let's add the states to the top of the drop down
     areaCategories.unshift(...stateCategories)
@@ -122,10 +122,10 @@ const ClimbLog = ({ allClimbs }) => {
     let selectedFilter = filter.split('?')[0]
     // Set the areaFilter so that the drop down can handle it's own state (we want it to be the "colorado?state" formatted value)
     setAreaFilter(filter)
-    // If the area filter the user selects is "All", let's reset to allClimbs and make sure we sort based on the current order
-    if (filter == 'All') {
+    // If the area filter the user selects is "all", let's reset to allClimbs and make sure we sort based on the current order
+    if (filter == 'all') {
       setFilteredClimbs(allClimbs)
-      sortData(allClimbs, 'All') // sortData helps us do the reset^
+      sortData(allClimbs, 'all') // sortData helps us do the reset^
       return
     }
     // Otherwise let's filter down to what we want based on the filter type
