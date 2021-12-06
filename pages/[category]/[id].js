@@ -48,8 +48,9 @@ const Post = ({ postData, postIds }) => {
     // If there are posts before before and after this one, let's have links leading to each one
     if (nextPost != -1 && prevPost != -1) {
       return (
-        <div className={utilStyles.backToHome}>
+        <div className={utilStyles.blogNavigation}>
           {prevPostLink}
+          <span className={utilStyles.separator}></span>
           {nextPostLink}
         </div>
       )
@@ -57,10 +58,11 @@ const Post = ({ postData, postIds }) => {
     // If there is no previous post, let's have back to blog and next post Links available
     if (prevPost == -1 && nextPost != -1) {
       return (
-        <div className={utilStyles.backToHome}>
+        <div className={utilStyles.blogNavigation}>
           <Link href="/blog">
             <a>← Back to blog</a>
           </Link>
+          <span className={utilStyles.separator}></span>
           {nextPostLink}
         </div>
       )
@@ -68,8 +70,9 @@ const Post = ({ postData, postIds }) => {
     // If there is no next post but a previous post, let's show that
     if (nextPost == -1 && prevPost != -1) {
       return (
-        <div className={utilStyles.backToHome}>
+        <div className={utilStyles.blogNavigation}>
           {prevPostLink}
+          <span className={utilStyles.separator}></span>
           <Link href="/blog">
             <a> Back to blog →</a>
           </Link>
@@ -78,7 +81,7 @@ const Post = ({ postData, postIds }) => {
     }
     // Always return something
     return (
-      <div className={utilStyles.backToHome}>
+      <div className={utilStyles.blogNavigation}>
         <Link href="/blog">
           <a>← Back to blog</a>
         </Link>
@@ -99,7 +102,7 @@ const Post = ({ postData, postIds }) => {
         </div>
         <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
       </article>
-      <div className={utilStyles.backToHome}>{buildNavigation()}</div>
+      {buildNavigation()}
     </Layout>
   )
 }
