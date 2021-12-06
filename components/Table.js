@@ -14,9 +14,6 @@ export default function Table({
   allAreas,
   areaFilter,
   setAreaFilter,
-  stateFilter,
-  setStateFilter,
-  allStates
 }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
@@ -80,6 +77,27 @@ export default function Table({
     return formatted
   }
 
+  const buildFilterByArea = () => {
+    return (
+      <select
+        value={areaFilter}
+        onChange={(e) => {
+          setAreaFilter(e.target.value)
+        }}
+        placeholder="Filter by Area"
+      >
+        <option value={'All'}>All</option>
+        {allAreas.map((area) => {
+          return (
+            <option key={area.value} value={`${area.value}?${area.type}`}>
+              {area.text}
+            </option>
+          )
+        })}
+      </select>
+    )
+  }
+
   return (
     <>
       <h1>Kylie's Climb Log</h1>
@@ -103,36 +121,8 @@ export default function Table({
       {/* Filter: by Area */}
       <div className={utilStyles.singleRow}>
         <p>Filter by Area:</p>
-        <select
-          value={areaFilter}
-          onChange={(e) => setAreaFilter(e.target.value)}
-          placeholder="Filter by Area"
-        >
-          <option value={'All'}>All</option>
-          {allAreas.map((area) => (
-            <option key={area} value={area}>
-              {area}
-            </option>
-          ))}
-        </select>
+        {buildFilterByArea()}
       </div>
-      {/* Filter: by State */}
-      <div className={utilStyles.singleRow}>
-        <p>Filter by State:</p>
-        <select
-          value={stateFilter}
-          onChange={(e) => setStateFilter(e.target.value)}
-          placeholder="Filter by State"
-        >
-          <option value={'All'}>All</option>
-          {allStates.map((area) => (
-            <option key={area} value={area}>
-              {area}
-            </option>
-          ))}
-        </select>
-      </div>
-
       <table>
         <caption>
           Click on a row to expand more details about that hike. Click on a header to sort
