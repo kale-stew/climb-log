@@ -59,8 +59,6 @@ const ClimbLog = ({ allClimbs }) => {
     }
     buildCategories()
     setData(sortedData)
-    // Force the data to update in the UI
-    refreshData()
   }
 
   /**

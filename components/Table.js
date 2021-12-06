@@ -135,7 +135,7 @@ export default function Table({
               positions={['top', 'bottom', 'left', 'right']} // in order of priority
               content={<CustomPopover climb={climb} metric={metric} />}
             >
-              <tr
+              <tr className={'tableRow'}
                 key={i}
                 onClick={() => {
                   togglePopOver(i)
