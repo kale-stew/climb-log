@@ -14,13 +14,13 @@ export default function Table({
   allAreas,
   areaFilter,
   setAreaFilter,
+  toggleBlanketEnabled
 }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
-  const [blanketEnabled, setBlanketEnabled] = useState(false)
 
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =
@@ -42,11 +42,11 @@ export default function Table({
 
   const togglePopOver = (id) => {
     if (isPopoverOpen) {
-      setBlanketEnabled(false)
+      toggleBlanketEnabled()
       setIsPopoverOpen(false)
       setRowClicked(null)
     } else {
-      setBlanketEnabled(true)
+      toggleBlanketEnabled()
       setIsPopoverOpen(true)
       setRowClicked(id)
     }
@@ -151,7 +151,6 @@ export default function Table({
           ))}
         </tbody>
       </table>
-      <div className={blanketEnabled ? 'blanket' : ''}/>
     </>
   )
 }

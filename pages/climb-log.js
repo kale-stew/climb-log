@@ -16,6 +16,7 @@ const ClimbLog = ({ allClimbs }) => {
   const [allAreas, setAllAreas] = useState([])
   const [areaFilter, setAreaFilter] = useState('All')
   const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
+  const [blanketEnabled, setBlanketEnabled] = useState(false)
 
   const router = useRouter()
   const firstUpdate = useRef(true)
@@ -110,8 +111,18 @@ const ClimbLog = ({ allClimbs }) => {
     sortData(filteredData, filter)
   }
 
+  const toggleBlanketEnabled = () => {
+    if (blanketEnabled) {
+      setBlanketEnabled(false)
+    } else {
+      setBlanketEnabled(true)
+    }
+  }
+
   return (
     <Layout>
+      {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
+      <div className={blanketEnabled ? 'blanket' : ''}></div>
       <Head>
         <title>Kylie Stewart | Climb Log</title>
       </Head>
@@ -124,6 +135,7 @@ const ClimbLog = ({ allClimbs }) => {
         allAreas={allAreas}
         areaFilter={areaFilter}
         setAreaFilter={selectAreaFilter}
+        toggleBlanketEnabled={toggleBlanketEnabled}
       />
     </Layout>
   )

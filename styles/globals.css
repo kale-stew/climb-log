@@ -17,12 +17,11 @@ code {
 }
 
 .globalPopover {
-  position: relative;
   z-index: 200;
 }
 
 .blanket {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   width: 100%;
