@@ -14,7 +14,7 @@ export default function Table({
   allAreas,
   areaFilter,
   setAreaFilter,
-  toggleBlanketEnabled
+  toggleBlanketEnabled,
 }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id']
@@ -148,7 +148,8 @@ export default function Table({
               positions={['top', 'bottom', 'left', 'right']} // in order of priority
               content={<CustomPopover climb={climb} metric={metric} />}
             >
-              <tr className={'tableRow'}
+              <tr
+                className={'tableRow'}
                 key={i}
                 onClick={() => {
                   togglePopOver(i)

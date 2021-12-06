@@ -103,13 +103,13 @@ table {
   line-height: 1.6;
 }
 
-table tr:nth-child(even){
-  background-color: #f2f2f2 ;
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
 table .tableRow:hover {
   background-color: #ddd;
-} 
+}
 
 .tableRow {
   font-size: 15px;
