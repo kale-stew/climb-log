@@ -16,6 +16,7 @@ const ClimbLog = ({ allClimbs }) => {
   const [allAreas, setAllAreas] = useState([])
   const [areaFilter, setAreaFilter] = useState('all')
   const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
+  const [blanketEnabled, setBlanketEnabled] = useState(false)
 
   const router = useRouter()
   const firstUpdate = useRef(true)
@@ -59,8 +60,6 @@ const ClimbLog = ({ allClimbs }) => {
     }
     buildCategories()
     setData(sortedData)
-    // Force the data to update in the UI
-    refreshData()
   }
 
   /**
@@ -136,8 +135,18 @@ const ClimbLog = ({ allClimbs }) => {
     sortData(filteredData, selectedFilter)
   }
 
+  const toggleBlanketEnabled = () => {
+    if (blanketEnabled) {
+      setBlanketEnabled(false)
+    } else {
+      setBlanketEnabled(true)
+    }
+  }
+
   return (
     <Layout>
+      {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
+      <div className={blanketEnabled ? 'blanket' : ''}></div>
       <Head>
         <title>Kylie Stewart | Climb Log</title>
       </Head>
@@ -150,6 +159,7 @@ const ClimbLog = ({ allClimbs }) => {
         allAreas={allAreas}
         areaFilter={areaFilter}
         setAreaFilter={selectAreaFilter}
+        toggleBlanketEnabled={toggleBlanketEnabled}
       />
     </Layout>
   )

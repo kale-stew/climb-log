@@ -16,6 +16,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.globalPopover {
+  z-index: 200;
+}
+
+.blanket {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0.5;
+  z-index: 100;
+}
+
 button {
   background-color: #c5c5c5;
   display: inline-block;
@@ -80,12 +95,29 @@ select {
 
 table {
   background-color: white;
-  padding: 0.4rem 0.8rem;
+  border-collapse: collapse;
   border: 1px gainsboro;
   border-radius: 1rem;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   width: 85vw;
   line-height: 1.6;
+}
+
+table tr:nth-child(even){
+  background-color: #f2f2f2 ;
+}
+
+table .tableRow:hover {
+  background-color: #ddd;
+} 
+
+.tableRow {
+  font-size: 15px;
+}
+
+.tableRow td {
+  border: 1px solid #f2f2f2;
+  border-spacing: 0;
 }
 
 .titleHeader {
@@ -116,22 +148,12 @@ caption {
 
 tbody {
   width: 100%;
-  text-align: left;
+  text-align: center;
 }
 
 th {
   text-transform: uppercase;
   padding: 1.25rem 0 0.75rem 0;
-}
-
-td {
-  font-size: 15px;
-}
-
-td:not(:first-child),
-th:not(:first-child) {
-  padding-left: 1.5rem;
-  word-wrap: break-word;
 }
 
 @media (max-width: 1024px) {
@@ -141,7 +163,7 @@ th:not(:first-child) {
   }
 
   table {
-    max-width: 75vw;
+    max-width: 85vw;
   }
 
   th {
@@ -150,6 +172,7 @@ th:not(:first-child) {
   }
 
   td {
+    padding: 0 0.25em;
     max-width: 25vw;
     font-size: 13px;
     overflow: hidden;
