@@ -14,8 +14,9 @@ const ClimbLog = ({ allClimbs }) => {
     direction: TABLE_SORT_ORDER.DESC,
   })
   const [allAreas, setAllAreas] = useState([])
-  const [areaFilter, setAreaFilter] = useState('All')
+  const [areaFilter, setAreaFilter] = useState('all')
   const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
+  const [blanketEnabled, setBlanketEnabled] = useState(false)
 
   const router = useRouter()
   const firstUpdate = useRef(true)
@@ -59,8 +60,6 @@ const ClimbLog = ({ allClimbs }) => {
     }
     buildCategories()
     setData(sortedData)
-    // Force the data to update in the UI
-    refreshData()
   }
 
   /**
@@ -80,40 +79,74 @@ const ClimbLog = ({ allClimbs }) => {
 
   // Build the area categories on the first load (populating dropdown)
   useEffect(() => {
-    // sortData()
     buildCategories()
   }, [])
 
   const buildCategories = () => {
     // Unique climb areas become a new category to sort by (these are sorted alphabetically)
-    let categories = [...new Set(allClimbs.map((climb) => climb.area))].sort((a, b) => {
-      if (a < b) return -1
-      if (a > b) return 1
-      return 0
-    })
-    setAllAreas(categories)
+    let areaCategories = [...new Set(allClimbs.map((climb) => climb.area))]
+      .sort((a, b) => {
+        if (a < b) return -1
+        if (a > b) return 1
+        return 0
+      })
+      .map((area) => {
+        // We have 2 different types of category in the same list, so let's make sure we include a "type" so
+        // that we can later make sure we are filtering by that type
+        return { text: `${area.trim()}`, value: area.trim(), type: 'area' }
+      })
+    // Unique climb states become a new category to sort by (these are sorted alphabetically)
+    let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))]
+      .sort((a, b) => {
+        if (a < b) return -1
+        if (a > b) return 1
+        return 0
+      })
+      .map((state) => {
+        return { text: `all ${state.trim()}`, value: state.trim(), type: 'state' }
+      })
+    // Let's add the states to the top of the drop down
+    areaCategories.unshift(...stateCategories)
+    setAllAreas(areaCategories)
   }
 
   /**
    * When the user selects an area, let's set state accordingly
+   * We're dealing with a state type and an area type, so the value of the dropdown item will look like "colorado?state"
+   * or "san juans?area", this way we can filter the climbs object with variables depending on the filter type
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
-    // If the area filter the user selects is "All", let's reset to allClimbs and make sure we sort based on the current order
+    let filterType = filter.split('?')[1]
+    let selectedFilter = filter.split('?')[0]
+    // Set the areaFilter so that the drop down can handle it's own state (we want it to be the "colorado?state" formatted value)
     setAreaFilter(filter)
-    if (filter == 'All') {
+    // If the area filter the user selects is "all", let's reset to allClimbs and make sure we sort based on the current order
+    if (filter == 'all') {
       setFilteredClimbs(allClimbs)
-      sortData(allClimbs, 'All') // sortData helps us do the reset^
+      sortData(allClimbs, 'all') // sortData helps us do the reset^
       return
     }
-    // Otherwise let's filter down to what we want and sort it after.
-    let filteredData = allClimbs.filter((climb) => climb.area.trim() == filter.trim())
+    // Otherwise let's filter down to what we want based on the filter type
+    let filteredData = allClimbs.filter(
+      (climb) => climb[filterType].trim() == selectedFilter.trim()
+    )
     setFilteredClimbs(filteredData)
-    sortData(filteredData, filter)
+    sortData(filteredData, selectedFilter)
+  }
+
+  const toggleBlanketEnabled = () => {
+    if (blanketEnabled) {
+      setBlanketEnabled(false)
+    } else {
+      setBlanketEnabled(true)
+    }
   }
 
   return (
     <Layout>
+      {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
+      <div className={blanketEnabled ? 'blanket' : ''}></div>
       <Head>
         <title>Kylie Stewart | Climb Log</title>
       </Head>
@@ -126,6 +159,7 @@ const ClimbLog = ({ allClimbs }) => {
         allAreas={allAreas}
         areaFilter={areaFilter}
         setAreaFilter={selectAreaFilter}
+        toggleBlanketEnabled={toggleBlanketEnabled}
       />
     </Layout>
   )
