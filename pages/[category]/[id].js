@@ -10,7 +10,7 @@ import utilStyles from '../../styles/utils.module.css'
 const Post = ({ postData, postIds }) => {
   /**
    * buildNavigation uses the sorted posts data to find it's own index, the next post's,
-   * and the previous post's index (if they exist). Now that it knows where it is in the 
+   * and the previous post's index (if they exist). Now that it knows where it is in the
    * sorted data, we can generate the nav links for the bottom of the page.
    * @returns next js <Link/>
    */
@@ -21,7 +21,7 @@ const Post = ({ postData, postIds }) => {
     let nextPostLink
     let prevPostLink
 
-    // This means we have previous post, let's set it's index and create the link  
+    // This means we have previous post, let's set it's index and create the link
     if (selfPosition + 1 <= postIds.length - 1) {
       nextPost = selfPosition + 1
       nextPostLink = (

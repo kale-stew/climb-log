@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Category from '../components/Category'
 import FormattedDate from '../components/Date'
 import Head from 'next/head'

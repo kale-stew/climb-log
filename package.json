@@ -1,6 +1,6 @@
 {
   "name": "climb-log",
-  "author": "Kylie Stewart <hello@kyliestewart.tech>",
+  "author": "Kylie Stewart <kylie@hey.com>",
   "version": "0.5.0",
   "license": "MIT",
   "scripts": {
@@ -12,7 +12,6 @@
   "dependencies": {
     "@notionhq/client": "^0.3.0",
     "date-fns": "^2.27.0",
-    "fs": "^0.0.1-security",
     "gray-matter": "^4.0.3",
     "next": "^11.1.2",
     "path": "^0.12.7",

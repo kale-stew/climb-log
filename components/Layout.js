@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Router from 'next/router'
 import Link from 'next/link'
 import Loading from './Loading'
