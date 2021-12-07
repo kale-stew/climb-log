@@ -115,6 +115,26 @@
   font-size: 13px;
 }
 
+.blogNavigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.blogNavigation a {
+  flex: 1 1 1;
+  text-align: center;
+  text-decoration: none;
+  color: #ff953d;
+}
+
+.separator {
+  display: none;
+  margin: 2px;
+  background: #ff953d;
+  width: 1px;
+}
+
 .backToHome {
   margin: 3rem 0;
 }
@@ -131,6 +151,10 @@
 @media (max-width: 1024px) {
   .aboutBlock {
     flex-direction: column;
+  }
+
+  .separator {
+    display: flex;
   }
 
   .aboutBlock img {
