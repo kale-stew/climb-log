@@ -3,6 +3,7 @@ import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/posts'
+import CustomHead from '../../components/CustomHead'
 
 import utilStyles from '../../styles/utils.module.css'
 
