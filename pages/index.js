@@ -1,9 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '../components/Layout'
-import CapitolCreek from '../public/photos/2021_capitol-creek.jpg'
-
-import styles from '../components/Layout.module.css'
+import ImageCapitolCreek from '../public/photos/2021_capitol-creek.jpg'
 
 const HomePage = () => (
   <Layout home>
@@ -12,7 +10,7 @@ const HomePage = () => (
     </Head>
     <br />
     <Image
-      src={CapitolCreek}
+      src={ImageCapitolCreek}
       alt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       layout="intrinsic"
       placeholder="blur"
