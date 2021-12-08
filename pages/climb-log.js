@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-import { fetchAllClimbs, fetchClimbHeaderImages } from '../utils/notion'
+import { fetchAllClimbs } from '../utils/notion'
 import { TABLE_SORT_ORDER } from '../utils/constants'
 import { useRouter } from 'next/router'
 

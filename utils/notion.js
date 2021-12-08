@@ -47,7 +47,7 @@ export const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
-  let returnArr = response.results.map((result) => {
+  return response.results.map((result) => {
     const {
       id,
       properties: { area, date, distance, gain, hike_title },
@@ -72,7 +72,6 @@ export const fetchAllClimbs = async () => {
       imgUrl: imageUrl,
     }
   }, [])
-  return returnArr
 }
 
 /**
