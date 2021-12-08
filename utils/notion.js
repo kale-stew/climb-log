@@ -26,18 +26,22 @@ const getDatabaseQueryConfig = () => {
  * into a Table-friendly object
  */
 const fmt = (field) => {
-  switch (field.type) {
-    case 'date':
-      return field?.date?.start
-    case 'number':
-      return field?.number
-    case 'rich_text':
-      return field?.rich_text[0]?.plain_text
-    case 'title':
-      return field?.title[0]?.plain_text
-    case 'url':
-      return field?.url
-  }
+  if (field !== null) {
+    switch (field.type) {
+      case 'date':
+        return field?.date?.start
+      case 'number':
+        return field?.number
+      case 'rich_text':
+        return field?.rich_text[0]?.plain_text
+      case 'title':
+        return field?.title[0]?.plain_text
+      case 'url':
+        return field?.url
+      case 'file':
+        return field?.file?.url
+    }
+  } else return null
 }
 
 /**
@@ -47,7 +51,6 @@ export const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
-
   return response.results.map((result) => {
     const {
       id,
@@ -59,6 +62,7 @@ export const fetchAllClimbs = async () => {
       date: fmt(date),
       title: fmt(hike_title),
       // slug: url,
+      imgUrl: fmt(result.cover),
       distance: fmt(distance),
       gain: fmt(gain),
       area: getLocationData(fmt(area)).area,
