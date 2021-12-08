@@ -8,3 +8,8 @@
   padding-bottom: 15px;
   position: relative;
 }
+
+.contentWithImg {
+  min-width: 50vw;
+  min-height: 50vw;
+}

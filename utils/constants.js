@@ -3,7 +3,7 @@ import path from 'path'
 export const CATEGORY_TYPE = {
   GEAR: 'gear',
   HIKE: 'hike',
-  THOUGHTS: 'thoughts'
+  THOUGHTS: 'thoughts',
 }
 
 export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)

@@ -33,11 +33,23 @@ const CustomPopover = ({ climb, metric }) => {
   }
 
   return (
-    <div className={styles.popoverContent}>
+    <div
+      className={
+        climb.imgUrl
+          ? `${styles.popoverContent} ${styles.contentWithImg}`
+          : `${styles.popoverContent}`
+      }
+    >
       <header>
         {buildTitle()}
         {climb.imgUrl && (
-          <Image src={climb.imgUrl} width="100%" height="100%" layout="responsive" objectFit="contain" />
+          <Image
+            src={climb.imgUrl}
+            width="100%"
+            height="100%"
+            layout="responsive"
+            objectFit="contain"
+          />
         )}
       </header>
 
