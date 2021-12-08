@@ -145,7 +145,7 @@ export default function Table({
               key={climb.id}
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}
-              positions={['top', 'bottom', 'left', 'right']} // in order of priority
+              positions={['center', 'bottom']} // in order of priority
               content={<CustomPopover climb={climb} metric={metric} />}
             >
               <tr
