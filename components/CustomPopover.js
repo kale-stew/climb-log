@@ -1,6 +1,7 @@
 import FormattedDate from './Date'
 import {
   addCommas,
+  capatalizeEachWord,
   feetToMeters,
   findMatchingSlug,
   milesToKilometers,
@@ -53,7 +54,7 @@ const CustomPopover = ({ climb, metric }) => {
           : climb && `${addCommas(climb.gain)}'`}
       </p>
       <p>
-        <strong>Location:</strong> {climb.area}, {climb.state}
+        <strong>Location:</strong> {capatalizeEachWord(climb.area)}, {capatalizeEachWord(climb.state)}
       </p>
     </div>
   )
