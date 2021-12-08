@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Category from '../components/Category'
+import CustomHead from '../components/CustomHead'
 import FormattedDate from '../components/Date'
 import Link from 'next/link'
 import Layout from '../components/Layout'
@@ -7,7 +8,6 @@ import { getSortedPostsData } from '../utils/posts'
 import { gearCategory, hikeCategory, thoughtsCategory } from '../utils/constants'
 
 import utilStyles from '../styles/utils.module.css'
-import CustomHead from '../components/CustomHead'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState('all')

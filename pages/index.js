@@ -1,7 +1,7 @@
 import Image from 'next/image'
+import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import CapitolCreek from '../public/photos/2021_capitol-creek.jpg'
-import CustomHead from '../components/CustomHead'
 
 import styles from '../components/Layout.module.css'
 

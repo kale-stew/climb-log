@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import Layout from '../components/Layout'
-import Table from '../components/Table'
-import { fetchAllClimbs } from '../utils/notion'
-import { TABLE_SORT_ORDER } from '../utils/constants'
 import { useRouter } from 'next/router'
 import CustomHead from '../components/CustomHead'
+import Layout from '../components/Layout'
+import Table from '../components/Table'
+import { TABLE_SORT_ORDER } from '../utils/constants'
+import { fetchAllClimbs } from '../utils/notion'
 
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)

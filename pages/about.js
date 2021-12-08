@@ -1,3 +1,4 @@
+import CustomHead from '../components/CustomHead'
 import Headshot from '../public/photos/headshot.jpg'
 import Image from 'next/image'
 import Layout from '../components/Layout'
@@ -6,7 +7,6 @@ import { MdOutlineMail } from 'react-icons/md'
 import { SocialLinks } from '../utils/socials'
 
 import utilStyles from '../styles/utils.module.css'
-import CustomHead from '../components/CustomHead'
 
 const AboutPage = () => (
   <Layout>
