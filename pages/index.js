@@ -12,6 +12,7 @@ const HomePage = () => (
     <Image
       src={ImageCapitolCreek}
       alt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
+      className="landingImage"
       layout="intrinsic"
       placeholder="blur"
     ></Image>
