@@ -12,13 +12,14 @@ const Category = ({ category, pushToRouter }) => {
       query: category,
     })
   }
-  
+
   switch (category) {
     case CATEGORY_TYPE.GEAR:
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.GEAR)}
           className={pushToRouter ? `${utilStyles.gearCategory} ${utilStyles.categoryLink}` : utilStyles.gearCategory}
+          role={pushToRouter ? 'navigation' : ''}
         >
           gear
         </div>
@@ -28,6 +29,7 @@ const Category = ({ category, pushToRouter }) => {
         <div
           onClick={() => pushProps(CATEGORY_TYPE.THOUGHTS)}
           className={pushToRouter ? `${utilStyles.thoughtsCategory} ${utilStyles.categoryLink}` : utilStyles.thoughtsCategory}
+          role={pushToRouter ? 'navigation' : ''}
         >
           thoughts
         </div>
@@ -37,6 +39,7 @@ const Category = ({ category, pushToRouter }) => {
         <div
           onClick={() => pushProps(CATEGORY_TYPE.HIKE)}
           className={pushToRouter ? `${utilStyles.hikeCategory} ${utilStyles.categoryLink}` : utilStyles.hikeCategory}
+          role={pushToRouter ? 'navigation' : ''}
         >
           trip reports
         </div>
