@@ -5,14 +5,18 @@ export const TABLE_SORT_ORDER = {
   DESC: 'descending',
 }
 
-export const gearCategory = 'gear'
-export const gearDirectory = path.join(process.cwd(), 'blog/gear')
+export const CATEGORY_TYPE = {
+  GEAR: 'gear',
+  THOUGHTS: 'thoughts',
+  HIKE: 'hike',
+}
 
-export const thoughtsCategory = 'thoughts'
-export const thoughtsDirectory = path.join(process.cwd(), 'blog/thoughts')
-
-export const hikeCategory = 'hike'
-export const hikeDirectory = path.join(process.cwd(), 'blog/hike')
+export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)
+export const hikeDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.HIKE}`)
+export const thoughtsDirectory = path.join(
+  process.cwd(),
+  `blog/${CATEGORY_TYPE.THOUGHTS}`
+)
 
 // TODO - more complex post calculation so it's agnostic to however many categories exist?
 // export const CATEGORIES = [
