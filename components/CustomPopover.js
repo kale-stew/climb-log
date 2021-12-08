@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import FormattedDate from './Date'
 import {
   addCommas,
@@ -35,7 +36,9 @@ const CustomPopover = ({ climb, metric }) => {
     <div className={styles.popoverContent}>
       <header>
         {buildTitle()}
-        {climb.imgUrl && <img src={climb.imgUrl} />}
+        {climb.imgUrl && (
+          <Image src={climb.imgUrl} /*width={} height={} */ layout="fill" />
+        )}
       </header>
 
       <FormattedDate dateString={climb.date} withDOW />
