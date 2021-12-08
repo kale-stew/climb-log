@@ -1,14 +1,9 @@
 import path from 'path'
 
-export const TABLE_SORT_ORDER = {
-  ASC: 'ascending',
-  DESC: 'descending',
-}
-
 export const CATEGORY_TYPE = {
   GEAR: 'gear',
-  THOUGHTS: 'thoughts',
   HIKE: 'hike',
+  THOUGHTS: 'thoughts'
 }
 
 export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)
@@ -19,8 +14,13 @@ export const thoughtsDirectory = path.join(
 )
 
 // TODO - more complex post calculation so it's agnostic to however many categories exist?
-// export const CATEGORIES = [
-//   { title: 'hike', directory: path.join(process.cwd(), 'blog/hike') },
-//   { title: 'thoughts', directory: path.join(process.cwd(), 'blog/thoughts') },
-//   { title: 'gear', directory: path.join(process.cwd(), 'blog/gear') },
+// export const BLOG_CATEGORIES = [
+//   { title: CATEGORY_TYPE.GEAR, directory: gearDirectory },
+//   { title: CATEGORY_TYPE.HIKE, directory: hikeDirectory },
+//   { title: CATEGORY_TYPE.THOUGHTS, directory: thoughtsDirectory },
 // ]
+
+export const TABLE_SORT_ORDER = {
+  ASC: 'ascending',
+  DESC: 'descending',
+}
