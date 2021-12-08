@@ -3,14 +3,12 @@
   flex-direction: column;
   align-items: center;
   font-family: 'Playfair Display', serif;
-  color: #0794e0;
 }
 
 .landingNavigation a {
   font-size: 1.25rem;
   padding: 1.5rem;
   text-decoration: none;
-  color: #0794e0;
 }
 
 .landingNavigation a:hover {
