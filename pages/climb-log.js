@@ -167,8 +167,6 @@ const ClimbLog = ({ allClimbs }) => {
 
 export async function getStaticProps() {
   const response = await fetchAllClimbs()
-  const thing = await fetchClimbHeaderImages()
-  console.log("THING:", response)
 
   return {
     props: {

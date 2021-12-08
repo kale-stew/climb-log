@@ -26,7 +26,6 @@ const getDatabaseQueryConfig = () => {
  * into a Table-friendly object
  */
 const fmt = (field) => {
-  
   switch (field.type) {
     case 'date':
       return field?.date?.start
@@ -41,12 +40,10 @@ const fmt = (field) => {
   }
 }
 
-let page_ids = []
 /**
  * Fetch list of climbs from Notion db
  */
 export const fetchAllClimbs = async () => {
-  page_ids = []
   const config = getDatabaseQueryConfig()
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
@@ -55,9 +52,14 @@ export const fetchAllClimbs = async () => {
       id,
       properties: { area, date, distance, gain, hike_title },
     } = result
-    page_ids.push(id)
-    // let page = await notion.pages.retrieve({ page_id: id });
-    // console.log("PAGE:", page)
+
+    let imageUrl = null
+    if (result.cover) {
+      if (result.cover?.file?.url != undefined) {
+        imageUrl = result.cover?.file?.url
+      }
+    }
+
     return {
       id,
       date: fmt(date),
@@ -67,26 +69,10 @@ export const fetchAllClimbs = async () => {
       gain: fmt(gain),
       area: getLocationData(fmt(area)).area,
       state: getLocationData(fmt(area)).state,
-      imgUrl: result.cover?.file?.url
+      imgUrl: imageUrl,
     }
   }, [])
   return returnArr
-  let returnObj = Promise.all(returnArr).then((data) => {
-    console.log("DATA:", data)
-    return data
-  }).catch((err) => {
-    console.warn("ERROR:", err)
-    return []
-  })
-  console.log("???", returnObj)
-  return returnObj
-  // return returnArr.then((data) => {
-  //   console.log("DATA:", data)
-  //   return data
-  // }).catch((err) => {
-  //   console.warn("ERROR:", err)
-  //   return []
-  // })
 }
 
 /**
@@ -103,9 +89,3 @@ export const fetchClimbsBySearchQuery = async (/* str */) => {}
  * Fetch a single climb's data
  */
 export const fetchClimbData = async (/* id */) => {}
-
-export const fetchClimbHeaderImages = async () => {
-  //30beee35-660c-409b-bd08-ccb68df5db45
-  // let response = await notion.pages.retrieve({ page_id: '30beee35-660c-409b-bd08-ccb68df5db45' });
-  // let response = await notion.databases.retrieve({database_id: process.env.NOTION_DATABASE_ID})
-}

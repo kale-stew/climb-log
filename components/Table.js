@@ -17,7 +17,7 @@ export default function Table({
   toggleBlanketEnabled,
 }) {
   // Notion data vals we -don't- want in the Table
-  const alwaysExclude = ['href', 'strava', 'id']
+  const alwaysExclude = ['href', 'strava', 'id', 'imgUrl']
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)

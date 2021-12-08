@@ -33,7 +33,11 @@ const CustomPopover = ({ climb, metric }) => {
 
   return (
     <div className={styles.popoverContent}>
-      <header>{buildTitle()}</header>
+      <header>
+        {buildTitle()}
+        {climb.imgUrl ? <img src={climb.imgUrl} /> : null}
+      </header>
+
       <FormattedDate dateString={climb.date} withDOW />
       <br />
       <p>
