@@ -5,7 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Layout from '../components/Layout'
 import { getSortedPostsData } from '../utils/posts'
-import { gearCategory, hikeCategory, thoughtsCategory } from '../utils/constants'
+import { CATEGORY_TYPE } from '../utils/constants'
 
 import utilStyles from '../styles/utils.module.css'
 
@@ -30,32 +30,38 @@ export default function BlogLandingPage({ allPostsData }) {
         </button>
         <button
           className={
-            viewCategory === gearCategory ? utilStyles.categorySelected : 'categoryButton'
+            viewCategory === CATEGORY_TYPE.GEAR
+              ? utilStyles.categorySelected
+              : 'categoryButton'
           }
           onClick={() =>
-            setCategory(viewCategory === gearCategory ? 'all' : gearCategory)
+            setCategory(viewCategory === CATEGORY_TYPE.GEAR ? 'all' : CATEGORY_TYPE.GEAR)
           }
         >
           Gear
         </button>
         <button
           className={
-            viewCategory === thoughtsCategory
+            viewCategory === CATEGORY_TYPE.THOUGHTS
               ? utilStyles.categorySelected
               : 'categoryButton'
           }
           onClick={() =>
-            setCategory(viewCategory === thoughtsCategory ? 'all' : thoughtsCategory)
+            setCategory(
+              viewCategory === CATEGORY_TYPE.THOUGHTS ? 'all' : CATEGORY_TYPE.THOUGHTS
+            )
           }
         >
           Thoughts
         </button>
         <button
           className={
-            viewCategory === hikeCategory ? utilStyles.categorySelected : 'categoryButton'
+            viewCategory === CATEGORY_TYPE.HIKE
+              ? utilStyles.categorySelected
+              : 'categoryButton'
           }
           onClick={() =>
-            setCategory(viewCategory === hikeCategory ? 'all' : hikeCategory)
+            setCategory(viewCategory === CATEGORY_TYPE.HIKE ? 'all' : CATEGORY_TYPE.HIKE)
           }
         >
           Trip Reports
