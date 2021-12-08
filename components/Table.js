@@ -89,7 +89,7 @@ export default function Table({
         }}
         placeholder="Filter by Area"
       >
-        <option value={'all'}>all</option>
+        <option value={'all'}>All</option>
         {allAreas.map((area) => {
           return (
             <option key={area.value} value={`${area.value}?${area.type}`}>

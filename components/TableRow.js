@@ -1,5 +1,6 @@
 import {
   addCommas,
+  capatalizeEachWord,
   feetToMeters,
   findMatchingSlug,
   formatDate,
@@ -42,14 +43,14 @@ export default function TableRow({ id, title, data, metric }) {
       // Hide row in mobile view
       return (
         <td key={id} className={styles.hiddenRow}>
-          {data}
+          {capatalizeEachWord(data)}
         </td>
       )
     case 'area':
       // Hide row in mobile view
       return (
         <td key={id} className={styles.hiddenRow}>
-          {data}
+          {capatalizeEachWord(data)}
         </td>
       )
     default:

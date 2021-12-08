@@ -34,6 +34,19 @@ const formatStatsMetric = (distance, gain) =>
   (distance && gain && `${milesToKilometers(distance)} km & ${feetToMeters(gain)} m`) ||
   null
 
+const capatalizeEachWord = (string) => {
+  let capatalized = string
+    .split(' ')
+    .map((s) => {
+      if (s == 'de' || s == 'la' ) {
+        return s
+      }
+      return s.charAt(0).toUpperCase() + s.substring(1)
+    })
+    .join(' ')
+  return capatalized
+}
+
 export {
   addCommas,
   feetToMeters,
@@ -44,4 +57,5 @@ export {
   formatStatsMetric,
   getLocationData,
   milesToKilometers,
+  capatalizeEachWord,
 }

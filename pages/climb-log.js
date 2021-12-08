@@ -5,6 +5,7 @@ import Table from '../components/Table'
 import { fetchAllClimbs } from '../utils/notion'
 import { TABLE_SORT_ORDER } from '../utils/constants'
 import { useRouter } from 'next/router'
+import { capatalizeEachWord } from '../utils/helpers'
 
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
@@ -93,7 +94,11 @@ const ClimbLog = ({ allClimbs }) => {
       .map((area) => {
         // We have 2 different types of category in the same list, so let's make sure we include a "type" so
         // that we can later make sure we are filtering by that type
-        return { text: `${area.trim()}`, value: area.trim(), type: 'area' }
+        return {
+          text: capatalizeEachWord(`${area.trim()}`),
+          value: area.trim(),
+          type: 'area',
+        }
       })
     // Unique climb states become a new category to sort by (these are sorted alphabetically)
     let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))]
@@ -103,7 +108,11 @@ const ClimbLog = ({ allClimbs }) => {
         return 0
       })
       .map((state) => {
-        return { text: `all ${state.trim()}`, value: state.trim(), type: 'state' }
+        return {
+          text: capatalizeEachWord(`all ${state.trim()}`),
+          value: state.trim(),
+          type: 'state',
+        }
       })
     // Let's add the states to the top of the drop down
     areaCategories.unshift(...stateCategories)
