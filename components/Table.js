@@ -17,7 +17,7 @@ export default function Table({
   toggleBlanketEnabled,
 }) {
   // Notion data vals we -don't- want in the Table
-  const alwaysExclude = ['href', 'strava', 'id']
+  const alwaysExclude = ['href', 'strava', 'id', 'imgUrl']
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
@@ -145,7 +145,7 @@ export default function Table({
               key={climb.id}
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}
-              positions={['top', 'bottom', 'left', 'right']} // in order of priority
+              positions={['center', 'bottom']} // in order of priority
               content={<CustomPopover climb={climb} metric={metric} />}
             >
               <tr

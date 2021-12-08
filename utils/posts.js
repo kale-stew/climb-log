@@ -4,11 +4,9 @@ import matter from 'gray-matter'
 import path from 'path'
 import { remark } from 'remark'
 import {
-  gearCategory,
+  CATEGORY_TYPE,
   gearDirectory,
-  hikeCategory,
   hikeDirectory,
-  thoughtsCategory,
   thoughtsDirectory,
 } from './constants'
 
@@ -27,13 +25,13 @@ export function getAllPostIds() {
   // Loop through each xxxFileNames array.
   // Add relevant category name to categoryNames array
   gearFileNames.forEach(function (gearFileName) {
-    categoryNames.push(gearCategory)
+    categoryNames.push(CATEGORY_TYPE.GEAR)
   })
   thoughtsFileNames.forEach(function (thoughtsFileName) {
-    categoryNames.push(thoughtsCategory)
+    categoryNames.push(CATEGORY_TYPE.THOUGHTS)
   })
   tripReportsFileNames.forEach(function (tripReportsFileName) {
-    categoryNames.push(hikeCategory)
+    categoryNames.push(CATEGORY_TYPE.HIKE)
   })
 
   // Concatenate each articles name in one array (id)
@@ -75,7 +73,7 @@ export function getSortedPostsData() {
     const longPreview = matterResult.content
 
     // Set the category
-    const category = gearCategory
+    const category = CATEGORY_TYPE.GEAR
 
     // Combine the data with the id
     return {
@@ -100,7 +98,7 @@ export function getSortedPostsData() {
     const longPreview = matterResult.content
 
     // Set the category
-    const category = thoughtsCategory
+    const category = CATEGORY_TYPE.THOUGHTS
 
     // Combine the data with the id
     return {
@@ -125,7 +123,7 @@ export function getSortedPostsData() {
     const longPreview = matterResult.content
 
     // Set the category
-    const category = hikeCategory
+    const category = CATEGORY_TYPE.HIKE
 
     // Combine the data with the id
     return {

@@ -1,22 +1,26 @@
 import path from 'path'
 
+export const CATEGORY_TYPE = {
+  GEAR: 'gear',
+  HIKE: 'hike',
+  THOUGHTS: 'thoughts'
+}
+
+export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)
+export const hikeDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.HIKE}`)
+export const thoughtsDirectory = path.join(
+  process.cwd(),
+  `blog/${CATEGORY_TYPE.THOUGHTS}`
+)
+
+// TODO - more complex post calculation so it's agnostic to however many categories exist?
+// export const BLOG_CATEGORIES = [
+//   { title: CATEGORY_TYPE.GEAR, directory: gearDirectory },
+//   { title: CATEGORY_TYPE.HIKE, directory: hikeDirectory },
+//   { title: CATEGORY_TYPE.THOUGHTS, directory: thoughtsDirectory },
+// ]
+
 export const TABLE_SORT_ORDER = {
   ASC: 'ascending',
   DESC: 'descending',
 }
-
-export const gearCategory = 'gear'
-export const gearDirectory = path.join(process.cwd(), 'blog/gear')
-
-export const thoughtsCategory = 'thoughts'
-export const thoughtsDirectory = path.join(process.cwd(), 'blog/thoughts')
-
-export const hikeCategory = 'hike'
-export const hikeDirectory = path.join(process.cwd(), 'blog/hike')
-
-// TODO - more complex post calculation so it's agnostic to however many categories exist?
-// export const CATEGORIES = [
-//   { title: 'hike', directory: path.join(process.cwd(), 'blog/hike') },
-//   { title: 'thoughts', directory: path.join(process.cwd(), 'blog/thoughts') },
-//   { title: 'gear', directory: path.join(process.cwd(), 'blog/gear') },
-// ]
