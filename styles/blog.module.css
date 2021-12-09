@@ -43,4 +43,14 @@
   .blogNavigationSeparator {
     display: flex;
   }
+
+  .blogSubheader {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .blogSection {
+    width: auto;
+  }
 }

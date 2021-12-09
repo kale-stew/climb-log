@@ -98,7 +98,7 @@ table .tableRow:hover {
 }
 
 article {
-  max-width: 70vw;
+  width: 760px;
   margin-bottom: 3em;
 }
 
@@ -151,5 +151,17 @@ th {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 1024px) {
+  article h1 {
+    text-align: center;
+  }
+}
+
+@media (max-width: 760px) {
+  article {
+    width: auto;
   }
 }

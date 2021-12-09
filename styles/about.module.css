@@ -8,6 +8,7 @@
 
 .aboutImage {
   padding: 0 2rem 0;
+  float: left;
 }
 
 .socialIcons {
@@ -36,6 +37,11 @@
 
   .aboutBlockText p {
     text-align: center;
+  }
+
+  .aboutImageMobile {
+    display: flex;
+    justify-content: center;
   }
 
   .socialIcons {

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { METADATA } from '../utils/constants'
-import styles from './ResponsiveImage.module.css'
+
+import utilStyles from '../styles/utils.module.css'
 
 /**
  * A wrapper for next/image that allows us to provide two different imageSources
@@ -18,7 +19,7 @@ const ResponsiveImage = ({
 }) => {
   return (
     <>
-      <div className={`${styles.imageFullWrapper} ${wrapperCn}`}>
+      <div className={`${utilStyles.hiddenForMobile} ${wrapperCn}`}>
         <Image
           src={desktopImg}
           width={desktopDimensions.width}
@@ -28,7 +29,7 @@ const ResponsiveImage = ({
         />
       </div>
       {mobileImg && (
-        <div className={styles.imageMobileWrapper}>
+        <div className={utilStyles.shownForMobile}>
           <Image
             className={mobileCn}
             src={mobileImg}

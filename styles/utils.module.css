@@ -62,6 +62,10 @@
   border-radius: 100%;
 }
 
+.shownForMobile {
+  display: none;
+}
+
 .singleRow {
   display: flex;
   align-items: center;
@@ -71,4 +75,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .hiddenForMobile {
+    display: none;
+  }
+
+  .shownForMobile {
+    display: flex;
+    justify-content: center;
+  }
 }
