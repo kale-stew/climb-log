@@ -26,11 +26,13 @@
   color: #000000;
 }
 
-@media (max-width: 1024px) {
+/* Adjusted so iPads get the desktop experience on this page */
+@media (max-width: 741px) {
   .aboutBlock {
     flex-direction: column;
-    padding: 0 2rem;
+    padding: 0 1.75rem;
     align-items: center;
+    max-width: 80vw;
   }
 
   .aboutHeadshotFullWrapper {
@@ -38,10 +40,10 @@
   }
 
   .aboutHeadshotMobileWrapper {
-    display: block;
-    margin: 0 6rem 2.2rem;
-    min-width: 30vw;
-    max-width: 50vw;
+    display: flex;
+    justify-content: center;
+    min-width: 40vw;
+    margin-bottom: 1.75em;
   }
 
   .aboutBlockText p {
@@ -50,5 +52,11 @@
 
   .socialIcons {
     margin: 0 5rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .aboutBlock p {
+    padding: 0.5rem 0;
   }
 }
