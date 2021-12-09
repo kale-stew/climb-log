@@ -2,6 +2,11 @@
   width: 100%;
 }
 
+.mostRecentPosts {
+  display: flex;
+  justify-content: space-around;
+}
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -11,6 +16,12 @@
 }
 
 @media (max-width: 1024px) {
+  .mostRecentPosts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
   .wrapper {
     margin: 0 2rem;
   }
