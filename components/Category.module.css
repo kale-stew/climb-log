@@ -1,0 +1,32 @@
+.categoryLink:hover {
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+}
+
+.categorySelected {
+  background-color: #6d6d6d;
+}
+
+.categoryPill {
+  color: white;
+  border-radius: 1em;
+  margin-left: 0.6rem;
+  padding: 0.2em 0.5em;
+  line-height: 1.3em;
+  font-size: 13px;
+}
+
+.gearCategory {
+  background-color: #e4960498;
+  /* Color w/o opacity: e49504 */
+}
+
+.hikeCategory {
+  background-color: #bb03e993;
+  /* Color w/o opacity: bb03e9 */
+}
+
+.thoughtsCategory {
+  background-color: #f1045f94;
+  /* Color w/o opacity: f1045f */
+}

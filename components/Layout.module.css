@@ -1,28 +1,5 @@
-.landingNavigation a {
-  font-size: 1.25rem;
-  padding: 1.5rem;
-  text-decoration: none;
-  color: #0794e0;
-}
-
-.landingNavigation a:hover {
-  text-decoration: underline;
-}
-
-.navigation {
-  margin-top: 1.4rem;
-}
-
-.landingHeader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Playfair Display', serif;
-}
-
 .landingPage {
   width: 100%;
-  color: #0794e0;
 }
 
 .wrapper {

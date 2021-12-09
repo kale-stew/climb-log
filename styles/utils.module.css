@@ -1,3 +1,11 @@
+.centerText {
+  text-align: center;
+}
+
+.roundImage {
+  border-radius: 100%;
+}
+
 .heading2Xl {
   font-size: 2.8rem;
   line-height: 1.2;
@@ -46,99 +54,10 @@
   align-items: center;
 }
 
-.socialIcons {
-  display: flex;
-  margin: 0 15rem;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
 .vertical {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.blogPostHeading {
-  font-size: 1.5rem;
-  color: #020202;
-}
-
-.blogPostHeading:hover {
-  text-decoration: underline;
-}
-
-.blogItemCategory {
-  display: flex;
-  align-items: center;
-}
-
-.aboutBlock {
-  display: flex;
-  align-items: flex-start;
-  max-width: 685px;
-}
-
-.aboutBlockText {
-  margin-left: 2rem;
-}
-
-.gearCategory {
-  background-color: #e4960498;
-  /* e49504 */
-  color: white;
-  border-radius: 1em;
-  margin-left: 0.6rem;
-  padding: 0.2em 0.5em;
-  line-height: 1.3em;
-  font-size: 13px;
-}
-
-.categoryLink:hover {
-  cursor: pointer;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-}
-
-.thoughtsCategory {
-  background-color: #f1045f94;
-  /* f1045f */
-  color: white;
-  border-radius: 1em;
-  margin-left: 0.6rem;
-  padding: 0.2em 0.5em;
-  line-height: 1.3em;
-  font-size: 13px;
-}
-
-.hikeCategory {
-  background-color: #bb03e993;
-  /* bb03e9 */
-  color: white;
-  border-radius: 1em;
-  margin-left: 0.6rem;
-  padding: 0.2em 0.5em;
-  line-height: 1.3em;
-  font-size: 13px;
-}
-
-.blogNavigation {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.blogNavigation a {
-  flex: 1 1 1;
-  text-align: center;
-  text-decoration: none;
-  color: #ff953d;
-}
-
-.separator {
-  display: none;
-  margin: 2px;
-  background: #ff953d;
-  width: 1px;
 }
 
 .backToHome {
@@ -148,27 +67,4 @@
 .backToHome a {
   text-decoration: none;
   color: #ff953d;
-}
-
-.categorySelected {
-  background-color: #6d6d6d;
-}
-
-@media (max-width: 1024px) {
-  .aboutBlock {
-    flex-direction: column;
-  }
-
-  .separator {
-    display: flex;
-  }
-
-  .aboutBlock img {
-    border-radius: 9999px;
-    width: 320px;
-  }
-
-  .socialIcons {
-    margin: 0 5rem;
-  }
 }

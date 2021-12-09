@@ -1,0 +1,62 @@
+.aboutBlock {
+  max-width: 585px;
+}
+
+.aboutBlockText p {
+  text-align: left;
+}
+
+.aboutHeadshotFullWrapper {
+  float: left;
+  margin: 0 2rem 2rem 0;
+}
+
+.aboutHeadshotMobileWrapper {
+  display: none;
+}
+
+.socialIcons {
+  display: flex;
+  margin: 0 7rem;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.socialIcons a {
+  color: #000000;
+}
+
+/* Adjusted so iPads get the desktop experience on this page */
+@media (max-width: 741px) {
+  .aboutBlock {
+    flex-direction: column;
+    padding: 0 1.75rem;
+    align-items: center;
+    max-width: 80vw;
+  }
+
+  .aboutHeadshotFullWrapper {
+    display: none;
+  }
+
+  .aboutHeadshotMobileWrapper {
+    display: flex;
+    justify-content: center;
+    min-width: 40vw;
+    margin-bottom: 1.75em;
+  }
+
+  .aboutBlockText p {
+    text-align: center;
+  }
+
+  .socialIcons {
+    margin: 0 5rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .aboutBlock p {
+    padding: 0.5rem 0;
+  }
+}

@@ -72,16 +72,6 @@ export const fetchAllClimbs = async () => {
 }
 
 /**
- * Filter by a 'Select' option
- */
-export const fetchClimbsByFilter = async () => {}
-
-/**
  * Filter by an input str (Search functionality)
  */
 export const fetchClimbsBySearchQuery = async (/* str */) => {}
-
-/**
- * Fetch a single climb's data
- */
-export const fetchClimbData = async (/* id */) => {}

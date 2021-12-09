@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { CATEGORY_TYPE, ROLE_NAVIGATION } from '../utils/constants'
-import utilStyles from '../styles/utils.module.css'
+
+import styles from './Category.module.css'
 
 const Category = ({ category, pushToRouter }) => {
   const router = useRouter()
@@ -18,11 +19,9 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.GEAR)}
-          className={
-            pushToRouter
-              ? `${utilStyles.gearCategory} ${utilStyles.categoryLink}`
-              : utilStyles.gearCategory
-          }
+          className={`${styles.gearCategory} ${styles.categoryPill} ${
+            pushToRouter ? styles.categoryLink : ''
+          }`}
           role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           gear
@@ -32,11 +31,9 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.THOUGHTS)}
-          className={
-            pushToRouter
-              ? `${utilStyles.thoughtsCategory} ${utilStyles.categoryLink}`
-              : utilStyles.thoughtsCategory
-          }
+          className={`${styles.thoughtsCategory} ${styles.categoryPill} ${
+            pushToRouter ? styles.categoryLink : ''
+          }`}
           role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           thoughts
@@ -46,11 +43,9 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.HIKE)}
-          className={
-            pushToRouter
-              ? `${utilStyles.hikeCategory} ${utilStyles.categoryLink}`
-              : utilStyles.hikeCategory
-          }
+          className={`${styles.hikeCategory} ${styles.categoryPill} ${
+            pushToRouter ? styles.categoryLink : ''
+          }`}
           role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           trip reports

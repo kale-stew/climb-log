@@ -1,17 +1,19 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import Layout from '../components/Layout'
 import ImageCapitolCreek from '../public/photos/2021_capitol-creek.jpg'
+import Layout from '../components/Layout'
+import { METADATA } from '../utils/constants'
 
 const HomePage = () => (
   <Layout home>
     <Head>
-      <title>Kylie Stewart | Photography, Hiking</title>
+      <title>{METADATA.SITE_NAME} | Photography, Hiking</title>
     </Head>
     <br />
     <Image
       src={ImageCapitolCreek}
       alt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
+      className="landingImage"
       layout="intrinsic"
       placeholder="blur"
     ></Image>

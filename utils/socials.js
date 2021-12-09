@@ -1,5 +1,5 @@
 export const SocialLinks = {
-  Email: 'kylie@hey.com',
+  Email: 'mailto:kylie@hey.com',
   Github: 'https://github.com/kale-stew',
   Flickr: 'https://flickr.com/photos/189863825@N02/',
   Homepage: 'https://kylieis.online',
