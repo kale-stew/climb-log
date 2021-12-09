@@ -1,16 +1,25 @@
-import { useState } from 'react'
-import Category from '../components/Category'
-import FormattedDate from '../components/Date'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import Category from '../components/Category'
+import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
-import { getSortedPostsData } from '../utils/posts'
 import { CATEGORY_TYPE } from '../utils/constants'
+import { getSortedPostsData } from '../utils/posts'
 
 import utilStyles from '../styles/utils.module.css'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
+  const router = useRouter()
+
+  useEffect(() => {
+    const queryPayload = router.query
+    if (Object.keys(queryPayload).length > 0) {
+      setCategory(Object.keys(queryPayload)[0])
+    }
+  }, [])
 
   return (
     <Layout>
@@ -26,7 +35,10 @@ export default function BlogLandingPage({ allPostsData }) {
               ? utilStyles.categorySelected
               : 'categoryButton'
           }
-          onClick={() => setCategory(CATEGORY_TYPE.ALL)}
+          onClick={() => {
+            router.push({ pathname: '/blog' })
+            setCategory(CATEGORY_TYPE.ALL)
+          }}
         >
           All
         </button>
@@ -94,7 +106,8 @@ export default function BlogLandingPage({ allPostsData }) {
               </Link>
               <br />
               <small className={`${utilStyles.lightText} ${utilStyles.blogItemCategory}`}>
-                <FormattedDate dateString={date} /> <Category category={category} />
+                <FormattedDate dateString={date} />{' '}
+                <Category category={category} pushToRouter={false} />
               </small>
               <small className={utilStyles.listItem}>{preview}...</small>
             </li>

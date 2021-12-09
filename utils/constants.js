@@ -21,6 +21,8 @@ export const thoughtsDirectory = path.join(
 //   { title: CATEGORY_TYPE.THOUGHTS, directory: thoughtsDirectory },
 // ]
 
+export const ROLE_NAVIGATION = 'navigation'
+
 export const TABLE_SORT_ORDER = {
   ASC: 'ascending',
   DESC: 'descending',
