@@ -32,7 +32,11 @@
 
 @media (max-width: 1024px) {
   .landingNavigation a {
-    /* font-size: 14px; */
     padding: none;
+  }
+
+  .navigation a {
+    font-size: 18px;
+    margin: 1.4rem 0.75rem;
   }
 }

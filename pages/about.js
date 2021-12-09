@@ -14,7 +14,9 @@ const AboutPage = () => (
     <Head>
       <title>About Kylie Stewart</title>
     </Head>
-    <h1 className={utilStyles.headingXl}>More about Kylie Stewart</h1>
+    <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
+      More about Kylie Stewart
+    </h1>
     <br />
     <div className={styles.aboutBlock}>
       <Image src={Headshot} height={1200} width={905} layout="intrinsic" />
