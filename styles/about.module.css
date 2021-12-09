@@ -1,16 +1,23 @@
 .aboutBlock {
-  display: flex;
-  align-items: flex-start;
-  max-width: 685px;
+  max-width: 585px;
 }
 
-.aboutBlockText {
-  margin-left: 2rem;
+.aboutBlockText p {
+  text-align: left;
+}
+
+.aboutHeadshotFullWrapper {
+  float: left;
+  margin: 0 2rem 2rem 0;
+}
+
+.aboutHeadshotMobileWrapper {
+  display: none;
 }
 
 .socialIcons {
   display: flex;
-  margin: 0 15rem;
+  margin: 0 7rem;
   align-items: center;
   justify-content: space-evenly;
 }
@@ -24,9 +31,17 @@
     flex-direction: column;
   }
 
-  .aboutBlock img {
-    border-radius: 9999px;
-    width: 320px;
+  .aboutHeadshotFullWrapper {
+    display: none;
+  }
+
+  .aboutHeadshotMobileWrapper {
+    display: block;
+    margin: 0 10rem 2.2rem;
+  }
+
+  .aboutBlockText p {
+    text-align: center;
   }
 
   .socialIcons {

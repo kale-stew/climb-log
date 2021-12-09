@@ -2,6 +2,10 @@
   text-align: center;
 }
 
+.roundImage {
+  border-radius: 100%;
+}
+
 .heading2Xl {
   font-size: 2.8rem;
   line-height: 1.2;
