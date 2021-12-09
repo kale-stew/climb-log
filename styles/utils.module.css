@@ -1,9 +1,14 @@
-.centerText {
-  text-align: center;
+.backToHome {
+  margin: 3rem 0;
 }
 
-.roundImage {
-  border-radius: 100%;
+.backToHome a {
+  text-decoration: none;
+  color: #ff953d;
+}
+
+.centerText {
+  text-align: center;
 }
 
 .heading2Xl {
@@ -31,10 +36,6 @@
   line-height: 1.5;
 }
 
-.padding1px {
-  padding-top: 1px;
-}
-
 .list {
   list-style: none;
   padding: 0;
@@ -49,6 +50,18 @@
   color: #666;
 }
 
+.marginRight {
+  margin-right: 2rem;
+}
+
+.padding1px {
+  padding-top: 1px;
+}
+
+.roundImage {
+  border-radius: 100%;
+}
+
 .singleRow {
   display: flex;
   align-items: center;
@@ -58,13 +71,4 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.backToHome {
-  margin: 3rem 0;
-}
-
-.backToHome a {
-  text-decoration: none;
-  color: #ff953d;
 }

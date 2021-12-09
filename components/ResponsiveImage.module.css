@@ -1,0 +1,18 @@
+.imageFullWrapper {
+  float: left;
+}
+
+.imageMobileWrapper {
+  display: none;
+}
+
+@media (max-width: 741px) {
+  .imageFullWrapper {
+    display: none;
+  }
+
+  .imageMobileWrapper {
+    display: flex;
+    justify-content: center;
+  }
+}

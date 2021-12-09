@@ -1,12 +1,11 @@
 import Head from 'next/head'
-import Image from 'next/image'
+import HeadshotFull from '../public/photos/headshot.jpg'
+import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
+import ResponsiveImage from '../components/ResponsiveImage'
 import { FaGithub, FaFlickr, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa'
 import { MdOutlineMail } from 'react-icons/md'
 import { METADATA, SocialLinks } from '../utils/constants'
-
-import HeadshotMobile from '../public/photos/square_headshot.jpg'
-import HeadshotFull from '../public/photos/headshot.jpg'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -21,18 +20,16 @@ const AboutPage = () => (
     </h1>
     <br />
     <div className={styles.aboutBlock}>
-      <div className={styles.aboutHeadshotFullWrapper}>
-        <Image src={HeadshotFull} width={300} height={412} layout="intrinsic" />
-      </div>
-      <div className={styles.aboutHeadshotMobileWrapper}>
-        <Image
-          className={utilStyles.roundImage}
-          src={HeadshotMobile}
-          width={250}
-          height={250}
-          layout="intrinsic"
-        />
-      </div>
+      <ResponsiveImage
+        altTxt={`A photo of the author, ${METADATA.NAME}`}
+        desktopImg={HeadshotFull}
+        wrapperCn={styles.aboutImage}
+        desktopDimensions={{ width: '300', height: '412' }}
+        mobileImg={HeadshotMobile}
+        mobileCn={`${utilStyles.roundImage} ${styles.aboutImage}`}
+        mobileDimensions={{ width: '250', height: '250' }}
+      />
+
       <div className={styles.aboutBlockText}>
         <p>
           {METADATA.NAME} is a web developer, avid hiker, amateur mountaineer and

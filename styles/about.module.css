@@ -1,18 +1,13 @@
 .aboutBlock {
-  max-width: 585px;
+  max-width: 650px;
 }
 
 .aboutBlockText p {
   text-align: left;
 }
 
-.aboutHeadshotFullWrapper {
-  float: left;
-  margin: 0 2rem 2rem 0;
-}
-
-.aboutHeadshotMobileWrapper {
-  display: none;
+.aboutImage {
+  padding: 0 2rem 0;
 }
 
 .socialIcons {
@@ -35,15 +30,8 @@
     max-width: 80vw;
   }
 
-  .aboutHeadshotFullWrapper {
-    display: none;
-  }
-
-  .aboutHeadshotMobileWrapper {
-    display: flex;
-    justify-content: center;
-    min-width: 40vw;
-    margin-bottom: 1.75em;
+  .aboutBlockText {
+    padding-top: 1.75rem;
   }
 
   .aboutBlockText p {

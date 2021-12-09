@@ -1,7 +1,8 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import ImageCapitolCreek from '../public/photos/2021_capitol-creek.jpg'
+import LanderFull from '../public/photos/lander.jpg'
+import LanderMobile from '../public/photos/lander_mobile.jpg'
 import Layout from '../components/Layout'
+import ResponsiveImage from '../components/ResponsiveImage'
 import { METADATA } from '../utils/constants'
 
 const HomePage = () => (
@@ -10,13 +11,13 @@ const HomePage = () => (
       <title>{METADATA.SITE_NAME} | Photography, Hiking</title>
     </Head>
     <br />
-    <Image
-      src={ImageCapitolCreek}
-      alt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
-      className="landingImage"
-      layout="intrinsic"
-      placeholder="blur"
-    ></Image>
+    <ResponsiveImage
+      altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
+      desktopImg={LanderFull}
+      desktopDimensions={{ width: '5000', height: '3333' }}
+      mobileImg={LanderMobile}
+      mobileDimensions={{ width: '2000', height: '1450' }}
+    />
   </Layout>
 )
 
