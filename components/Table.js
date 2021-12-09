@@ -5,6 +5,7 @@ import TableRow from './TableRow'
 import { CATEGORY_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
 
 import categoryStyles from './Category.module.css'
+import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 export default function Table({
@@ -136,14 +137,18 @@ export default function Table({
         <tbody>
           <tr>
             {headers.map((header, i) => (
-              <th key={i} className={`${header}Header`} onClick={() => sortRow(header)}>
+              <th
+                key={i}
+                className={styles[`${header}Header`]}
+                onClick={() => sortRow(header)}
+              >
                 {formatHeader(header)}
               </th>
             ))}
           </tr>
           {data.map((climb, i) => (
             <Popover
-              containerClassName={'globalPopover'}
+              containerClassName={styles.tablePopover}
               key={climb.id}
               onClickOutside={() => togglePopOver(i)}
               isOpen={isPopoverOpen && rowClicked === i}

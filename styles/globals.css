@@ -16,21 +16,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.globalPopover {
-  z-index: 200;
-}
-
-.blanket {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  opacity: 0.5;
-  z-index: 100;
-}
-
 button {
   background-color: #c5c5c5;
   display: inline-block;
@@ -112,27 +97,6 @@ table .tableRow:hover {
   background-color: #ddd;
 }
 
-.tableRow {
-  font-size: 15px;
-}
-
-.tableRow td {
-  border: 1px solid #f2f2f2;
-  border-spacing: 0;
-}
-
-.titleHeader {
-  width: 25vw;
-}
-
-.areaHeader {
-  width: 15vw;
-}
-
-.distanceHeader {
-  width: 9vw;
-}
-
 article {
   max-width: 70vw;
   margin-bottom: 3em;
@@ -157,6 +121,7 @@ caption {
 tbody {
   width: 100%;
   text-align: center;
+  font-size: 15px;
 }
 
 th {
@@ -186,10 +151,5 @@ th {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .stateHeader,
-  .areaHeader {
-    display: none;
   }
 }

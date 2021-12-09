@@ -7,6 +7,8 @@ import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
 
+import tableStyles from '../components/Table.module.css'
+
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
   const [data, setData] = useState(allClimbs)
@@ -155,7 +157,7 @@ const ClimbLog = ({ allClimbs }) => {
   return (
     <Layout>
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
-      <div className={blanketEnabled ? 'blanket' : ''}></div>
+      <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
       <Head>
         <title>{METADATA.SITE_NAME} | Climb Log</title>
       </Head>
