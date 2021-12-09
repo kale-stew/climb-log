@@ -25,7 +25,7 @@ The first couple of miles snowshoeing the road before the Rainbow Trail turn wer
 
 _First light seen along Humboldt's east ridge approach._
 
-About 3.5 miles in, we realize we're all working especially hard but not seeming to gain quite as much elevation as is to be expected at this point along the trail. It seems like we're moving straight, not up. Our group has begun to drift, with two leading and two holding up the rear, but out of communication distance. We later learned that the leading group had found some SAR tracks and unknowingly followed them off routes, but we were all determined to get up this thing so we continued to trudge even when we realized we had made a mistake.
+About 3.5 miles in, we realized we were all working especially hard but not seeming to gain quite as much elevation as is to be expected at this point along the trail. It seemed like we were moving straight, not up. Our group had begun to drift, with two leading and two holding up the rear, just barely out of audible communication distance. We later learned that the leading group had unintentional followed some SAR tracks off route, but we were all determined to get up this thing so we continued to trudge even after we realized we had made a mistake.
 
 ![moonset](https://live.staticflickr.com/65535/51732583708_ed244b2cf5_k.jpg)
 
@@ -49,13 +49,13 @@ We got up to the same false summit block just before the final summit ridge and 
 
 One more month went by before I tried for Humboldt again... Well, I admit, one morning I did begin the drive down to South Colony once again, but found myself struck with anxiety an hour from home and turned around. So it wasn't until April 3rd that I found myself walking the snow-covered 4WD road to the Rainbow Trail split again. This time I was "alone", but I picked up friendly hikers to form a little misfit ascent group. Casey, his dog Bandit, Luis, Tucker, and I all chugged along the east ridge approach once more but this time no one followed the wrong trench, no one got hurt, we were moving quicker than I had even anticipated, and the weather was cooperating in full.
 
-I passed all of the checkpoints where we had had to turn around on trips prior. Passed the vomit-break tree, passed the false summit, passed the ridge point 200' below the summit and finally found myself on top of Humboldt Peak.
+I passed all of the checkpoints where we had turned around on trips prior. Passed the vomit-break tree, passed the false summit, passed the section 200' below the summit where we first made the call, and finally found myself on top of Humboldt Peak.
 
 ![humboldt-sign](https://live.staticflickr.com/65535/51732592028_0bc574b2d5_k.jpg)
 
 _Photo of my summit sign on top of Humboldt Peak, Crestone Peak & Needle in the background._
 
-The east ridge route up to Humboldt Peak is funny because you can't see anything until you're on the summit proper. Sure, you get beautiful views once you break treeline and you see all kinds of wildlife and neighboring Centennials when you're gaining that last 1000' of ridge, but the Crestones are the sight that make this whole day worth it. And you can only see those from the 14,064' summit.
+The east ridge route up to Humboldt Peak is funny because you don't see the Crestones until you're on the summit proper. You do, however, get beautiful views once you start to gain the slopes around treeline, see all kinds of wildlife, and the neighboring Centennials show off for you most of the way up. But when you're standing on the summit block, the Crestones are the sight that make this whole day worth it. And you can only see those two from the 14,064' summit.
 
 ![humboldt-summit](https://live.staticflickr.com/65535/51732341796_bb50b9b797_k.jpg)
 
