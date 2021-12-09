@@ -35,8 +35,12 @@
     padding: none;
   }
 
+  .navigation {
+    margin: 0.75rem;
+  }
+
   .navigation a {
     font-size: 18px;
-    margin: 1.4rem 0.75rem;
+    margin: 1rem 0.75rem;
   }
 }
