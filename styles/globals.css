@@ -134,12 +134,18 @@ table .tableRow:hover {
 }
 
 article {
-  max-width: 90vw;
+  max-width: 70vw;
   margin-bottom: 3em;
 }
 
 img {
-  max-width: 75vw;
+  max-width: 65vw;
+  padding: 2rem 0 0 0;
+}
+
+img[alt='humboldt-sign'] {
+  width: 550px;
+  align-self: center;
 }
 
 caption {
