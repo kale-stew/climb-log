@@ -27,16 +27,18 @@ const ResponsiveImage = ({
           alt={altTxt}
         />
       </div>
-      <div className={styles.imageMobileWrapper}>
-        <Image
-          className={mobileCn}
-          src={mobileImg}
-          width={mobileDimensions.width}
-          height={mobileDimensions.height}
-          layout="intrinsic"
-          alt={altTxt}
-        />
-      </div>
+      {mobileImg && (
+        <div className={styles.imageMobileWrapper}>
+          <Image
+            className={mobileCn}
+            src={mobileImg}
+            width={mobileDimensions.width}
+            height={mobileDimensions.height}
+            layout="intrinsic"
+            alt={altTxt}
+          />
+        </div>
+      )}
     </>
   )
 }
