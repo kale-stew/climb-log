@@ -7,35 +7,26 @@
   background-color: #6d6d6d;
 }
 
-.gearCategory {
-  background-color: #e4960498;
-  /* e49504 */
+.categoryPill {
   color: white;
   border-radius: 1em;
   margin-left: 0.6rem;
   padding: 0.2em 0.5em;
   line-height: 1.3em;
   font-size: 13px;
+}
+
+.gearCategory {
+  background-color: #e4960498;
+  /* Color w/o opacity: e49504 */
 }
 
 .hikeCategory {
   background-color: #bb03e993;
-  /* bb03e9 */
-  color: white;
-  border-radius: 1em;
-  margin-left: 0.6rem;
-  padding: 0.2em 0.5em;
-  line-height: 1.3em;
-  font-size: 13px;
+  /* Color w/o opacity: bb03e9 */
 }
 
 .thoughtsCategory {
   background-color: #f1045f94;
-  /* f1045f */
-  color: white;
-  border-radius: 1em;
-  margin-left: 0.6rem;
-  padding: 0.2em 0.5em;
-  line-height: 1.3em;
-  font-size: 13px;
+  /* Color w/o opacity: f1045f */
 }

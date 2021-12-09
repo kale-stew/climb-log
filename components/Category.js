@@ -19,11 +19,9 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.GEAR)}
-          className={
-            pushToRouter
-              ? `${styles.gearCategory} ${styles.categoryLink}`
-              : styles.gearCategory
-          }
+          className={`${styles.gearCategory} ${styles.categoryPill} ${
+            pushToRouter ? styles.categoryLink : ''
+          }`}
           role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           gear
@@ -33,11 +31,9 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.THOUGHTS)}
-          className={
-            pushToRouter
-              ? `${styles.thoughtsCategory} ${styles.categoryLink}`
-              : styles.thoughtsCategory
-          }
+          className={`${styles.thoughtsCategory} ${styles.categoryPill} ${
+            pushToRouter ? styles.categoryLink : ''
+          }`}
           role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           thoughts
@@ -47,11 +43,9 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.HIKE)}
-          className={
-            pushToRouter
-              ? `${styles.hikeCategory} ${styles.categoryLink}`
-              : styles.hikeCategory
-          }
+          className={`${styles.hikeCategory} ${styles.categoryPill} ${
+            pushToRouter ? styles.categoryLink : ''
+          }`}
           role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           trip reports
