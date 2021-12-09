@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-import { CATEGORY_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
 
@@ -157,7 +157,7 @@ const ClimbLog = ({ allClimbs }) => {
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? 'blanket' : ''}></div>
       <Head>
-        <title>Kylie Stewart | Climb Log</title>
+        <title>{METADATA.SITE_NAME} | Climb Log</title>
       </Head>
       <Table
         data={data}

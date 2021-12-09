@@ -1,5 +1,7 @@
 import path from 'path'
 
+export * from './socials'
+
 export const CATEGORY_TYPE = {
   ALL: 'all',
   GEAR: 'gear',
@@ -7,6 +9,7 @@ export const CATEGORY_TYPE = {
   THOUGHTS: 'thoughts',
 }
 
+// TODO - more complex post calculation so it's agnostic to however many categories exist?
 export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)
 export const hikeDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.HIKE}`)
 export const thoughtsDirectory = path.join(
@@ -14,12 +17,10 @@ export const thoughtsDirectory = path.join(
   `blog/${CATEGORY_TYPE.THOUGHTS}`
 )
 
-// TODO - more complex post calculation so it's agnostic to however many categories exist?
-// export const BLOG_CATEGORIES = [
-//   { title: CATEGORY_TYPE.GEAR, directory: gearDirectory },
-//   { title: CATEGORY_TYPE.HIKE, directory: hikeDirectory },
-//   { title: CATEGORY_TYPE.THOUGHTS, directory: thoughtsDirectory },
-// ]
+export const METADATA = {
+  NAME: 'Kylie Stewart',
+  SITE_NAME: 'kylies.photos',
+}
 
 export const ROLE_NAVIGATION = 'navigation'
 

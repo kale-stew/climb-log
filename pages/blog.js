@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import Category from '../components/Category'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
-import { CATEGORY_TYPE } from '../utils/constants'
+import { CATEGORY_TYPE, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/posts'
 
 import categoryStyles from '../components/Category.module.css'
@@ -26,7 +26,7 @@ export default function BlogLandingPage({ allPostsData }) {
   return (
     <Layout>
       <Head>
-        <title>Kylie Stewart | Hiking Blog</title>
+        <title>{METADATA.SITE_NAME} | Hiking Blog</title>
       </Head>
       <h1 className={utilStyles.headingXl}>Blog</h1>
 

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Layout from '../components/Layout'
 import { FaGithub, FaFlickr, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa'
 import { MdOutlineMail } from 'react-icons/md'
-import { SocialLinks } from '../utils/socials'
+import { METADATA, SocialLinks } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -12,17 +12,17 @@ import utilStyles from '../styles/utils.module.css'
 const AboutPage = () => (
   <Layout>
     <Head>
-      <title>About Kylie Stewart</title>
+      <title>About {METADATA.NAME}</title>
     </Head>
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
-      More about Kylie Stewart
+      More about {METADATA.NAME}
     </h1>
     <br />
     <div className={styles.aboutBlock}>
       <Image src={Headshot} height={1200} width={905} layout="intrinsic" />
       <div className={`${utilStyles.vertical} ${styles.aboutBlockText}`}>
         <p>
-          Kylie Stewart is a web developer, avid hiker, amateur mountaineer and
+          {METADATA.NAME} is a web developer, avid hiker, amateur mountaineer and
           photo-taker. When she's not hanging out at home with her fiancé and dog, you can
           find her hiking Colorado's high peaks or researching her next climb.
         </p>
@@ -33,7 +33,7 @@ const AboutPage = () => (
         </p>
         <p>
           To see some of Kylie's other work, check out her{' '}
-          <a href="https://kylieis.online">website</a>.
+          <a href={SocialLinks.Homepage}>website</a>.
         </p>
       </div>
     </div>
