@@ -10,6 +10,7 @@
 }
 
 .contentWithImg {
-  max-width: 50vw;
+  min-width: 42vw;
+  max-width: 75vw;
   padding: 0 1rem;
 }
