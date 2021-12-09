@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import Category from '../components/Category'
-import FormattedDate from '../components/Date'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import Category from '../components/Category'
+import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
-import { getSortedPostsData } from '../utils/posts'
 import { CATEGORY_TYPE } from '../utils/constants'
+import { getSortedPostsData } from '../utils/posts'
 
 import utilStyles from '../styles/utils.module.css'
-import { useRouter } from 'next/router'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)

@@ -98,7 +98,7 @@ const Post = ({ postData, postIds }) => {
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
         <div className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
           <FormattedDate dateString={postData.date} withDOW />{' '}
-          <Category category={postData.category} pushToRouter={true}/>
+          <Category category={postData.category} pushToRouter={true} />
         </div>
         <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
       </article>

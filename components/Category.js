@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 const Category = ({ category, pushToRouter }) => {
   const router = useRouter()
- 
+
   const pushProps = (category) => {
     if (!pushToRouter) return
     router.push({
@@ -18,7 +18,11 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.GEAR)}
-          className={pushToRouter ? `${utilStyles.gearCategory} ${utilStyles.categoryLink}` : utilStyles.gearCategory}
+          className={
+            pushToRouter
+              ? `${utilStyles.gearCategory} ${utilStyles.categoryLink}`
+              : utilStyles.gearCategory
+          }
           role={pushToRouter ? 'navigation' : ''}
         >
           gear
@@ -28,7 +32,11 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.THOUGHTS)}
-          className={pushToRouter ? `${utilStyles.thoughtsCategory} ${utilStyles.categoryLink}` : utilStyles.thoughtsCategory}
+          className={
+            pushToRouter
+              ? `${utilStyles.thoughtsCategory} ${utilStyles.categoryLink}`
+              : utilStyles.thoughtsCategory
+          }
           role={pushToRouter ? 'navigation' : ''}
         >
           thoughts
@@ -38,7 +46,11 @@ const Category = ({ category, pushToRouter }) => {
       return (
         <div
           onClick={() => pushProps(CATEGORY_TYPE.HIKE)}
-          className={pushToRouter ? `${utilStyles.hikeCategory} ${utilStyles.categoryLink}` : utilStyles.hikeCategory}
+          className={
+            pushToRouter
+              ? `${utilStyles.hikeCategory} ${utilStyles.categoryLink}`
+              : utilStyles.hikeCategory
+          }
           role={pushToRouter ? 'navigation' : ''}
         >
           trip reports
