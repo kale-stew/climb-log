@@ -10,7 +10,7 @@ import { CATEGORY_TYPE } from '../utils/constants'
 import utilStyles from '../styles/utils.module.css'
 
 export default function BlogLandingPage({ allPostsData }) {
-  const [viewCategory, setCategory] = useState('all')
+  const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
 
   return (
     <Layout>
@@ -22,9 +22,11 @@ export default function BlogLandingPage({ allPostsData }) {
       <section>
         <button
           className={
-            viewCategory === 'all' ? utilStyles.categorySelected : 'categoryButton'
+            viewCategory === CATEGORY_TYPE.ALL
+              ? utilStyles.categorySelected
+              : 'categoryButton'
           }
-          onClick={() => setCategory('all')}
+          onClick={() => setCategory(CATEGORY_TYPE.ALL)}
         >
           All
         </button>
@@ -35,7 +37,9 @@ export default function BlogLandingPage({ allPostsData }) {
               : 'categoryButton'
           }
           onClick={() =>
-            setCategory(viewCategory === CATEGORY_TYPE.GEAR ? 'all' : CATEGORY_TYPE.GEAR)
+            setCategory(
+              viewCategory === CATEGORY_TYPE.GEAR ? CATEGORY_TYPE.ALL : CATEGORY_TYPE.GEAR
+            )
           }
         >
           Gear
@@ -48,7 +52,9 @@ export default function BlogLandingPage({ allPostsData }) {
           }
           onClick={() =>
             setCategory(
-              viewCategory === CATEGORY_TYPE.THOUGHTS ? 'all' : CATEGORY_TYPE.THOUGHTS
+              viewCategory === CATEGORY_TYPE.THOUGHTS
+                ? CATEGORY_TYPE.ALL
+                : CATEGORY_TYPE.THOUGHTS
             )
           }
         >
@@ -61,7 +67,9 @@ export default function BlogLandingPage({ allPostsData }) {
               : 'categoryButton'
           }
           onClick={() =>
-            setCategory(viewCategory === CATEGORY_TYPE.HIKE ? 'all' : CATEGORY_TYPE.HIKE)
+            setCategory(
+              viewCategory === CATEGORY_TYPE.HIKE ? CATEGORY_TYPE.ALL : CATEGORY_TYPE.HIKE
+            )
           }
         >
           Trip Reports
@@ -76,7 +84,9 @@ export default function BlogLandingPage({ allPostsData }) {
               key={id}
               style={{
                 display:
-                  viewCategory === category || viewCategory === 'all' ? 'block' : 'none',
+                  viewCategory === category || viewCategory === CATEGORY_TYPE.ALL
+                    ? 'block'
+                    : 'none',
               }}
             >
               <Link href="/[category]/[id]" as={`/${category}/${id}`}>

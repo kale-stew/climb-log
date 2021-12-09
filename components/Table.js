@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
-import { TABLE_SORT_ORDER } from '../utils/constants'
-import TableRow from './TableRow'
-import utilStyles from '../styles/utils.module.css'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
+import TableRow from './TableRow'
+import { CATEGORY_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+import utilStyles from '../styles/utils.module.css'
 
 export default function Table({
-  data,
-  sortOrder,
-  setSortOrder,
-  metric,
-  setMetric,
   allAreas,
   areaFilter,
+  data,
+  metric,
   setAreaFilter,
+  setMetric,
+  setSortOrder,
+  sortOrder,
   toggleBlanketEnabled,
 }) {
   // Notion data vals we -don't- want in the Table
@@ -89,7 +89,7 @@ export default function Table({
         }}
         placeholder="Filter by Area"
       >
-        <option value={'all'}>All</option>
+        <option value={CATEGORY_TYPE.ALL}>All</option>
         {allAreas.map((area) => {
           return (
             <option key={area.value} value={`${area.value}?${area.type}`}>

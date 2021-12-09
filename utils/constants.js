@@ -1,6 +1,7 @@
 import path from 'path'
 
 export const CATEGORY_TYPE = {
+  ALL: 'all',
   GEAR: 'gear',
   HIKE: 'hike',
   THOUGHTS: 'thoughts',
