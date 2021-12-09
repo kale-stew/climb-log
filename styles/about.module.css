@@ -38,6 +38,7 @@
   .aboutHeadshotMobileWrapper {
     display: block;
     margin: 0 10rem 2.2rem;
+    min-width: 30vw;
   }
 
   .aboutBlockText p {
