@@ -1,13 +1,20 @@
 .landingHeader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   font-family: 'Playfair Display', serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  height: 42px;
+  padding: 1px;
+}
+
+.landingHeader h1 {
+  margin: 0.25em 0 1.5em 1.5em;
 }
 
 .landingNavigation a {
+  color: #1b1b1b;
   font-size: 1.25rem;
-  padding: 1.5rem;
+  margin: 0.25em 1.5em 1.5em 0;
   text-decoration: none;
 }
 
@@ -15,13 +22,17 @@
   text-decoration: underline;
 }
 
+.navigation a {
+  color: #1b1b1b;
+}
+
 .navigation {
-  margin-top: 1.4rem;
+  margin: 1.4rem;
 }
 
 @media (max-width: 1024px) {
   .landingNavigation a {
-    font-size: 12px;
+    /* font-size: 14px; */
     padding: none;
   }
 }

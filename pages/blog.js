@@ -8,6 +8,8 @@ import Layout from '../components/Layout'
 import { CATEGORY_TYPE } from '../utils/constants'
 import { getSortedPostsData } from '../utils/posts'
 
+import categoryStyles from '../components/Category.module.css'
+import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 export default function BlogLandingPage({ allPostsData }) {
@@ -32,7 +34,7 @@ export default function BlogLandingPage({ allPostsData }) {
         <button
           className={
             viewCategory === CATEGORY_TYPE.ALL
-              ? utilStyles.categorySelected
+              ? categoryStyles.categorySelected
               : 'categoryButton'
           }
           onClick={() => {
@@ -45,7 +47,7 @@ export default function BlogLandingPage({ allPostsData }) {
         <button
           className={
             viewCategory === CATEGORY_TYPE.GEAR
-              ? utilStyles.categorySelected
+              ? categoryStyles.categorySelected
               : 'categoryButton'
           }
           onClick={() =>
@@ -59,7 +61,7 @@ export default function BlogLandingPage({ allPostsData }) {
         <button
           className={
             viewCategory === CATEGORY_TYPE.THOUGHTS
-              ? utilStyles.categorySelected
+              ? categoryStyles.categorySelected
               : 'categoryButton'
           }
           onClick={() =>
@@ -75,7 +77,7 @@ export default function BlogLandingPage({ allPostsData }) {
         <button
           className={
             viewCategory === CATEGORY_TYPE.HIKE
-              ? utilStyles.categorySelected
+              ? categoryStyles.categorySelected
               : 'categoryButton'
           }
           onClick={() =>
@@ -102,10 +104,10 @@ export default function BlogLandingPage({ allPostsData }) {
               }}
             >
               <Link href="/[category]/[id]" as={`/${category}/${id}`}>
-                <a className={`${utilStyles.blogPostHeading}`}>{title}</a>
+                <a className={`${styles.blogPostHeading}`}>{title}</a>
               </Link>
               <br />
-              <small className={`${utilStyles.lightText} ${utilStyles.blogItemCategory}`}>
+              <small className={`${utilStyles.lightText} ${styles.blogItemCategory}`}>
                 <FormattedDate dateString={date} />{' '}
                 <Category category={category} pushToRouter={false} />
               </small>

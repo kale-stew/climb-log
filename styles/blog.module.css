@@ -1,0 +1,41 @@
+.blogItemCategory {
+  display: flex;
+  align-items: center;
+}
+
+.blogNavigation {
+  display: flex;
+  justify-content: space-between;
+}
+
+.blogNavigation a {
+  text-align: center;
+  text-decoration: none;
+  color: #757575;
+}
+
+.blogNavigation a:hover {
+  font-weight: bold;
+}
+
+.blogPostHeading {
+  font-size: 1.5rem;
+  color: #020202;
+}
+
+.blogPostHeading:hover {
+  text-decoration: underline;
+}
+
+.blogNavigationSeparator {
+  display: none;
+  margin: 2px;
+  background: #696969;
+  width: 1px;
+}
+
+@media (max-width: 1024px) {
+  .blogNavigationSeparator {
+    display: flex;
+  }
+}

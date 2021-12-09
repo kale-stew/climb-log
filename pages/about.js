@@ -6,6 +6,7 @@ import { FaGithub, FaFlickr, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-
 import { MdOutlineMail } from 'react-icons/md'
 import { SocialLinks } from '../utils/socials'
 
+import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const AboutPage = () => (
@@ -15,9 +16,9 @@ const AboutPage = () => (
     </Head>
     <h1 className={utilStyles.headingXl}>More about Kylie Stewart</h1>
     <br />
-    <div className={utilStyles.aboutBlock}>
+    <div className={styles.aboutBlock}>
       <Image src={Headshot} height={1200} width={905} layout="intrinsic" />
-      <div className={`${utilStyles.vertical} ${utilStyles.aboutBlockText}`}>
+      <div className={`${utilStyles.vertical} ${styles.aboutBlockText}`}>
         <p>
           Kylie Stewart is a web developer, avid hiker, amateur mountaineer and
           photo-taker. When she's not hanging out at home with her fiancé and dog, you can
@@ -36,7 +37,7 @@ const AboutPage = () => (
     </div>
     <br />
     <br />
-    <div className={utilStyles.socialIcons}>
+    <div className={styles.socialIcons}>
       <a target="_blank" href={SocialLinks.Email} network="email">
         <MdOutlineMail />
       </a>

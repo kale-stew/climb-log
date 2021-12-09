@@ -5,6 +5,7 @@ import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/posts'
 
+import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
 
 const Post = ({ postData, postIds }) => {
@@ -48,9 +49,9 @@ const Post = ({ postData, postIds }) => {
     // If there are posts before before and after this one, let's have links leading to each one
     if (nextPost != -1 && prevPost != -1) {
       return (
-        <div className={utilStyles.blogNavigation}>
+        <div className={styles.blogNavigation}>
           {prevPostLink}
-          <span className={utilStyles.separator}></span>
+          <span className={styles.blogNavigationSeparator}></span>
           {nextPostLink}
         </div>
       )
@@ -58,11 +59,11 @@ const Post = ({ postData, postIds }) => {
     // If there is no previous post, let's have back to blog and next post Links available
     if (prevPost == -1 && nextPost != -1) {
       return (
-        <div className={utilStyles.blogNavigation}>
+        <div className={styles.blogNavigation}>
           <Link href="/blog">
             <a>← Back to blog</a>
           </Link>
-          <span className={utilStyles.separator}></span>
+          <span className={styles.blogNavigationSeparator}></span>
           {nextPostLink}
         </div>
       )
@@ -70,9 +71,9 @@ const Post = ({ postData, postIds }) => {
     // If there is no next post but a previous post, let's show that
     if (nextPost == -1 && prevPost != -1) {
       return (
-        <div className={utilStyles.blogNavigation}>
+        <div className={styles.blogNavigation}>
           {prevPostLink}
-          <span className={utilStyles.separator}></span>
+          <span className={styles.blogNavigationSeparator}></span>
           <Link href="/blog">
             <a> Back to blog →</a>
           </Link>
@@ -81,7 +82,7 @@ const Post = ({ postData, postIds }) => {
     }
     // Always return something
     return (
-      <div className={utilStyles.blogNavigation}>
+      <div className={styles.blogNavigation}>
         <Link href="/blog">
           <a>← Back to blog</a>
         </Link>

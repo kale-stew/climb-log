@@ -57,12 +57,12 @@ button:hover {
 }
 
 a {
-  color: #1b1b1b;
+  color: #0084db;
   text-decoration: none;
 }
 
-p a {
-  color: #005688;
+a:hover {
+  text-decoration: underline;
 }
 
 p a:hover {

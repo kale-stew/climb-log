@@ -3,6 +3,8 @@ import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
 import { CATEGORY_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+
+import categoryStyles from './Category.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 export default function Table({
@@ -108,13 +110,13 @@ export default function Table({
       {/* Buttons: Switch between Imperial and Metric num values */}
       <div className={utilStyles.singleRow}>
         <button
-          className={metric ? 'categoryButton' : utilStyles.categorySelected}
+          className={metric ? 'categoryButton' : categoryStyles.categorySelected}
           onClick={() => setMetric(false)}
         >
           Imperial
         </button>
         <button
-          className={metric ? utilStyles.categorySelected : 'categoryButton'}
+          className={metric ? categoryStyles.categorySelected : 'categoryButton'}
           onClick={() => setMetric(true)}
         >
           Metric
