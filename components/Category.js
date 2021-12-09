@@ -1,6 +1,6 @@
-import { CATEGORY_TYPE } from '../utils/constants'
-import utilStyles from '../styles/utils.module.css'
 import { useRouter } from 'next/router'
+import { CATEGORY_TYPE, ROLE_NAVIGATION } from '../utils/constants'
+import utilStyles from '../styles/utils.module.css'
 
 const Category = ({ category, pushToRouter }) => {
   const router = useRouter()
@@ -23,7 +23,7 @@ const Category = ({ category, pushToRouter }) => {
               ? `${utilStyles.gearCategory} ${utilStyles.categoryLink}`
               : utilStyles.gearCategory
           }
-          role={pushToRouter ? 'navigation' : ''}
+          role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           gear
         </div>
@@ -37,7 +37,7 @@ const Category = ({ category, pushToRouter }) => {
               ? `${utilStyles.thoughtsCategory} ${utilStyles.categoryLink}`
               : utilStyles.thoughtsCategory
           }
-          role={pushToRouter ? 'navigation' : ''}
+          role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           thoughts
         </div>
@@ -51,7 +51,7 @@ const Category = ({ category, pushToRouter }) => {
               ? `${utilStyles.hikeCategory} ${utilStyles.categoryLink}`
               : utilStyles.hikeCategory
           }
-          role={pushToRouter ? 'navigation' : ''}
+          role={pushToRouter ? ROLE_NAVIGATION : ''}
         >
           trip reports
         </div>
