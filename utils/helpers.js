@@ -2,14 +2,17 @@ import { format } from 'date-fns'
 
 const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
-const roundDecimal = (num) => num && num.toFixed(2)
-
-const getLocationData = (str) => {
-  const [area, state] = str.toLowerCase().split(',')
-  return {
-    area,
-    state,
-  }
+const capitalizeEachWord = (string) => {
+  let capitalize = string
+    .split(' ')
+    .map((s) => {
+      if (s == 'de' || s == 'la') {
+        return s
+      }
+      return s.charAt(0).toUpperCase() + s.substring(1)
+    })
+    .join(' ')
+  return capitalize
 }
 
 // TODO: Match hike_title to existing NextJs generated slugs
@@ -21,27 +24,27 @@ const formatDate = (date) => format(date, 'LLL d, yyyy')
 
 const formatDateWithDayOfWeek = (date) => format(date, 'iiii, LLLL do, yyyy')
 
-// Metric to Imperial conversion
-const formatStatsImperial = (distance, gain) =>
-  (distance && gain && `${distance} miles & ${addCommas(gain)}'`) || null
+const getLocationData = (str) => {
+  const [area, state] = str.toLowerCase().split(',')
+  return {
+    area,
+    state,
+  }
+}
 
 // Imperial to Metric conversions
 const milesToKilometers = (num) => roundDecimal(num * 1.609)
-
 const feetToMeters = (num) => addCommas(roundDecimal(num / 3.281))
 
-const formatStatsMetric = (distance, gain) =>
-  (distance && gain && `${milesToKilometers(distance)} km & ${feetToMeters(gain)} m`) ||
-  null
+const roundDecimal = (num) => num && num.toFixed(2)
 
 export {
   addCommas,
+  capitalizeEachWord,
   feetToMeters,
   findMatchingSlug,
   formatDate,
   formatDateWithDayOfWeek,
-  formatStatsImperial,
-  formatStatsMetric,
   getLocationData,
   milesToKilometers,
 }
