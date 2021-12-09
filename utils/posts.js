@@ -12,6 +12,30 @@ import {
 
 const postsDirectory = path.join(process.cwd(), 'blog')
 
+const FAKE_FEATURES = [
+  {
+    title: 'Climb Fletcher Mtn',
+    date: '12-02-21',
+    description:
+      'A bunch of information about Fletcher Mountain, it was a good climb, averaged about normal distance.',
+    href: '/fletcher',
+  },
+  {
+    title: 'Hike Missouri Mtn',
+    date: '10-12-21',
+    description:
+      'It was a cool & dry day on Missouri with bluebird conditions. Where is the snow?',
+    href: '/missouri',
+  },
+  {
+    title: 'Packing for a 14er',
+    date: '11-29-21',
+    description:
+      'There are lots of things to consider when packing for your first 14er...',
+    href: '/14er-pack-lists',
+  },
+]
+
 // Get all the post IDs
 export function getAllPostIds() {
   // Get file names under each categories directory
@@ -53,6 +77,35 @@ export function getAllPostIds() {
   })
 }
 
+// Create an array of five most recent objects to present
+// on the landing page (2 blog posts + 3 climbs)
+export function getMostRecentPosts() {
+  return FAKE_FEATURES
+}
+
+// Get relevant post data
+export async function getPostData(category, id) {
+  // Set the relevant /posts file path using category and id in the query params
+  const fullPath = path.join(postsDirectory, `${category}`, `${id}.md`)
+  const fileContents = fs.readFileSync(fullPath, 'utf8')
+
+  // Use gray-matter to parse the post metadata section
+  const matterResult = matter(fileContents)
+
+  // Use remark to convert markdown into HTML string
+  const processedContent = await remark().use(html).process(matterResult.content)
+  const contentHtml = processedContent.toString()
+
+  // Combine the data with the id
+  return {
+    id,
+    contentHtml,
+    category,
+    ...matterResult.data,
+  }
+}
+
+// Get all post data, in chronological order
 export function getSortedPostsData() {
   // Get file names under each category directory
   const gearFileNames = fs.readdirSync(gearDirectory)
@@ -147,26 +200,4 @@ export function getSortedPostsData() {
       return -1
     }
   })
-}
-
-// Get relevant post data
-export async function getPostData(category, id) {
-  // Set the relevant /posts file path using category and id in the query params
-  const fullPath = path.join(postsDirectory, `${category}`, `${id}.md`)
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-
-  // Use gray-matter to parse the post metadata section
-  const matterResult = matter(fileContents)
-
-  // Use remark to convert markdown into HTML string
-  const processedContent = await remark().use(html).process(matterResult.content)
-  const contentHtml = processedContent.toString()
-
-  // Combine the data with the id
-  return {
-    id,
-    contentHtml,
-    category,
-    ...matterResult.data,
-  }
 }
