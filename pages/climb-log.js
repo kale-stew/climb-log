@@ -129,9 +129,9 @@ const ClimbLog = ({ allClimbs }) => {
   const selectAreaFilter = (filter) => {
     window.dataLayer.push({
       'event': 'click',
-      'value': '${filter}',
-      'pagePath': 'https://www.kylies.photos${router.asPath}',
-      'pageTitle': '${METADATA.SITE_NAME} | Climb Log',
+      'value': `${filter}`,
+      'pagePath': `https://www.kylies.photos${router.asPath}`,
+      'pageTitle': `${METADATA.SITE_NAME} | Climb Log`,
       'visitorType': 'HARD CODED VISITOR'
     })
     let filterType = filter.split('?')[1]
