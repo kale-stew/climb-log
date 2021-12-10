@@ -18,7 +18,15 @@
   font-weight: bold;
 }
 
+.blogNavigationSeparator {
+  display: none;
+  margin: 2px;
+  background: #696969;
+  width: 1px;
+}
+
 .blogPostHeading {
+  font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   color: #020202;
 }
@@ -27,15 +35,22 @@
   text-decoration: underline;
 }
 
-.blogNavigationSeparator {
-  display: none;
-  margin: 2px;
-  background: #696969;
-  width: 1px;
+.blogSection {
+  width: 760px;
 }
 
 @media (max-width: 1024px) {
   .blogNavigationSeparator {
     display: flex;
+  }
+
+  .blogSubheader {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .blogSection {
+    width: auto;
   }
 }

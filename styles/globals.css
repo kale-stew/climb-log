@@ -42,7 +42,7 @@ button:hover {
 }
 
 a {
-  color: #0084db;
+  color: #f88d00;
   text-decoration: none;
 }
 
@@ -98,12 +98,12 @@ table .tableRow:hover {
 }
 
 article {
-  max-width: 70vw;
+  width: 760px;
   margin-bottom: 3em;
 }
 
-img {
-  max-width: 65vw;
+article img {
+  max-width: 57vw;
   padding: 2rem 0 0 0;
 }
 
@@ -151,5 +151,23 @@ th {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 1024px) {
+  article h1 {
+    text-align: center;
+  }
+}
+
+@media (max-width: 925px) {
+  article img {
+    max-width: 85vw;
+  }
+}
+
+@media (max-width: 760px) {
+  article {
+    width: auto;
   }
 }

@@ -1,5 +1,14 @@
 .landingPage {
   width: 100%;
+  background-color: #f9f9f9;
+}
+
+.mostRecentPosts {
+  display: grid;
+  grid-gap: 2.5em;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  padding: 0 3em;
+  margin-top: 2.2em;
 }
 
 .wrapper {
@@ -18,5 +27,12 @@
   .landingNavigation a {
     font-size: 12px;
     padding: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .mostRecentPosts {
+    display: flex;
+    flex-direction: column;
   }
 }

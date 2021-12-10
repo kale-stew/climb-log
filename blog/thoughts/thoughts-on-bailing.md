@@ -1,5 +1,5 @@
 ---
-title: 'Knowing When to Bail'
+title: 'The Importance of Knowing When to Bail'
 date: '2021-11-09'
 ---
 

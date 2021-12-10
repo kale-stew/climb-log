@@ -1,18 +1,14 @@
 .aboutBlock {
-  max-width: 585px;
+  max-width: 650px;
 }
 
 .aboutBlockText p {
   text-align: left;
 }
 
-.aboutHeadshotFullWrapper {
+.aboutImage {
+  padding: 0 2rem 0;
   float: left;
-  margin: 0 2rem 2rem 0;
-}
-
-.aboutHeadshotMobileWrapper {
-  display: none;
 }
 
 .socialIcons {
@@ -35,19 +31,17 @@
     max-width: 80vw;
   }
 
-  .aboutHeadshotFullWrapper {
-    display: none;
-  }
-
-  .aboutHeadshotMobileWrapper {
-    display: flex;
-    justify-content: center;
-    min-width: 40vw;
-    margin-bottom: 1.75em;
+  .aboutBlockText {
+    padding-top: 1.75rem;
   }
 
   .aboutBlockText p {
     text-align: center;
+  }
+
+  .aboutImageMobile {
+    display: flex;
+    justify-content: center;
   }
 
   .socialIcons {

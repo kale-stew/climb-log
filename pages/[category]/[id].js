@@ -97,8 +97,16 @@ const Post = ({ postData, postIds }) => {
       </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
-        <div className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
-          <FormattedDate dateString={postData.date} withDOW />{' '}
+        <div className={`${styles.blogSubheader} ${utilStyles.singleRow}`}>
+          <FormattedDate
+            dateString={postData.date}
+            className={utilStyles.shownForMobile}
+          />
+          <FormattedDate
+            dateString={postData.date}
+            withDOW
+            className={utilStyles.hiddenForMobile}
+          />
           <Category category={postData.category} pushToRouter={true} />
         </div>
         <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
@@ -110,7 +118,6 @@ const Post = ({ postData, postIds }) => {
 
 export async function getStaticPaths() {
   const paths = getAllPostIds()
-
   return {
     paths,
     fallback: false,
@@ -120,7 +127,6 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const postData = await getPostData(params.category, params.id)
   const postIds = getSortedPostsData()
-
   return {
     props: {
       postData,

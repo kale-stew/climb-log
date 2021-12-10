@@ -1,0 +1,14 @@
+.card {
+  display: inline-block;
+  min-width: 330px;
+}
+
+.cardHeader a {
+  color: #1d1d1d;
+}
+
+@media (max-width: 1024px) {
+  .card {
+    max-width: 75vw;
+  }
+}

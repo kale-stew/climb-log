@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import Category from '../components/Category'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
@@ -90,7 +90,9 @@ export default function BlogLandingPage({ allPostsData }) {
         </button>
       </section>
 
-      <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
+      <section
+        className={`${utilStyles.headingMd} ${utilStyles.padding1px} ${styles.blogSection}`}
+      >
         <ul className={utilStyles.list}>
           {allPostsData.map(({ id, category, date, preview, title }) => (
             <li
@@ -111,7 +113,7 @@ export default function BlogLandingPage({ allPostsData }) {
                 <FormattedDate dateString={date} />{' '}
                 <Category category={category} pushToRouter={false} />
               </small>
-              <small className={utilStyles.listItem}>{preview}...</small>
+              <small className={utilStyles.listItem}>{preview}</small>
             </li>
           ))}
         </ul>
