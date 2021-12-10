@@ -6,7 +6,7 @@ import Table from '../components/Table'
 import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
-import GA_TRACKING_ID from '../utils/gtag'
+import { GA_TRACKING_ID } from '../utils/gtag'
 import tableStyles from '../components/Table.module.css'
 
 const ClimbLog = ({ allClimbs }) => {

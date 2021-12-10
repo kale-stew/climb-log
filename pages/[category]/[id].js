@@ -7,7 +7,7 @@ import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/post
 
 import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
-import GA_TRACKING_ID from '../utils/gtag'
+import { GA_TRACKING_ID } from '../utils/gtag'
 const Post = ({ postData, postIds }) => {
   /**
    * buildNavigation uses the sorted posts data to find it's own index, the next post's,

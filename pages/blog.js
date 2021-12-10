@@ -11,7 +11,7 @@ import { getSortedPostsData } from '../utils/posts'
 import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
-import GA_TRACKING_ID from '../utils/gtag'
+import { GA_TRACKING_ID } from '../utils/gtag'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)

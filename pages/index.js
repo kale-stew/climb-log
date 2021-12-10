@@ -10,7 +10,7 @@ import LanderTop from '../public/photos/lander_top.png'
 import LanderBottom from '../public/photos/lander_bottom.png'
 import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
-import GA_TRACKING_ID from '../utils/gtag'
+import { GA_TRACKING_ID } from '../utils/gtag'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 

@@ -9,7 +9,7 @@ import { METADATA, SocialLinks } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
-import GA_TRACKING_ID from '../utils/gtag'
+import { GA_TRACKING_ID } from '../utils/gtag'
 const AboutPage = () => (
   <Layout>
     <Head>
