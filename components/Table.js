@@ -50,7 +50,7 @@ export default function Table({
       setIsPopoverOpen(false)
       setRowClicked(null)
     } else {
-      event('click', climb.title, `https://www.kylies.photos/climb-log`, 'TableClick', `${METADATA.SITE_NAME} | Climb Log`)
+      event('gtm.click', climb.title, `https://www.kylies.photos/climb-log`, 'TableClick', `${METADATA.SITE_NAME} | Climb Log`)
       toggleBlanketEnabled()
       setIsPopoverOpen(true)
       setRowClicked(id)
@@ -107,7 +107,7 @@ export default function Table({
   }
 
   const toggleUnits = (isMetric) => {
-    event('click', `${isMetric ? 'metric' : 'imperial'}`, `https://www.kylies.photos/climb-log`, 'UntiToggle', `${METADATA.SITE_NAME} | Climb Log`)
+    event('gtm.click', `${isMetric ? 'metric' : 'imperial'}`, `https://www.kylies.photos/climb-log`, 'UntiToggle', `${METADATA.SITE_NAME} | Climb Log`)
     setMetric(isMetric)
   }
   return (

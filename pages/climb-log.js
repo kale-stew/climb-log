@@ -127,7 +127,7 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
-    event('click', filter, `https://www.kylies.photos${router.asPath}`, 'AreaSelect', `${METADATA.SITE_NAME} | Climb Log`)
+    event('gtm.click', filter, `https://www.kylies.photos${router.asPath}`, 'AreaSelect', `${METADATA.SITE_NAME} | Climb Log`)
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
     // Set the areaFilter so that the drop down can handle it's own state
