@@ -37,7 +37,7 @@ const CustomHead = ({ title }) => {
         }}
       />
       <title>{title}</title>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8" />
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} />
 
       <script
         dangerouslySetInnerHTML={{
@@ -46,7 +46,7 @@ const CustomHead = ({ title }) => {
             
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
+            gtag('config', '${GA_TRACKING_ID}', { page_path: window.location.pathname });
           `,
         }}
       />
