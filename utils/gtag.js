@@ -8,6 +8,7 @@ export const pageview = (url) => {
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
 export const event = ({ action, value, path, label, pageTitle }) => {
   if (window && window.dataLayer) {
+    console.log("PUSHING:", action, value, label)
     window.dataLayer.push({
       'event': action,
       'value': value,
