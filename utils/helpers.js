@@ -20,9 +20,9 @@ const findMatchingSlug = (str) => {
   return false
 }
 
-const formatDate = (date) => format(date, 'LLL d, yyyy')
+const formatDate = (date) => format(date, 'PP')
 
-const formatDateWithDayOfWeek = (date) => format(date, 'iiii, LLLL do, yyyy')
+const formatDateWithDayOfWeek = (date) => format(date, 'PPPP')
 
 const getLocationData = (str) => {
   const [area, state] = str.toLowerCase().split(',')
