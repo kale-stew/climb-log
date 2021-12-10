@@ -7,7 +7,7 @@ import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/post
 
 import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
-import { GA_TRACKING_ID } from '../../utils/gtag'
+
 const Post = ({ postData, postIds }) => {
   /**
    * buildNavigation uses the sorted posts data to find it's own index, the next post's,
@@ -95,7 +95,7 @@ const Post = ({ postData, postIds }) => {
         {/* Global Site Tag (gtag.js) - Google Analytics */}
         <script
             async
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
           />
           <script
             dangerouslySetInnerHTML={{
@@ -103,7 +103,7 @@ const Post = ({ postData, postIds }) => {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GA_TRACKING_ID}', {
+            gtag('config', 'G-W9WRKKHEN8', {
               page_path: window.location.pathname,
             });
           `,

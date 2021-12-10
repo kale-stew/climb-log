@@ -6,7 +6,6 @@ import Table from '../components/Table'
 import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
-import { GA_TRACKING_ID } from '../utils/gtag'
 import tableStyles from '../components/Table.module.css'
 
 const ClimbLog = ({ allClimbs }) => {
@@ -162,7 +161,7 @@ const ClimbLog = ({ allClimbs }) => {
         {/* Global Site Tag (gtag.js) - Google Analytics */}
         <script
             async
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
           />
           <script
             dangerouslySetInnerHTML={{
@@ -170,7 +169,7 @@ const ClimbLog = ({ allClimbs }) => {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GA_TRACKING_ID}', {
+            gtag('config', 'G-W9WRKKHEN8', {
               page_path: window.location.pathname,
             });
           `,

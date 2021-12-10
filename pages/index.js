@@ -10,7 +10,6 @@ import LanderTop from '../public/photos/lander_top.png'
 import LanderBottom from '../public/photos/lander_bottom.png'
 import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
-import { GA_TRACKING_ID } from '../utils/gtag'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 
@@ -20,7 +19,7 @@ const HomePage = ({ featuredPosts }) => (
       {/* Global Site Tag (gtag.js) - Google Analytics */}
       <script
             async
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
           />
           <script
             dangerouslySetInnerHTML={{
@@ -28,7 +27,7 @@ const HomePage = ({ featuredPosts }) => (
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GA_TRACKING_ID}', {
+            gtag('config', 'G-W9WRKKHEN8', {
               page_path: window.location.pathname,
             });
           `,

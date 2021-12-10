@@ -4,14 +4,14 @@ import Layout from '../components/Layout'
 import ImageGoats from '../public/photos/404.jpeg'
 
 import utilStyles from '../styles/utils.module.css'
-import { GA_TRACKING_ID } from '../utils/gtag'
+
 const NotFoundPage = () => (
   <Layout>
     <Head>
       {/* Global Site Tag (gtag.js) - Google Analytics */}
       <script
             async
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
           />
           <script
             dangerouslySetInnerHTML={{
@@ -19,7 +19,7 @@ const NotFoundPage = () => (
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GA_TRACKING_ID}', {
+            gtag('config', 'G-W9WRKKHEN8', {
               page_path: window.location.pathname,
             });
           `,
