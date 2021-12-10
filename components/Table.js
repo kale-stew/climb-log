@@ -7,6 +7,7 @@ import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
 import categoryStyles from './Category.module.css'
 import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
+import { event } from '../utils/gtag'
 
 export default function Table({
   allAreas,
@@ -25,22 +26,6 @@ export default function Table({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
 
-  const event = ({ action, value, path, label, pageTitle }) => {
-    if (window && window.dataLayer) {
-      console.log("PUSHING:", action, value, label)
-      window.dataLayer.push({
-        'event': action,
-        'value': value,
-        'pagePath': `https://www.kylies.photos${path}`,
-        'pageTitle': pageTitle,
-        'visitorType': 'HARD CODED VISITOR',
-        'label': label
-      })
-    } else {
-      console.warn("Google Analytics may be disabled")
-    }
-  }
-  
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =
     data.length > 0
