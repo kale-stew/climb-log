@@ -7,6 +7,7 @@ import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
 import tableStyles from '../components/Table.module.css'
 import CustomHead from '../components/CustomHead'
+import { event } from '../utils/gtag'
 
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
@@ -126,6 +127,7 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
+    event('selectFilter', 'click', 'filterClimbLog', filter)
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
     // Set the areaFilter so that the drop down can handle it's own state
