@@ -127,13 +127,13 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
-    window.dataLayer.push(`{
+    window.dataLayer.push({
       'event': 'click',
-      'value': '${filter},
+      'value': '${filter}',
       'pagePath': 'https://www.kylies.photos${router.asPath}',
       'pageTitle': '${METADATA.SITE_NAME} | Climb Log',
       'visitorType': 'HARD CODED VISITOR'
-    }`)
+    })
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
     // Set the areaFilter so that the drop down can handle it's own state
