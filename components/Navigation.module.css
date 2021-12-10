@@ -5,6 +5,7 @@
   align-items: baseline;
   height: 42px;
   padding: 1px;
+  margin-bottom: 2.2rem;
 }
 
 .landingHeader h1 {
@@ -31,8 +32,16 @@
 }
 
 @media (max-width: 1024px) {
+  .landingHeader {
+    background-color: #317cb2;
+    color: white;
+    margin-bottom: 0;
+    padding: 1em;
+  }
+
   .landingNavigation a {
     padding: none;
+    color: white;
   }
 
   .navigation {

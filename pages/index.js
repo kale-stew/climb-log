@@ -19,7 +19,6 @@ const HomePage = ({ featuredPosts }) => (
     <Head>
       <title>{METADATA.SITE_NAME} | Photography, Hiking</title>
     </Head>
-    <br />
     <ResponsiveImage
       altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       desktopImg={LanderTop}
