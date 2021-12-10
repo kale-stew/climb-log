@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
@@ -9,62 +8,11 @@ import { METADATA, SocialLinks } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
-import { useRouter } from 'next/router'
+import CustomHead from '../components/CustomHead'
 
-const AboutPage = () => {
-  const router = useRouter()
-  const title = `About ${METADATA.NAME}`
-  return (
+const AboutPage = () => (
   <Layout>
-    <Head>
-      {/* Global Site Tag (gtag.js) - Google Analytics */}
-      <script
-            async
-            src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
-          />
-          <script
-        dangerouslySetInnerHTML={{
-          __html: `
-          window.dataLayer = window.dataLayer || [];
-          dataLayer.push({
-            'event': 'Pageview',
-            'pagePath': 'https://www.kylies.photos${router.asPath}',
-            'pageTitle': '${title}',
-            'visitorType': 'HARD CODED VISITOR'
-          })
-          `,
-        }}
-      />
-          <script
-        dangerouslySetInnerHTML={{
-          __html: `
-      <!-- Google Tag Manager -->
-      (function(w, d, s, l, i) {
-        w[l] = w[l] || []
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : ''
-        j.async = true
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
-        f.parentNode.insertBefore(j, f)
-      })(window, document, 'script', 'dataLayer', 'GTM-5VZPGSC')
-      `,
-        }}
-      />
-<script
-        dangerouslySetInnerHTML={{
-          __html: `
-          <!-- Global site tag (gtag.js) - Google Analytics -->
-            
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
-          `,
-        }}
-      />
-      <title>About {METADATA.NAME}</title>
-    </Head>
+    <CustomHead title={`About ${METADATA.NAME}`} />
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
       More about {METADATA.NAME}
     </h1>
@@ -121,5 +69,5 @@ const AboutPage = () => {
     </div>
   </Layout>
 )
-}
+
 export default AboutPage

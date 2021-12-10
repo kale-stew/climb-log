@@ -6,6 +6,8 @@ const CustomHead = ({ title }) => {
 
   return (
     <Head>
+      {/* Global Site Tag (gtag.js) - Google Analytics */}
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`} />
       <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -36,9 +38,6 @@ const CustomHead = ({ title }) => {
       `,
         }}
       />
-      <title>{title}</title>
-      <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} />
-
       <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -50,6 +49,7 @@ const CustomHead = ({ title }) => {
           `,
         }}
       />
+      <title>{title}</title>
     </Head>
   )
 }

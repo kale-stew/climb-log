@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Card from '../components/Card'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
@@ -12,62 +11,11 @@ import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
-import { useRouter } from 'next/router'
+import CustomHead from '../components/CustomHead'
 
-const HomePage = ({ featuredPosts }) => {
-  const router = useRouter()
-  const title = `${METADATA.SITE_NAME} | Photography, Hiking`
-  return (
+const HomePage = ({ featuredPosts }) => (
   <Layout home>
-    <Head>
-      {/* Global Site Tag (gtag.js) - Google Analytics */}
-      <script
-            async
-            src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
-          />
-          <script
-        dangerouslySetInnerHTML={{
-          __html: `
-          window.dataLayer = window.dataLayer || [];
-          dataLayer.push({
-            'event': 'Pageview',
-            'pagePath': 'https://www.kylies.photos${router.asPath}',
-            'pageTitle': '${title}',
-            'visitorType': 'HARD CODED VISITOR'
-          })
-          `,
-        }}
-      />
-          <script
-        dangerouslySetInnerHTML={{
-          __html: `
-      <!-- Google Tag Manager -->
-      (function(w, d, s, l, i) {
-        w[l] = w[l] || []
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : ''
-        j.async = true
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
-        f.parentNode.insertBefore(j, f)
-      })(window, document, 'script', 'dataLayer', 'GTM-5VZPGSC')
-      `,
-        }}
-      />
-<script
-        dangerouslySetInnerHTML={{
-          __html: `
-          <!-- Global site tag (gtag.js) - Google Analytics -->
-            
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
-          `,
-        }}
-      />
-      <title>{METADATA.SITE_NAME} | Photography, Hiking</title>
-    </Head>
+    <CustomHead title={`${METADATA.SITE_NAME} | Photography, Hiking`} />
     <ResponsiveImage
       altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       desktopImg={LanderTop}
@@ -91,7 +39,7 @@ const HomePage = ({ featuredPosts }) => {
       mobileDimensions={{ width: '1200', height: '611' }}
     />
   </Layout>
-)}
+)
 
 export async function getStaticProps() {
   const featuredPosts = await getMostRecentPosts()

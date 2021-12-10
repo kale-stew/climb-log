@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Link from 'next/link'
 import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
@@ -7,11 +6,9 @@ import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/post
 
 import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
-import { useRouter } from 'next/router'
+import CustomHead from '../../components/CustomHead'
 
 const Post = ({ postData, postIds }) => {
-  const router = useRouter()
-  const title = `${postData.title} | kylies.photos`
   /**
    * buildNavigation uses the sorted posts data to find it's own index, the next post's,
    * and the previous post's index (if they exist). Now that it knows where it is in the
@@ -94,55 +91,7 @@ const Post = ({ postData, postIds }) => {
   }
   return (
     <Layout>
-      <Head>
-        {/* Global Site Tag (gtag.js) - Google Analytics */}
-        <script
-            async
-            src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
-          />
-          <script
-        dangerouslySetInnerHTML={{
-          __html: `
-          window.dataLayer = window.dataLayer || [];
-          dataLayer.push({
-            'event': 'Pageview',
-            'pagePath': 'https://www.kylies.photos${router.asPath}',
-            'pageTitle': '${title}',
-            'visitorType': 'HARD CODED VISITOR'
-          })
-          `,
-        }}
-      />
-          <script
-        dangerouslySetInnerHTML={{
-          __html: `
-      <!-- Google Tag Manager -->
-      (function(w, d, s, l, i) {
-        w[l] = w[l] || []
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : ''
-        j.async = true
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
-        f.parentNode.insertBefore(j, f)
-      })(window, document, 'script', 'dataLayer', 'GTM-5VZPGSC')
-      `,
-        }}
-      />
-<script
-        dangerouslySetInnerHTML={{
-          __html: `
-          <!-- Global site tag (gtag.js) - Google Analytics -->
-            
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
-          `,
-        }}
-      />
-        <title>{postData.title} | kylies.photos</title>
-      </Head>
+      <CustomHead title={`${postData.title} | kylies.photos`} />
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
         <div className={`${styles.blogSubheader} ${utilStyles.singleRow}`}>
