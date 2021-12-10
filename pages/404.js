@@ -1,11 +1,15 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 import Layout from '../components/Layout'
 import ImageGoats from '../public/photos/404.jpeg'
 
 import utilStyles from '../styles/utils.module.css'
 
-const NotFoundPage = () => (
+const NotFoundPage = () => {
+  const router = useRouter()
+  const title = `Page Not Found | kylies.photos`
+  return (
   <Layout>
     <Head>
       {/* Global Site Tag (gtag.js) - Google Analytics */}
@@ -64,6 +68,6 @@ const NotFoundPage = () => (
       <p>Click the home icon below ↓ to navigate back home</p>
     </div>
   </Layout>
-)
+)}
 
 export default NotFoundPage

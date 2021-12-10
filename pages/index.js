@@ -12,8 +12,12 @@ import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
+import { useRouter } from 'next/router'
 
-const HomePage = ({ featuredPosts }) => (
+const HomePage = ({ featuredPosts }) => {
+  const router = useRouter()
+  const title = `${METADATA.SITE_NAME} | Photography, Hiking`
+  return (
   <Layout home>
     <Head>
       {/* Global Site Tag (gtag.js) - Google Analytics */}
@@ -87,7 +91,7 @@ const HomePage = ({ featuredPosts }) => (
       mobileDimensions={{ width: '1200', height: '611' }}
     />
   </Layout>
-)
+)}
 
 export async function getStaticProps() {
   const featuredPosts = await getMostRecentPosts()

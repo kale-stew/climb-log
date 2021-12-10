@@ -9,8 +9,12 @@ import { METADATA, SocialLinks } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
+import { useRouter } from 'next/router'
 
-const AboutPage = () => (
+const AboutPage = () => {
+  const router = useRouter()
+  const title = `About ${METADATA.NAME}`
+  return (
   <Layout>
     <Head>
       {/* Global Site Tag (gtag.js) - Google Analytics */}
@@ -117,5 +121,5 @@ const AboutPage = () => (
     </div>
   </Layout>
 )
-
+}
 export default AboutPage

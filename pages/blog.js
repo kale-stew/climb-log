@@ -15,7 +15,7 @@ import utilStyles from '../styles/utils.module.css'
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
   const router = useRouter()
-
+  const title = `${METADATA.SITE_NAME} | Hiking Blog`
   useEffect(() => {
     const queryPayload = router.query
     if (Object.keys(queryPayload).length > 0) {

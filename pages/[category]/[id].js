@@ -7,8 +7,11 @@ import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/post
 
 import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
+import { useRouter } from 'next/router'
 
 const Post = ({ postData, postIds }) => {
+  const router = useRouter()
+  const title = `${postData.title} | kylies.photos`
   /**
    * buildNavigation uses the sorted posts data to find it's own index, the next post's,
    * and the previous post's index (if they exist). Now that it knows where it is in the

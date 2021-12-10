@@ -22,6 +22,7 @@ const ClimbLog = ({ allClimbs }) => {
 
   const router = useRouter()
   const firstUpdate = useRef(true)
+  const title = `${METADATA.SITE_NAME} | Climb Log`
 
   /**
    * refreshData utilizes Next.js's router to replace the path with the current one,
