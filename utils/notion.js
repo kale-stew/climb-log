@@ -54,7 +54,7 @@ export const fetchAllClimbs = async () => {
   return response.results.map((result) => {
     const {
       id,
-      properties: { area, date, distance, gain, hike_title },
+      properties: { area, date, distance, gain, hike_title, strava },
     } = result
 
     return {
@@ -67,6 +67,7 @@ export const fetchAllClimbs = async () => {
       gain: fmt(gain),
       area: getLocationData(fmt(area)).area,
       state: getLocationData(fmt(area)).state,
+      strava: fmt(strava),
     }
   }, [])
 }
