@@ -132,7 +132,8 @@ const ClimbLog = ({ allClimbs }) => {
       'value': `${filter}`,
       'pagePath': `https://www.kylies.photos${router.asPath}`,
       'pageTitle': `${METADATA.SITE_NAME} | Climb Log`,
-      'visitorType': 'HARD CODED VISITOR'
+      'visitorType': 'HARD CODED VISITOR',
+      'label': 'AreaSelect'
     })
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]

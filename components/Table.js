@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
-import { CATEGORY_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
 
 import categoryStyles from './Category.module.css'
 import styles from './Table.module.css'
@@ -49,6 +49,14 @@ export default function Table({
       setIsPopoverOpen(false)
       setRowClicked(null)
     } else {
+      window.dataLayer.push({
+        'event': 'click',
+        'value': `${id}`,
+        'pagePath': `https://www.kylies.photos/climb-log`,
+        'pageTitle': `${METADATA.SITE_NAME} | Climb Log`,
+        'visitorType': 'HARD CODED VISITOR',
+        'label': 'TableClick'
+      })
       toggleBlanketEnabled()
       setIsPopoverOpen(true)
       setRowClicked(id)
@@ -104,6 +112,17 @@ export default function Table({
     )
   }
 
+  const toggleUnits = (isMetric) => {
+    window.dataLayer.push({
+      'event': 'click',
+      'value': `${isMetric ? 'metric' : 'imperial'}`,
+      'pagePath': `https://www.kylies.photos/climb-log`,
+      'pageTitle': `${METADATA.SITE_NAME} | Climb Log`,
+      'visitorType': 'HARD CODED VISITOR',
+      'label': 'UnitToggle'
+    })
+    setMetric(isMetric)
+  }
   return (
     <>
       <h1>Kylie's Climb Log</h1>
@@ -112,13 +131,13 @@ export default function Table({
       <div className={utilStyles.singleRow}>
         <button
           className={metric ? 'categoryButton' : categoryStyles.categorySelected}
-          onClick={() => setMetric(false)}
+          onClick={() => toggleUnits(false)}
         >
           Imperial
         </button>
         <button
           className={metric ? categoryStyles.categorySelected : 'categoryButton'}
-          onClick={() => setMetric(true)}
+          onClick={() => toggleUnits(true)}
         >
           Metric
         </button>
