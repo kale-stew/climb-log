@@ -46,7 +46,7 @@ const CustomHead = ({ title }) => {
             
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GA_TRACKING_ID}', { page_path: window.location.pathname });
+            gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
           `,
         }}
       />

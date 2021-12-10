@@ -19,17 +19,18 @@ const AboutPage = () => (
             src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`}
           />
           <script
-            dangerouslySetInnerHTML={{
-              __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-W9WRKKHEN8', {
-              page_path: window.location.pathname,
-            });
+        dangerouslySetInnerHTML={{
+          __html: `
+          window.dataLayer = window.dataLayer || [];
+          dataLayer.push({
+            'event': 'Pageview',
+            'pagePath': 'https://www.kylies.photos${router.asPath}',
+            'pageTitle': '${title}',
+            'visitorType': 'HARD CODED VISITOR'
+          })
           `,
-            }}
-          />
+        }}
+      />
           <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -45,6 +46,17 @@ const AboutPage = () => (
         f.parentNode.insertBefore(j, f)
       })(window, document, 'script', 'dataLayer', 'GTM-5VZPGSC')
       `,
+        }}
+      />
+<script
+        dangerouslySetInnerHTML={{
+          __html: `
+          <!-- Global site tag (gtag.js) - Google Analytics -->
+            
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-W9WRKKHEN8', { page_path: window.location.pathname });
+          `,
         }}
       />
       <title>About {METADATA.NAME}</title>
