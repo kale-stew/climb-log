@@ -25,6 +25,21 @@ const ClimbLog = ({ allClimbs }) => {
   const firstUpdate = useRef(true)
   const title = `${METADATA.SITE_NAME} | Climb Log`
 
+  const event = ({ action, value, path, label, pageTitle }) => {
+    if (window && window.dataLayer) {
+      console.log("PUSHING:", action, value, label)
+      window.dataLayer.push({
+        'event': action,
+        'value': value,
+        'pagePath': `https://www.kylies.photos${path}`,
+        'pageTitle': pageTitle,
+        'visitorType': 'HARD CODED VISITOR',
+        'label': label
+      })
+    } else {
+      console.warn("Google Analytics may be disabled")
+    }
+  }
   /**
    * refreshData utilizes Next.js's router to replace the path with the current one,
    * effectively going no where. But this does allow the page to re-render, because we're

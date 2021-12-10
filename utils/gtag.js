@@ -20,9 +20,4 @@ export const event = ({ action, value, path, label, pageTitle }) => {
   } else {
     console.warn("Google Analytics may be disabled")
   }
-  // window.gtag('event', action, {
-  //   event_category: category,
-  //   event_label: label,
-  //   value: value,
-  // })
 }
