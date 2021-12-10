@@ -7,6 +7,7 @@ import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
 import categoryStyles from './Category.module.css'
 import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
+import { event } from '../utils/gtag'
 
 export default function Table({
   allAreas,
@@ -43,20 +44,13 @@ export default function Table({
     )
   }
 
-  const togglePopOver = (id) => {
+  const togglePopOver = (id, climb) => {
     if (isPopoverOpen) {
       toggleBlanketEnabled()
       setIsPopoverOpen(false)
       setRowClicked(null)
     } else {
-      window.dataLayer.push({
-        'event': 'click',
-        'value': `${id}`,
-        'pagePath': `https://www.kylies.photos/climb-log`,
-        'pageTitle': `${METADATA.SITE_NAME} | Climb Log`,
-        'visitorType': 'HARD CODED VISITOR',
-        'label': 'TableClick'
-      })
+      event('click', climb.title, `https://www.kylies.photos/climb-log`, 'TableClick', `${METADATA.SITE_NAME} | Climb Log`)
       toggleBlanketEnabled()
       setIsPopoverOpen(true)
       setRowClicked(id)
@@ -113,14 +107,7 @@ export default function Table({
   }
 
   const toggleUnits = (isMetric) => {
-    window.dataLayer.push({
-      'event': 'click',
-      'value': `${isMetric ? 'metric' : 'imperial'}`,
-      'pagePath': `https://www.kylies.photos/climb-log`,
-      'pageTitle': `${METADATA.SITE_NAME} | Climb Log`,
-      'visitorType': 'HARD CODED VISITOR',
-      'label': 'UnitToggle'
-    })
+    event('click', `${isMetric ? 'metric' : 'imperial'}`, `https://www.kylies.photos/climb-log`, 'UntiToggle', `${METADATA.SITE_NAME} | Climb Log`)
     setMetric(isMetric)
   }
   return (
@@ -169,7 +156,7 @@ export default function Table({
             <Popover
               containerClassName={styles.tablePopover}
               key={climb.id}
-              onClickOutside={() => togglePopOver(i)}
+              onClickOutside={() => togglePopOver(i, climb)}
               isOpen={isPopoverOpen && rowClicked === i}
               positions={['center', 'bottom']} // in order of priority
               content={<CustomPopover climb={climb} metric={metric} />}
@@ -178,7 +165,7 @@ export default function Table({
                 className={'tableRow'}
                 key={i}
                 onClick={() => {
-                  togglePopOver(i)
+                  togglePopOver(i, climb)
                 }}
               >
                 {Object.keys(climb).map((key) => buildTableRow(key, climb))}

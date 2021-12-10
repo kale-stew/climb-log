@@ -6,10 +6,22 @@ export const pageview = (url) => {
 }
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
-export const event = ({ action, category, label, value }) => {
-  window.gtag('event', action, {
-    event_category: category,
-    event_label: label,
-    value: value,
-  })
+export const event = ({ action, value, path, label, pageTitle }) => {
+  if (window && window.dataLayer) {
+    window.dataLayer.push({
+      'event': action,
+      'value': value,
+      'pagePath': `https://www.kylies.photos${path}`,
+      'pageTitle': pageTitle,
+      'visitorType': 'HARD CODED VISITOR',
+      'label': label
+    })
+  } else {
+    console.warn("Google Analytics may be disabled")
+  }
+  // window.gtag('event', action, {
+  //   event_category: category,
+  //   event_label: label,
+  //   value: value,
+  // })
 }
