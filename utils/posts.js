@@ -12,30 +12,6 @@ import {
 
 const postsDirectory = path.join(process.cwd(), 'blog')
 
-const FAKE_FEATURES = [
-  {
-    title: 'Climb Fletcher Mtn',
-    date: '12-02-21',
-    description:
-      'A bunch of information about Fletcher Mountain, it was a good climb, averaged about normal distance.',
-    href: '/fletcher',
-  },
-  {
-    title: 'Hike Missouri Mtn',
-    date: '10-12-21',
-    description:
-      'It was a cool & dry day on Missouri with bluebird conditions. Where is the snow?',
-    href: '/missouri',
-  },
-  {
-    title: 'Packing for a 14er',
-    date: '11-29-21',
-    description:
-      'There are lots of things to consider when packing for your first 14er...',
-    href: '/14er-pack-lists',
-  },
-]
-
 // Get all the post IDs
 export function getAllPostIds() {
   // Get file names under each categories directory
@@ -75,12 +51,6 @@ export function getAllPostIds() {
       },
     }
   })
-}
-
-// Create an array of five most recent objects to present
-// on the landing page (2 blog posts + 3 climbs)
-export function getMostRecentPosts() {
-  return FAKE_FEATURES
 }
 
 // Get relevant post data
@@ -123,7 +93,9 @@ export function getSortedPostsData() {
 
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents)
-    const longPreview = matterResult.content
+
+    // Create a 'preview' of the content string
+    const longPreview = matterResult.content.substring(0, 350)
 
     // Set the category
     const category = CATEGORY_TYPE.GEAR
@@ -132,7 +104,7 @@ export function getSortedPostsData() {
     return {
       id,
       category,
-      preview: longPreview.substring(0, 350),
+      preview: `${longPreview}...`,
       ...matterResult.data,
     }
   })
@@ -148,7 +120,9 @@ export function getSortedPostsData() {
 
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents)
-    const longPreview = matterResult.content
+
+    // Create a 'preview' of the content string
+    const longPreview = matterResult.content.substring(0, 350)
 
     // Set the category
     const category = CATEGORY_TYPE.THOUGHTS
@@ -157,7 +131,7 @@ export function getSortedPostsData() {
     return {
       id,
       category,
-      preview: longPreview.substring(0, 350),
+      preview: `${longPreview}...`,
       ...matterResult.data,
     }
   })
@@ -173,7 +147,9 @@ export function getSortedPostsData() {
 
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents)
-    const longPreview = matterResult.content
+
+    // Create a 'preview' of the content string
+    const longPreview = matterResult.content.substring(0, 350)
 
     // Set the category
     const category = CATEGORY_TYPE.HIKE
@@ -182,7 +158,7 @@ export function getSortedPostsData() {
     return {
       id,
       category,
-      preview: longPreview.substring(0, 350),
+      preview: `${longPreview}...`,
       ...matterResult.data,
     }
   })
@@ -200,4 +176,18 @@ export function getSortedPostsData() {
       return -1
     }
   })
+}
+
+// Create an array of five most recent objects to present
+// on the landing page (2 blog posts + 3 climbs)
+export function getMostRecentPosts() {
+  const recentBlogs = getSortedPostsData().splice(0, 2)
+
+  recentBlogs.map((post) => {
+    post.href = `/${post.category}/${post.id}`
+    post.description = `${post.preview.substring(0, 150)}...`
+    return post
+  })
+
+  return recentBlogs
 }

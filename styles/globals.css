@@ -102,8 +102,8 @@ article {
   margin-bottom: 3em;
 }
 
-img {
-  max-width: 65vw;
+article img {
+  max-width: 57vw;
   padding: 2rem 0 0 0;
 }
 
@@ -157,6 +157,12 @@ th {
 @media (max-width: 1024px) {
   article h1 {
     text-align: center;
+  }
+}
+
+@media (max-width: 925px) {
+  article img {
+    max-width: 85vw;
   }
 }
 

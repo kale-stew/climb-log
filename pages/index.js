@@ -32,7 +32,7 @@ const HomePage = ({ featuredPosts }) => (
     </h1>
     <div className={styles.mostRecentPosts}>
       {featuredPosts.map((post) => (
-        <Card postData={post} />
+        <Card postData={post} key={post.id} />
       ))}
     </div>
     <ResponsiveImage

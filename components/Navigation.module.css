@@ -43,4 +43,24 @@
     font-size: 18px;
     margin: 1rem 0.75rem;
   }
+
+  .landingHeader {
+    flex-direction: column;
+    height: auto;
+    align-items: center;
+  }
+
+  .landingHeader h1 {
+    margin: 0;
+  }
+
+  .landingNavigation {
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .landingNavigation a {
+    margin: auto;
+    padding: 2.5em 1em 0 1em;
+  }
 }

@@ -1,6 +1,10 @@
 .card {
   display: inline-block;
-  width: 500px;
+  width: 420px;
+}
+
+.cardHeader a {
+  color: #1d1d1d;
 }
 
 @media (max-width: 1024px) {
