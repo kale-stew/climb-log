@@ -127,7 +127,7 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
-    event('selectFilter', 'click', 'filterClimbLog', filter)
+    event('click', 'click', 'filterClimbLog', filter)
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
     // Set the areaFilter so that the drop down can handle it's own state
