@@ -4,8 +4,11 @@
 }
 
 .mostRecentPosts {
-  display: flex;
-  justify-content: space-around;
+  display: grid;
+  grid-gap: 2.5em;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  padding: 0 3em;
+  margin-top: 2.2em;
 }
 
 .wrapper {
@@ -17,13 +20,6 @@
 }
 
 @media (max-width: 1024px) {
-  .mostRecentPosts {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
   .wrapper {
     margin: 0 2rem;
   }
@@ -31,5 +27,12 @@
   .landingNavigation a {
     font-size: 12px;
     padding: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .mostRecentPosts {
+    display: flex;
+    flex-direction: column;
   }
 }

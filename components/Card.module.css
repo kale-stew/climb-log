@@ -1,6 +1,6 @@
 .card {
   display: inline-block;
-  width: 420px;
+  min-width: 330px;
 }
 
 .cardHeader a {

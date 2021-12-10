@@ -45,7 +45,7 @@ const HomePage = ({ featuredPosts }) => (
 )
 
 export async function getStaticProps() {
-  const featuredPosts = getMostRecentPosts()
+  const featuredPosts = await getMostRecentPosts()
   return {
     props: {
       featuredPosts,

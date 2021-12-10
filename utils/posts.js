@@ -9,6 +9,8 @@ import {
   hikeDirectory,
   thoughtsDirectory,
 } from './constants'
+import { addCommas, capitalizeEachWord } from './helpers'
+import { fetchAllClimbs } from './notion'
 
 const postsDirectory = path.join(process.cwd(), 'blog')
 
@@ -180,14 +182,41 @@ export function getSortedPostsData() {
 
 // Create an array of five most recent objects to present
 // on the landing page (2 blog posts + 3 climbs)
-export function getMostRecentPosts() {
-  const recentBlogs = getSortedPostsData().splice(0, 2)
-
-  recentBlogs.map((post) => {
-    post.href = `/${post.category}/${post.id}`
-    post.description = `${post.preview.substring(0, 150)}...`
-    return post
+export async function getMostRecentPosts() {
+  const recentBlogs = getSortedPostsData().splice(0, 3)
+  const featuredBlogs = recentBlogs.map((post) => {
+    return {
+      id: post.id,
+      date: post.date,
+      title: post.title,
+      href: `/${post.category}/${post.id}`,
+      description: `${post.preview.substring(0, 150)}...`,
+    }
   })
 
-  return recentBlogs
+  const allClimbs = await fetchAllClimbs()
+  const recentClimbs = allClimbs.splice(0, 3)
+  const formClimbDescription = (climb) =>
+    `A ${climb.distance} mile and ${addCommas(climb.gain)}' hike
+      in the ${capitalizeEachWord(climb.area)} of ${capitalizeEachWord(climb.state)}.`
+  const featuredClimbs = recentClimbs.map((climb) => {
+    return {
+      id: climb.id,
+      date: climb.date,
+      title: climb.title,
+      href: '/climb-log',
+      description: formClimbDescription(climb),
+    }
+  })
+
+  const featuredPosts = [...featuredBlogs, ...featuredClimbs]
+
+  // Sort posts by date
+  return featuredPosts.sort((a, b) => {
+    if (a.date < b.date) {
+      return 1
+    } else {
+      return -1
+    }
+  })
 }
