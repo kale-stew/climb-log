@@ -72,6 +72,11 @@ const CustomPopover = ({ climb, metric }) => {
         <strong>Location:</strong> {capitalizeEachWord(climb.area)},{' '}
         {capitalizeEachWord(climb.state)}
       </p>
+      {climb.strava && (
+        <a href={climb.strava} target="_blank" alt={`View '${climb.title}' on Strava`}>
+          Check out this activity on Strava ↗
+        </a>
+      )}
     </div>
   )
 }
