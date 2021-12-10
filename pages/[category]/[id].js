@@ -7,7 +7,7 @@ import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/post
 
 import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
-
+import GA_TRACKING_ID from '../utils/gtag'
 const Post = ({ postData, postIds }) => {
   /**
    * buildNavigation uses the sorted posts data to find it's own index, the next post's,
@@ -89,10 +89,26 @@ const Post = ({ postData, postIds }) => {
       </div>
     )
   }
-
   return (
     <Layout>
       <Head>
+        {/* Global Site Tag (gtag.js) - Google Analytics */}
+        <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_TRACKING_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
+            }}
+          />
         <title>{postData.title} | kylies.photos</title>
       </Head>
       <article>

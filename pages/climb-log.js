@@ -6,7 +6,7 @@ import Table from '../components/Table'
 import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
-
+import GA_TRACKING_ID from '../utils/gtag'
 import tableStyles from '../components/Table.module.css'
 
 const ClimbLog = ({ allClimbs }) => {
@@ -159,6 +159,23 @@ const ClimbLog = ({ allClimbs }) => {
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
       <Head>
+        {/* Global Site Tag (gtag.js) - Google Analytics */}
+        <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_TRACKING_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
+            }}
+          />
         <title>{METADATA.SITE_NAME} | Climb Log</title>
       </Head>
       <Table

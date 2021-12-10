@@ -10,13 +10,30 @@ import LanderTop from '../public/photos/lander_top.png'
 import LanderBottom from '../public/photos/lander_bottom.png'
 import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
-
+import GA_TRACKING_ID from '../utils/gtag'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
     <Head>
+      {/* Global Site Tag (gtag.js) - Google Analytics */}
+      <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_TRACKING_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
+            }}
+          />
       <title>{METADATA.SITE_NAME} | Photography, Hiking</title>
     </Head>
     <ResponsiveImage

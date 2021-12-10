@@ -9,10 +9,27 @@ import { METADATA, SocialLinks } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
-
+import GA_TRACKING_ID from '../utils/gtag'
 const AboutPage = () => (
   <Layout>
     <Head>
+      {/* Global Site Tag (gtag.js) - Google Analytics */}
+      <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_TRACKING_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
+            }}
+          />
       <title>About {METADATA.NAME}</title>
     </Head>
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
