@@ -1,6 +1,6 @@
 import { Client, LogLevel } from '@notionhq/client'
 import { getLocationData } from './helpers'
-
+import { getSortedPostsData } from './posts'
 /**
  * Initialize Notion client & configure a default db query
  */
@@ -11,9 +11,9 @@ const notion = new Client({
 
 /**
  * Builds our database config for us
- * @param {String} cursor 
- * @param {Number} pageSize 
- * @returns 
+ * @param {String} cursor
+ * @param {Number} pageSize
+ * @returns
  */
 const getDatabaseQueryConfig = (cursor = null, pageSize = null) => {
   let today = new Date().toISOString()
@@ -59,33 +59,45 @@ const fmt = (field) => {
   } else return null
 }
 
+const findMatchingSlug = (str) => {
+  const posts = getSortedPostsData()
+  let foundPost = posts.find((post) => post.id == str)
+  if (foundPost) {
+    return str
+  }
+  return false
+}
+
 /**
  * Formats an array of climbs from a notion.database.query response, should be the response.results
- * @param {Array} response 
+ * @param {Array} response
  * @returns {Array}
  */
-const formatClimbs = (response) => response.map((result) => {
-  const {
-    id,
-    properties: { area, date, distance, gain, hike_title, strava },
-  } = result
-
-  return {
-    id,
-    date: fmt(date),
-    title: fmt(hike_title),
-    // slug: url,
-    imgUrl: fmt(result.cover),
-    distance: fmt(distance),
-    gain: fmt(gain),
-    area: getLocationData(fmt(area)).area,
-    state: getLocationData(fmt(area)).state,
-    strava: fmt(strava),
-  }
-}, [])
+const formatClimbs = (response) => {
+  return response.map((result) => {
+    const {
+      id,
+      properties: { area, date, distance, gain, hike_title, strava, related_slug },
+    } = result
+    const slug = findMatchingSlug(fmt(related_slug))
+    const returnObj = {
+      id,
+      date: fmt(date),
+      title: fmt(hike_title),
+      slug: slug ? slug : null,
+      imgUrl: fmt(result.cover),
+      distance: fmt(distance),
+      gain: fmt(gain),
+      area: getLocationData(fmt(area)).area,
+      state: getLocationData(fmt(area)).state,
+      strava: fmt(strava),
+    }
+    return returnObj
+  }, [])
+}
 
 /**
- * 
+ *
  * @returns {Array} with the 3 most recent climbs
  */
 export const fetchMostRecentClimbs = async () => {
@@ -110,7 +122,7 @@ export const fetchAllClimbs = async () => {
     response = await notion.databases.query(config)
     responseArray = [...responseArray, ...response.results]
   }
-  //response.has_more // <-- This will tell us if the database has more pages 
+  //response.has_more // <-- This will tell us if the database has more pages
   //response.next_cursor // <-- This is the next page of results, can be passed as the start_cursor parameter to the same endpoint
   return formatClimbs(responseArray)
 }
