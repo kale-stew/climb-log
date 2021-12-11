@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
@@ -17,13 +17,12 @@ export default function Table({
   setMetric,
   setSortOrder,
   sortOrder,
-  toggleBlanketEnabled,
+  rowClicked,
+  isPopoverOpen,
+  togglePopOver,
 }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id', 'imgUrl', 'slug']
-
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
-  const [rowClicked, setRowClicked] = useState(null)
 
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =
@@ -48,18 +47,6 @@ export default function Table({
         slug={climb.slug}
       />
     )
-  }
-
-  const togglePopOver = (id) => {
-    if (isPopoverOpen) {
-      toggleBlanketEnabled()
-      setIsPopoverOpen(false)
-      setRowClicked(null)
-    } else {
-      toggleBlanketEnabled()
-      setIsPopoverOpen(true)
-      setRowClicked(id)
-    }
   }
 
   const sortRow = (header) => {
@@ -163,7 +150,8 @@ export default function Table({
               content={<CustomPopover climb={climb} metric={metric} />}
             >
               <tr
-                className={'tableRow'}
+                id={`tableRow${i}`}
+                className={`tableRow`}
                 key={i}
                 onClick={(e) => {
                   // If we're clicking on a link don't show the popover
