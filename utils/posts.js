@@ -203,7 +203,7 @@ export async function getMostRecentPosts() {
       id: climb.id,
       date: climb.date,
       title: climb.title,
-      href: '/climb-log',
+      href: climb.slug ? `/hike/${climb.slug}` : '/climb-log',
       description: formClimbDescription(climb),
     }
   })
