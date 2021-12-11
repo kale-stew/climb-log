@@ -20,7 +20,7 @@ export default function Table({
   toggleBlanketEnabled,
 }) {
   // Notion data vals we -don't- want in the Table
-  const alwaysExclude = ['href', 'strava', 'id', 'imgUrl']
+  const alwaysExclude = ['href', 'strava', 'id', 'imgUrl', 'slug']
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
@@ -39,7 +39,14 @@ export default function Table({
     }
 
     return (
-      <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={metric} />
+      <TableRow
+        key={key}
+        id={climb.id}
+        title={key}
+        data={climb[key]}
+        metric={metric}
+        slug={climb.slug}
+      />
     )
   }
 
@@ -158,7 +165,11 @@ export default function Table({
               <tr
                 className={'tableRow'}
                 key={i}
-                onClick={() => {
+                onClick={(e) => {
+                  // If we're clicking on a link don't show the popover
+                  if (e.target.nodeName == 'A') {
+                    return
+                  }
                   togglePopOver(i)
                 }}
               >

@@ -4,7 +4,6 @@ import {
   addCommas,
   capitalizeEachWord,
   feetToMeters,
-  findMatchingSlug,
   milesToKilometers,
 } from '../utils/helpers'
 
@@ -13,14 +12,11 @@ import utilStyles from '../styles/utils.module.css'
 
 const CustomPopover = ({ climb, metric }) => {
   const buildTitle = () => {
-    if (findMatchingSlug(climb.title)) {
+    if (climb.slug) {
       return (
-        <a
-          href={`/${findMatchingSlug(climb.title)}`}
-          alt={`View trip report from ${climb.title}`}
-        >
+        <a href={`/hike/${climb.slug}`} alt={`View trip report from ${climb.title}`}>
           <h2 className={`${utilStyles.headingLg} ${utilStyles.padding1px}`}>
-            {climb.title}
+            {climb.title} ↗
           </h2>
         </a>
       )

@@ -15,11 +15,6 @@ const capitalizeEachWord = (string) => {
   return capitalize
 }
 
-// TODO: Match hike_title to existing NextJs generated slugs
-const findMatchingSlug = (str) => {
-  return false
-}
-
 const formatDate = (date) => format(date, 'PP')
 
 const formatDateWithDayOfWeek = (date) => format(date, 'PPPP')
@@ -42,7 +37,6 @@ export {
   addCommas,
   capitalizeEachWord,
   feetToMeters,
-  findMatchingSlug,
   formatDate,
   formatDateWithDayOfWeek,
   getLocationData,
