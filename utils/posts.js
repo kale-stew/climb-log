@@ -10,7 +10,7 @@ import {
   thoughtsDirectory,
 } from './constants'
 import { addCommas, capitalizeEachWord } from './helpers'
-import { fetchAllClimbs } from './notion'
+import { fetchMostRecentClimbs } from './notion'
 
 const postsDirectory = path.join(process.cwd(), 'blog')
 
@@ -194,8 +194,7 @@ export async function getMostRecentPosts() {
     }
   })
 
-  const allClimbs = await fetchAllClimbs()
-  const recentClimbs = allClimbs.splice(0, 3)
+  const recentClimbs = await fetchMostRecentClimbs()
   const formClimbDescription = (climb) =>
     `A ${climb.distance} mile and ${addCommas(climb.gain)}' hike
       in the ${capitalizeEachWord(climb.area)} of ${capitalizeEachWord(climb.state)}.`
