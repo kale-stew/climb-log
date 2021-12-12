@@ -11,7 +11,6 @@ import styles from './CustomPopover.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const CustomPopover = ({ climb, metric }) => {
-  console.log(climb)
   const buildTitle = () => {
     if (climb.slug) {
       return (

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
@@ -12,13 +11,13 @@ export default function Table({
   allAreas,
   areaFilter,
   data,
+  isPopoverOpen,
   metric,
+  rowClicked,
   setAreaFilter,
   setMetric,
   setSortOrder,
   sortOrder,
-  rowClicked,
-  isPopoverOpen,
   togglePopOver,
 }) {
   // Notion data vals we -don't- want in the Table
