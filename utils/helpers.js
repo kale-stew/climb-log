@@ -26,6 +26,20 @@ const capitalizeEachWord = (string) => {
   return capitalize
 }
 
+// Idk what I want this function to return... a string?
+// a boolean? Something to indicate to the filter that this
+// 'area' contains a park type
+const containsParkType = (area) => {
+  const strings = area.split(' ')
+  const arr = strings.map((str) => {
+    return PARK_TITLES[str] ? PARK_TITLES[str] : null
+  })
+
+  console.log(arr)
+
+  return arr.includes(true)
+}
+
 const formatDate = (date) => format(date, 'PP')
 
 const formatDateWithDayOfWeek = (date) => format(date, 'PPPP')
@@ -48,6 +62,7 @@ export {
   addCommas,
   buildAreaName,
   capitalizeEachWord,
+  containsParkType,
   feetToMeters,
   formatDate,
   formatDateWithDayOfWeek,

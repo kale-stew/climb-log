@@ -3,8 +3,8 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
-import { buildAreaName, capitalizeEachWord } from '../utils/helpers'
+import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER, PARK_TITLE } from '../utils/constants'
+import { buildAreaName, containsParkType, capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
 
 import tableStyles from '../components/Table.module.css'
@@ -28,17 +28,19 @@ const ClimbLog = ({ allClimbs }) => {
 
   /**
    * refreshData utilizes Next.js's router to replace the path with the current one,
-   * effectively going no where. But this does allow the page to re-render, because we're
-   * now sending JSON to the React side of things instead of the full HTML like Next usually
-   * does. It does cause a new API call, so maybe change this in the future?
+   * effectively going nowhere. This does allow the page to re-render, because
+   * we're now sending JSON to the React side of things instead of the full HTML
+   * like Next usually does.
+   * Note: It does cause a new API call, so maybe change this in the future?
    */
   const refreshData = () => router.replace(router.asPath)
 
   /**
-   * sortData allows us to sort the data by area selected with the areaFilter state, or pass one in ourselves.
-   * This is helpful because it lets us persist sort orders along with whatever area filter the user selects.
-   * Future sortOrder could also be added, all we would need to do is pass in another parameter with
-   * it's corresponding state as a default value.
+   * sortData allows us to sort the data by area selected with the areaFilter state,
+   * or pass one in ourselves. This is helpful because it lets us persist sort orders
+   * along with whatever area filter the user selects. Future sortOrder could also be
+   * added, all we would need to do is pass in another parameter with its corresponding
+   * state as a default value.
    *
    * @param {Array} dataToSort
    * @param {string} area
@@ -98,14 +100,34 @@ const ClimbLog = ({ allClimbs }) => {
         return 0
       })
       .map((area) => {
-        // We have 2 different types of category in the same list, so let's make sure we include a "type" so
-        // that we can later make sure we are filtering by that type
+        // We have 3 different types of category in the same list, so we include
+        // a "type" so that we can later make sure we are filtering by that type
         return {
           text: buildAreaName(area),
           value: area.trim(),
           type: 'area',
         }
       })
+
+    // Form an arr of [All National Parks, All State Parks, ...]
+    let parkCategories = [...new Set(allClimbs.map((climb) => climb.area))]
+      .sort((a, b) => {
+        if (a < b) return -1
+        if (a > b) return 1
+        return 0
+      })
+      .map((area) => {
+        if (containsParkType(area)) {
+          console.log('YES IT DOES', area)
+          return {
+            text: capitalizeEachWord(`all ${PARK_TITLE[area]}s`),
+            value: PARK_TITLE[area],
+            type: 'area',
+          }
+        }
+        return null
+      })
+    console.log(parkCategories)
 
     // Unique climb states become a new category to sort by (these are sorted alphabetically)
     let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))]
@@ -128,22 +150,24 @@ const ClimbLog = ({ allClimbs }) => {
   }
 
   /**
-   * When the user selects an area, let's set state accordingly
-   * We're dealing with a state type and an area type, so the value of the dropdown item will look like "colorado?state"
-   * or "san juans?area", this way we can filter the climbs obj with variables depending on the filter type
+   * When the user selects an area, let's set state accordingly.
+   * We're dealing with a state type and an area type, so the value of
+   * the dropdown item will look like "colorado?state" or "san juans?area",
+   * this way we can filter the climbs obj with variables depending on the filter type
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
-    // Set the areaFilter so that the drop down can handle it's own state
+    // Set the areaFilter so that the drop down can handle its own state
     // (we want it to be the "colorado?state" formatted value)
     setAreaFilter(filter)
     // If the area filter the user selects is "all", let's reset to allClimbs
     // and make sure we sort based on the current order
     if (filter == CATEGORY_TYPE.ALL) {
       setFilteredClimbs(allClimbs)
-      sortData(allClimbs, CATEGORY_TYPE.ALL) // sortData helps us do the reset^
+      // Reset the filter using sortData()
+      sortData(allClimbs, CATEGORY_TYPE.ALL)
       return
     }
     // Otherwise let's filter down to what we want based on the filter type
