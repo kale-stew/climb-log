@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER, PARK_TITLE } from '../utils/constants'
+import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER, PARK_TYPE } from '../utils/constants'
 import { buildAreaName, containsParkType, capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
 
@@ -120,8 +120,8 @@ const ClimbLog = ({ allClimbs }) => {
         if (containsParkType(area)) {
           console.log('YES IT DOES', area)
           return {
-            text: capitalizeEachWord(`all ${PARK_TITLE[area]}s`),
-            value: PARK_TITLE[area],
+            text: capitalizeEachWord(`all ${PARK_TYPE[area]}s`),
+            value: PARK_TYPE[area],
             type: 'area',
           }
         }

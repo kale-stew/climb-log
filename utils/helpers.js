@@ -1,12 +1,12 @@
 import { format } from 'date-fns'
-import { PARK_TITLES } from './constants'
+import { PARK_TYPES } from './constants'
 
 const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
 const buildAreaName = (area) => {
   const areaStrings = area.split(' ')
   const arr = areaStrings.map((str) => {
-    return PARK_TITLES[str] ? PARK_TITLES[str] : str
+    return PARK_TYPES[str] ? PARK_TYPES[str] : str
   })
 
   const reformattedArea = arr.toString().replace(/,/g, ' ')
@@ -32,7 +32,7 @@ const capitalizeEachWord = (string) => {
 const containsParkType = (area) => {
   const strings = area.split(' ')
   const arr = strings.map((str) => {
-    return PARK_TITLES[str] ? PARK_TITLES[str] : null
+    return PARK_TYPES[str] ? PARK_TYPES[str] : null
   })
 
   console.log(arr)
