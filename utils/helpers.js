@@ -1,6 +1,17 @@
 import { format } from 'date-fns'
+import { PARK_TITLES } from './constants'
 
 const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+const buildAreaName = (area) => {
+  const areaStrings = area.split(' ')
+  const arr = areaStrings.map((str) => {
+    return PARK_TITLES[str] ? PARK_TITLES[str] : str
+  })
+
+  const reformattedArea = arr.toString().replace(/,/g, ' ')
+  return capitalizeEachWord(`${reformattedArea.trim()}`)
+}
 
 const capitalizeEachWord = (string) => {
   let capitalize = string
@@ -35,6 +46,7 @@ const roundDecimal = (num) => num && num.toFixed(2)
 
 export {
   addCommas,
+  buildAreaName,
   capitalizeEachWord,
   feetToMeters,
   formatDate,

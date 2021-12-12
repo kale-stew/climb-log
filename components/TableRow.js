@@ -1,5 +1,6 @@
 import {
   addCommas,
+  buildAreaName,
   capitalizeEachWord,
   feetToMeters,
   formatDate,
@@ -49,7 +50,7 @@ export default function TableRow({ id, title, data, metric, slug }) {
       // Hide row in mobile view
       return (
         <td key={id} className={styles.hiddenRow}>
-          {capitalizeEachWord(data)}
+          {buildAreaName(data)}
         </td>
       )
     default:

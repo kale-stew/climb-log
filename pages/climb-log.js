@@ -4,7 +4,7 @@ import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
-import { capitalizeEachWord } from '../utils/helpers'
+import { buildAreaName, capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
 
 import tableStyles from '../components/Table.module.css'
@@ -101,11 +101,12 @@ const ClimbLog = ({ allClimbs }) => {
         // We have 2 different types of category in the same list, so let's make sure we include a "type" so
         // that we can later make sure we are filtering by that type
         return {
-          text: capitalizeEachWord(`${area.trim()}`),
+          text: buildAreaName(area),
           value: area.trim(),
           type: 'area',
         }
       })
+
     // Unique climb states become a new category to sort by (these are sorted alphabetically)
     let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))]
       .sort((a, b) => {
@@ -120,6 +121,7 @@ const ClimbLog = ({ allClimbs }) => {
           type: 'state',
         }
       })
+
     // Let's add the states to the top of the drop down
     areaCategories.unshift(...stateCategories)
     setAllAreas(areaCategories)
