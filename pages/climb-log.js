@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER, PARK_TYPE } from '../utils/constants'
+import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER, PARK_TYPES } from '../utils/constants'
 import { buildAreaName, containsParkType, capitalizeEachWord } from '../utils/helpers'
 import { fetchAllClimbs } from '../utils/notion'
 
@@ -110,24 +110,14 @@ const ClimbLog = ({ allClimbs }) => {
       })
 
     // Form an arr of [All National Parks, All State Parks, ...]
-    let parkCategories = [...new Set(allClimbs.map((climb) => climb.area))]
-      .sort((a, b) => {
-        if (a < b) return -1
-        if (a > b) return 1
-        return 0
-      })
-      .map((area) => {
-        if (containsParkType(area)) {
-          console.log('YES IT DOES', area)
-          return {
-            text: capitalizeEachWord(`all ${PARK_TYPE[area]}s`),
-            value: PARK_TYPE[area],
-            type: 'area',
-          }
-        }
-        return null
-      })
-    console.log(parkCategories)
+    let parkCategories = Object.values(PARK_TYPES).map((parkType) => {
+      return {
+        text: capitalizeEachWord(`all ${parkType}s`),
+        value: parkType,
+        type: 'area',
+      }
+    })
+    areaCategories.unshift(...parkCategories)
 
     // Unique climb states become a new category to sort by (these are sorted alphabetically)
     let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))]
@@ -172,7 +162,18 @@ const ClimbLog = ({ allClimbs }) => {
     }
     // Otherwise let's filter down to what we want based on the filter type
     let filteredData = allClimbs.filter(
-      (climb) => climb[filterType].trim() == selectedFilter.trim()
+      (climb) => {
+      // Let's see if the selected filter is a park type
+        let climbParkTypeStr = containsParkType(climb[filterType])
+        if (climbParkTypeStr){
+          // We have found that the climb is one of the PARK_TYPES, that means the
+          // selected filter is 'National Park', 'Regional Park', ect. so let's get the
+          // first letters of the selected filter and compare to this climb's park type (climbParkTypeStr)
+          let selectedFilterSplit = selectedFilter.split(' ')
+          let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
+          return climbParkTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
+        }
+        return climb[filterType].trim() == selectedFilter.trim()}
     )
     setFilteredClimbs(filteredData)
     sortData(filteredData, selectedFilter)

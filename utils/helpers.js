@@ -26,18 +26,18 @@ const capitalizeEachWord = (string) => {
   return capitalize
 }
 
-// Idk what I want this function to return... a string?
-// a boolean? Something to indicate to the filter that this
-// 'area' contains a park type
+/**
+ * We can use this function to tell if a climb's area name coorisponds to one of our PARK_TYPES.
+ * If we find that it does, we'll return the key value of the PARK_TYPE, otherwise we'll return 
+ * undefined.
+ * @param {String} area 
+ * @returns String || undefined
+ */
 const containsParkType = (area) => {
   const strings = area.split(' ')
-  const arr = strings.map((str) => {
-    return PARK_TYPES[str] ? PARK_TYPES[str] : null
+  return strings.find((str) => {
+    return PARK_TYPES[str]
   })
-
-  console.log(arr)
-
-  return arr.includes(true)
 }
 
 const formatDate = (date) => format(date, 'PP')
