@@ -20,6 +20,8 @@ const ClimbLog = ({ allClimbs }) => {
   const [areaFilter, setAreaFilter] = useState(CATEGORY_TYPE.ALL)
   const [filteredClimbs, setFilteredClimbs] = useState(allClimbs)
   const [blanketEnabled, setBlanketEnabled] = useState(false)
+  const [rowClicked, setRowClicked] = useState(null)
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
   const router = useRouter()
   const firstUpdate = useRef(true)
@@ -81,6 +83,10 @@ const ClimbLog = ({ allClimbs }) => {
   // Build the area categories on the first load (populating dropdown)
   useEffect(() => {
     buildCategories()
+    const queryPayload = router.query
+    if (Object.keys(queryPayload).length > 0) {
+      togglePopOver(Object.keys(queryPayload)[0])
+    }
   }, [])
 
   const buildCategories = () => {
@@ -146,6 +152,31 @@ const ClimbLog = ({ allClimbs }) => {
     sortData(filteredData, selectedFilter)
   }
 
+  const togglePopOver = (id) => {
+    if (isPopoverOpen) {
+      toggleBlanketEnabled()
+      setIsPopoverOpen(false)
+      setRowClicked(null)
+    } else if (Number.isInteger(id)) {
+      toggleBlanketEnabled()
+      setIsPopoverOpen(true)
+      setRowClicked(id)
+    } else if (!Number.isInteger(id)) {
+      let found = data.findIndex((climb) => climb.id == id)
+      if (found != undefined) {
+        toggleBlanketEnabled()
+        setIsPopoverOpen(true)
+        setRowClicked(found)
+        scrollTo(found)
+      }
+    }
+  }
+
+  const scrollTo = (position) => {
+    const itemToScrollTo = document.getElementById(`tableRow${position}`)
+    itemToScrollTo.scrollIntoView(false)
+  }
+
   const toggleBlanketEnabled = () => {
     if (blanketEnabled) {
       setBlanketEnabled(false)
@@ -170,7 +201,9 @@ const ClimbLog = ({ allClimbs }) => {
         allAreas={allAreas}
         areaFilter={areaFilter}
         setAreaFilter={selectAreaFilter}
-        toggleBlanketEnabled={toggleBlanketEnabled}
+        rowClicked={rowClicked}
+        isPopoverOpen={isPopoverOpen}
+        togglePopOver={togglePopOver}
       />
     </Layout>
   )
