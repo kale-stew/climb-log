@@ -5,12 +5,12 @@ import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
 import { FaGithub, FaFlickr, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa'
 import { MdOutlineMail } from 'react-icons/md'
-import { METADATA, SocialLinks } from '../utils/constants'
+import { LINKS_URL, METADATA } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
 
-const AboutPage = () => (
+const AboutPage = ({ socialLinks }) => (
   <Layout>
     <Head>
       <title>About {METADATA.NAME}</title>
@@ -43,33 +43,43 @@ const AboutPage = () => (
         </p>
         <p>
           To see some of Kylie's other work, check out her{' '}
-          <a href={SocialLinks.Homepage}>website</a>.
+          <a href={socialLinks.PersonalHomepage}>website</a>.
         </p>
       </div>
     </div>
     <br />
     <br />
     <div className={styles.socialIcons}>
-      <a target="_blank" href={SocialLinks.Email} network="email">
+      <a target="_blank" href={socialLinks.PersonalEmail} network="email">
         <MdOutlineMail />
       </a>
-      <a target="_blank" href={SocialLinks.Twitter}>
+      <a target="_blank" href={socialLinks.Twitter}>
         <FaTwitter />
       </a>
-      <a target="_blank" href={SocialLinks.Flickr}>
+      <a target="_blank" href={socialLinks.Flickr}>
         <FaFlickr />
       </a>
-      <a target="_blank" href={SocialLinks.LinkedIn}>
+      <a target="_blank" href={socialLinks.LinkedIn}>
         <FaLinkedinIn />
       </a>
-      <a target="_blank" href={SocialLinks.Instagram}>
+      <a target="_blank" href={socialLinks.Instagram}>
         <FaInstagram />
       </a>
-      <a target="_blank" href={SocialLinks.Github}>
+      <a target="_blank" href={socialLinks.Github}>
         <FaGithub />
       </a>
     </div>
   </Layout>
 )
+
+export async function getStaticProps() {
+  const result = await fetch(LINKS_URL)
+  const links = await result.json()
+  return {
+    props: {
+      socialLinks: links[0],
+    },
+  }
+}
 
 export default AboutPage

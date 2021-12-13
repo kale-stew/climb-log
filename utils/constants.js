@@ -1,7 +1,5 @@
 import path from 'path'
 
-export * from './socials'
-
 export const CATEGORY_TYPE = {
   ALL: 'all',
   GEAR: 'gear',
@@ -16,6 +14,9 @@ export const thoughtsDirectory = path.join(
   process.cwd(),
   `blog/${CATEGORY_TYPE.THOUGHTS}`
 )
+
+export const LINKS_URL =
+  'https://raw.githubusercontent.com/kale-stew/kale-stew.github.io/dev/src/data/socials.json'
 
 export const METADATA = {
   NAME: 'Kylie Stewart',
