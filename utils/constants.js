@@ -1,5 +1,30 @@
 import path from 'path'
 
+export const AREA_TYPE = {
+  nf: 'National Forest',
+  np: 'National Park',
+  os: 'Open Space',
+  ra: 'Recreation Area',
+  rp: 'Regional Park',
+  sp: 'State Park',
+  wa: 'Wilderness',
+}
+
+export const BRANDS = [
+  {
+    name: 'Keep Nature Wild',
+    href: 'https://keepnaturewild.com',
+    description:
+      'An eco-minded outdoor brand that promises to pick up 1lb of trash for every product sold.',
+  },
+  {
+    name: 'Notion.so',
+    href: 'https://notion.so',
+    description:
+      'A productivity app used for everything from personal note-taking to professional project management work. Fun fact: the climb log on this website is built using it!',
+  },
+]
+
 export const CATEGORY_TYPE = {
   ALL: 'all',
   GEAR: 'gear',
@@ -21,16 +46,6 @@ export const LINKS_URL =
 export const METADATA = {
   NAME: 'Kylie Stewart',
   SITE_NAME: 'kylies.photos',
-}
-
-export const AREA_TYPE = {
-  nf: 'National Forest',
-  np: 'National Park',
-  os: 'Open Space',
-  ra: 'Recreation Area',
-  rp: 'Regional Park',
-  sp: 'State Park',
-  wa: 'Wilderness',
 }
 
 export const ROLE_NAVIGATION = 'navigation'

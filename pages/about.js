@@ -5,7 +5,7 @@ import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
 import { FaGithub, FaFlickr, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa'
 import { MdOutlineMail } from 'react-icons/md'
-import { LINKS_URL, METADATA } from '../utils/constants'
+import { BRANDS, LINKS_URL, METADATA } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -33,17 +33,39 @@ const AboutPage = ({ socialLinks }) => (
       <div className={styles.aboutBlockText}>
         <p>
           {METADATA.NAME} is a web developer, avid hiker, amateur mountaineer and
-          photo-taker. When she's not hanging out at home with her fiancé and dog, you can
-          find her hiking Colorado's high peaks or researching her next climb.
+          photo-taker. She spends her time hiking Colorado's high peaks and researching
+          its terrain when she's not working from home alongside her fiancé or walking
+          their dog, Otis, around the local alpine lake.
         </p>
         <p>
           As an aspiring photographer, Kylie spends a good amount of time testing out what
-          she's learned in the mountains. Living in the scenic Colorado Rockies, it's easy
-          to find something worth taking a photo of.
+          she's learned in the mountains. Living in a small mountain town in the Colorado
+          Rockies, it's usually easy to find something worth taking a photo of.
         </p>
         <p>
-          To see some of Kylie's other work, check out her{' '}
-          <a href={socialLinks.PersonalHomepage}>website</a>.
+          Although she is taking the first 6 months of 2022 off of hiking to recover from
+          ankle surgery, she's eager to make the most of this time off by testing out her
+          camera's features from handicap-accessible lots across the state.
+        </p>
+        <p>
+          To see some of Kylie's other projects, check out her{' '}
+          <a href={socialLinks.PersonalHomepage}>personal site</a>.
+        </p>
+
+        <br />
+        <h2>Brands</h2>
+        <p>
+          Kylie is an ambassador for...
+          <ul>
+            {BRANDS.map((brand) => (
+              <li>
+                <a className={styles.brandLink} href={brand.href}>
+                  {brand.name}
+                </a>
+                {brand.description && `: ${brand.description}`}
+              </li>
+            ))}
+          </ul>
         </p>
       </div>
     </div>
