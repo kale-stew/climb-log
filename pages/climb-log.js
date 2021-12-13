@@ -5,11 +5,11 @@ import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
   createAreaSelects,
-  createParkSelects,
+  createAreaTypeSelects,
   createStateSelects,
   containsAreaType,
 } from '../utils/builders'
-import { CATEGORY_TYPE, METADATA, AREA_TYPES, TABLE_SORT_ORDER } from '../utils/constants'
+import { CATEGORY_TYPE, METADATA, AREA_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
 import { fetchAllClimbs } from '../utils/notion'
 
 import tableStyles from '../components/Table.module.css'
@@ -100,11 +100,11 @@ const ClimbLog = ({ allClimbs }) => {
 
   const buildCategories = () => {
     let areaCategories = createAreaSelects(allClimbs)
-    let parkCategories = createParkSelects()
+    let areaTypeCategories = createAreaTypeSelects()
     let stateCategories = createStateSelects(allClimbs)
 
-    // Make sure park types show up above the rest of the categories
-    areaCategories.unshift(...parkCategories)
+    // Make sure area types show up above the rest of the categories
+    areaCategories.unshift(...areaTypeCategories)
     // Add states to the top of the dropdown
     areaCategories.unshift(...stateCategories)
     setAllAreas(areaCategories)
@@ -144,17 +144,25 @@ const ClimbLog = ({ allClimbs }) => {
     }
     // Otherwise let's filter down to what we want based on the filter type
     let filteredData = allClimbs.filter((climb) => {
-      // Let's see if the selected filter is a park type
+      // Let's see if the selected filter is an existing area type
       let climbAreaTypeStr = containsAreaType(climb[filterType])
-      let areaTypes = Object.values(AREA_TYPES)
+      let areaTypes = Object.values(AREA_TYPE)
       if (climbAreaTypeStr && areaTypes.includes(selectedFilter)) {
-        // We have found that the climb is one of the AREA_TYPES, that means the
-        // selected filter is 'National Park', 'Regional Park', ect. so let's get the
-        // first letters of the selected filter and compare to this climb's park type (climbAreaTypeStr)
+        // We have found that the climb is one of the AREA_TYPE, that means the
+        // selected filter is 'National Park', 'State Park', 'Wilderness', etc.
+
+        // If the filter is a single word, Wilderness, don't split it
+        if (selectedFilter == AREA_TYPE.wa) {
+          return climb.area.slice(-2) == 'wa'
+        }
+
+        // For the rest of the filters, grab the first letters of the selected filter
+        // and compare to this climb's area type (climbAreaTypeStr)
         let selectedFilterSplit = selectedFilter.split(' ')
         let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
         return climbAreaTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
       }
+
       return climb[filterType].trim() == selectedFilter.trim()
     })
     setFilteredClimbs(filteredData)
