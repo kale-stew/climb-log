@@ -25,9 +25,11 @@ export const METADATA = {
 export const PARK_TYPES = {
   nf: 'National Forest',
   np: 'National Park',
+  os: 'Open Space',
   ra: 'Recreation Area',
   rp: 'Regional Park',
   sp: 'State Park',
+  wa: 'Wilderness',
 }
 
 export const ROLE_NAVIGATION = 'navigation'

@@ -2,11 +2,11 @@ import Image from 'next/image'
 import FormattedDate from './Date'
 import {
   addCommas,
-  buildAreaName,
   capitalizeEachWord,
   feetToMeters,
   milesToKilometers,
 } from '../utils/helpers'
+import { buildAreaName } from '../utils/builders'
 
 import styles from './CustomPopover.module.css'
 import utilStyles from '../styles/utils.module.css'

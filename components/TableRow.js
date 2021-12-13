@@ -1,11 +1,11 @@
 import {
   addCommas,
-  buildAreaName,
   capitalizeEachWord,
   feetToMeters,
   formatDate,
   milesToKilometers,
 } from '../utils/helpers'
+import { buildAreaName } from '../utils/builders'
 
 import styles from './Table.module.css'
 

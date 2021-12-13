@@ -3,8 +3,13 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER, PARK_TYPES } from '../utils/constants'
-import { buildAreaName, containsParkType, capitalizeEachWord } from '../utils/helpers'
+import {
+  createAreaSelects,
+  createParkSelects,
+  createStateSelects,
+  containsParkType,
+} from '../utils/builders'
+import { CATEGORY_TYPE, METADATA, PARK_TYPES, TABLE_SORT_ORDER } from '../utils/constants'
 import { fetchAllClimbs } from '../utils/notion'
 
 import tableStyles from '../components/Table.module.css'
@@ -69,8 +74,10 @@ const ClimbLog = ({ allClimbs }) => {
     setData(sortedData)
   }
 
-  // We want to use this useEffect to check and see if the sort order state has changed,
-  // that way we can properly sort the data and update the table.
+  /**
+   * Checks whether the sort order state has changed.
+   * Allows us to properly sort data & update the table.
+   */
   useEffect(() => {
     // We don't want this to cause the page to do too many re-renders,
     // so let's make sure we don't call the sorting function on the first
@@ -92,58 +99,33 @@ const ClimbLog = ({ allClimbs }) => {
   }, [])
 
   const buildCategories = () => {
-    // Unique climb areas become a new category to sort by (these are sorted alphabetically)
-    let areaCategories = [...new Set(allClimbs.map((climb) => climb.area))]
-      .sort((a, b) => {
-        if (a < b) return -1
-        if (a > b) return 1
-        return 0
-      })
-      .map((area) => {
-        // We have 3 different types of category in the same list, so we include
-        // a "type" so that we can later make sure we are filtering by that type
-        return {
-          text: buildAreaName(area),
-          value: area.trim(),
-          type: 'area',
-        }
-      })
+    let areaCategories = createAreaSelects(allClimbs)
+    let parkCategories = createParkSelects()
+    let stateCategories = createStateSelects(allClimbs)
 
-    // Form an arr of [All National Parks, All State Parks, ...]
-    let parkCategories = Object.values(PARK_TYPES).map((parkType) => {
-      return {
-        text: capitalizeEachWord(`all ${parkType}s`),
-        value: parkType,
-        type: 'area',
-      }
-    })
+    // Make sure park types show up above the rest of the categories
     areaCategories.unshift(...parkCategories)
-
-    // Unique climb states become a new category to sort by (these are sorted alphabetically)
-    let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))]
-      .sort((a, b) => {
-        if (a < b) return -1
-        if (a > b) return 1
-        return 0
-      })
-      .map((state) => {
-        return {
-          text: capitalizeEachWord(`all ${state.trim()}`),
-          value: state.trim(),
-          type: 'state',
-        }
-      })
-
-    // Let's add the states to the top of the drop down
+    // Add states to the top of the dropdown
     areaCategories.unshift(...stateCategories)
     setAllAreas(areaCategories)
   }
 
   /**
-   * When the user selects an area, let's set state accordingly.
-   * We're dealing with a state type and an area type, so the value of
-   * the dropdown item will look like "colorado?state" or "san juans?area",
-   * this way we can filter the climbs obj with variables depending on the filter type
+   * Scroll to the item being brought into view (for routing to items in
+   * the climb-log directly)
+   */
+  const scrollTo = (position) => {
+    const itemToScrollTo = document.getElementById(`tableRow${position}`)
+    itemToScrollTo.scrollIntoView(false)
+  }
+
+  /**
+   * When the user selects an area, set state accordingly.
+   * We're dealing with a `state` and `area` type, so the value of
+   * the dropdown item will be formatted as "colorado?state" or
+   * "san juans?area", so we can filter the climbs obj with variables
+   * depending on the filter type.
+   *
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
@@ -161,20 +143,20 @@ const ClimbLog = ({ allClimbs }) => {
       return
     }
     // Otherwise let's filter down to what we want based on the filter type
-    let filteredData = allClimbs.filter(
-      (climb) => {
+    let filteredData = allClimbs.filter((climb) => {
       // Let's see if the selected filter is a park type
-        let climbParkTypeStr = containsParkType(climb[filterType])
-        if (climbParkTypeStr){
-          // We have found that the climb is one of the PARK_TYPES, that means the
-          // selected filter is 'National Park', 'Regional Park', ect. so let's get the
-          // first letters of the selected filter and compare to this climb's park type (climbParkTypeStr)
-          let selectedFilterSplit = selectedFilter.split(' ')
-          let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
-          return climbParkTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
-        }
-        return climb[filterType].trim() == selectedFilter.trim()}
-    )
+      let climbParkTypeStr = containsParkType(climb[filterType])
+      let parkTypes = Object.values(PARK_TYPES)
+      if (climbParkTypeStr && parkTypes.includes(selectedFilter)) {
+        // We have found that the climb is one of the PARK_TYPES, that means the
+        // selected filter is 'National Park', 'Regional Park', ect. so let's get the
+        // first letters of the selected filter and compare to this climb's park type (climbParkTypeStr)
+        let selectedFilterSplit = selectedFilter.split(' ')
+        let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
+        return climbParkTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
+      }
+      return climb[filterType].trim() == selectedFilter.trim()
+    })
     setFilteredClimbs(filteredData)
     sortData(filteredData, selectedFilter)
   }
@@ -197,11 +179,6 @@ const ClimbLog = ({ allClimbs }) => {
         scrollTo(found)
       }
     }
-  }
-
-  const scrollTo = (position) => {
-    const itemToScrollTo = document.getElementById(`tableRow${position}`)
-    itemToScrollTo.scrollIntoView(false)
   }
 
   const toggleBlanketEnabled = () => {
