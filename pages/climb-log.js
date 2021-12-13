@@ -7,9 +7,9 @@ import {
   createAreaSelects,
   createParkSelects,
   createStateSelects,
-  containsParkType,
+  containsAreaType,
 } from '../utils/builders'
-import { CATEGORY_TYPE, METADATA, PARK_TYPES, TABLE_SORT_ORDER } from '../utils/constants'
+import { CATEGORY_TYPE, METADATA, AREA_TYPES, TABLE_SORT_ORDER } from '../utils/constants'
 import { fetchAllClimbs } from '../utils/notion'
 
 import tableStyles from '../components/Table.module.css'
@@ -145,15 +145,15 @@ const ClimbLog = ({ allClimbs }) => {
     // Otherwise let's filter down to what we want based on the filter type
     let filteredData = allClimbs.filter((climb) => {
       // Let's see if the selected filter is a park type
-      let climbParkTypeStr = containsParkType(climb[filterType])
-      let parkTypes = Object.values(PARK_TYPES)
-      if (climbParkTypeStr && parkTypes.includes(selectedFilter)) {
-        // We have found that the climb is one of the PARK_TYPES, that means the
+      let climbAreaTypeStr = containsAreaType(climb[filterType])
+      let areaTypes = Object.values(AREA_TYPES)
+      if (climbAreaTypeStr && areaTypes.includes(selectedFilter)) {
+        // We have found that the climb is one of the AREA_TYPES, that means the
         // selected filter is 'National Park', 'Regional Park', ect. so let's get the
-        // first letters of the selected filter and compare to this climb's park type (climbParkTypeStr)
+        // first letters of the selected filter and compare to this climb's park type (climbAreaTypeStr)
         let selectedFilterSplit = selectedFilter.split(' ')
         let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
-        return climbParkTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
+        return climbAreaTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
       }
       return climb[filterType].trim() == selectedFilter.trim()
     })

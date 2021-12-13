@@ -1,5 +1,5 @@
 import { capitalizeEachWord } from './helpers'
-import { PARK_TYPES } from './constants'
+import { AREA_TYPES } from './constants'
 
 /**
  * Format the area rich_text that is returned from the Notion API.
@@ -8,7 +8,7 @@ import { PARK_TYPES } from './constants'
 const buildAreaName = (area) => {
   const areaStrings = area.split(' ')
   const arr = areaStrings.map((str) => {
-    return PARK_TYPES[str] ? PARK_TYPES[str] : str
+    return AREA_TYPES[str] ? AREA_TYPES[str] : str
   })
 
   const reformattedArea = arr.toString().replace(/,/g, ' ')
@@ -38,14 +38,14 @@ const createAreaSelects = (allClimbs) =>
     })
 
 /**
- * Create a new Select option for each value in the PARK_TYPES
+ * Create a new Select option for each value in the AREA_TYPES
  * constant. Returns an array of Selects, sorted A→Z
  */
 const createParkSelects = () =>
-  Object.values(PARK_TYPES).map((parkType) => {
+  Object.values(AREA_TYPES).map((areaType) => {
     return {
-      text: capitalizeEachWord(`all ${parkType}s`),
-      value: parkType,
+      text: capitalizeEachWord(`all ${areaType}s`),
+      value: areaType,
       type: 'area',
     }
   })
@@ -72,13 +72,13 @@ const createStateSelects = (allClimbs) =>
 
 /**
  * Checks if a climb's area name corresponds to one of our
- * PARK_TYPES. If it does, return the key value of the PARK_TYPE,
+ * AREA_TYPES. If it does, return the key value of the AREA_TYPE,
  * otherwise return undefined.
  */
-const containsParkType = (area) => {
+const containsAreaType = (area) => {
   const strings = area.split(' ')
   return strings.find((str) => {
-    return PARK_TYPES[str]
+    return AREA_TYPES[str]
   })
 }
 
@@ -87,5 +87,5 @@ export {
   createAreaSelects,
   createParkSelects,
   createStateSelects,
-  containsParkType,
+  containsAreaType,
 }

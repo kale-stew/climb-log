@@ -22,7 +22,7 @@ export const METADATA = {
   SITE_NAME: 'kylies.photos',
 }
 
-export const PARK_TYPES = {
+export const AREA_TYPES = {
   nf: 'National Forest',
   np: 'National Park',
   os: 'Open Space',
