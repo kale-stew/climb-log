@@ -3,8 +3,13 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
-import { capitalizeEachWord } from '../utils/helpers'
+import {
+  createAreaSelects,
+  createAreaTypeSelects,
+  createStateSelects,
+  containsAreaType,
+} from '../utils/builders'
+import { CATEGORY_TYPE, METADATA, AREA_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
 import { fetchAllClimbs } from '../utils/notion'
 
 import tableStyles from '../components/Table.module.css'
@@ -28,17 +33,19 @@ const ClimbLog = ({ allClimbs }) => {
 
   /**
    * refreshData utilizes Next.js's router to replace the path with the current one,
-   * effectively going no where. But this does allow the page to re-render, because we're
-   * now sending JSON to the React side of things instead of the full HTML like Next usually
-   * does. It does cause a new API call, so maybe change this in the future?
+   * effectively going nowhere. This does allow the page to re-render, because
+   * we're now sending JSON to the React side of things instead of the full HTML
+   * like Next usually does.
+   * Note: It does cause a new API call, so maybe change this in the future?
    */
   const refreshData = () => router.replace(router.asPath)
 
   /**
-   * sortData allows us to sort the data by area selected with the areaFilter state, or pass one in ourselves.
-   * This is helpful because it lets us persist sort orders along with whatever area filter the user selects.
-   * Future sortOrder could also be added, all we would need to do is pass in another parameter with
-   * it's corresponding state as a default value.
+   * sortData allows us to sort the data by area selected with the areaFilter state,
+   * or pass one in ourselves. This is helpful because it lets us persist sort orders
+   * along with whatever area filter the user selects. Future sortOrder could also be
+   * added, all we would need to do is pass in another parameter with its corresponding
+   * state as a default value.
    *
    * @param {Array} dataToSort
    * @param {string} area
@@ -67,8 +74,10 @@ const ClimbLog = ({ allClimbs }) => {
     setData(sortedData)
   }
 
-  // We want to use this useEffect to check and see if the sort order state has changed,
-  // that way we can properly sort the data and update the table.
+  /**
+   * Checks whether the sort order state has changed.
+   * Allows us to properly sort data & update the table.
+   */
   useEffect(() => {
     // We don't want this to cause the page to do too many re-renders,
     // so let's make sure we don't call the sorting function on the first
@@ -90,64 +99,72 @@ const ClimbLog = ({ allClimbs }) => {
   }, [])
 
   const buildCategories = () => {
-    // Unique climb areas become a new category to sort by (these are sorted alphabetically)
-    let areaCategories = [...new Set(allClimbs.map((climb) => climb.area))]
-      .sort((a, b) => {
-        if (a < b) return -1
-        if (a > b) return 1
-        return 0
-      })
-      .map((area) => {
-        // We have 2 different types of category in the same list, so let's make sure we include a "type" so
-        // that we can later make sure we are filtering by that type
-        return {
-          text: capitalizeEachWord(`${area.trim()}`),
-          value: area.trim(),
-          type: 'area',
-        }
-      })
-    // Unique climb states become a new category to sort by (these are sorted alphabetically)
-    let stateCategories = [...new Set(allClimbs.map((climb) => climb.state))]
-      .sort((a, b) => {
-        if (a < b) return -1
-        if (a > b) return 1
-        return 0
-      })
-      .map((state) => {
-        return {
-          text: capitalizeEachWord(`all ${state.trim()}`),
-          value: state.trim(),
-          type: 'state',
-        }
-      })
-    // Let's add the states to the top of the drop down
+    let areaCategories = createAreaSelects(allClimbs)
+    let areaTypeCategories = createAreaTypeSelects()
+    let stateCategories = createStateSelects(allClimbs)
+
+    // Make sure area types show up above the rest of the categories
+    areaCategories.unshift(...areaTypeCategories)
+    // Add states to the top of the dropdown
     areaCategories.unshift(...stateCategories)
     setAllAreas(areaCategories)
   }
 
   /**
-   * When the user selects an area, let's set state accordingly
-   * We're dealing with a state type and an area type, so the value of the dropdown item will look like "colorado?state"
-   * or "san juans?area", this way we can filter the climbs obj with variables depending on the filter type
+   * Scroll to the item being brought into view (for routing to items in
+   * the climb-log directly)
+   */
+  const scrollTo = (position) => {
+    const itemToScrollTo = document.getElementById(`tableRow${position}`)
+    itemToScrollTo.scrollIntoView(false)
+  }
+
+  /**
+   * When the user selects an area, set state accordingly.
+   * We're dealing with a `state` and `area` type, so the value of
+   * the dropdown item will be formatted as "colorado?state" or
+   * "san juans?area", so we can filter the climbs obj with variables
+   * depending on the filter type.
+   *
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
-    // Set the areaFilter so that the drop down can handle it's own state
+    // Set the areaFilter so that the drop down can handle its own state
     // (we want it to be the "colorado?state" formatted value)
     setAreaFilter(filter)
     // If the area filter the user selects is "all", let's reset to allClimbs
     // and make sure we sort based on the current order
     if (filter == CATEGORY_TYPE.ALL) {
       setFilteredClimbs(allClimbs)
-      sortData(allClimbs, CATEGORY_TYPE.ALL) // sortData helps us do the reset^
+      // Reset the filter using sortData()
+      sortData(allClimbs, CATEGORY_TYPE.ALL)
       return
     }
     // Otherwise let's filter down to what we want based on the filter type
-    let filteredData = allClimbs.filter(
-      (climb) => climb[filterType].trim() == selectedFilter.trim()
-    )
+    let filteredData = allClimbs.filter((climb) => {
+      // Let's see if the selected filter is an existing area type
+      let climbAreaTypeStr = containsAreaType(climb[filterType])
+      let areaTypes = Object.values(AREA_TYPE)
+      if (climbAreaTypeStr && areaTypes.includes(selectedFilter)) {
+        // We have found that the climb is one of the AREA_TYPE, that means the
+        // selected filter is 'National Park', 'State Park', 'Wilderness', etc.
+
+        // If the filter is a single word, Wilderness, don't split it
+        if (selectedFilter == AREA_TYPE.wa) {
+          return climb.area.slice(-2) == 'wa'
+        }
+
+        // For the rest of the filters, grab the first letters of the selected filter
+        // and compare to this climb's area type (climbAreaTypeStr)
+        let selectedFilterSplit = selectedFilter.split(' ')
+        let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
+        return climbAreaTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
+      }
+
+      return climb[filterType].trim() == selectedFilter.trim()
+    })
     setFilteredClimbs(filteredData)
     sortData(filteredData, selectedFilter)
   }
@@ -170,11 +187,6 @@ const ClimbLog = ({ allClimbs }) => {
         scrollTo(found)
       }
     }
-  }
-
-  const scrollTo = (position) => {
-    const itemToScrollTo = document.getElementById(`tableRow${position}`)
-    itemToScrollTo.scrollIntoView(false)
   }
 
   const toggleBlanketEnabled = () => {

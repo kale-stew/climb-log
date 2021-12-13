@@ -22,6 +22,16 @@ export const METADATA = {
   SITE_NAME: 'kylies.photos',
 }
 
+export const AREA_TYPE = {
+  nf: 'National Forest',
+  np: 'National Park',
+  os: 'Open Space',
+  ra: 'Recreation Area',
+  rp: 'Regional Park',
+  sp: 'State Park',
+  wa: 'Wilderness',
+}
+
 export const ROLE_NAVIGATION = 'navigation'
 
 export const TABLE_SORT_ORDER = {

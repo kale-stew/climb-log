@@ -5,6 +5,7 @@ import {
   formatDate,
   milesToKilometers,
 } from '../utils/helpers'
+import { buildAreaName } from '../utils/builders'
 
 import styles from './Table.module.css'
 
@@ -49,7 +50,7 @@ export default function TableRow({ id, title, data, metric, slug }) {
       // Hide row in mobile view
       return (
         <td key={id} className={styles.hiddenRow}>
-          {capitalizeEachWord(data)}
+          {buildAreaName(data)}
         </td>
       )
     default:

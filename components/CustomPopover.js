@@ -6,6 +6,7 @@ import {
   feetToMeters,
   milesToKilometers,
 } from '../utils/helpers'
+import { buildAreaName } from '../utils/builders'
 
 import styles from './CustomPopover.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -65,7 +66,7 @@ const CustomPopover = ({ climb, metric }) => {
           : climb && `${addCommas(climb.gain)}'`}
       </p>
       <p>
-        <strong>Location:</strong> {capitalizeEachWord(climb.area)},{' '}
+        <strong>Location:</strong> {buildAreaName(climb.area)},{' '}
         {capitalizeEachWord(climb.state)}
       </p>
       {climb.strava && (
