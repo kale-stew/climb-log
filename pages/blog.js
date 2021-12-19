@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import Head from 'next/head'
 import Link from 'next/link'
 import Category from '../components/Category'
 import FormattedDate from '../components/Date'
@@ -11,11 +10,11 @@ import { getSortedPostsData } from '../utils/posts'
 import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
+import CustomHead from '../components/CustomHead'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
   const router = useRouter()
-
   useEffect(() => {
     const queryPayload = router.query
     if (Object.keys(queryPayload).length > 0) {
@@ -25,9 +24,7 @@ export default function BlogLandingPage({ allPostsData }) {
 
   return (
     <Layout>
-      <Head>
-        <title>{METADATA.SITE_NAME} | Hiking Blog</title>
-      </Head>
+      <CustomHead title={`${METADATA.SITE_NAME} | Hiking Blog`} />
       <h1 className={utilStyles.headingXl}>Blog</h1>
 
       <section>

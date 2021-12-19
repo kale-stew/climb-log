@@ -1,11 +1,12 @@
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
-import { CATEGORY_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
 
 import categoryStyles from './Category.module.css'
 import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
+import { event } from '../utils/gtag'
 
 export default function Table({
   allAreas,
@@ -97,6 +98,16 @@ export default function Table({
     )
   }
 
+  const toggleUnits = (isMetric) => {
+    event(
+      'gtm.click',
+      `${isMetric ? 'metric' : 'imperial'}`,
+      `https://www.kylies.photos/climb-log`,
+      'UntiToggle',
+      `${METADATA.SITE_NAME} | Climb Log`
+    )
+    setMetric(isMetric)
+  }
   return (
     <>
       <h1>Kylie's Climb Log</h1>
@@ -105,13 +116,13 @@ export default function Table({
       <div className={utilStyles.singleRow}>
         <button
           className={metric ? 'categoryButton' : categoryStyles.categorySelected}
-          onClick={() => setMetric(false)}
+          onClick={() => toggleUnits(false)}
         >
           Imperial
         </button>
         <button
           className={metric ? categoryStyles.categorySelected : 'categoryButton'}
-          onClick={() => setMetric(true)}
+          onClick={() => toggleUnits(true)}
         >
           Metric
         </button>
@@ -143,7 +154,7 @@ export default function Table({
             <Popover
               containerClassName={styles.tablePopover}
               key={climb.id}
-              onClickOutside={() => togglePopOver(i)}
+              onClickOutside={() => togglePopOver(i, climb)}
               isOpen={isPopoverOpen && rowClicked === i}
               positions={['center', 'bottom']} // in order of priority
               content={<CustomPopover climb={climb} metric={metric} />}

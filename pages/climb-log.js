@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
-import Head from 'next/head'
+import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
@@ -10,6 +10,7 @@ import {
   containsAreaType,
 } from '../utils/builders'
 import { CATEGORY_TYPE, METADATA, AREA_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/notion'
 
 import tableStyles from '../components/Table.module.css'
@@ -30,6 +31,7 @@ const ClimbLog = ({ allClimbs }) => {
 
   const router = useRouter()
   const firstUpdate = useRef(true)
+  const title = `${METADATA.SITE_NAME} | Climb Log`
 
   /**
    * refreshData utilizes Next.js's router to replace the path with the current one,
@@ -129,6 +131,13 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
+    event(
+      'gtm.click',
+      filter,
+      `https://www.kylies.photos${router.asPath}`,
+      'AreaSelect',
+      `${METADATA.SITE_NAME} | Climb Log`
+    )
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
     // Set the areaFilter so that the drop down can handle its own state
@@ -201,9 +210,7 @@ const ClimbLog = ({ allClimbs }) => {
     <Layout>
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
-      <Head>
-        <title>{METADATA.SITE_NAME} | Climb Log</title>
-      </Head>
+      <CustomHead title={`${METADATA.SITE_NAME} | Climb Log`} />
       <Table
         data={data}
         sortOrder={sortOrder}

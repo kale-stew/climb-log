@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Card from '../components/Card'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
@@ -10,15 +9,13 @@ import LanderTop from '../public/photos/lander_top.png'
 import LanderBottom from '../public/photos/lander_bottom.png'
 import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
-
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
+import CustomHead from '../components/CustomHead'
 
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
-    <Head>
-      <title>{METADATA.SITE_NAME} | Photography, Hiking</title>
-    </Head>
+    <CustomHead title={`${METADATA.SITE_NAME} | Photography, Hiking`} />
     <ResponsiveImage
       altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       desktopImg={LanderTop}
