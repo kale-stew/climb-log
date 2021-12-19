@@ -20,13 +20,15 @@ _A screenshot of my peak checklist on 14ers.com. See how the Snowflake appears o
 ![la-plata-snowflake](https://live.staticflickr.com/65535/51757385408_0386c75cb2_k.jpg)
 _Ascending La Plata in March of 2021. We were post-holing up to our waist at times._
 
-Colorado winters up in the alpine are something special. It’s not easy to convey the serenity one feels when slogging up a snowy hill on a 0℉ winter morning. Or how a sunrise inversion reflecting off of a fresh blanket of snow can stay in your mind for years. The accomplishment one feels when summiting a 14,000 foot peak despite icy winds and waist-deep pockets of powder. And if you’re a downhill enthusiast, you’ll find yourself at the top of some of the best ski lines in the world. The payoff for your effort seems tenfold in the winter, and I would argue the peaks look their best wearing a fresh white coat.
+Colorado winters up in the alpine are something special. It’s not easy to convey the serenity one feels when slogging up a snowy hill on a 0℉ winter morning. Or how a sunrise inversion reflecting off of a fresh blanket of snow can stay in your mind for years. Or the accomplishment one feels when summiting a 14,000 foot peak despite icy winds and waist-deep pockets of powder. And if you’re a downhill enthusiast, you’ll find yourself at the top of some of the best ski lines in the world. The payoff for your effort seems tenfold in the winter, and I would argue the peaks look their best wearing a fresh white coat.
 
 ## Preparing for a Winter Climb
 
 As I’ve mentioned, winter brings some of the deadliest conditions possible to the Colorado high peaks. While it is possible to have an amazing bluebird day in the snowy backcountry, it is crucial you prepare for the worst before you enter any wilderness area this time of year. Recreating in deep snow can quickly become a matter of life and death, and the risk is increased when aggressive slope angles and a notoriously unstable snowpack come into play.
 
-In addition to gear, training or at least some technical preparation is recommended. Albeit expensive, a Level One AIARE (American Institute for Avalanche Research and Education) Avalanche Rescue Course is highly recommended “for _anyone_, regardless of method of travel, who wants to recreate in or near avalanche terrain” [according to the course creator, the Avalanche Research and Education Center](https://avtraining.org/aiare-level-1/). AIARE 1 prepares you to develop a plan to travel through and identify avalanche terrain, effectively make terrain choices in a group setting, and demonstrate effective companion rescue. If you aren’t sure you’ll enjoy winter hiking and want to save your money before committing to a course, taking the time to research these topics ahead of your first backcountry winter experience is encouraged.
+On top of these deadly conditions, the already difficult feat of climbing a mountain is made harder when you have flotation devices strapped to your feet. Your pace and stamina also take a couple of hits when the temperatures start to drop. Expect to arrive at your destination hours later than you might plan to on a summer day, and don't expect the descent to be significantly easier than your ascent. Even with a couple of glissades factored in, afternoon snow is a different beast than early morning pack and you increase your risk of triggering a slide the later in the day you descend.
+
+In addition to gear, training or at least some technical preparation is recommended. Albeit expensive, a Level One AIARE (American Institute for Avalanche Research and Education) Avalanche Rescue Course is highly recommended “for _anyone_, regardless of method of travel, who wants to recreate in or near avalanche terrain” [according to the course creator, the Avalanche Research and Education Center](https://avtraining.org/aiare-level-1/). AIARE 1 prepares you to (1) develop a plan to travel through and (2) identify avalanche terrain, (3) effectively make terrain choices in a group setting, and (4) demonstrate effective companion rescue. If you aren’t sure you’ll enjoy winter hiking and want to save your money before committing to a course, taking the time to research these topics ahead of your first backcountry winter experience is encouraged.
 
 Some free resources you can use to learn more about recreating in avalanche terrain:
 
@@ -48,11 +50,11 @@ _A look back at our group ascending La Plata Peak._
 
 In addition to the standard safety and shelter items I outline in my [post about packing for a 14er](https://www.kylies.photos/gear/14er-pack-list), I’ve found the following items to be essential on my successful winter summits:
 
-- **Water bottle** (_not_ a bladder). I learned how quickly a straw will freeze on my first winter hike. After trying to drink from the opening of my Camelbak bladder and spilling it all down my coat instead, I have not once forgotten to pack an insulated Nalgene instead.
+- **Water bottle** (_not_ a bladder). I learned how quickly a straw will freeze on my first winter hike. After trying to drink from the opening of my Camelbak bladder and spilling it all down my coat instead, I have not forgotten to opt for an insulated Nalgene since.
 
 - **Gatorade**. I’ll admit, water isn’t always appetizing when I’ve been suffering in cold winds for a few consecutive hours. Gatorade or a similar sugary electrolyte-filled beverage goes a long way up high. One of my climbing partners will tell you nothing tastes better than Glacier Cherry at alpine.
 
-- A **Satellite Communications device**. I’ve said that a SatCom isn’t necessary but is recommended for 14ers, but I would argue it is necessary for winter travel. You don’t want to be stuck without service or SOS capabilities when the stakes are higher. More robust models with the ability to show your position on a topographic map can also help you avoid avalanche terrain while in the field.
+- A **Satellite Communications device**. I’ve said that a SatCom is recommended but not necessary to climb a 14er, but I would argue it _is_ necessary for winter travel. You don’t want to be stuck without service or SOS capabilities when the stakes are higher. More robust models with the ability to show your position on a topographic map can also help you avoid avalanche terrain while in the field.
 
 - **Avalanche beacon & probe**, for every member of your winter climbing team. Ideally everyone in the group has their own, but it can be nice to own two or more as a solo climber so you can loan one out if someone forgets or doesn’t own one themselves. You don't only have to use probes in an emergency situation, either. It can be helpful to poke at the snow at various points as you're going along to gauge depth and density.
 
@@ -62,17 +64,17 @@ In addition to the standard safety and shelter items I outline in my [post about
 
 - **Snowshoes**, preferably ones that aren't difficult to use for extended periods of time. I love my MSR Lightning Ascents because they're lightweight, durable, and they have a heel raiser for those steeper uphills. They pack nicely along the sides of my Osprey Mutant 38L and that has made all the difference- it's a significant upgrade from my winter pack setup prior, which consisted of a Deuter UL daypack and some precariously-placed carabiners.
 
-- A **belay jacket** to help keep warm during the in-between moments. Something that packs down very small and has high insulation, ideally this is a shell layer that fits over all of your other layers to insulate you while you're taking a break.
+- A **belay jacket** to help keep warm during the in-between moments. Something that packs down very small and has high insulation, ideally this is an outer layer that fits over all of your other layers to insulate you while you're taking a break.
 
 ### Nice to Haves
 
 - Backpacking **stove & mini propane tank**: you can make yourself a warm cup of hot chocolate at the summit, or melt down some snow to refill your water bottle in case of an emergency. It’s handy for at least one member of your group to have a stove on hand for any winter climb.
 
-- **Wool base layers**: I was not a believer until I bought my first pair of Smartwool Intraknit tights. Since then, I question why I ever doubted wool’s capabilities. It manages to stay dry & warm even in waist-deep conditions, and I don’t overheat like I did with my synthetic layers (shoutout to all of the fleece I bought only to hate). Smartwool in particular does a great job with their blends.
+- **Wool base layers**. I was not a believer until I bought my first pair of Smartwool Intraknit tights. Since then, I question why I ever doubted wool’s capabilities. It manages to stay dry & warm even in waist-deep conditions, and I don’t overheat like I did with my synthetic layers (shoutout to all of the fleece I bought only to hate). Smartwool in particular does a great job with their blends.
 
 - **Mittens** to go over my glove liners. It’s easy to underestimate that winter cold, especially when you’re working up a sweat on an uphill grind, but the second you expose your hands to the air you’ve started a countdown to frostbite. Getting a pair of waterproof mittens that easily pulls on and off my gloved hand has changed everything for me. And if it gets too warm, I can easily clip them to a carabiner on my pack for storage.
 
-- A **vest**. Another item I didn’t believe in until I tried it, my Smartwool vest has revolutionized my winter layering system. I didn’t realize how warm my arms were getting until I took a layer off of them, and a wind-proof vest does especially well on a bluebird summit day. Without wind, it’s the only outer layer I need to stay comfortable at altitude.
+- A **vest** is another item I'll admit I didn't believe in until I tried out. On a windless & sunny winter day, a vest is the only outer layer I need to be comfortable at altitude.
 
 ![mount-democrat-snowflake](https://live.staticflickr.com/65535/51758010860_9b71276d75_k.jpg)
 _Ascending Mount Democrat in January of 2021, Mount Cameron in the background._
