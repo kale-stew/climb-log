@@ -2,22 +2,22 @@ import {
   addCommas,
   capitalizeEachWord,
   feetToMeters,
-  findMatchingSlug,
   formatDate,
   milesToKilometers,
 } from '../utils/helpers'
+import { buildAreaName } from '../utils/builders'
 
 import styles from './Table.module.css'
 
-export default function TableRow({ id, title, data, metric }) {
+export default function TableRow({ id, title, data, metric, slug }) {
   switch (title) {
     case 'title':
-      if (findMatchingSlug(data)) {
+      if (slug) {
         // Link to full page report if it exists
         return (
           <td key={id}>
-            <a href={`/${findMatchingSlug(data)}`} alt={`View trip report from ${data}`}>
-              {data}
+            <a href={`/hike/${slug}`} alt={`View trip report from ${data}`}>
+              {data} ↗
             </a>
           </td>
         )
@@ -50,7 +50,7 @@ export default function TableRow({ id, title, data, metric }) {
       // Hide row in mobile view
       return (
         <td key={id} className={styles.hiddenRow}>
-          {capitalizeEachWord(data)}
+          {buildAreaName(data)}
         </td>
       )
     default:

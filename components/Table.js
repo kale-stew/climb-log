@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
@@ -13,18 +12,17 @@ export default function Table({
   allAreas,
   areaFilter,
   data,
+  isPopoverOpen,
   metric,
+  rowClicked,
   setAreaFilter,
   setMetric,
   setSortOrder,
   sortOrder,
-  toggleBlanketEnabled,
+  togglePopOver,
 }) {
   // Notion data vals we -don't- want in the Table
-  const alwaysExclude = ['href', 'strava', 'id', 'imgUrl']
-
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
-  const [rowClicked, setRowClicked] = useState(null)
+  const alwaysExclude = ['href', 'strava', 'id', 'imgUrl', 'slug']
 
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =
@@ -40,21 +38,15 @@ export default function Table({
     }
 
     return (
-      <TableRow key={key} id={climb.id} title={key} data={climb[key]} metric={metric} />
+      <TableRow
+        key={key}
+        id={climb.id}
+        title={key}
+        data={climb[key]}
+        metric={metric}
+        slug={climb.slug}
+      />
     )
-  }
-
-  const togglePopOver = (id, climb) => {
-    if (isPopoverOpen) {
-      toggleBlanketEnabled()
-      setIsPopoverOpen(false)
-      setRowClicked(null)
-    } else {
-      event('gtm.click', climb.title, `https://www.kylies.photos/climb-log`, 'TableClick', `${METADATA.SITE_NAME} | Climb Log`)
-      toggleBlanketEnabled()
-      setIsPopoverOpen(true)
-      setRowClicked(id)
-    }
   }
 
   const sortRow = (header) => {
@@ -162,10 +154,15 @@ export default function Table({
               content={<CustomPopover climb={climb} metric={metric} />}
             >
               <tr
-                className={'tableRow'}
+                id={`tableRow${i}`}
+                className={`tableRow`}
                 key={i}
-                onClick={() => {
-                  togglePopOver(i, climb)
+                onClick={(e) => {
+                  // If we're clicking on a link don't show the popover
+                  if (e.target.nodeName == 'A') {
+                    return
+                  }
+                  togglePopOver(i)
                 }}
               >
                 {Object.keys(climb).map((key) => buildTableRow(key, climb))}

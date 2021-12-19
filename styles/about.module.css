@@ -7,8 +7,12 @@
 }
 
 .aboutImage {
-  padding: 0 2rem 0;
+  padding: 0 2rem 0 0;
   float: left;
+}
+
+.brandLink {
+  color: #0065b8;
 }
 
 .socialIcons {
@@ -33,6 +37,10 @@
 
   .aboutBlockText {
     padding-top: 1.75rem;
+  }
+
+  .aboutBlockText h2 {
+    text-align: center;
   }
 
   .aboutBlockText p {

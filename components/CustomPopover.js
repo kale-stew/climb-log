@@ -4,23 +4,20 @@ import {
   addCommas,
   capitalizeEachWord,
   feetToMeters,
-  findMatchingSlug,
   milesToKilometers,
 } from '../utils/helpers'
+import { buildAreaName } from '../utils/builders'
 
 import styles from './CustomPopover.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const CustomPopover = ({ climb, metric }) => {
   const buildTitle = () => {
-    if (findMatchingSlug(climb.title)) {
+    if (climb.slug) {
       return (
-        <a
-          href={`/${findMatchingSlug(climb.title)}`}
-          alt={`View trip report from ${climb.title}`}
-        >
+        <a href={`/hike/${climb.slug}`} alt={`View trip report from ${climb.title}`}>
           <h2 className={`${utilStyles.headingLg} ${utilStyles.padding1px}`}>
-            {climb.title}
+            {climb.title} ↗
           </h2>
         </a>
       )
@@ -69,7 +66,7 @@ const CustomPopover = ({ climb, metric }) => {
           : climb && `${addCommas(climb.gain)}'`}
       </p>
       <p>
-        <strong>Location:</strong> {capitalizeEachWord(climb.area)},{' '}
+        <strong>Location:</strong> {buildAreaName(climb.area)},{' '}
         {capitalizeEachWord(climb.state)}
       </p>
       {climb.strava && (
