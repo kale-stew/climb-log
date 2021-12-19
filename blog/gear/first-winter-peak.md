@@ -76,6 +76,8 @@ In addition to the standard safety and shelter items I outline in my [post about
 
 - A **vest** is another item I'll admit I didn't believe in until I tried out. On a windless & sunny winter day, a vest is the only outer layer I need to be comfortable at altitude.
 
+- An **ice axe** isn't necessary for most class one and two climbs, but it can make descending an icy slope of any grade just a bit safer and easier. You cold use hiking poles to stabilize you for a descent, but an ice axe can be a worthwhile investment as it helps you self-arrest if you lose your footing.
+
 ![mount-democrat-snowflake](https://live.staticflickr.com/65535/51758010860_9b71276d75_k.jpg)
 _Ascending Mount Democrat in January of 2021, Mount Cameron in the background._
 
@@ -98,7 +100,7 @@ Without repeating too much info from the free resources I’ve linked above, the
 
   As I’ve mentioned, I frequent the [14ers.com](https://14ers.com) forum, but I probably visit it more in the winter than I do in the summer. Conditions can be fairly stable in the summer and reports that will change your plans are more relevant to trailhead closures or access issues (see: Mount Lindsey or DeCaLiBron access issues from the summer of 2021).
 
-  In the winter, conditions are a little more touchy. Reports of slides or road closures further out than seasons prior can change your whole approach.
+  In the winter, conditions are a little more touchy. Reports of avalanche slides or road closures further out than seasons prior can change your whole approach. It's important to find condition reports closer to your planned climb date, or reports from a different year but the same season or conditions you plan to climb in. For example, we couldn't find any recent reports when we climbed La Plata this past March, but we found a report from the March prior that gave us helpful information for our climb a year later.
 
 ### Recommended Starter Routes
 
@@ -106,7 +108,7 @@ I'm not saying any of these are easy, but there are some winter routes with lowe
 
 - Mount Bierstadt's Standard Route
 
-  - Guanella Pass does close somewhere between 1.5 and 3 miles below the pass's summit during winter months, but it doesn't add that much to your climb all things considered. As far as road walks go, this one is pretty easily done and won't bog down your overall day by much. You also typically have a nice trench to work with as Bierstadt is heavily trafficked on and off season.
+  - Guanella Pass does close somewhere between 1.5 and 3 miles below the top of pass during winter months, but it doesn't add that much to your climb all things considered. As far as road walks go, this one is pretty easily done and won't bog down your overall day by much. You also typically have a nice trench to work with as Bierstadt is heavily trafficked on and off season.
   - _Roundtrip stats:_ 10 miles & 3,700 feet of gain.
 
 - Mount Sherman's South Slopes
