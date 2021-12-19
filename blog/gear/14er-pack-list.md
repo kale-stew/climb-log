@@ -1,6 +1,6 @@
 ---
 title: 'Packing for a 14er'
-date: '2021-12-22'
+date: '2021-11-26'
 ---
 
 I'm incredibly embarrassed to admit it, but I used to think you could get away with little to no gear on a hike in Colorado. On my first hike after moving here in the summer of 2016, I carried a heavy insulated bottle and _nothing else_ up to Saint Mary's Glacier as my first hike at altitude, ever. Things have definitely changed in the 5+ years since then.
