@@ -3,13 +3,13 @@ title: 'Hiking Your First Winter Peak'
 date: '2021-12-20'
 ---
 
-With calendar winter quickly approaching, I've been thinking about what worked for me last snowflake season and what definitely didn’t. Although we might not get as much snow this upcoming season with it being a la niña year here in Colorado, it's still important to consider the essentials when you're getting started with backcountry winter travel.
+With calendar winter quickly approaching, I find it helpful to reflect on what worked for me last snowflake season and what definitely didn’t. Although we might not get as much snow this upcoming season with it being a la niña year here in Colorado, it's always important to consider the essentials when evaluating backcountry winter travel. The following are some of the lessons I learned during my first winter alpine season.
 
 ## What is a 'Snowflake Peak'?
 
-When we call a peak a 'snowflake', we're referring to what time of year it was climbed. Climbs during calendar winter can be classified as a 'snowflake' summit.
+To clarify, when I call a peak a 'snowflake', I am referring to the time of year I climbed it. Anything climbed during calendar winter qualifies as a Snowflake summit. Although winter conditions do not exclusively exist during calendar winter, it is easier to qualify a climb based on the season it falls in than something more discretionary like a climber's consideration of conditions. Technically, one could experience winter conditions in Colorado in May, but that wouldn't qualify as a snowflake peak because it's past the calendar winter cut-off (which typically falls near the end of March).
 
-As a frequent user of the [14ers.com](https://www.14ers.com) forum, I understand this term to derive from the ❄️ Snowflake Emoji your list gains when you check a peak off in the calendar winter. There are likely other terms used within other circles for this accomplishment, but the claim is the same: summiting a peak during some of the roughest possible conditions.
+As a frequent user of the [14ers.com](https://www.14ers.com) forum, I understand this term to derive from the ❄️ snowflake emoji your peak list gains when you complete a climb during calendar winter. There are likely other terms used among mountaineers for this accomplishment, but the claim is the same: summiting a peak during some of the roughest possible conditions.
 
 ![peak-checklist-screenshot](https://live.staticflickr.com/65535/51758027680_55a2260745_w.jpg)
 
@@ -20,11 +20,11 @@ _A screenshot of my peak checklist on 14ers.com. See how the Snowflake appears o
 ![la-plata-snowflake](https://live.staticflickr.com/65535/51757385408_0386c75cb2_k.jpg)
 _Ascending La Plata in March of 2021. We were post-holing up to our waist at times._
 
-Colorado winters are something special. It’s not easy to convey the serenity one feels when slogging up a snowy hill on a 0℉ winter morning. Or how a sunrise inversion reflecting off of a fresh blanket of snow can stay in your mind for years. The accomplishment one feels when summiting a 14,000 foot peak despite icy winds and waist-deep pockets of powder. And if you’re a downhill enthusiast, you’ll find yourself at the top of some of the best ski lines in the world. The payoff for your effort seems tenfold in the winter, and I would argue the peaks look their best wearing a fresh white coat.
+Colorado winters up in the alpine are something special. It’s not easy to convey the serenity one feels when slogging up a snowy hill on a 0℉ winter morning. Or how a sunrise inversion reflecting off of a fresh blanket of snow can stay in your mind for years. The accomplishment one feels when summiting a 14,000 foot peak despite icy winds and waist-deep pockets of powder. And if you’re a downhill enthusiast, you’ll find yourself at the top of some of the best ski lines in the world. The payoff for your effort seems tenfold in the winter, and I would argue the peaks look their best wearing a fresh white coat.
 
 ## Preparing for a Winter Climb
 
-As I’ve mentioned, winter brings some of the deadliest conditions in the Colorado high peaks with it each year. Recreating in deep snow can be a matter of life and death, but that risk is increased when aggressive slope angles and a notoriously unstable snowpack come into play. While it is possible to have a bluebird day in the snowy backcountry, it is crucial you also prepare for the worst before you enter any wilderness area.
+As I’ve mentioned, winter brings some of the deadliest conditions possible to the Colorado high peaks. While it is possible to have an amazing bluebird day in the snowy backcountry, it is crucial you prepare for the worst before you enter any wilderness area this time of year. Recreating in deep snow can quickly become a matter of life and death, and the risk is increased when aggressive slope angles and a notoriously unstable snowpack come into play.
 
 In addition to gear, training or at least some technical preparation is recommended. Albeit expensive, a Level One AIARE (American Institute for Avalanche Research and Education) Avalanche Rescue Course is highly recommended “for _anyone_, regardless of method of travel, who wants to recreate in or near avalanche terrain” [according to the course creator, the Avalanche Research and Education Center](https://avtraining.org/aiare-level-1/). AIARE 1 prepares you to develop a plan to travel through and identify avalanche terrain, effectively make terrain choices in a group setting, and demonstrate effective companion rescue. If you aren’t sure you’ll enjoy winter hiking and want to save your money before committing to a course, taking the time to research these topics ahead of your first backcountry winter experience is encouraged.
 
@@ -79,18 +79,18 @@ _Ascending Mount Democrat in January of 2021, Mount Cameron in the background._
 
 ## Finding Winter Routes
 
-Without getting too much into some of the same items you’ll cover in some of the free resources I’ve linked above, there are a few things to consider that will help you identify which routes might be better to pursue in the winter.
+Without repeating too much info from the free resources I’ve linked above, there are a few things to consider about each route you're evaluating that will help you identify which routes might be a better option to pursue in the winter.
 
 - **Slope Angle**
 
-  One of the most straightforward ways to assess risk on a winter route is identifying the slope angle you might be traveling under or across. The side of the mountain you intend to climb can also impact slide risk (e.g. the north side of a peak gets more sun in winter months), but seeing your line on a topographical map (I like the slope angle filter on [gaia](https://www.gaiagps.com)’s app) can be a much more clear-cut way to identify risk.
+  One of the most straightforward ways to assess risk on a winter route is identifying the slope angle you might be traveling under or across. The aspect of the mountain you intend to climb can also impact slide risk (e.g. the north side gets less sun in winter months, causing more snow to stay accumulated a.k.a. slope load), but seeing your line on a topographical map (I like the slope angle filter on [gaia](https://www.gaiagps.com)’s app) can be a much more clear-cut way to identify risk.
   ![screenshot comparing two route’s angles](https://live.staticflickr.com/65535/51758050945_e4c3de86f3_k.jpg)
 
   _Can you see why the line on the right might be riskier?_
 
 - **Trailhead Access**
 
-  In the summer, 4WD roads can bar access to a peak for sedan drivers. In the winter, the angle of the road alone could be your barrier to drivable entry. What might take a little capable driving during drier months, like Uncompahgre Creek, can become completely impassable with 2’ of snow and ice melt. Websites like [climb13ers.com](https://climb13ers.com) and [14ers.com](https://14ers.com) can gleam insight on winter access to a number of popular trailheads, but you might need to dig deeper for lesser traveled areas.
+  In the summer, 4WD roads can bar access to a peak for sedan drivers. In the winter, the angle of the road alone could be your barrier to drivable entry. What might be a moderate 4x4 road during drier months, like Uncompahgre Creek, can become completely impassable with 2’ of snow and ice melt. Websites like [climb13ers.com](https://climb13ers.com) and [14ers.com](https://14ers.com) can glean insight on winter access to a number of popular trailheads, but you might need to dig deeper for lesser traveled areas.
 
 - **Recent Condition Reports**
 
