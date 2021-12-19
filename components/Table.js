@@ -99,7 +99,13 @@ export default function Table({
   }
 
   const toggleUnits = (isMetric) => {
-    event('gtm.click', `${isMetric ? 'metric' : 'imperial'}`, `https://www.kylies.photos/climb-log`, 'UntiToggle', `${METADATA.SITE_NAME} | Climb Log`)
+    event(
+      'gtm.click',
+      `${isMetric ? 'metric' : 'imperial'}`,
+      `https://www.kylies.photos/climb-log`,
+      'UntiToggle',
+      `${METADATA.SITE_NAME} | Climb Log`
+    )
     setMetric(isMetric)
   }
   return (

@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import Category from '../../components/Category'
+import CustomHead from '../../components/CustomHead'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
+import { METADATA } from '../../utils/constants'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/posts'
 
 import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
-import CustomHead from '../../components/CustomHead'
 
 const Post = ({ postData, postIds }) => {
   /**
@@ -91,7 +92,7 @@ const Post = ({ postData, postIds }) => {
   }
   return (
     <Layout>
-      <CustomHead title={`${postData.title} | kylies.photos`} />
+      <CustomHead title={`${postData.title} | ${METADATA.SITE_NAME}`} />
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
         <div className={`${styles.blogSubheader} ${utilStyles.singleRow}`}>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
+import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
@@ -9,10 +10,10 @@ import {
   containsAreaType,
 } from '../utils/builders'
 import { CATEGORY_TYPE, METADATA, AREA_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
-import { fetchAllClimbs } from '../utils/notion'
-import tableStyles from '../components/Table.module.css'
-import CustomHead from '../components/CustomHead'
 import { event } from '../utils/gtag'
+import { fetchAllClimbs } from '../utils/notion'
+
+import tableStyles from '../components/Table.module.css'
 
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
@@ -130,7 +131,13 @@ const ClimbLog = ({ allClimbs }) => {
    * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
-    event('gtm.click', filter, `https://www.kylies.photos${router.asPath}`, 'AreaSelect', `${METADATA.SITE_NAME} | Climb Log`)
+    event(
+      'gtm.click',
+      filter,
+      `https://www.kylies.photos${router.asPath}`,
+      'AreaSelect',
+      `${METADATA.SITE_NAME} | Climb Log`
+    )
     let filterType = filter.split('?')[1]
     let selectedFilter = filter.split('?')[0]
     // Set the areaFilter so that the drop down can handle its own state

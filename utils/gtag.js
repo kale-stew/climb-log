@@ -9,14 +9,14 @@ export const pageview = (url) => {
 export const event = (action, value, path, label, pageTitle) => {
   if (window && window.dataLayer) {
     window.dataLayer.push({
-      'event': action,
-      'value': value,
-      'pagePath': `https://www.kylies.photos${path}`,
-      'pageTitle': pageTitle,
-      'visitorType': 'HARD CODED VISITOR',
-      'label': label
+      event: action,
+      value: value,
+      pagePath: `https://www.kylies.photos${path}`,
+      pageTitle: pageTitle,
+      visitorType: 'HARD CODED VISITOR',
+      label: label,
     })
   } else {
-    console.warn("Google Analytics may be disabled")
+    console.warn('Google Analytics may be disabled')
   }
 }
