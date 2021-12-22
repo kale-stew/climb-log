@@ -2,14 +2,21 @@
   font-family: 'Playfair Display', serif;
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   height: 42px;
-  padding: 1px;
-  margin-bottom: 2.2rem;
+  padding: 1rem 0.25rem 1.5rem 0.25rem;
 }
 
 .landingHeader h1 {
   margin: 0.25em 0 1.5em 1.5em;
+}
+
+.landingLogoWrapper {
+  width: 110px;
+}
+
+.landingLogoWrapper img {
+  padding: 0.5rem;
 }
 
 .landingNavigation a {
@@ -58,6 +65,11 @@
 
   .landingHeader h1 {
     margin: 0;
+  }
+
+  .landingLogoWrapper {
+    width: auto;
+    height: auto;
   }
 
   .landingNavigation {
