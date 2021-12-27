@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Category from '../components/Category'
+import CustomHead from '../components/CustomHead'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
 import { CATEGORY_TYPE, METADATA } from '../utils/constants'
@@ -10,7 +11,6 @@ import { getSortedPostsData } from '../utils/posts'
 import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
-import CustomHead from '../components/CustomHead'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
@@ -22,70 +22,36 @@ export default function BlogLandingPage({ allPostsData }) {
     }
   }, [])
 
+  const buildCategories = () =>
+    Object.entries(CATEGORY_TYPE).map(([key, value]) => {
+      return (
+        <button
+          className={
+            viewCategory === CATEGORY_TYPE[key]
+              ? categoryStyles.categorySelected
+              : 'categoryButton'
+          }
+          onClick={() =>
+            key == CATEGORY_TYPE.ALL
+              ? router.push({ pathname: '/blog' }) && setCategory(CATEGORY_TYPE.ALL)
+              : setCategory(
+                  viewCategory === CATEGORY_TYPE[key]
+                    ? CATEGORY_TYPE.ALL
+                    : CATEGORY_TYPE[key]
+                )
+          }
+        >
+          {value === CATEGORY_TYPE.HIKE ? 'trip reports' : value}
+        </button>
+      )
+    })
+
   return (
     <Layout>
       <CustomHead title={`${METADATA.SITE_NAME} | Hiking Blog`} />
       <h1 className={utilStyles.headingXl}>Blog</h1>
 
-      <section>
-        <button
-          className={
-            viewCategory === CATEGORY_TYPE.ALL
-              ? categoryStyles.categorySelected
-              : 'categoryButton'
-          }
-          onClick={() => {
-            router.push({ pathname: '/blog' })
-            setCategory(CATEGORY_TYPE.ALL)
-          }}
-        >
-          All
-        </button>
-        <button
-          className={
-            viewCategory === CATEGORY_TYPE.GEAR
-              ? categoryStyles.categorySelected
-              : 'categoryButton'
-          }
-          onClick={() =>
-            setCategory(
-              viewCategory === CATEGORY_TYPE.GEAR ? CATEGORY_TYPE.ALL : CATEGORY_TYPE.GEAR
-            )
-          }
-        >
-          Gear
-        </button>
-        <button
-          className={
-            viewCategory === CATEGORY_TYPE.THOUGHTS
-              ? categoryStyles.categorySelected
-              : 'categoryButton'
-          }
-          onClick={() =>
-            setCategory(
-              viewCategory === CATEGORY_TYPE.THOUGHTS
-                ? CATEGORY_TYPE.ALL
-                : CATEGORY_TYPE.THOUGHTS
-            )
-          }
-        >
-          Thoughts
-        </button>
-        <button
-          className={
-            viewCategory === CATEGORY_TYPE.HIKE
-              ? categoryStyles.categorySelected
-              : 'categoryButton'
-          }
-          onClick={() =>
-            setCategory(
-              viewCategory === CATEGORY_TYPE.HIKE ? CATEGORY_TYPE.ALL : CATEGORY_TYPE.HIKE
-            )
-          }
-        >
-          Trip Reports
-        </button>
-      </section>
+      <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
 
       <section
         className={`${utilStyles.headingMd} ${utilStyles.padding1px} ${styles.blogSection}`}

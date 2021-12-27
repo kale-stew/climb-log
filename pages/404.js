@@ -1,6 +1,6 @@
-import Image from 'next/image'
 import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
+import Image from 'next/image'
 import ImageGoats from '../public/photos/404.jpeg'
 import { METADATA } from '../utils/constants'
 

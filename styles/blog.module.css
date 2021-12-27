@@ -39,6 +39,10 @@
   width: 760px;
 }
 
+.categoryFilterWrapper {
+  margin-bottom: 1.25rem;
+}
+
 @media (max-width: 1024px) {
   .blogNavigationSeparator {
     display: flex;

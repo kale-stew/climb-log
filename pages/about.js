@@ -1,3 +1,4 @@
+import CustomHead from '../components/CustomHead'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
@@ -8,7 +9,6 @@ import { BRANDS, LINKS_URL, METADATA } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
-import CustomHead from '../components/CustomHead'
 
 const AboutPage = ({ socialLinks }) => (
   <Layout>

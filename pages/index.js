@@ -1,4 +1,5 @@
 import Card from '../components/Card'
+import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
 import { METADATA } from '../utils/constants'
@@ -11,7 +12,6 @@ import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
-import CustomHead from '../components/CustomHead'
 
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
