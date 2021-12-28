@@ -15,9 +15,15 @@ const capitalizeEachWord = (string) => {
   return capitalize
 }
 
-const formatDate = (date) => format(date, 'PP')
+const formatDate = (date, type) => {
+  if (type === 'long') {
+    return format(date, 'PPPP')
+  } else if (type === 'short') {
+    return format(date, 'M/d/yy')
+  }
 
-const formatDateWithDayOfWeek = (date) => format(date, 'PPPP')
+  return format(date, 'PP')
+}
 
 const getLocationData = (str) => {
   const [area, state] = str.toLowerCase().split(',')
@@ -31,14 +37,13 @@ const getLocationData = (str) => {
 const milesToKilometers = (num) => roundDecimal(num * 1.609)
 const feetToMeters = (num) => addCommas(roundDecimal(num / 3.281))
 
-const roundDecimal = (num) => num && num.toFixed(2)
+const roundDecimal = (num) => num && num.toFixed(1)
 
 export {
   addCommas,
   capitalizeEachWord,
   feetToMeters,
   formatDate,
-  formatDateWithDayOfWeek,
   getLocationData,
   milesToKilometers,
 }

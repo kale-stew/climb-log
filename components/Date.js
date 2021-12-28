@@ -1,4 +1,4 @@
-import { formatDate, formatDateWithDayOfWeek } from '../utils/helpers'
+import { formatDate } from '../utils/helpers'
 import utilStyles from '../styles/utils.module.css'
 
 const FormattedDate = ({ dateString, withDOW, className = '' }) => {
@@ -6,7 +6,7 @@ const FormattedDate = ({ dateString, withDOW, className = '' }) => {
 
   return (
     <time className={`${utilStyles.lightText} ${className}`} dateTime={dateString}>
-      {withDOW ? formatDateWithDayOfWeek(date) : formatDate(date)}
+      {withDOW ? formatDate(date, 'long') : formatDate(date)}
     </time>
   )
 }

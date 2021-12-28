@@ -1,12 +1,12 @@
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
+import { event } from '../utils/gtag'
 import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
 
 import categoryStyles from './Category.module.css'
 import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
-import { event } from '../utils/gtag'
 
 export default function Table({
   allAreas,
@@ -108,6 +108,7 @@ export default function Table({
     )
     setMetric(isMetric)
   }
+
   return (
     <>
       <h1>Kylie's Climb Log</h1>

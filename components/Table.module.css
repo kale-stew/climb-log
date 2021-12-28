@@ -1,13 +1,21 @@
-.hiddenRow {
+.hiddenInMobile {
   display: inside;
 }
 
-.titleHeader {
-  width: 25vw;
+.hiddenOnDesktop {
+  display: none;
 }
 
-.areaHeader {
-  width: 15vw;
+.titleHeader,
+.titleData {
+  width: 25vw;
+  text-align: left;
+}
+
+.areaHeader,
+.areaData {
+  width: 17vw;
+  text-align: left;
 }
 
 .distanceHeader {
@@ -30,14 +38,21 @@
 }
 
 @media (max-width: 1024px) {
-  .hiddenRow {
+  .hiddenInMobile {
     display: none;
   }
-}
 
-@media (max-width: 1024px) {
-  .stateHeader,
-  .areaHeader {
+  .hiddenOnDesktop {
+    display: inline;
+  }
+
+  .titleHeader,
+  .titleData {
+    width: 40vw;
+  }
+
+  .areaHeader,
+  .stateHeader {
     display: none;
   }
 }
