@@ -1,17 +1,16 @@
 import fs from 'fs'
-import html from 'remark-html'
 import matter from 'gray-matter'
 import path from 'path'
-import { remark } from 'remark'
-import {
-  CATEGORY_TYPE,
-  gearDirectory,
-  hikeDirectory,
-  thoughtsDirectory,
-} from './constants'
+import { CATEGORY_TYPE } from './constants'
 import { addCommas, capitalizeEachWord } from './helpers'
 import { fetchMostRecentClimbs } from './notion'
 
+export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)
+export const hikeDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.HIKE}`)
+export const thoughtsDirectory = path.join(
+  process.cwd(),
+  `blog/${CATEGORY_TYPE.THOUGHTS}`
+)
 const postsDirectory = path.join(process.cwd(), 'blog')
 
 // Get all the post IDs
@@ -55,122 +54,82 @@ export function getAllPostIds() {
   })
 }
 
-// Get relevant post data
+// Get data for a single post
 export async function getPostData(category, id) {
-  // Set the relevant /posts file path using category and id in the query params
   const fullPath = path.join(postsDirectory, `${category}`, `${id}.md`)
   const fileContents = fs.readFileSync(fullPath, 'utf8')
 
-  // Use gray-matter to parse the post metadata section
-  const matterResult = matter(fileContents)
+  const { data, content } = matter(fileContents)
 
-  // Use remark to convert markdown into HTML string
-  const processedContent = await remark().use(html).process(matterResult.content)
-  const contentHtml = processedContent.toString()
-
-  // Combine the data with the id
   return {
     id,
-    contentHtml,
+    content,
     category,
-    ...matterResult.data,
+    ...data,
   }
 }
 
 // Get all post data, in chronological order
 export function getSortedPostsData() {
-  // Get file names under each category directory
   const gearFileNames = fs.readdirSync(gearDirectory)
   const thoughtsFileNames = fs.readdirSync(thoughtsDirectory)
   const tripReportsFileNames = fs.readdirSync(hikeDirectory)
 
-  // get data from Gear posts
   const gearFilesData = gearFileNames.map((fileName) => {
-    // Remove ".md" from file name to get id
     const id = fileName.replace(/\.md$/, '')
-
-    // Read markdown file as string
     const fullPath = path.join(gearDirectory, fileName)
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
-    // Use gray-matter to parse the post metadata section
-    const matterResult = matter(fileContents)
-
-    // Create a 'preview' of the content string
-    const longPreview = matterResult.content.substring(0, 350)
-
-    // Set the category
+    const { data, content } = matter(fileContents)
+    const longPreview = content.substring(0, 350)
     const category = CATEGORY_TYPE.GEAR
 
-    // Combine the data with the id
     return {
       id,
       category,
       preview: `${longPreview}...`,
-      ...matterResult.data,
+      ...data,
     }
   })
 
-  // get data from Thoughts posts
   const thoughtsFilesData = thoughtsFileNames.map((fileName) => {
-    // Remove ".md" from file name to get id
     const id = fileName.replace(/\.md$/, '')
-
-    // Read markdown file as string
     const fullPath = path.join(thoughtsDirectory, fileName)
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
-    // Use gray-matter to parse the post metadata section
-    const matterResult = matter(fileContents)
-
-    // Create a 'preview' of the content string
-    const longPreview = matterResult.content.substring(0, 350)
-
-    // Set the category
+    const { data, content } = matter(fileContents)
+    const longPreview = content.substring(0, 350)
     const category = CATEGORY_TYPE.THOUGHTS
 
-    // Combine the data with the id
     return {
       id,
       category,
       preview: `${longPreview}...`,
-      ...matterResult.data,
+      ...data,
     }
   })
 
-  // get data from Trip Report posts
   const tripReportsFilesData = tripReportsFileNames.map((fileName) => {
-    // Remove ".md" from file name to get id
     const id = fileName.replace(/\.md$/, '')
-
-    // Read markdown file as string
     const fullPath = path.join(hikeDirectory, fileName)
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
-    // Use gray-matter to parse the post metadata section
-    const matterResult = matter(fileContents)
-
-    // Create a 'preview' of the content string
-    const longPreview = matterResult.content.substring(0, 350)
-
-    // Set the category
+    const { data, content } = matter(fileContents)
+    const longPreview = content.substring(0, 350)
     const category = CATEGORY_TYPE.HIKE
 
-    // Combine the data with the id
     return {
       id,
       category,
       preview: `${longPreview}...`,
-      ...matterResult.data,
+      ...data,
     }
   })
 
-  // Concatenate each articles data in one array
   const allPostsData = gearFilesData
     .concat(thoughtsFilesData)
     .concat(tripReportsFilesData)
 
-  // Sort articles by date
   return allPostsData.sort((a, b) => {
     if (a.date < b.date) {
       return 1

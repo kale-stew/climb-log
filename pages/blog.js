@@ -26,6 +26,7 @@ export default function BlogLandingPage({ allPostsData }) {
     Object.entries(CATEGORY_TYPE).map(([key, value]) => {
       return (
         <button
+          key={key}
           className={
             viewCategory === CATEGORY_TYPE[key]
               ? categoryStyles.categorySelected

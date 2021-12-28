@@ -3,6 +3,7 @@ import Category from '../../components/Category'
 import CustomHead from '../../components/CustomHead'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
+import ReactMarkdown from 'react-markdown'
 import { METADATA } from '../../utils/constants'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/posts'
 
@@ -90,6 +91,7 @@ const Post = ({ postData, postIds }) => {
       </div>
     )
   }
+
   return (
     <Layout>
       <CustomHead title={`${postData.title} | ${METADATA.SITE_NAME}`} />
@@ -107,7 +109,7 @@ const Post = ({ postData, postIds }) => {
           />
           <Category category={postData.category} pushToRouter={true} />
         </div>
-        <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
+        <ReactMarkdown>{postData.content}</ReactMarkdown>
       </article>
       {buildNavigation()}
     </Layout>

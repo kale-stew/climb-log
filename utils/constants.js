@@ -1,5 +1,3 @@
-import path from 'path'
-
 export const AREA_TYPE = {
   nf: 'National Forest',
   np: 'National Park',
@@ -31,14 +29,6 @@ export const CATEGORY_TYPE = {
   HIKE: 'hike',
   THOUGHTS: 'thoughts',
 }
-
-// TODO - more complex post calculation so it's agnostic to however many categories exist?
-export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)
-export const hikeDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.HIKE}`)
-export const thoughtsDirectory = path.join(
-  process.cwd(),
-  `blog/${CATEGORY_TYPE.THOUGHTS}`
-)
 
 export const LINKS_URL =
   'https://raw.githubusercontent.com/kale-stew/kale-stew.github.io/dev/src/data/socials.json'
