@@ -235,6 +235,7 @@ export async function getStaticProps() {
     props: {
       allClimbs: response,
     },
+    revalidate: 60,
   }
 }
 
