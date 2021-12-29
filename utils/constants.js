@@ -44,3 +44,18 @@ export const TABLE_SORT_ORDER = {
   ASC: 'ascending',
   DESC: 'descending',
 }
+
+export const MONTHS_ARRAY = [
+  'JANUARY',
+  'FEBRUARY',
+  'MARCH',
+  'APRIL',
+  'MAY',
+  'JUNE',
+  'JULY',
+  'AUGUST',
+  'SEPTEMBER',
+  'OCTOBER',
+  'NOVEMBER',
+  'DECEMBER',
+]

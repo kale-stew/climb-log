@@ -9,10 +9,16 @@ import {
   createStateSelects,
   containsAreaType,
 } from '../utils/builders'
-import { CATEGORY_TYPE, METADATA, AREA_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+import {
+  CATEGORY_TYPE,
+  METADATA,
+  AREA_TYPE,
+  TABLE_SORT_ORDER,
+  MONTHS_ARRAY,
+} from '../utils/constants'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/notion'
-
+import getMonth from 'date-fns/getMonth'
 import tableStyles from '../components/Table.module.css'
 
 const ClimbLog = ({ allClimbs }) => {
@@ -28,6 +34,7 @@ const ClimbLog = ({ allClimbs }) => {
   const [blanketEnabled, setBlanketEnabled] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const [userSearch, setUserSearch] = useState('')
 
   const router = useRouter()
   const firstUpdate = useRef(true)
@@ -178,6 +185,40 @@ const ClimbLog = ({ allClimbs }) => {
     sortData(filteredData, selectedFilter)
   }
 
+  const searchClimbLog = (e) => {
+    if (e === '') {
+      setFilteredClimbs(allClimbs)
+      sortData(allClimbs, CATEGORY_TYPE.ALL)
+      setUserSearch(e)
+      return
+    }
+    let sorted = allClimbs.filter((climb) => {
+      let { area, date, distance, gain, state, title } = climb
+      let searchQuery = e.toUpperCase()
+      area = area.toUpperCase()
+      state = state.toUpperCase()
+      title = title.toUpperCase()
+
+      return (
+        title.includes(searchQuery) ||
+        state.includes(searchQuery) ||
+        area.includes(searchQuery) ||
+        checkMonth(searchQuery, date)
+      )
+    })
+    setFilteredClimbs(sorted)
+    sortData(sorted)
+    setUserSearch(e)
+  }
+
+  const checkMonth = (queryMonth, date) => {
+    let dateNum = getMonth(new Date(date))
+    let foundMonths = MONTHS_ARRAY.filter((month) => month.includes(queryMonth)).map(
+      (month) => MONTHS_ARRAY.indexOf(month)
+    )
+    return foundMonths.includes(dateNum)
+  }
+
   const togglePopOver = (id) => {
     if (isPopoverOpen) {
       toggleBlanketEnabled()
@@ -223,6 +264,7 @@ const ClimbLog = ({ allClimbs }) => {
         rowClicked={rowClicked}
         isPopoverOpen={isPopoverOpen}
         togglePopOver={togglePopOver}
+        setUserSearch={searchClimbLog}
       />
     </Layout>
   )

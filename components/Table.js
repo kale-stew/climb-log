@@ -20,6 +20,7 @@ export default function Table({
   setSortOrder,
   sortOrder,
   togglePopOver,
+  setUserSearch,
 }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id', 'imgUrl', 'slug']
@@ -133,6 +134,17 @@ export default function Table({
       <div className={utilStyles.singleRow}>
         <p>Filter by Area:</p>
         {buildFilterByArea()}
+      </div>
+      <div className={utilStyles.singleRow}>
+        <p>Search Climbs:</p>
+        <input
+          className={styles.logSearch}
+          type={'search'}
+          placeholder="Search Climb Log..."
+          onChange={(e) => {
+            setUserSearch(e.target.value)
+          }}
+        />
       </div>
       <table>
         <caption>
