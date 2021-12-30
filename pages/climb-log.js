@@ -14,7 +14,7 @@ import {
   METADATA,
   AREA_TYPE,
   TABLE_SORT_ORDER,
-  MONTHS_ARRAY,
+  ALL_MONTHS,
 } from '../utils/constants'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/notion'
@@ -185,6 +185,15 @@ const ClimbLog = ({ allClimbs }) => {
     sortData(filteredData, selectedFilter)
   }
 
+  const checkMonth = (queryMonth, date) => {
+    const dateNum = getMonth(new Date(date))
+    const foundMonths = ALL_MONTHS.filter((month) => month.includes(queryMonth)).map(
+      (month) => ALL_MONTHS.indexOf(month)
+    )
+
+    return foundMonths.includes(dateNum)
+  }
+
   const searchClimbLog = (e) => {
     if (e === '') {
       setFilteredClimbs(allClimbs)
@@ -213,12 +222,12 @@ const ClimbLog = ({ allClimbs }) => {
     setUserSearch(e)
   }
 
-  const checkMonth = (queryMonth, date) => {
-    let dateNum = getMonth(new Date(date))
-    let foundMonths = MONTHS_ARRAY.filter((month) => month.includes(queryMonth)).map(
-      (month) => MONTHS_ARRAY.indexOf(month)
-    )
-    return foundMonths.includes(dateNum)
+  const toggleBlanketEnabled = () => {
+    if (blanketEnabled) {
+      setBlanketEnabled(false)
+    } else {
+      setBlanketEnabled(true)
+    }
   }
 
   const togglePopOver = (id) => {
@@ -238,14 +247,6 @@ const ClimbLog = ({ allClimbs }) => {
         setRowClicked(found)
         scrollTo(found)
       }
-    }
-  }
-
-  const toggleBlanketEnabled = () => {
-    if (blanketEnabled) {
-      setBlanketEnabled(false)
-    } else {
-      setBlanketEnabled(true)
     }
   }
 
