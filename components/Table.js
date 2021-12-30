@@ -18,9 +18,9 @@ export default function Table({
   setAreaFilter,
   setMetric,
   setSortOrder,
+  setUserSearch,
   sortOrder,
   togglePopOver,
-  setUserSearch,
 }) {
   // Notion data vals we -don't- want in the Table
   const alwaysExclude = ['href', 'strava', 'id', 'imgUrl', 'slug']
@@ -85,7 +85,8 @@ export default function Table({
         onChange={(e) => {
           setAreaFilter(e.target.value)
         }}
-        placeholder="Filter by Area"
+        placeholder="Filter by area"
+        className={styles.areaFilter}
       >
         <option value={CATEGORY_TYPE.ALL}>All</option>
         {allAreas.map((area) => {
@@ -131,16 +132,18 @@ export default function Table({
       </div>
 
       {/* Filter: by Area */}
-      <div className={utilStyles.singleRow}>
-        <p>Filter by Area:</p>
+      <div className={`${utilStyles.singleRow} ${styles.areaFilter}`}>
+        <p className={styles.filterTitle}>Filter by area:</p>
         {buildFilterByArea()}
       </div>
-      <div className={utilStyles.singleRow}>
-        <p>Search Climbs:</p>
+
+      {/* Search all Climbs */}
+      <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
+        <p className={styles.filterTitle}>Search all entries:</p>
         <input
-          className={styles.logSearch}
+          className={styles.searchInput}
           type={'search'}
-          placeholder="Search Climb Log..."
+          placeholder="Try 'October' or 'Attempt'"
           onChange={(e) => {
             setUserSearch(e.target.value)
           }}
@@ -163,31 +166,33 @@ export default function Table({
               </th>
             ))}
           </tr>
-          {data.length == 0 ? "No Data Found" : data.map((climb, i) => (
-            <Popover
-              containerClassName={styles.tablePopover}
-              key={climb.id}
-              onClickOutside={() => togglePopOver(i, climb)}
-              isOpen={isPopoverOpen && rowClicked === i}
-              positions={['center', 'bottom']} // in order of priority
-              content={<CustomPopover climb={climb} metric={metric} />}
-            >
-              <tr
-                id={`tableRow${i}`}
-                className={`tableRow`}
-                key={i}
-                onClick={(e) => {
-                  // If we're clicking on a link don't show the popover
-                  if (e.target.nodeName == 'A') {
-                    return
-                  }
-                  togglePopOver(i)
-                }}
-              >
-                {Object.keys(climb).map((key) => buildTableRow(key, climb))}
-              </tr>
-            </Popover>
-          ))}
+          {data.length == 0
+            ? 'No Data Found'
+            : data.map((climb, i) => (
+                <Popover
+                  containerClassName={styles.tablePopover}
+                  key={climb.id}
+                  onClickOutside={() => togglePopOver(i, climb)}
+                  isOpen={isPopoverOpen && rowClicked === i}
+                  positions={['center', 'bottom']} // in order of priority
+                  content={<CustomPopover climb={climb} metric={metric} />}
+                >
+                  <tr
+                    id={`tableRow${i}`}
+                    className={`tableRow`}
+                    key={i}
+                    onClick={(e) => {
+                      // If we're clicking on a link don't show the popover
+                      if (e.target.nodeName == 'A') {
+                        return
+                      }
+                      togglePopOver(i)
+                    }}
+                  >
+                    {Object.keys(climb).map((key) => buildTableRow(key, climb))}
+                  </tr>
+                </Popover>
+              ))}
         </tbody>
       </table>
     </>

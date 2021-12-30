@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import format from 'date-fns/format'
 
 const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
@@ -36,7 +36,6 @@ const getLocationData = (str) => {
 // Imperial to Metric conversions
 const milesToKilometers = (num) => roundDecimal(num * 1.609)
 const feetToMeters = (num) => addCommas(roundDecimal(num / 3.281))
-
 const roundDecimal = (num) => num && num.toFixed(1)
 
 export {

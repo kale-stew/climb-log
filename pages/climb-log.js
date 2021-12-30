@@ -4,10 +4,10 @@ import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
+  containsAreaType,
   createAreaSelects,
   createAreaTypeSelects,
   createStateSelects,
-  containsAreaType,
 } from '../utils/builders'
 import {
   CATEGORY_TYPE,
@@ -192,8 +192,9 @@ const ClimbLog = ({ allClimbs }) => {
       setUserSearch(e)
       return
     }
+
     let sorted = allClimbs.filter((climb) => {
-      let { area, date, distance, gain, state, title } = climb
+      let { area, date, state, title } = climb
       let searchQuery = e.toUpperCase()
       area = area.toUpperCase()
       state = state.toUpperCase()
@@ -206,6 +207,7 @@ const ClimbLog = ({ allClimbs }) => {
         checkMonth(searchQuery, date)
       )
     })
+
     setFilteredClimbs(sorted)
     sortData(sorted)
     setUserSearch(e)
@@ -253,18 +255,18 @@ const ClimbLog = ({ allClimbs }) => {
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
       <CustomHead title={`${METADATA.SITE_NAME} | Climb Log`} />
       <Table
-        data={data}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-        metric={metric}
-        setMetric={setMetric}
         allAreas={allAreas}
         areaFilter={areaFilter}
-        setAreaFilter={selectAreaFilter}
-        rowClicked={rowClicked}
+        data={data}
         isPopoverOpen={isPopoverOpen}
-        togglePopOver={togglePopOver}
+        metric={metric}
+        rowClicked={rowClicked}
+        setAreaFilter={selectAreaFilter}
+        setMetric={setMetric}
+        setSortOrder={setSortOrder}
         setUserSearch={searchClimbLog}
+        sortOrder={sortOrder}
+        togglePopOver={togglePopOver}
       />
     </Layout>
   )
