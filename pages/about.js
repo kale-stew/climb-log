@@ -3,9 +3,7 @@ import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
-import { FaGithub, FaFlickr, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa'
-import { MdOutlineMail } from 'react-icons/md'
-import { BRANDS, LINKS_URL, METADATA } from '../utils/constants'
+import { BRANDS, SOCIALS, METADATA } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -47,7 +45,7 @@ const AboutPage = ({ socialLinks }) => (
         </p>
         <p>
           To see some of Kylie's other projects, check out her{' '}
-          <a href={socialLinks.PersonalHomepage}>personal site</a>.
+          <a href={SOCIALS.Homepage}>personal site</a>.
         </p>
 
         <br />
@@ -67,39 +65,7 @@ const AboutPage = ({ socialLinks }) => (
         </p>
       </div>
     </div>
-    <br />
-    <br />
-    <div className={styles.socialIcons}>
-      <a target="_blank" href={socialLinks.PersonalEmail} network="email">
-        <MdOutlineMail />
-      </a>
-      <a target="_blank" href={socialLinks.Twitter}>
-        <FaTwitter />
-      </a>
-      <a target="_blank" href={socialLinks.Flickr}>
-        <FaFlickr />
-      </a>
-      <a target="_blank" href={socialLinks.LinkedIn}>
-        <FaLinkedinIn />
-      </a>
-      <a target="_blank" href={socialLinks.Instagram}>
-        <FaInstagram />
-      </a>
-      <a target="_blank" href={socialLinks.Github}>
-        <FaGithub />
-      </a>
-    </div>
   </Layout>
 )
-
-export async function getStaticProps() {
-  const result = await fetch(LINKS_URL)
-  const links = await result.json()
-  return {
-    props: {
-      socialLinks: links[0],
-    },
-  }
-}
 
 export default AboutPage

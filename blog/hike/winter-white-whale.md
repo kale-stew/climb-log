@@ -51,7 +51,7 @@ One more month went by before I tried for Humboldt again... Well, I admit, one m
 
 I passed all of the checkpoints where we had turned around on trips prior. Passed the vomit-break tree, passed the false summit, passed the section 200' below the summit where we first made the call, and finally found myself on top of Humboldt Peak.
 
-![humboldt-sign](https://live.staticflickr.com/65535/51732592028_0bc574b2d5_k.jpg)
+![vertical](https://live.staticflickr.com/65535/51732592028_0bc574b2d5_k.jpg)
 
 _Photo of my summit sign on top of Humboldt Peak, Crestone Peak & Needle in the background._
 

@@ -71,6 +71,10 @@
   align-items: center;
 }
 
+.uppercase {
+  font-family: 'Playfair Display SC', serif;
+}
+
 .vertical {
   display: flex;
   flex-direction: column;
