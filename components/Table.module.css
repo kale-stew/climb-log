@@ -12,7 +12,7 @@
   height: 100%;
   background: black;
   opacity: 0.5;
-  z-index: 100;
+  z-index: 50;
 }
 
 .distanceHeader {
@@ -42,7 +42,7 @@
 }
 
 .tablePopover {
-  z-index: 50;
+  z-index: 100;
 }
 
 .titleHeader,
