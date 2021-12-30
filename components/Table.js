@@ -163,7 +163,7 @@ export default function Table({
               </th>
             ))}
           </tr>
-          {data.map((climb, i) => (
+          {data.length == 0 ? "No Data Found" : data.map((climb, i) => (
             <Popover
               containerClassName={styles.tablePopover}
               key={climb.id}
