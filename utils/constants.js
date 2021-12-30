@@ -76,10 +76,6 @@ export const METADATA = {
 
 export const ROLE_NAVIGATION = 'navigation'
 
-export const SOCIALS = {
-  Homepage: 'https://kylieis.online',
-}
-
 export const TABLE_SORT_ORDER = {
   ASC: 'ascending',
   DESC: 'descending',
