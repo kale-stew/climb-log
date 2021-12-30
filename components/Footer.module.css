@@ -33,16 +33,24 @@
 }
 
 .footerLinks {
-  display: flex;
-  justify-content: space-between;
+  font-family: 'Open Sans', sans-serif;
   display: grid;
   grid-gap: 2.5em;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  font-family: 'Open Sans', sans-serif;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 2.5fr));
+  width: 40vw;
+  margin: auto;
+}
+
+@media (max-width: 2200px) {
+  .footerLinks {
+    width: 70%;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
 }
 
 @media (max-width: 1024px) {
   .footerLinks {
     padding: 0 0.75rem;
+    width: 100%;
   }
 }
