@@ -31,7 +31,7 @@ export default function TableRow({ id, title, data, metric, slug }) {
       const dateStr = new Date(data)
       return (
         <>
-          <td key={id} className={styles.hiddenOnDesktop}>
+          <td key={`${id}-short`} className={styles.hiddenOnDesktop}>
             {formatDate(dateStr, 'short')}
           </td>
           <td key={id} className={styles.hiddenInMobile}>

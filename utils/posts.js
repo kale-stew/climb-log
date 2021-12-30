@@ -1,6 +1,7 @@
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
+import { buildAreaName } from './builders'
 import { CATEGORY_TYPE } from './constants'
 import { addCommas, capitalizeEachWord } from './helpers'
 import { fetchMostRecentClimbs } from './notion'
@@ -156,7 +157,7 @@ export async function getMostRecentPosts() {
   const recentClimbs = await fetchMostRecentClimbs()
   const formClimbDescription = (climb) =>
     `A ${climb.distance} mile and ${addCommas(climb.gain)}' hike
-      in the ${capitalizeEachWord(climb.area)} of ${capitalizeEachWord(climb.state)}.`
+      in the ${buildAreaName(climb.area)} of ${capitalizeEachWord(climb.state)}.`
   const featuredClimbs = recentClimbs.map((climb) => {
     return {
       id: climb.id,

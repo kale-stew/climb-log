@@ -1,29 +1,7 @@
-.hiddenInMobile {
-  display: inside;
-}
-
-.hiddenOnDesktop {
-  display: none;
-}
-
-.titleHeader,
-.titleData {
-  width: 25vw;
-  text-align: left;
-}
-
 .areaHeader,
 .areaData {
   width: 17vw;
   text-align: left;
-}
-
-.distanceHeader {
-  width: 9vw;
-}
-
-.tablePopover {
-  z-index: 200;
 }
 
 .blanket {
@@ -37,7 +15,59 @@
   z-index: 100;
 }
 
+.distanceHeader {
+  width: 9vw;
+}
+
+.hiddenInMobile {
+  display: inside;
+}
+
+.hiddenOnDesktop {
+  display: none;
+}
+
+.searchInput {
+  margin-left: 0.75rem;
+  font-size: 14px;
+  padding: 0.2rem 0.4rem;
+  width: 35%;
+  border: 1px solid grey;
+  border-radius: 5px;
+
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.tablePopover {
+  z-index: 50;
+}
+
+.titleHeader,
+.titleData {
+  width: 25vw;
+  text-align: left;
+}
+
 @media (max-width: 1024px) {
+  .areaFilter,
+  .searchFilter {
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+  }
+
+  .areaHeader,
+  .stateHeader {
+    display: none;
+  }
+
+  .filterTitle {
+    margin: 1.5rem 0 0.75rem 0;
+  }
+
   .hiddenInMobile {
     display: none;
   }
@@ -51,8 +81,8 @@
     width: 40vw;
   }
 
-  .areaHeader,
-  .stateHeader {
-    display: none;
+  .searchInput {
+    width: 80%;
+    margin: 0;
   }
 }

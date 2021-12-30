@@ -1,15 +1,22 @@
+import getMonth from 'date-fns/getMonth'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
+  containsAreaType,
   createAreaSelects,
   createAreaTypeSelects,
   createStateSelects,
-  containsAreaType,
 } from '../utils/builders'
-import { CATEGORY_TYPE, METADATA, AREA_TYPE, TABLE_SORT_ORDER } from '../utils/constants'
+import {
+  ALL_MONTHS,
+  AREA_TYPE,
+  CATEGORY_TYPE,
+  METADATA,
+  TABLE_SORT_ORDER,
+} from '../utils/constants'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/notion'
 
@@ -28,6 +35,7 @@ const ClimbLog = ({ allClimbs }) => {
   const [blanketEnabled, setBlanketEnabled] = useState(false)
   const [rowClicked, setRowClicked] = useState(null)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const [userSearch, setUserSearch] = useState('')
 
   const router = useRouter()
   const firstUpdate = useRef(true)
@@ -127,8 +135,6 @@ const ClimbLog = ({ allClimbs }) => {
    * the dropdown item will be formatted as "colorado?state" or
    * "san juans?area", so we can filter the climbs obj with variables
    * depending on the filter type.
-   *
-   * @param {string} filter
    */
   const selectAreaFilter = (filter) => {
     event(
@@ -171,11 +177,51 @@ const ClimbLog = ({ allClimbs }) => {
         let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
         return climbAreaTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
       }
-
       return climb[filterType].trim() == selectedFilter.trim()
     })
     setFilteredClimbs(filteredData)
     sortData(filteredData, selectedFilter)
+  }
+
+  const checkMonth = (queryMonth, date) => {
+    const dateNum = getMonth(new Date(date))
+    const foundMonths = ALL_MONTHS.filter((month) => month.includes(queryMonth)).map(
+      (month) => ALL_MONTHS.indexOf(month)
+    )
+    return foundMonths.includes(dateNum)
+  }
+
+  const searchClimbLog = (e) => {
+    if (e === '') {
+      setFilteredClimbs(allClimbs)
+      sortData(allClimbs, CATEGORY_TYPE.ALL)
+      setUserSearch(e)
+      return
+    }
+    let sorted = allClimbs.filter((climb) => {
+      let { area, date, state, title } = climb
+      let searchQuery = e.toUpperCase()
+      area = area.toUpperCase()
+      state = state.toUpperCase()
+      title = title.toUpperCase()
+      return (
+        title.includes(searchQuery) ||
+        state.includes(searchQuery) ||
+        area.includes(searchQuery) ||
+        checkMonth(searchQuery, date)
+      )
+    })
+    setFilteredClimbs(sorted)
+    sortData(sorted)
+    setUserSearch(e)
+  }
+
+  const toggleBlanketEnabled = () => {
+    if (blanketEnabled) {
+      setBlanketEnabled(false)
+    } else {
+      setBlanketEnabled(true)
+    }
   }
 
   const togglePopOver = (id) => {
@@ -198,30 +244,23 @@ const ClimbLog = ({ allClimbs }) => {
     }
   }
 
-  const toggleBlanketEnabled = () => {
-    if (blanketEnabled) {
-      setBlanketEnabled(false)
-    } else {
-      setBlanketEnabled(true)
-    }
-  }
-
   return (
     <Layout>
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
       <CustomHead title={`${METADATA.SITE_NAME} | Climb Log`} />
       <Table
-        data={data}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-        metric={metric}
-        setMetric={setMetric}
         allAreas={allAreas}
         areaFilter={areaFilter}
-        setAreaFilter={selectAreaFilter}
-        rowClicked={rowClicked}
+        data={data}
         isPopoverOpen={isPopoverOpen}
+        metric={metric}
+        rowClicked={rowClicked}
+        setAreaFilter={selectAreaFilter}
+        setMetric={setMetric}
+        setSortOrder={setSortOrder}
+        setUserSearch={searchClimbLog}
+        sortOrder={sortOrder}
         togglePopOver={togglePopOver}
       />
     </Layout>
