@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Logo from './logo'
+import Logo from './Logo'
 import { FiExternalLink } from 'react-icons/fi'
 import {
   CONNECT as connectLinks,
@@ -9,7 +9,7 @@ import {
 
 import styles from './Footer.module.css'
 
-const Footer = () => {
+export default function Footer() {
   const buildExternalLink = ({ title, href }) => (
     <div className={styles.externalLink}>
       <a target="_blank" href={href}>
@@ -49,5 +49,3 @@ const Footer = () => {
     </footer>
   )
 }
-
-export default Footer
