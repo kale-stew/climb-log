@@ -9,7 +9,7 @@ import {
 
 import styles from './Footer.module.css'
 
-const Footer = ({ home }) => {
+const Footer = () => {
   const buildExternalLink = ({ title, href }) => (
     <div className={styles.externalLink}>
       <a target="_blank" href={href}>
@@ -40,12 +40,11 @@ const Footer = ({ home }) => {
           <hr className={styles.footerDivider}></hr>
           {referralLinks.map((item) => buildExternalLink(item))}
         </div>
-        {!home && (
-          <div className={styles.footerLogo}>
-            <Logo theme="dark" />
-            <small>© 2021 Kylie Stewart</small>
-          </div>
-        )}
+
+        <div className={styles.footerLogo}>
+          <Logo theme="dark" />
+          <small>© 2021 Kylie Stewart</small>
+        </div>
       </div>
     </footer>
   )

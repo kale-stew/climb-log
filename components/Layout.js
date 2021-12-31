@@ -27,7 +27,8 @@ export default function Layout({ children, home }) {
           </div>
         )}
       </div>
-      <Footer home={home} />
+
+      {!home && <Footer />}
     </>
   )
 }
