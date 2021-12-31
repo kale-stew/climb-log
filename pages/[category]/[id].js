@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import Category from '../../components/Category'
-import CustomHead from '../../components/CustomHead'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import ReactMarkdown from 'react-markdown'
-import { METADATA } from '../../utils/constants'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/posts'
+import { socialImage } from '../../utils/social-image'
 
 import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
@@ -94,7 +93,6 @@ const Post = ({ postData, postIds }) => {
 
   return (
     <Layout>
-      <CustomHead title={`${postData.title} | ${METADATA.SITE_NAME}`} />
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
         <div className={`${styles.blogSubheader} ${utilStyles.singleRow}`}>
@@ -127,10 +125,16 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const postData = await getPostData(params.category, params.id)
   const postIds = getSortedPostsData()
+  const title = postData.title
+  const description = 'by Kylie Stewart'
+
   return {
     props: {
       postData,
       postIds,
+      title,
+      description,
+      ...(await socialImage(title, description, `post-${params.id}`)),
     },
   }
 }

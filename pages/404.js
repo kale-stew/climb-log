@@ -1,16 +1,14 @@
-import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import Image from 'next/image'
 import ImageGoats from '../public/photos/404.jpeg'
 import { METADATA } from '../utils/constants'
+import { socialImage } from '../utils/social-image'
 
 import utilStyles from '../styles/utils.module.css'
 
 const NotFoundPage = () => {
   return (
     <Layout>
-      <CustomHead title={`Page Not Found | ${METADATA.SITE_NAME}`} />
-      <br />
       <h1>Well this is awkward...</h1>
       <Image src={ImageGoats} />
       <div className={utilStyles.vertical}>
@@ -19,6 +17,19 @@ const NotFoundPage = () => {
       </div>
     </Layout>
   )
+}
+
+export async function getStaticProps() {
+  const title = 'Page Not Found'
+  const description = `${METADATA.NAME}: Photographer, hiker, and web developer.`
+
+  return {
+    props: {
+      title,
+      description,
+      ...(await socialImage(title, description, '404')),
+    },
+  }
 }
 
 export default NotFoundPage

@@ -1,7 +1,8 @@
+import { FacebookOpenGraph } from '@resoc/core'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-const CustomHead = ({ title }) => {
+const CustomHead = (pageProps) => {
   const router = useRouter()
 
   return (
@@ -15,7 +16,7 @@ const CustomHead = ({ title }) => {
           dataLayer.push({
             'event': 'Pageview',
             'pagePath': 'https://www.kylies.photos${router.asPath}',
-            'pageTitle': '${title}',
+            'pageTitle': '${pageProps.title}',
             'visitorType': 'HARD CODED VISITOR'
           })
           `,
@@ -49,7 +50,23 @@ const CustomHead = ({ title }) => {
           `,
         }}
       />
-      <title>{title}</title>
+
+      <link rel="icon" href="/favicon.ico" />
+      <meta property="og:title" content={pageProps.title} />
+      <meta property="og:description" content={pageProps.description} />
+      <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
+      <meta property="og:image:width" content={FacebookOpenGraph.width} />
+      <meta property="og:image:height" content={FacebookOpenGraph.height} />
+
+      <meta
+        name="description"
+        content={
+          pageProps.description
+            ? pageProps.description
+            : 'Climbing the high peaks of Colorado.'
+        }
+      />
+      <title>{pageProps.title}</title>
     </Head>
   )
 }

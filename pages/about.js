@@ -1,16 +1,15 @@
-import CustomHead from '../components/CustomHead'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
 import { BRANDS, METADATA } from '../utils/constants'
+import { socialImage } from '../utils/social-image'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const AboutPage = () => (
   <Layout>
-    <CustomHead title={`About ${METADATA.NAME}`} />
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
       More about {METADATA.NAME}
     </h1>
@@ -74,5 +73,18 @@ const AboutPage = () => (
     </div>
   </Layout>
 )
+
+export async function getStaticProps() {
+  const title = `About ${METADATA.NAME}`
+  const description = `Photographer, hiker, and web developer.`
+
+  return {
+    props: {
+      title,
+      description,
+      ...(await socialImage(title, description, 'about')),
+    },
+  }
+}
 
 export default AboutPage

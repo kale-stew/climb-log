@@ -1,9 +1,9 @@
 import Card from '../components/Card'
-import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
 import { METADATA } from '../utils/constants'
 import { getMostRecentPosts } from '../utils/posts'
+import { socialImage } from '../utils/social-image'
 
 // Photos
 import LanderTop from '../public/photos/lander_top.png'
@@ -16,7 +16,6 @@ import utilStyles from '../styles/utils.module.css'
 
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
-    <CustomHead title={`${METADATA.SITE_NAME} | Photography, Hiking`} />
     <ResponsiveImage
       altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       desktopImg={LanderTop}
@@ -24,6 +23,7 @@ const HomePage = ({ featuredPosts }) => (
       mobileImg={MobileLanderTop}
       mobileDimensions={{ width: 1200, height: 550 }}
     />
+
     <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>
       Most Recent Posts
     </h1>
@@ -32,6 +32,7 @@ const HomePage = ({ featuredPosts }) => (
         <Card postData={post} key={post.id} />
       ))}
     </div>
+
     <ResponsiveImage
       altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       desktopImg={LanderBottom}
@@ -44,9 +45,15 @@ const HomePage = ({ featuredPosts }) => (
 
 export async function getStaticProps() {
   const featuredPosts = await getMostRecentPosts()
+  const title = METADATA.SITE_NAME
+  const description = `${METADATA.NAME} is climbing the high peaks of Colorado.`
+
   return {
     props: {
+      title,
+      description,
       featuredPosts,
+      ...(await socialImage(title, description, 'homepage')),
     },
   }
 }
