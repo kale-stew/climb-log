@@ -20,7 +20,7 @@
 }
 
 .hiddenInMobile {
-  display: inside;
+  display: inline;
 }
 
 .hiddenOnDesktop {

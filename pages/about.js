@@ -20,10 +20,10 @@ const AboutPage = () => (
         altTxt={`A photo of the author, ${METADATA.NAME}`}
         desktopImg={HeadshotFull}
         wrapperCn={styles.aboutImage}
-        desktopDimensions={{ width: '300', height: '412' }}
+        desktopDimensions={{ width: 300, height: 412 }}
         mobileImg={HeadshotMobile}
         mobileCn={`${utilStyles.roundImage} ${styles.aboutImage}`}
-        mobileDimensions={{ width: '250', height: '250' }}
+        mobileDimensions={{ width: 250, height: 250 }}
       />
 
       <div className={styles.aboutBlockText}>

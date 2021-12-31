@@ -10,6 +10,7 @@ import LanderTop from '../public/photos/lander_top.png'
 import LanderBottom from '../public/photos/lander_bottom.png'
 import MobileLanderTop from '../public/photos/Mlander_top.png'
 import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
+
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 
@@ -19,9 +20,9 @@ const HomePage = ({ featuredPosts }) => (
     <ResponsiveImage
       altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       desktopImg={LanderTop}
-      desktopDimensions={{ width: '2100', height: '824' }}
+      desktopDimensions={{ width: 2100, height: 824 }}
       mobileImg={MobileLanderTop}
-      mobileDimensions={{ width: '1200', height: '550' }}
+      mobileDimensions={{ width: 1200, height: 550 }}
     />
     <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>
       Most Recent Posts
@@ -34,9 +35,9 @@ const HomePage = ({ featuredPosts }) => (
     <ResponsiveImage
       altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
       desktopImg={LanderBottom}
-      desktopDimensions={{ width: '2100', height: '888' }}
+      desktopDimensions={{ width: 2100, height: 888 }}
       mobileImg={MobileLanderBottom}
-      mobileDimensions={{ width: '1200', height: '611' }}
+      mobileDimensions={{ width: 1200, height: 611 }}
     />
   </Layout>
 )
