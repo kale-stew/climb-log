@@ -1,0 +1,31 @@
+<div class="wrapper">
+  <div class="side">
+    <div class="side-content">
+      <h1 id="title">
+        {{ title }}
+      </h1>
+    </div>
+    <div class="footer">
+      <img class="logo" src="logo.png">
+      <h4 class="brand-name">
+        kylies.photos
+      </h4>
+    </div>
+  </div>
+  <div class="main">
+    <div class="extended-background"></div>
+    {{#mainImageUrl}}
+    <img class="main-image" src="{{mainImageUrl}}" />
+    {{/mainImageUrl}}
+    {{^mainImageUrl}}
+    <img class="main-image" src="preview.jpg" />
+    {{/mainImageUrl}}
+  </div>
+</div>
+
+<script src="textFit.js"></script>
+<script>
+  window.onload = function () {
+    textFit(document.getElementById('title'), { maxFontSize: 500, multiLine: true });
+  };
+</script>

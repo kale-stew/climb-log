@@ -1,0 +1,19 @@
+{
+  "partials": {
+    "content": "./content.html.mustache",
+    "styles": "./styles.css.mustache"
+  },
+  "parameters": [
+    {
+      "name": "title",
+      "type": "text",
+      "demoValue": "A picture is worth a thousand words"
+    },
+    {
+      "label": "Main image",
+      "name": "mainImageUrl",
+      "type": "imageUrl",
+      "demoValue": "https://live.staticflickr.com/65535/51791023814_bd142234b2_b.jpg"
+    }
+  ]
+}
