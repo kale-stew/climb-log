@@ -3,7 +3,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 42px;
   padding: 1rem 0.25rem 1.5rem 0.25rem;
 }
 
@@ -12,17 +11,17 @@
 }
 
 .landingLogoWrapper {
-  width: 110px;
+  margin-left: 1rem;
 }
 
 .landingLogoWrapper img {
-  padding: 0.5rem;
+  width: 115px;
 }
 
 .landingNavigation a {
   color: #1b1b1b;
   font-size: 1.25rem;
-  margin: 0.25em 1.5em 1.5em 0;
+  margin: 0.5em 1.5em 1.5em 0;
   text-decoration: none;
 }
 
@@ -67,14 +66,13 @@
     margin: 0;
   }
 
-  .landingLogoWrapper {
-    width: auto;
-    height: auto;
+  .landingLogoWrapper img {
+    width: 210px;
   }
 
   .landingNavigation {
     flex-direction: column;
-    margin: 0;
+    margin-top: 0.5em;
   }
 
   .landingNavigation a {

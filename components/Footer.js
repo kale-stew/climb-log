@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Logo from './logo'
 import { FiExternalLink } from 'react-icons/fi'
 import {
   CONNECT as connectLinks,
@@ -8,7 +9,7 @@ import {
 
 import styles from './Footer.module.css'
 
-const Footer = () => {
+const Footer = ({ home }) => {
   const buildExternalLink = ({ title, href }) => (
     <div className={styles.externalLink}>
       <a target="_blank" href={href}>
@@ -39,6 +40,12 @@ const Footer = () => {
           <hr className={styles.footerDivider}></hr>
           {referralLinks.map((item) => buildExternalLink(item))}
         </div>
+        {!home && (
+          <div className={styles.footerLogo}>
+            <Logo theme="dark" />
+            <small>© 2021 Kylie Stewart</small>
+          </div>
+        )}
       </div>
     </footer>
   )

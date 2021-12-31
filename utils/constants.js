@@ -59,10 +59,10 @@ export const CONNECT = [
 
 export const EXPLORE = [
   { title: 'Home', href: '/' },
-  { title: 'My Gear', href: '/gear' },
-  { title: 'About Kylie', href: '/about' },
+  // { title: 'My Gear', href: '/gear' },
   { title: 'Climb Log', href: '/climb-log' },
   { title: 'Trip Reports', href: `/blog?${CATEGORY_TYPE.HIKE}` },
+  { title: 'About Kylie', href: '/about' },
 ]
 
 export const REFERRALS = [

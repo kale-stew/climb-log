@@ -80,11 +80,10 @@ caption {
 
 footer {
   background-color: #2e2e2e;
-  padding: 1rem 2rem 3rem 2rem;
+  padding: 1.75rem 2rem 3rem 2rem;
   color: #cfcfcf;
   width: 100%;
   margin: 0;
-  border-top: 2px solid #2e2e2e;
   display: flex;
   justify-content: center;
 }
@@ -153,6 +152,10 @@ th {
   caption {
     margin-top: 1.25rem;
     line-height: 1.4;
+  }
+
+  footer {
+    padding: 1.75rem 1rem 3rem 1rem;
   }
 
   header a {

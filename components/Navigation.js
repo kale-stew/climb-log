@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import LogoImg from '../public/logo.png'
+import Logo from '../components/logo'
 
 import styles from './Navigation.module.css'
 
@@ -15,7 +14,7 @@ export const Navigation = () => (
 export const LandingHeader = () => (
   <div className={styles.landingHeader}>
     <div className={styles.landingLogoWrapper}>
-      <Image src={LogoImg} layout="intrinsic" />
+      <Logo theme="light" />
     </div>
     <div className={styles.landingNavigation}>
       <Link href="/blog">Blog</Link>
