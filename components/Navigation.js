@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { METADATA } from '../utils/constants'
+import Logo from './Logo'
 
 import styles from './Navigation.module.css'
 
@@ -13,7 +13,9 @@ export const Navigation = () => (
 
 export const LandingHeader = () => (
   <div className={styles.landingHeader}>
-    <h1>{METADATA.NAME.toUpperCase()}</h1>
+    <div className={styles.landingLogoWrapper}>
+      <Logo theme="light" />
+    </div>
     <div className={styles.landingNavigation}>
       <Link href="/blog">Blog</Link>
       <Link href="/climb-log">Climb Log</Link>

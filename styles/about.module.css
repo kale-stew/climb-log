@@ -15,17 +15,6 @@
   color: #0065b8;
 }
 
-.socialIcons {
-  display: flex;
-  margin: 0 7rem;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
-.socialIcons a {
-  color: #000000;
-}
-
 /* Adjusted so iPads get the desktop experience on this page */
 @media (max-width: 741px) {
   .aboutBlock {
@@ -50,10 +39,6 @@
   .aboutImageMobile {
     display: flex;
     justify-content: center;
-  }
-
-  .socialIcons {
-    margin: 0 5rem;
   }
 }
 

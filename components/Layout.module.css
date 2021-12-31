@@ -23,11 +23,6 @@
   .wrapper {
     margin: 0 2rem;
   }
-
-  .landingNavigation a {
-    font-size: 12px;
-    padding: none;
-  }
 }
 
 @media (max-width: 650px) {

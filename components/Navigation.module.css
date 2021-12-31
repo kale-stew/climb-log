@@ -2,20 +2,26 @@
   font-family: 'Playfair Display', serif;
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  height: 42px;
-  padding: 1px;
-  margin-bottom: 2.2rem;
+  align-items: center;
+  padding: 1rem 0.25rem 1.5rem 0.25rem;
 }
 
 .landingHeader h1 {
   margin: 0.25em 0 1.5em 1.5em;
 }
 
+.landingLogoWrapper {
+  margin-left: 1rem;
+}
+
+.landingLogoWrapper img {
+  width: 115px;
+}
+
 .landingNavigation a {
   color: #1b1b1b;
   font-size: 1.25rem;
-  margin: 0.25em 1.5em 1.5em 0;
+  margin: 0.5em 1.5em 1.5em 0;
   text-decoration: none;
 }
 
@@ -60,9 +66,13 @@
     margin: 0;
   }
 
+  .landingLogoWrapper img {
+    width: 250px;
+  }
+
   .landingNavigation {
     flex-direction: column;
-    margin: 0;
+    margin-top: 0.5em;
   }
 
   .landingNavigation a {

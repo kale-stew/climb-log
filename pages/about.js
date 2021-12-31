@@ -3,14 +3,12 @@ import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
-import { FaGithub, FaFlickr, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa'
-import { MdOutlineMail } from 'react-icons/md'
-import { BRANDS, LINKS_URL, METADATA } from '../utils/constants'
+import { BRANDS, METADATA } from '../utils/constants'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
 
-const AboutPage = ({ socialLinks }) => (
+const AboutPage = () => (
   <Layout>
     <CustomHead title={`About ${METADATA.NAME}`} />
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
@@ -22,10 +20,10 @@ const AboutPage = ({ socialLinks }) => (
         altTxt={`A photo of the author, ${METADATA.NAME}`}
         desktopImg={HeadshotFull}
         wrapperCn={styles.aboutImage}
-        desktopDimensions={{ width: '300', height: '412' }}
+        desktopDimensions={{ width: 300, height: 412 }}
         mobileImg={HeadshotMobile}
         mobileCn={`${utilStyles.roundImage} ${styles.aboutImage}`}
-        mobileDimensions={{ width: '250', height: '250' }}
+        mobileDimensions={{ width: 250, height: 250 }}
       />
 
       <div className={styles.aboutBlockText}>
@@ -46,8 +44,15 @@ const AboutPage = ({ socialLinks }) => (
           camera's features from handicap-accessible lots across the state.
         </p>
         <p>
-          To see some of Kylie's other projects, check out her{' '}
-          <a href={socialLinks.PersonalHomepage}>personal site</a>.
+          To stay up to date with Kylie's climbs, follow her{' '}
+          <a href="https://www.instagram.com/kalestews/">on Instagram</a>. If you want to
+          check out some of Kylie's other projects, check out her{' '}
+          <a href="https://kylieis.online">personal site</a>. To discuss working together,
+          send her{' '}
+          <a href="mailto:kylie@hey.com" network="email">
+            an email
+          </a>{' '}
+          .
         </p>
 
         <br />
@@ -67,39 +72,7 @@ const AboutPage = ({ socialLinks }) => (
         </p>
       </div>
     </div>
-    <br />
-    <br />
-    <div className={styles.socialIcons}>
-      <a target="_blank" href={socialLinks.PersonalEmail} network="email">
-        <MdOutlineMail />
-      </a>
-      <a target="_blank" href={socialLinks.Twitter}>
-        <FaTwitter />
-      </a>
-      <a target="_blank" href={socialLinks.Flickr}>
-        <FaFlickr />
-      </a>
-      <a target="_blank" href={socialLinks.LinkedIn}>
-        <FaLinkedinIn />
-      </a>
-      <a target="_blank" href={socialLinks.Instagram}>
-        <FaInstagram />
-      </a>
-      <a target="_blank" href={socialLinks.Github}>
-        <FaGithub />
-      </a>
-    </div>
   </Layout>
 )
-
-export async function getStaticProps() {
-  const result = await fetch(LINKS_URL)
-  const links = await result.json()
-  return {
-    props: {
-      socialLinks: links[0],
-    },
-  }
-}
 
 export default AboutPage

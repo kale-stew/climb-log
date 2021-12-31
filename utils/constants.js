@@ -45,8 +45,29 @@ export const CATEGORY_TYPE = {
   THOUGHTS: 'thoughts',
 }
 
-export const LINKS_URL =
-  'https://raw.githubusercontent.com/kale-stew/kale-stew.github.io/dev/src/data/socials.json'
+export const CONNECT = [
+  { title: 'Instagram', href: 'https://www.instagram.com/kalestews/' },
+  { title: 'AllTrails', href: 'https://www.alltrails.com/members/kylie-stewart-1' },
+  { title: 'Strava', href: 'https://www.strava.com/athletes/46336787' },
+  {
+    title: '14ers.com',
+    href: 'https://www.14ers.com/forum/memberlist.php?mode=viewprofile&u=87761',
+  },
+  { title: 'Flickr', href: 'https://flickr.com/photos/189863825@N02/' },
+  { title: 'Twitter', href: 'https://twitter.com/kyliestew' },
+]
+
+export const EXPLORE = [
+  { title: 'Home', href: '/' },
+  // { title: 'My Gear', href: '/gear' },
+  { title: 'Climb Log', href: '/climb-log' },
+  { title: 'Trip Reports', href: `/blog?${CATEGORY_TYPE.HIKE}` },
+  { title: 'About Kylie', href: '/about' },
+]
+
+export const REFERRALS = [
+  { title: 'AllTrails Pro', href: 'https://www.alltrails.com/invite/N0NW0I' },
+]
 
 export const METADATA = {
   NAME: 'Kylie Stewart',

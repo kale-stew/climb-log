@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+.externalLink a {
+  display: flex;
+  align-items: center;
+}
+
+.externalLink svg {
+  margin-left: 0.5ch;
+}
+
+.footerColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.footerColumn a {
+  color: #cfcfcf;
+  margin: 0.25rem 0;
+}
+
+.footerColumn h3 {
+  font-family: 'Playfair Display SC', serif;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0.25rem 0 0.75rem 0;
+}
+
+.footerDivider {
+  width: 100%;
+  border-top: 1px solid #cfcfcfcc;
+}
+
+.footerLinks {
+  font-family: 'Open Sans', sans-serif;
+  display: grid;
+  grid-gap: 2.5em;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  width: 70%;
+  margin: auto;
+}
+
+.footerLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 880px) {
+  .footerLinks {
+    grid-template-columns: repeat(auto-fill, minmax(135px, 2fr));
+    padding: 0 0.75rem;
+    width: 100%;
+  }
+}

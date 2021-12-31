@@ -50,7 +50,7 @@ export default function Table({
     )
   }
 
-  const sortRow = (header) => {
+  const sortColumn = (header) => {
     // User has clicked on a different header than what was previously being sorted
     if (header != sortOrder.property) {
       setSortOrder({ property: header, direction: TABLE_SORT_ORDER.DESC })
@@ -69,10 +69,10 @@ export default function Table({
     let formatted = header
     if (header === sortOrder.property) {
       if (sortOrder.direction == TABLE_SORT_ORDER.ASC) {
-        formatted = `${header} ▲`
+        formatted = `${header} ▼`
       }
       if (sortOrder.direction == TABLE_SORT_ORDER.DESC) {
-        formatted = `${header} ▼`
+        formatted = `${header} ▲`
       }
     }
     return formatted
@@ -159,13 +159,14 @@ export default function Table({
             {headers.map((header, i) => (
               <th
                 key={i}
-                className={styles[`${header}Header`]}
-                onClick={() => sortRow(header)}
+                className={`${styles[`${header}Header`]} ${utilStyles.uppercase}`}
+                onClick={() => sortColumn(header)}
               >
                 {formatHeader(header)}
               </th>
             ))}
           </tr>
+
           {data.length == 0
             ? 'No Data Found'
             : data.map((climb, i) => (
