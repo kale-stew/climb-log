@@ -35,7 +35,7 @@ const CustomPopover = ({ climb, metric }) => {
       className={
         climb.previewImgUrl
           ? `${styles.popoverContent} ${styles.contentWithImg}`
-          : `${styles.popoverContent}`
+          : styles.popoverContent
       }
     >
       <header>

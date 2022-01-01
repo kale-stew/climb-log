@@ -33,10 +33,13 @@
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   color: #020202;
+  padding: 0;
 }
 
 .blogPostHeading:hover {
   text-decoration: underline;
+  box-shadow: none;
+  color: #020202;
 }
 
 .blogSection {

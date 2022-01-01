@@ -15,7 +15,7 @@ export default function Layout({ children, home }) {
 
   return (
     <>
-      <div className={!home ? `${styles.wrapper}` : `${styles.landingPage}`}>
+      <div className={!home ? styles.wrapper : styles.landingPage}>
         {home ? <LandingNavigation /> : <Navigation />}
         <main>{!loading ? children : <Loading />}</main>
 
