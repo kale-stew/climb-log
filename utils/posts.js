@@ -6,40 +6,35 @@ import { CATEGORY_TYPE, PREVIEW_IMAGES } from './constants'
 import { addCommas, capitalizeEachWord } from './helpers'
 import { fetchMostRecentClimbs } from './notion'
 
-export const gearDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`)
-export const hikeDirectory = path.join(process.cwd(), `blog/${CATEGORY_TYPE.HIKE}`)
-export const thoughtsDirectory = path.join(
-  process.cwd(),
-  `blog/${CATEGORY_TYPE.THOUGHTS}`
-)
-const postsDirectory = path.join(process.cwd(), 'blog')
+const ALL_DIRECTORIES = {
+  gearDir: path.join(process.cwd(), `blog/${CATEGORY_TYPE.GEAR}`),
+  hikeDir: path.join(process.cwd(), `blog/${CATEGORY_TYPE.HIKE}`),
+  thoughtsDir: path.join(process.cwd(), `blog/${CATEGORY_TYPE.THOUGHTS}`),
+  allPosts: path.join(process.cwd(), 'blog'),
+}
 
-// Get all the post IDs
+// Get all post IDs
 export function getAllPostIds() {
-  // Get file names under each categories directory
-  const gearFileNames = fs.readdirSync(gearDirectory)
-  const thoughtsFileNames = fs.readdirSync(thoughtsDirectory)
-  const tripReportsFileNames = fs.readdirSync(hikeDirectory)
+  const gearFileNames = fs.readdirSync(ALL_DIRECTORIES.gearDir)
+  const thoughtsFileNames = fs.readdirSync(ALL_DIRECTORIES.thoughtsDir)
+  const tripReportsFileNames = fs.readdirSync(ALL_DIRECTORIES.hikeDir)
 
-  // Holds all [category] names
   let categoryNames = []
 
-  // Loop through each xxxFileNames array.
-  // Add relevant category name to categoryNames array
-  gearFileNames.forEach(function (gearFileName) {
+  gearFileNames.forEach(function () {
     categoryNames.push(CATEGORY_TYPE.GEAR)
   })
-  thoughtsFileNames.forEach(function (thoughtsFileName) {
+  thoughtsFileNames.forEach(function () {
     categoryNames.push(CATEGORY_TYPE.THOUGHTS)
   })
-  tripReportsFileNames.forEach(function (tripReportsFileName) {
+  tripReportsFileNames.forEach(function () {
     categoryNames.push(CATEGORY_TYPE.HIKE)
   })
 
-  // Concatenate each articles name in one array (id)
+  // Add every article name (id) to an arr
   const fileNames = gearFileNames.concat(thoughtsFileNames).concat(tripReportsFileNames)
 
-  // Combine categoryNames & fileNames arrays
+  // Combine categoryNames & fileNames arrs
   const postParams = categoryNames.map(function (e, i) {
     return { categoryName: e, id: fileNames[i] }
   })
@@ -57,7 +52,7 @@ export function getAllPostIds() {
 
 // Get data for a single post
 export async function getPostData(category, id) {
-  const fullPath = path.join(postsDirectory, `${category}`, `${id}.md`)
+  const fullPath = path.join(ALL_DIRECTORIES.allPosts, `${category}`, `${id}.md`)
   const fileContents = fs.readFileSync(fullPath, 'utf8')
 
   const { data, content } = matter(fileContents)
@@ -66,8 +61,8 @@ export async function getPostData(category, id) {
     id,
     content,
     category,
-    mainImageUrl: data.mainImageUrl
-      ? data.mainImageUrl
+    previewImgUrl: data.previewImgUrl
+      ? data.previewImgUrl
       : PREVIEW_IMAGES.BLOG_FALLBACK_IMAGE,
     ...data,
   }
@@ -75,13 +70,13 @@ export async function getPostData(category, id) {
 
 // Get all post data, in chronological order
 export function getSortedPostsData() {
-  const gearFileNames = fs.readdirSync(gearDirectory)
-  const thoughtsFileNames = fs.readdirSync(thoughtsDirectory)
-  const tripReportsFileNames = fs.readdirSync(hikeDirectory)
+  const gearFileNames = fs.readdirSync(ALL_DIRECTORIES.gearDir)
+  const thoughtsFileNames = fs.readdirSync(ALL_DIRECTORIES.thoughtsDir)
+  const tripReportsFileNames = fs.readdirSync(ALL_DIRECTORIES.hikeDir)
 
   const gearFilesData = gearFileNames.map((fileName) => {
     const id = fileName.replace(/\.md$/, '')
-    const fullPath = path.join(gearDirectory, fileName)
+    const fullPath = path.join(ALL_DIRECTORIES.gearDir, fileName)
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
     const { data, content } = matter(fileContents)
@@ -98,7 +93,7 @@ export function getSortedPostsData() {
 
   const thoughtsFilesData = thoughtsFileNames.map((fileName) => {
     const id = fileName.replace(/\.md$/, '')
-    const fullPath = path.join(thoughtsDirectory, fileName)
+    const fullPath = path.join(ALL_DIRECTORIES.thoughtsDir, fileName)
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
     const { data, content } = matter(fileContents)
@@ -115,7 +110,7 @@ export function getSortedPostsData() {
 
   const tripReportsFilesData = tripReportsFileNames.map((fileName) => {
     const id = fileName.replace(/\.md$/, '')
-    const fullPath = path.join(hikeDirectory, fileName)
+    const fullPath = path.join(ALL_DIRECTORIES.hikeDir, fileName)
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
     const { data, content } = matter(fileContents)

@@ -23,7 +23,7 @@ export default function Table({
   togglePopOver,
 }) {
   // Notion data vals we -don't- want in the Table
-  const alwaysExclude = ['href', 'strava', 'id', 'imgUrl', 'slug']
+  const alwaysExclude = ['href', 'id', 'previewImgUrl', 'slug', 'strava']
 
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
   const headers =

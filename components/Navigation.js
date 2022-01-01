@@ -11,7 +11,7 @@ export const Navigation = () => (
   </header>
 )
 
-export const LandingHeader = () => (
+export const LandingNavigation = () => (
   <div className={styles.landingHeader}>
     <div className={styles.landingLogoWrapper}>
       <Logo theme="light" />

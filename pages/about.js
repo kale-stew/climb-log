@@ -88,7 +88,7 @@ export async function getStaticProps() {
       ...(await socialImage({
         title,
         description,
-        mainImageUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
+        previewImgUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
         baseName,
       })),
     },

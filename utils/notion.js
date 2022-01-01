@@ -1,6 +1,7 @@
 import { Client, LogLevel } from '@notionhq/client'
 import { getLocationData } from './helpers'
 import { getSortedPostsData } from './posts'
+
 /**
  * Initialize Notion client & configure a default db query
  */
@@ -10,10 +11,7 @@ const notion = new Client({
 })
 
 /**
- * Builds our database config for us
- * @param {String} cursor
- * @param {Number} pageSize
- * @returns
+ * Builds our database config
  */
 const getDatabaseQueryConfig = (cursor = null, pageSize = null) => {
   let today = new Date().toISOString()
@@ -37,14 +35,15 @@ const getDatabaseQueryConfig = (cursor = null, pageSize = null) => {
 }
 
 /**
- * Massage data returned from the Notion API
- * into a Table-friendly object
+ * Massage data returned from the Notion API into a Table-friendly object
  */
 const fmt = (field) => {
   if (field !== null) {
     switch (field.type) {
       case 'date':
         return field?.date?.start
+      case 'file':
+        return field?.file?.url
       case 'number':
         return field?.number
       case 'rich_text':
@@ -53,8 +52,6 @@ const fmt = (field) => {
         return field?.title[0]?.plain_text
       case 'url':
         return field?.url
-      case 'file':
-        return field?.file?.url
     }
   } else return null
 }
@@ -69,9 +66,7 @@ const findMatchingSlug = (str) => {
 }
 
 /**
- * Formats an array of climbs from a notion.database.query response, should be the response.results
- * @param {Array} response
- * @returns {Array}
+ * Formats an array of climbs returned from the Notion query
  */
 const formatClimbs = (response) => {
   return response.map((result) => {
@@ -79,26 +74,27 @@ const formatClimbs = (response) => {
       id,
       properties: { area, date, distance, gain, hike_title, strava, related_slug },
     } = result
+
     const slug = findMatchingSlug(fmt(related_slug))
-    const returnObj = {
+    const finalObj = {
       id,
       date: fmt(date),
       title: fmt(hike_title),
       slug: slug ? slug : null,
-      imgUrl: fmt(result.cover),
+      previewImgUrl: fmt(result.cover),
       distance: fmt(distance),
       gain: fmt(gain),
       area: getLocationData(fmt(area)).area,
       state: getLocationData(fmt(area)).state,
       strava: fmt(strava),
     }
-    return returnObj
+    return finalObj
   }, [])
 }
 
 /**
- *
- * @returns {Array} with the 3 most recent climbs
+ * Fetch an array of the 3 most recent climbs logged to be
+ * featured on the home page
  */
 export const fetchMostRecentClimbs = async () => {
   const config = getDatabaseQueryConfig(null, 3)
@@ -109,25 +105,22 @@ export const fetchMostRecentClimbs = async () => {
 
 /**
  * Fetch list of climbs from Notion db
- * @returns {Array}
  */
 export const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
   let responseArray = [...response.results]
+
   while (response.has_more) {
+    // response.has_more tells us if the database has more pages
+    // response.next_cursor contains the next page of results,
+    //    can be passed as the start_cursor param to the same endpoint
     const config = getDatabaseQueryConfig(response.next_cursor)
     config.sorts = [{ property: 'date', direction: 'descending' }]
     response = await notion.databases.query(config)
     responseArray = [...responseArray, ...response.results]
   }
-  //response.has_more // <-- This will tell us if the database has more pages
-  //response.next_cursor // <-- This is the next page of results, can be passed as the start_cursor parameter to the same endpoint
+
   return formatClimbs(responseArray)
 }
-
-/**
- * Filter by an input str (Search functionality)
- */
-export const fetchClimbsBySearchQuery = async (/* str */) => {}
