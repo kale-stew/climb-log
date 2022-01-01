@@ -6,6 +6,8 @@ import { socialImage } from '../utils/social-image'
 
 import utilStyles from '../styles/utils.module.css'
 
+const baseName = '404'
+
 const NotFoundPage = () => {
   return (
     <Layout>
@@ -27,11 +29,12 @@ export async function getStaticProps() {
     props: {
       title,
       description,
+      baseName,
       ...(await socialImage({
         title,
         description,
         mainImageUrl: PREVIEW_IMAGES.NOT_FOUND_IMAGE,
-        baseName: '404',
+        baseName,
       })),
     },
   }

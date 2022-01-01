@@ -5,6 +5,9 @@ import { METADATA } from '../utils/constants'
 
 const CustomHead = (pageProps) => {
   const router = useRouter()
+  const routeToPage = `https://${METADATA.SITE_NAME}/${
+    pageProps.baseName !== 'home' ? pageProps.baseName : ''
+  }`
 
   return (
     <Head>
@@ -52,12 +55,20 @@ const CustomHead = (pageProps) => {
         }}
       />
 
-      <meta property="og:title" content={pageProps.title} />
-      <meta property="og:description" content={pageProps.description} />
-      <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
-      <meta property="og:image:width" content={FacebookOpenGraph.width} />
-      <meta property="og:image:height" content={FacebookOpenGraph.height} />
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:site" content="@kyliestew" />
+      <meta name="twitter:title" content={pageProps.title} />
+      <meta name="twitter:description" content={pageProps.description} />
+      <meta name="twitter:image" content="/logo.png" />
 
+      <meta
+        property="og:description"
+        content={
+          pageProps.description
+            ? pageProps.description
+            : `${METADATA.NAME} is climbing the high peaks of Colorado.`
+        }
+      />
       <meta
         name="description"
         content={
@@ -66,6 +77,12 @@ const CustomHead = (pageProps) => {
             : `${METADATA.NAME} is climbing the high peaks of Colorado.`
         }
       />
+      <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
+      <meta property="og:image:width" content={FacebookOpenGraph.width} />
+      <meta property="og:image:height" content={FacebookOpenGraph.height} />
+      <meta property="og:url" content={routeToPage} />
+
+      <meta property="og:title" content={pageProps.title} />
       <title>{`${pageProps.title} · ${METADATA.SITE_NAME}`}</title>
     </Head>
   )

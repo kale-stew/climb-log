@@ -134,6 +134,7 @@ export async function getStaticProps({ params }) {
       postIds,
       title,
       description,
+      baseName: `${params.category}/${params.id}`,
       ...(await socialImage({
         title,
         description,

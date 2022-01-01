@@ -8,6 +8,8 @@ import { socialImage } from '../utils/social-image'
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
 
+const baseName = 'about'
+
 const AboutPage = () => (
   <Layout>
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
@@ -81,12 +83,13 @@ export async function getStaticProps() {
   return {
     props: {
       title,
+      baseName,
       description,
       ...(await socialImage({
         title,
         description,
         mainImageUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
-        baseName: 'about',
+        baseName,
       })),
     },
   }

@@ -12,6 +12,8 @@ import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
 
+export const baseName = 'blog'
+
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
   const router = useRouter()
@@ -93,9 +95,10 @@ export async function getStaticProps() {
   return {
     props: {
       allPostsData,
+      baseName,
       description,
       title,
-      ...(await socialImage({ title, description, baseName: 'blog' })),
+      ...(await socialImage({ title, description, baseName })),
     },
   }
 }

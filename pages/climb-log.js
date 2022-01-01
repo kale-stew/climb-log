@@ -23,6 +23,8 @@ import { socialImage } from '../utils/social-image'
 
 import tableStyles from '../components/Table.module.css'
 
+const baseName = 'climb-log'
+
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
   const [data, setData] = useState(allClimbs)
@@ -276,12 +278,13 @@ export async function getStaticProps() {
     props: {
       allClimbs: response,
       title,
+      baseName,
       description,
       ...(await socialImage({
         title,
         description,
         mainImageUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
-        baseName: 'climb-log',
+        baseName,
       })),
     },
   }

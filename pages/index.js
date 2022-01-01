@@ -14,6 +14,8 @@ import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 
+const baseName = 'home'
+
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
     <ResponsiveImage
@@ -50,10 +52,11 @@ export async function getStaticProps() {
 
   return {
     props: {
-      title,
+      baseName,
       description,
       featuredPosts,
-      ...(await socialImage({ title, description, baseName: 'home' })),
+      title,
+      ...(await socialImage({ title, description, baseName })),
     },
   }
 }
