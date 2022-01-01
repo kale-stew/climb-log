@@ -41,6 +41,11 @@
   margin: auto;
 }
 
+.footerLinks a:hover {
+  box-shadow: none;
+  text-decoration: underline;
+}
+
 .footerLogo {
   display: flex;
   flex-direction: column;

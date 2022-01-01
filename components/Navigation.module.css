@@ -22,15 +22,21 @@
   color: #1b1b1b;
   font-size: 1.25rem;
   margin: 0.5em 1.5em 1.5em 0;
-  text-decoration: none;
+  padding: 0;
 }
 
 .landingNavigation a:hover {
   text-decoration: underline;
+  box-shadow: none;
 }
 
 .navigation a {
   color: #1b1b1b;
+}
+
+.navigation a:hover {
+  text-decoration: underline;
+  box-shadow: none;
 }
 
 .navigation {

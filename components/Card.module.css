@@ -2,9 +2,8 @@
   display: inline-block;
   min-width: 330px;
   border: 0.25px solid #eee;
-  border-left: none;
   border-radius: 35px 35px 20px 20px;
-  box-shadow: 5px 6px 10px #dddddd;
+  box-shadow: 5px 6px 10px #dddd;
   transition: transform 0.5s;
 }
 
@@ -14,6 +13,12 @@
 
 .cardTitle a {
   color: #1d1d1d;
+  padding: 0;
+}
+
+.cardTitle a:hover {
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 .cardText {
@@ -32,5 +37,9 @@
 @media (max-width: 1024px) {
   .card {
     max-width: 75vw;
+  }
+
+  .cardText {
+    padding: 1vw 3vw;
   }
 }
