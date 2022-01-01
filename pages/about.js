@@ -13,12 +13,12 @@ const baseName = 'about'
 const AboutPage = () => (
   <Layout>
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
-      More about {METADATA.NAME}
+      About {METADATA.FIRST_NAME}
     </h1>
     <br />
     <div className={styles.aboutBlock}>
       <ResponsiveImage
-        altTxt={`A photo of the author, ${METADATA.NAME}`}
+        altTxt={`A photo of the author, ${METADATA.FULL_NAME}`}
         desktopImg={HeadshotFull}
         wrapperCn={styles.aboutImage}
         desktopDimensions={{ width: 300, height: 412 }}
@@ -29,7 +29,7 @@ const AboutPage = () => (
 
       <div className={styles.aboutBlockText}>
         <p>
-          {METADATA.NAME} is a web developer, avid hiker, amateur mountaineer and
+          {METADATA.FULL_NAME} is a web developer, avid hiker, amateur mountaineer and
           photo-taker. She spends her time hiking Colorado's high peaks and researching
           its terrain when she's not working from home alongside her fiancé or walking
           their dog, Otis, around the local alpine lake.
@@ -47,7 +47,7 @@ const AboutPage = () => (
         <p>
           To stay up to date with Kylie's climbs, follow her{' '}
           <a href="https://www.instagram.com/kalestews/">on Instagram</a>. If you want to
-          check out some of Kylie's other projects, check out her{' '}
+          check out some of Kylie's other projects, visit her{' '}
           <a href="https://kylieis.online">personal site</a>. To discuss working together,
           send her{' '}
           <a href="mailto:kylie@hey.com" network="email">
@@ -77,7 +77,7 @@ const AboutPage = () => (
 )
 
 export async function getStaticProps() {
-  const title = `About ${METADATA.NAME}`
+  const title = `About ${METADATA.FULL_NAME}`
   const description = 'Photographer, hiker, and web developer.'
 
   return {

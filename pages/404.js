@@ -23,7 +23,7 @@ const NotFoundPage = () => {
 
 export async function getStaticProps() {
   const title = 'Page Not Found'
-  const description = `${METADATA.NAME}: Photographer, hiker, and web developer.`
+  const description = `${METADATA.FULL_NAME}: Photographer, hiker, and web developer.`
 
   return {
     props: {

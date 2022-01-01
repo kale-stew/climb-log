@@ -45,8 +45,8 @@ const HomePage = ({ featuredPosts }) => (
 
 export async function getStaticProps() {
   const featuredPosts = await getRecentPosts()
-  const title = `Colorado Hiking & Photography`
-  const description = `${METADATA.NAME} is climbing the high peaks of Colorado.`
+  const title = `${METADATA.FIRST_NAME}'s Climbing Log and Hiking Blog`
+  const description = `${METADATA.FULL_NAME}'s photography, climbing log, and hiking blog.`
 
   return {
     props: {
