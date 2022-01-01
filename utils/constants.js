@@ -1,9 +1,3 @@
-export const PREVIEW_IMAGES = {
-  ABOUT_IMAGE: 'https://live.staticflickr.com/65535/51791518735_55a15b6aca_k.jpg',
-  CLIMB_LOG_IMAGE: 'https://live.staticflickr.com/65535/51789832732_041ee645fa_k.jpg',
-  BLOG_FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51716926587_ba8bbedd69_b.jpg',
-}
-
 export const ALL_MONTHS = [
   'JANUARY',
   'FEBRUARY',
@@ -71,17 +65,21 @@ export const EXPLORE = [
   { title: 'About Kylie', href: '/about' },
 ]
 
-export const BLOG_FALLBACK_IMAGE =
-  'https://live.staticflickr.com/65535/51716926587_ba8bbedd69_b.jpg'
-
-export const REFERRALS = [
-  { title: 'AllTrails Pro', href: 'https://www.alltrails.com/invite/N0NW0I' },
-]
-
 export const METADATA = {
   NAME: 'Kylie Stewart',
   SITE_NAME: 'kylies.photos',
 }
+
+export const PREVIEW_IMAGES = {
+  ABOUT_IMAGE: 'https://live.staticflickr.com/65535/51791518735_55a15b6aca_k.jpg',
+  BLOG_FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51716926587_ba8bbedd69_b.jpg',
+  CLIMB_LOG_IMAGE: 'https://live.staticflickr.com/65535/51789832732_041ee645fa_k.jpg',
+  NOT_FOUND_IMAGE: 'https://live.staticflickr.com/65535/51789853637_0e1329495c_b.jpg',
+}
+
+export const REFERRALS = [
+  { title: 'AllTrails Pro', href: 'https://www.alltrails.com/invite/N0NW0I' },
+]
 
 export const ROLE_NAVIGATION = 'navigation'
 

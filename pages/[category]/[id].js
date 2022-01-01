@@ -128,8 +128,6 @@ export async function getStaticProps({ params }) {
   const title = postData.title
   const description = 'by Kylie Stewart'
 
-  console.log(postData)
-
   return {
     props: {
       postData,
