@@ -11,7 +11,7 @@ import styles from './Footer.module.css'
 
 export default function Footer() {
   const buildExternalLink = ({ title, href }) => (
-    <div className={styles.externalLink}>
+    <div className={styles.externalLink} key={`url-${title}`}>
       <a target="_blank" href={href}>
         {title} <FiExternalLink />
       </a>
@@ -25,7 +25,9 @@ export default function Footer() {
           <h3>Explore</h3>
           <hr className={styles.footerDivider}></hr>
           {exploreLinks.map((item) => (
-            <Link href={item.href}>{item.title}</Link>
+            <Link href={item.href} key={`url-${item.title}`}>
+              {item.title}
+            </Link>
           ))}
         </div>
 

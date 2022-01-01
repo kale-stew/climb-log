@@ -1,7 +1,6 @@
 import getMonth from 'date-fns/getMonth'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
-import CustomHead from '../components/CustomHead'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
@@ -15,10 +14,12 @@ import {
   AREA_TYPE,
   CATEGORY_TYPE,
   METADATA,
+  PREVIEW_IMAGES,
   TABLE_SORT_ORDER,
 } from '../utils/constants'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/notion'
+import { socialImage } from '../utils/social-image'
 
 import tableStyles from '../components/Table.module.css'
 
@@ -248,7 +249,6 @@ const ClimbLog = ({ allClimbs }) => {
     <Layout>
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
-      <CustomHead title={`${METADATA.SITE_NAME} | Climb Log`} />
       <Table
         allAreas={allAreas}
         areaFilter={areaFilter}
@@ -269,10 +269,20 @@ const ClimbLog = ({ allClimbs }) => {
 
 export async function getStaticProps() {
   const response = await fetchAllClimbs()
+  const title = `${METADATA.NAME}'s Climb Log`
+  const description = `All of ${METADATA.NAME}'s trip reports and hiking stats.`
 
   return {
     props: {
       allClimbs: response,
+      title,
+      description,
+      ...(await socialImage({
+        title,
+        description,
+        mainImageUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
+        baseName: 'climb-log',
+      })),
     },
   }
 }

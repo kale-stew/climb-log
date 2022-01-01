@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 import Category from '../components/Category'
-import CustomHead from '../components/CustomHead'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
+import Link from 'next/link'
 import { CATEGORY_TYPE, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/posts'
+import { socialImage } from '../utils/social-image'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
@@ -49,7 +49,6 @@ export default function BlogLandingPage({ allPostsData }) {
 
   return (
     <Layout>
-      <CustomHead title={`${METADATA.SITE_NAME} | Hiking Blog`} />
       <h1 className={utilStyles.headingXl}>Blog</h1>
 
       <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
@@ -70,7 +69,7 @@ export default function BlogLandingPage({ allPostsData }) {
               }}
             >
               <Link href="/[category]/[id]" as={`/${category}/${id}`}>
-                <a className={`${styles.blogPostHeading}`}>{title}</a>
+                <a className={styles.blogPostHeading}>{title}</a>
               </Link>
               <br />
               <small className={`${utilStyles.lightText} ${styles.blogItemCategory}`}>
@@ -88,9 +87,15 @@ export default function BlogLandingPage({ allPostsData }) {
 
 export async function getStaticProps() {
   const allPostsData = getSortedPostsData()
+  const title = `${METADATA.NAME}'s Hiking Blog`
+  const description = 'Thoughts, trip reports, and gear posts.'
+
   return {
     props: {
       allPostsData,
+      description,
+      title,
+      ...(await socialImage({ title, description, baseName: 'blog' })),
     },
   }
 }

@@ -24,6 +24,8 @@
     "styled-components": "^5.3.1"
   },
   "devDependencies": {
+    "@resoc/core": "^0.9.1",
+    "@resoc/create-img": "^0.9.1",
     "prettier": "^2.3.2"
   },
   "browserslist": {

@@ -1,16 +1,15 @@
-import CustomHead from '../components/CustomHead'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
-import { BRANDS, METADATA } from '../utils/constants'
+import { BRANDS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { socialImage } from '../utils/social-image'
 
 import styles from '../styles/about.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const AboutPage = () => (
   <Layout>
-    <CustomHead title={`About ${METADATA.NAME}`} />
     <h1 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>
       More about {METADATA.NAME}
     </h1>
@@ -57,11 +56,11 @@ const AboutPage = () => (
 
         <br />
         <h2>Brands</h2>
-        <p>
+        <div>
           Kylie is an ambassador for...
           <ul>
             {BRANDS.map((brand) => (
-              <li>
+              <li key={brand.name}>
                 <a className={styles.brandLink} href={brand.href}>
                   {brand.name}
                 </a>
@@ -69,10 +68,28 @@ const AboutPage = () => (
               </li>
             ))}
           </ul>
-        </p>
+        </div>
       </div>
     </div>
   </Layout>
 )
+
+export async function getStaticProps() {
+  const title = `About ${METADATA.NAME}`
+  const description = 'Photographer, hiker, and web developer.'
+
+  return {
+    props: {
+      title,
+      description,
+      ...(await socialImage({
+        title,
+        description,
+        mainImageUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
+        baseName: 'about',
+      })),
+    },
+  }
+}
 
 export default AboutPage
