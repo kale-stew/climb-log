@@ -1,10 +1,32 @@
 .card {
   display: inline-block;
   min-width: 330px;
+  border: 0.25px solid #eee;
+  border-left: none;
+  border-radius: 35px 35px 20px 20px;
+  box-shadow: 5px 6px 10px #dddddd;
+  transition: transform 0.5s;
 }
 
-.cardHeader a {
+.card:hover {
+  transform: scale(1.05);
+}
+
+.cardTitle a {
   color: #1d1d1d;
+}
+
+.cardText {
+  padding: 1vw;
+}
+
+.headerImg {
+  min-width: 330px;
+  height: 155px;
+  object-fit: cover;
+  overflow: hidden;
+  object-position: center top;
+  border-radius: 35px 35px 0 0;
 }
 
 @media (max-width: 1024px) {

@@ -1,7 +1,7 @@
 ---
 title: 'Summiting My Winter White Whale'
 date: '2021-12-03'
-previewImgUrl: 'https://live.staticflickr.com/65535/51732590893_34f1d33708_k.jpg'
+previewImgUrl: 'https://live.staticflickr.com/65535/51790214482_31c994dd38_b.jpg'
 ---
 
 In the fall of 2020, The Year of the Pandemic, I was let go from my role as a software engineer. With a sudden onslaught of free time and raging burnout, I made the choice to start pursuing high peaks in the winter. December was rough as I got familiar with my snowshoes and the brutal conditions that winter summits demanded. I bought my first pair of ski goggles and my second pair of microspikes. I started to research routes and reach out to folks I knew were down for the sufferfest (I primarily found myself partnered up with experienced backcountry skiers or hikers with at least one season of seeking out snowflake peaks under their belt). And thus began my winter mountaineering career.
@@ -58,6 +58,6 @@ _Photo of my summit sign on top of Humboldt Peak, Crestone Peak & Needle in the 
 
 The east ridge route up to Humboldt Peak is funny because you don't see the Crestones until you're on the summit proper. You do, however, get beautiful views once you start to gain the slopes around treeline, see all kinds of wildlife, and the neighboring Centennials show off for you most of the way up. But when you're standing on the summit block, the Crestones are the sight that make this whole day worth it. And you can only see those two from the 14,064' summit.
 
-![humboldt-summit](https://live.staticflickr.com/65535/51732341796_bb50b9b797_k.jpg)
+![humboldt-summit](https://live.staticflickr.com/65535/51790214482_31c994dd38_b.jpg)
 
 _A wider view of the Crestones from the summit of Humboldt Peak._

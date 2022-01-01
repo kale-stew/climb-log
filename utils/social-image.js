@@ -11,8 +11,7 @@ async function socialImage({ title, description, baseName, previewImgUrl }) {
       previewImgUrl,
     },
     FacebookOpenGraph,
-    `public/open-graph/${baseName}-{{ hash }}.jpg`,
-    { cache: true }
+    `public/open-graph/${baseName}.jpg`
   )
 
   return {

@@ -140,7 +140,7 @@ export function getSortedPostsData() {
 
 // Create an array of five most recent objects to present
 // on the landing page (2 blog posts + 3 climbs)
-export async function getMostRecentPosts() {
+export async function getRecentPosts() {
   const recentBlogs = getSortedPostsData().splice(0, 3)
   const featuredBlogs = recentBlogs.map((post) => {
     return {
@@ -149,6 +149,7 @@ export async function getMostRecentPosts() {
       title: post.title,
       href: `/${post.category}/${post.id}`,
       description: `${post.preview.substring(0, 150)}...`,
+      previewImgUrl: post.previewImgUrl ? post.previewImgUrl : null,
     }
   })
 
@@ -163,6 +164,7 @@ export async function getMostRecentPosts() {
       title: climb.title,
       href: climb.slug ? `/hike/${climb.slug}` : `/climb-log?${climb.id}`,
       description: formClimbDescription(climb),
+      previewImgUrl: climb.previewImgUrl ? climb.previewImgUrl : null,
     }
   })
 
