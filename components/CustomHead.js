@@ -59,7 +59,10 @@ const CustomHead = (pageProps) => {
       <meta name="twitter:site" content="@kyliestew" />
       <meta name="twitter:title" content={pageProps.title} />
       <meta name="twitter:description" content={pageProps.description} />
-      <meta property="twitter:image" content={`/open-graph/${pageProps.ogImage}`} />
+      <meta
+        property="twitter:image"
+        content={`https://raw.githubusercontent.com/kale-stew/climb-log/main/public/open-graph/${pageProps.ogImage}`}
+      />
 
       <meta
         property="og:description"
