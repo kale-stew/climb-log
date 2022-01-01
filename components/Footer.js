@@ -45,7 +45,7 @@ export default function Footer() {
 
         <div className={styles.footerLogo}>
           <Logo theme="dark" />
-          <small>© 2021 Kylie Stewart</small>
+          <small>© 2022 Kylie Stewart</small>
         </div>
       </div>
     </footer>
