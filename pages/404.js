@@ -30,8 +30,8 @@ export async function getStaticProps() {
       ...(await socialImage({
         title,
         description,
+        mainImageUrl: '/public/photos/404.jpeg',
         baseName: '404',
-        mainImageUrl: ImageGoats,
       })),
     },
   }
