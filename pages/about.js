@@ -2,7 +2,7 @@ import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
-import { BRANDS, METADATA } from '../utils/constants'
+import { BRANDS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { socialImage } from '../utils/social-image'
 
 import styles from '../styles/about.module.css'
@@ -56,11 +56,11 @@ const AboutPage = () => (
 
         <br />
         <h2>Brands</h2>
-        <p>
+        <div>
           Kylie is an ambassador for...
           <ul>
             {BRANDS.map((brand) => (
-              <li>
+              <li key={brand.name}>
                 <a className={styles.brandLink} href={brand.href}>
                   {brand.name}
                 </a>
@@ -68,7 +68,7 @@ const AboutPage = () => (
               </li>
             ))}
           </ul>
-        </p>
+        </div>
       </div>
     </div>
   </Layout>
@@ -76,13 +76,18 @@ const AboutPage = () => (
 
 export async function getStaticProps() {
   const title = `About ${METADATA.NAME}`
-  const description = `Photographer, hiker, and web developer.`
+  const description = 'Photographer, hiker, and web developer.'
 
   return {
     props: {
       title,
       description,
-      ...(await socialImage(title, description, 'about')),
+      ...(await socialImage({
+        title,
+        description,
+        mainImageUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
+        baseName: 'about',
+      })),
     },
   }
 }

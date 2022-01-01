@@ -2,7 +2,7 @@ import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
 import { buildAreaName } from './builders'
-import { CATEGORY_TYPE } from './constants'
+import { CATEGORY_TYPE, PREVIEW_IMAGES } from './constants'
 import { addCommas, capitalizeEachWord } from './helpers'
 import { fetchMostRecentClimbs } from './notion'
 
@@ -66,6 +66,9 @@ export async function getPostData(category, id) {
     id,
     content,
     category,
+    mainImageUrl: data.mainImageUrl
+      ? data.mainImageUrl
+      : PREVIEW_IMAGES.BLOG_FALLBACK_IMAGE,
     ...data,
   }
 }

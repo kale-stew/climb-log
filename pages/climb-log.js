@@ -14,6 +14,7 @@ import {
   AREA_TYPE,
   CATEGORY_TYPE,
   METADATA,
+  PREVIEW_IMAGES,
   TABLE_SORT_ORDER,
 } from '../utils/constants'
 import { event } from '../utils/gtag'
@@ -276,7 +277,12 @@ export async function getStaticProps() {
       allClimbs: response,
       title,
       description,
-      ...(await socialImage(title, description, 'climb-log')),
+      ...(await socialImage({
+        title,
+        description,
+        mainImageUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
+        baseName: 'climb-log',
+      })),
     },
   }
 }

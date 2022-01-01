@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 import Category from '../components/Category'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
+import Link from 'next/link'
 import { CATEGORY_TYPE, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/posts'
 import { socialImage } from '../utils/social-image'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
@@ -69,7 +69,7 @@ export default function BlogLandingPage({ allPostsData }) {
               }}
             >
               <Link href="/[category]/[id]" as={`/${category}/${id}`}>
-                <a className={`${styles.blogPostHeading}`}>{title}</a>
+                <a className={styles.blogPostHeading}>{title}</a>
               </Link>
               <br />
               <small className={`${utilStyles.lightText} ${styles.blogItemCategory}`}>
@@ -93,9 +93,9 @@ export async function getStaticProps() {
   return {
     props: {
       allPostsData,
-      title,
       description,
-      ...(await socialImage(title, description, 'blog')),
+      title,
+      ...(await socialImage({ title, description, baseName: 'blog' })),
     },
   }
 }

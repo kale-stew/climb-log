@@ -27,7 +27,12 @@ export async function getStaticProps() {
     props: {
       title,
       description,
-      ...(await socialImage(title, description, '404')),
+      ...(await socialImage({
+        title,
+        description,
+        baseName: '404',
+        mainImageUrl: ImageGoats,
+      })),
     },
   }
 }

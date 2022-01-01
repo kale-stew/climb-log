@@ -45,7 +45,7 @@ const HomePage = ({ featuredPosts }) => (
 
 export async function getStaticProps() {
   const featuredPosts = await getMostRecentPosts()
-  const title = METADATA.SITE_NAME
+  const title = `Colorado Hiking & Photography`
   const description = `${METADATA.NAME} is climbing the high peaks of Colorado.`
 
   return {
@@ -53,7 +53,7 @@ export async function getStaticProps() {
       title,
       description,
       featuredPosts,
-      ...(await socialImage(title, description, 'homepage')),
+      ...(await socialImage({ title, description, baseName: 'home' })),
     },
   }
 }

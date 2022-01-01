@@ -1,6 +1,7 @@
 import { FacebookOpenGraph } from '@resoc/core'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { METADATA } from '../utils/constants'
 
 const CustomHead = (pageProps) => {
   const router = useRouter()
@@ -63,10 +64,10 @@ const CustomHead = (pageProps) => {
         content={
           pageProps.description
             ? pageProps.description
-            : 'Climbing the high peaks of Colorado.'
+            : `${METADATA.NAME} is climbing the high peaks of Colorado.`
         }
       />
-      <title>{pageProps.title}</title>
+      <title>{`${pageProps.title} · ${METADATA.SITE_NAME}`}</title>
     </Head>
   )
 }

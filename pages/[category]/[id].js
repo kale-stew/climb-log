@@ -128,13 +128,20 @@ export async function getStaticProps({ params }) {
   const title = postData.title
   const description = 'by Kylie Stewart'
 
+  console.log(postData)
+
   return {
     props: {
       postData,
       postIds,
       title,
       description,
-      ...(await socialImage(title, description, `post-${params.id}`)),
+      ...(await socialImage({
+        title,
+        description,
+        mainImageUrl: postData.mainImageUrl,
+        baseName: `post-${params.id}`,
+      })),
     },
   }
 }

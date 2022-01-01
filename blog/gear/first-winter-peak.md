@@ -1,6 +1,7 @@
 ---
 title: 'Hiking Your First Winter Peak'
 date: '2021-12-20'
+mainImageUrl: 'https://live.staticflickr.com/65535/51722449700_9dfcb5609d_k.jpg'
 ---
 
 With calendar winter quickly approaching, I find it helpful to reflect on what worked for me last snowflake season and what definitely didn’t. Although we might not get as much snow this upcoming season with it being a la niña year here in Colorado, it's always important to consider the essentials when evaluating backcountry winter travel. The following are some of the lessons I learned during my first winter alpine season.
