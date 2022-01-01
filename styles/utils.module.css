@@ -7,6 +7,12 @@
   color: #ff953d;
 }
 
+.backToHome a:hover {
+  box-shadow: inset 0 -75px 0 0 #ff953d;
+  color: white;
+  border-radius: 15px;
+}
+
 .centerText {
   text-align: center;
 }

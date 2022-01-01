@@ -2,17 +2,16 @@ import path from 'path'
 import { compileLocalTemplate } from '@resoc/create-img'
 import { FacebookOpenGraph } from '@resoc/core'
 
-async function socialImage({ title, description, baseName, mainImageUrl }) {
+async function socialImage({ title, description, baseName, previewImgUrl }) {
   const ogImage = await compileLocalTemplate(
     'resoc-template/resoc.manifest.json',
     {
       title,
       description,
-      mainImageUrl,
+      previewImgUrl,
     },
     FacebookOpenGraph,
-    `public/open-graph/${baseName}-{{ hash }}.jpg`,
-    { cache: true }
+    `public/open-graph/${baseName}.jpg`
   )
 
   return {

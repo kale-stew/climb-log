@@ -271,8 +271,8 @@ const ClimbLog = ({ allClimbs }) => {
 
 export async function getStaticProps() {
   const response = await fetchAllClimbs()
-  const title = `${METADATA.NAME}'s Climb Log`
-  const description = `All of ${METADATA.NAME}'s trip reports and hiking stats.`
+  const title = `${METADATA.FIRST_NAME}'s Climb Log`
+  const description = `All of ${METADATA.FIRST_NAME}'s trip reports and hiking stats.`
 
   return {
     props: {
@@ -283,7 +283,7 @@ export async function getStaticProps() {
       ...(await socialImage({
         title,
         description,
-        mainImageUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
+        previewImgUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
         baseName,
       })),
     },

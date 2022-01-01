@@ -11,7 +11,7 @@
     },
     {
       "label": "Main image",
-      "name": "mainImageUrl",
+      "name": "previewImgUrl",
       "type": "imageUrl",
       "demoValue": "https://live.staticflickr.com/65535/51791023814_bd142234b2_b.jpg"
     }

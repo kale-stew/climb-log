@@ -2,7 +2,7 @@ import Card from '../components/Card'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
 import { METADATA } from '../utils/constants'
-import { getMostRecentPosts } from '../utils/posts'
+import { getRecentPosts } from '../utils/posts'
 import { socialImage } from '../utils/social-image'
 
 // Photos
@@ -26,10 +26,8 @@ const HomePage = ({ featuredPosts }) => (
       mobileDimensions={{ width: 1200, height: 550 }}
     />
 
-    <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>
-      Most Recent Posts
-    </h1>
-    <div className={styles.mostRecentPosts}>
+    <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>Recent Posts</h1>
+    <div className={styles.recentPosts}>
       {featuredPosts.map((post) => (
         <Card postData={post} key={post.id} />
       ))}
@@ -46,9 +44,9 @@ const HomePage = ({ featuredPosts }) => (
 )
 
 export async function getStaticProps() {
-  const featuredPosts = await getMostRecentPosts()
-  const title = `Colorado Hiking & Photography`
-  const description = `${METADATA.NAME} is climbing the high peaks of Colorado.`
+  const featuredPosts = await getRecentPosts()
+  const title = `${METADATA.FIRST_NAME}'s Climbing Log and Hiking Blog`
+  const description = `${METADATA.FULL_NAME}'s photography, climbing log, and hiking blog.`
 
   return {
     props: {

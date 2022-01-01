@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Footer from './Footer'
-import { LandingHeader, Navigation } from './Navigation'
+import { LandingNavigation, Navigation } from './Navigation'
 import Link from 'next/link'
 import Loading from './Loading'
 import Router from 'next/router'
@@ -15,8 +15,8 @@ export default function Layout({ children, home }) {
 
   return (
     <>
-      <div className={!home ? `${styles.wrapper}` : `${styles.landingPage}`}>
-        {home ? <LandingHeader /> : <Navigation />}
+      <div className={!home ? styles.wrapper : styles.landingPage}>
+        {home ? <LandingNavigation /> : <Navigation />}
         <main>{!loading ? children : <Loading />}</main>
 
         {!home && (

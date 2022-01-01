@@ -9,7 +9,7 @@ import utilStyles from '../styles/utils.module.css'
  * supplied via the `mobileCn` prop.
  */
 const ResponsiveImage = ({
-  altTxt = `An image taken by ${METADATA.NAME}.`,
+  altTxt = `An image taken by ${METADATA.FULL_NAME}.`,
   desktopDimensions = { width: '100%', height: '100%' },
   desktopImg,
   mobileDimensions = { width: '100%', height: '100%' },

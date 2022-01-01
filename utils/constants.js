@@ -66,14 +66,16 @@ export const EXPLORE = [
 ]
 
 export const METADATA = {
-  NAME: 'Kylie Stewart',
+  FIRST_NAME: 'Kylie',
+  FULL_NAME: 'Kylie Stewart',
   SITE_NAME: 'kylies.photos',
 }
 
 export const PREVIEW_IMAGES = {
-  ABOUT_IMAGE: 'https://live.staticflickr.com/65535/51791518735_55a15b6aca_k.jpg',
+  ABOUT_IMAGE: 'https://live.staticflickr.com/65535/51791228456_aa3e462b7f_k.jpg',
   BLOG_FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51716926587_ba8bbedd69_b.jpg',
   CLIMB_LOG_IMAGE: 'https://live.staticflickr.com/65535/51789832732_041ee645fa_k.jpg',
+  FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51721573796_c2143acb54_b.jpg',
   NOT_FOUND_IMAGE: 'https://live.staticflickr.com/65535/51789853637_0e1329495c_b.jpg',
 }
 

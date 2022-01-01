@@ -23,7 +23,7 @@ const NotFoundPage = () => {
 
 export async function getStaticProps() {
   const title = 'Page Not Found'
-  const description = `${METADATA.NAME}: Photographer, hiker, and web developer.`
+  const description = `${METADATA.FULL_NAME}: Photographer, hiker, and web developer.`
 
   return {
     props: {
@@ -33,7 +33,7 @@ export async function getStaticProps() {
       ...(await socialImage({
         title,
         description,
-        mainImageUrl: PREVIEW_IMAGES.NOT_FOUND_IMAGE,
+        previewImgUrl: PREVIEW_IMAGES.NOT_FOUND_IMAGE,
         baseName,
       })),
     },

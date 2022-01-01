@@ -14,12 +14,12 @@
   </div>
   <div class="main">
     <div class="extended-background"></div>
-    {{#mainImageUrl}}
-    <img class="main-image" src="{{mainImageUrl}}" />
-    {{/mainImageUrl}}
-    {{^mainImageUrl}}
+    {{#previewImgUrl}}
+    <img class="main-image" src="{{previewImgUrl}}" />
+    {{/previewImgUrl}}
+    {{^previewImgUrl}}
     <img class="main-image" src="preview.jpg" />
-    {{/mainImageUrl}}
+    {{/previewImgUrl}}
   </div>
 </div>
 

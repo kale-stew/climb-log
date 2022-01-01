@@ -33,15 +33,15 @@ const CustomPopover = ({ climb, metric }) => {
   return (
     <div
       className={
-        climb.imgUrl
+        climb.previewImgUrl
           ? `${styles.popoverContent} ${styles.contentWithImg}`
-          : `${styles.popoverContent}`
+          : styles.popoverContent
       }
     >
       <header>
-        {climb.imgUrl && (
+        {climb.previewImgUrl && (
           <Image
-            src={climb.imgUrl}
+            src={climb.previewImgUrl}
             width="100%"
             height="100%"
             layout="responsive"

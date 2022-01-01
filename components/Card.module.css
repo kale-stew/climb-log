@@ -1,14 +1,45 @@
 .card {
   display: inline-block;
   min-width: 330px;
+  border: 0.25px solid #eee;
+  border-radius: 35px 35px 20px 20px;
+  box-shadow: 5px 6px 10px #dddd;
+  transition: transform 0.5s;
 }
 
-.cardHeader a {
+.card:hover {
+  transform: scale(1.05);
+}
+
+.cardTitle a {
   color: #1d1d1d;
+  padding: 0;
+}
+
+.cardTitle a:hover {
+  box-shadow: none;
+  text-decoration: underline;
+}
+
+.cardText {
+  padding: 1vw;
+}
+
+.headerImg {
+  min-width: 330px;
+  height: 155px;
+  object-fit: cover;
+  overflow: hidden;
+  object-position: center top;
+  border-radius: 35px 35px 0 0;
 }
 
 @media (max-width: 1024px) {
   .card {
     max-width: 75vw;
+  }
+
+  .cardText {
+    padding: 1vw 3vw;
   }
 }

@@ -89,7 +89,7 @@ export default function BlogLandingPage({ allPostsData }) {
 
 export async function getStaticProps() {
   const allPostsData = getSortedPostsData()
-  const title = `${METADATA.NAME}'s Hiking Blog`
+  const title = `${METADATA.FIRST_NAME}'s Hiking Blog`
   const description = 'Thoughts, trip reports, and gear posts.'
 
   return {
