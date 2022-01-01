@@ -52,7 +52,6 @@ const CustomHead = (pageProps) => {
         }}
       />
 
-      <link rel="icon" href="/favicon.ico" />
       <meta property="og:title" content={pageProps.title} />
       <meta property="og:description" content={pageProps.description} />
       <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
