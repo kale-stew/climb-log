@@ -55,11 +55,11 @@ const CustomHead = (pageProps) => {
         }}
       />
 
-      <meta name="twitter:card" content="summary" />
+      <meta property="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content="@kyliestew" />
       <meta name="twitter:title" content={pageProps.title} />
       <meta name="twitter:description" content={pageProps.description} />
-      <meta name="twitter:image" content="/logo.png" />
+      <meta property="twitter:image" content={`/open-graph/${pageProps.ogImage}`} />
 
       <meta
         property="og:description"
@@ -80,6 +80,7 @@ const CustomHead = (pageProps) => {
       <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
       <meta property="og:image:width" content={FacebookOpenGraph.width} />
       <meta property="og:image:height" content={FacebookOpenGraph.height} />
+      <meta property="og:type" content="website" />
       <meta property="og:url" content={routeToPage} />
 
       <meta property="og:title" content={pageProps.title} />
