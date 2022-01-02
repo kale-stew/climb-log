@@ -2,6 +2,7 @@
 title: 'Summiting My Winter White Whale'
 date: '2021-12-03'
 previewImgUrl: 'https://live.staticflickr.com/65535/51790214482_31c994dd38_b.jpg'
+bgColor: '#85726c'
 ---
 
 In the fall of 2020, The Year of the Pandemic, I was let go from my role as a software engineer. With a sudden onslaught of free time and raging burnout, I made the choice to start pursuing high peaks in the winter. December was rough as I got familiar with my snowshoes and the brutal conditions that winter summits demanded. I bought my first pair of ski goggles and my second pair of microspikes. I started to research routes and reach out to folks I knew were down for the sufferfest (I primarily found myself partnered up with experienced backcountry skiers or hikers with at least one season of seeking out snowflake peaks under their belt). And thus began my winter mountaineering career.

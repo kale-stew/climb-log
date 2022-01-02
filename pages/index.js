@@ -1,7 +1,7 @@
 import Card from '../components/Card'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
-import { METADATA } from '../utils/constants'
+import { COLORS, METADATA } from '../utils/constants'
 import { getRecentPosts } from '../utils/posts'
 import { socialImage } from '../utils/social-image'
 
@@ -13,8 +13,6 @@ import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
 
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
-
-const baseName = 'home'
 
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
@@ -50,11 +48,15 @@ export async function getStaticProps() {
 
   return {
     props: {
-      baseName,
+      title,
       description,
       featuredPosts,
-      title,
-      ...(await socialImage({ title, description, baseName })),
+      ...(await socialImage({
+        title,
+        description,
+        baseName: 'home',
+        bgColor: COLORS.blue,
+      })),
     },
   }
 }

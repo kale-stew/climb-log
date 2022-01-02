@@ -13,6 +13,7 @@ import {
   ALL_MONTHS,
   AREA_TYPE,
   CATEGORY_TYPE,
+  COLORS,
   METADATA,
   PREVIEW_IMAGES,
   TABLE_SORT_ORDER,
@@ -22,8 +23,6 @@ import { fetchAllClimbs } from '../utils/notion'
 import { socialImage } from '../utils/social-image'
 
 import tableStyles from '../components/Table.module.css'
-
-const baseName = 'climb-log'
 
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
@@ -278,13 +277,13 @@ export async function getStaticProps() {
     props: {
       allClimbs: response,
       title,
-      baseName,
       description,
       ...(await socialImage({
         title,
         description,
         previewImgUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
-        baseName,
+        baseName: 'climb-log',
+        bgColor: COLORS.navy,
       })),
     },
   }

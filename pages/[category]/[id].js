@@ -3,6 +3,7 @@ import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import ReactMarkdown from 'react-markdown'
+import { COLORS } from '../../utils/constants'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/posts'
 import { socialImage } from '../../utils/social-image'
 
@@ -134,12 +135,13 @@ export async function getStaticProps({ params }) {
       postIds,
       title,
       description,
-      baseName: `${params.category}/${params.id}`,
       ...(await socialImage({
         title,
         description,
         previewImgUrl: postData.previewImgUrl,
         baseName: `post-${params.id}`,
+        bgColor: postData.bgColor ? postData.bgColor : COLORS.teal,
+        textColor: postData.textColor ? postData.textColor : COLORS.white,
       })),
     },
   }
