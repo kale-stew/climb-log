@@ -5,9 +5,15 @@ import { METADATA } from '../utils/constants'
 
 const CustomHead = (pageProps) => {
   const router = useRouter()
-  const routeToPage = `https://${METADATA.SITE_NAME}/${
-    pageProps.baseName !== 'home' ? pageProps.baseName : ''
-  }`
+  const getPageUrl = () => {
+    if (pageProps.baseName.indexOf('post-') === 0) {
+      return `https://${METADATA.SITE_NAME}/${pageProps.postData.category}/${pageProps.postData.id}`
+    } else if (pageProps.baseName === 'home') {
+      return `https://${METADATA.SITE_NAME}`
+    }
+
+    return `https://${METADATA.SITE_NAME}/${pageProps.baseName}`
+  }
 
   return (
     <Head>
@@ -68,7 +74,7 @@ const CustomHead = (pageProps) => {
       <meta property="og:image:width" content={FacebookOpenGraph.width} />
       <meta property="og:image:height" content={FacebookOpenGraph.height} />
       <meta property="og:type" content="website" />
-      <meta property="og:url" content={routeToPage} />
+      <meta property="og:url" content={getPageUrl()} />
 
       <meta property="og:title" content={pageProps.title} />
       <title>{`${pageProps.title} · ${METADATA.SITE_NAME}`}</title>

@@ -49,6 +49,7 @@ export const COLORS = {
   blue: '#2078ae',
   grey: '#3a3a3a',
   navy: '#11162b',
+  teal: '#285f76',
   white: '#f1f1f1',
   yellow: '#bc8d02',
 }

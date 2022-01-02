@@ -2,7 +2,7 @@ import Category from '../components/Category'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import { CATEGORY_TYPE, METADATA } from '../utils/constants'
+import { CATEGORY_TYPE, COLORS, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/posts'
 import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
@@ -11,8 +11,6 @@ import { useRouter } from 'next/router'
 import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
-
-export const baseName = 'blog'
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
@@ -95,10 +93,15 @@ export async function getStaticProps() {
   return {
     props: {
       allPostsData,
-      baseName,
       description,
       title,
-      ...(await socialImage({ title, description, baseName })),
+      ...(await socialImage({
+        title,
+        description,
+        baseName: 'blog',
+        bgColor: COLORS.yellow,
+        textColor: COLORS.navy
+      })),
     },
   }
 }
