@@ -82,6 +82,7 @@ export const METADATA = {
 
 export const PREVIEW_IMAGES = {
   ABOUT_IMAGE: 'https://live.staticflickr.com/65535/51791228456_aa3e462b7f_k.jpg',
+  ALL_PHOTOS_IMAGE: 'https://live.staticflickr.com/65535/51795083133_aede34b83c_b.jpg',
   BLOG_FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51716926587_ba8bbedd69_b.jpg',
   CLIMB_LOG_IMAGE: 'https://live.staticflickr.com/65535/51789832732_041ee645fa_k.jpg',
   FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51721573796_c2143acb54_b.jpg',

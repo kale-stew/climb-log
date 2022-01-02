@@ -5,15 +5,28 @@ import { METADATA } from '../utils/constants'
 
 const CustomHead = (pageProps) => {
   const router = useRouter()
+  const getPageTitle = () =>
+    pageProps.baseName && pageProps.baseName === 'home'
+      ? pageProps.title
+      : `${pageProps.title} · ${METADATA.SITE_NAME}`
+
   const getPageUrl = () => {
-    if (pageProps.baseName && pageProps.baseName.indexOf('post-') === 0) {
-      return `https://${METADATA.SITE_NAME}/${pageProps.postData.category}/${pageProps.postData.id}`
-    } else if (pageProps.baseName && pageProps.baseName === 'home') {
+    if (!pageProps.baseName) {
       return `https://${METADATA.SITE_NAME}`
+    } else if (pageProps.baseName.indexOf('post-') === 0) {
+      return `https://${METADATA.SITE_NAME}/${pageProps.postData.category}/${pageProps.postData.id}`
+    } else if (pageProps.baseName === 'home') {
+      return `https://${METADATA.SITE_NAME}`
+    } else if (pageProps.baseName === 'photos') {
+      return `https://${METADATA.SITE_NAME}/all`
     }
 
     return `https://${METADATA.SITE_NAME}/${pageProps.baseName}`
   }
+
+  const description = pageProps.description
+    ? pageProps.description
+    : `${METADATA.FULL_NAME}'s climbing log, hiking blog, and photography.`
 
   return (
     <Head>
@@ -26,7 +39,7 @@ const CustomHead = (pageProps) => {
             dataLayer.push({
               'event': 'Pageview',
               'pagePath': 'https://www.kylies.photos${router.asPath}',
-              'pageTitle': '${pageProps.title}',
+              'pageTitle': "${pageProps.title}",
               'visitorType': 'HARD CODED VISITOR'
             })
           `,
@@ -77,23 +90,9 @@ const CustomHead = (pageProps) => {
       <meta property="og:url" content={getPageUrl()} />
 
       <meta property="og:title" content={pageProps.title} />
-      <title>{`${pageProps.title} · ${METADATA.SITE_NAME}`}</title>
-      <meta
-        property="og:description"
-        content={
-          pageProps.description
-            ? pageProps.description
-            : `${METADATA.FULL_NAME}'s photography, climbing log, and hiking blog.`
-        }
-      />
-      <meta
-        name="description"
-        content={
-          pageProps.description
-            ? pageProps.description
-            : `${METADATA.FULL_NAME}'s photography, climbing log, and hiking blog.`
-        }
-      />
+      <title>{getPageTitle()}</title>
+      <meta property="og:description" content={description} />
+      <meta name="description" content={description} />
     </Head>
   )
 }
