@@ -1,6 +1,6 @@
 import ImageGallery from '../components/ImageGallery'
 import Layout from '../components/Layout'
-import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { socialImage } from '../utils/social-image'
 
 import utilStyles from '../styles/utils.module.css'
@@ -28,8 +28,9 @@ export async function getStaticProps() {
       ...(await socialImage({
         title,
         description,
-        previewImgUrl: PREVIEW_IMAGES.FALLBACK_IMAGE,
+        previewImgUrl: PREVIEW_IMAGES.ALL_PHOTOS_IMAGE,
         baseName: 'photos',
+        bgColor: COLORS.blue,
       })),
     },
   }

@@ -23,14 +23,19 @@ export const fmt = (field) => {
         if (field?.formula?.string || field?.formula?.string == '') {
           return field?.formula?.string
         } else {
-          console.warn(field?.formula?.string == '',"Hey 👋 Looks like we are using a formula that isn't evaluated to a string. We need to update the fmt function in notion.js")
+          console.warn(
+            field?.formula?.string == '',
+            "Hey 👋 Looks like we are using a formula that isn't evaluated to a string. We need to update the fmt function in notion.js"
+          )
           return null
         }
       case 'number':
         return field?.number
       case 'relation':
         // TODO: things if we need to use the entire relation
-        console.warn("We haven't set up the relation case in the fmt function in notion.js")
+        console.warn(
+          "We haven't set up the relation case in the fmt function in notion.js"
+        )
         return ''
       case 'rich_text':
         return field?.rich_text[0]?.plain_text
@@ -51,7 +56,12 @@ export const findMatchingSlug = (str) => {
   return false
 }
 
-export const getDatabaseQueryConfig = (cursor = null, pageSize = null, database_id = process.env.NOTION_DATABASE_ID, dateProperty = 'date') => {
+export const getDatabaseQueryConfig = (
+  cursor = null,
+  pageSize = null,
+  database_id = process.env.NOTION_DATABASE_ID,
+  dateProperty = 'date'
+) => {
   let today = new Date().toISOString()
   const config = {
     database_id,

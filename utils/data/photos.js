@@ -29,7 +29,7 @@ const formatPhotos = (response) => {
       href: fmt(href),
       width: fmt(width),
       height: fmt(height),
-      bgColor: fmt(accent_color) == undefined ? null : fmt(accent_color) ,
+      bgColor: fmt(accent_color) == undefined ? null : fmt(accent_color),
     }
     return finalObj
   }, [])
@@ -42,7 +42,7 @@ const fetchAllImages = async () => {
   photosConfig.sorts = [{ property: 'taken_on', direction: 'descending' }]
   let response = await notion.databases.query(photosConfig)
   let responseArray = [...response.results]
-  
+
   while (response.has_more) {
     // response.has_more tells us if the database has more pages
     // response.next_cursor contains the next page of results,
