@@ -1,5 +1,5 @@
 import { Client, LogLevel } from '@notionhq/client'
-import { getLocationData } from './helpers'
+import { getLocationData } from '../helpers'
 import { getSortedPostsData } from './posts'
 
 /**

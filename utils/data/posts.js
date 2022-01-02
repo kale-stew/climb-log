@@ -1,9 +1,9 @@
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
-import { buildAreaName } from './builders'
-import { CATEGORY_TYPE, PREVIEW_IMAGES } from './constants'
-import { addCommas, capitalizeEachWord } from './helpers'
+import { buildAreaName } from '../builders'
+import { CATEGORY_TYPE, PREVIEW_IMAGES } from '../constants'
+import { addCommas, capitalizeEachWord } from '../helpers'
 import { fetchMostRecentClimbs } from './notion'
 
 const ALL_DIRECTORIES = {

@@ -2,7 +2,7 @@ import Card from '../components/Card'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
 import { COLORS, METADATA } from '../utils/constants'
-import { getRecentPosts } from '../utils/posts'
+import { getRecentPosts } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 
 // Photos
