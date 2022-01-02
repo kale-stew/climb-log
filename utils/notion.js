@@ -59,7 +59,7 @@ export const findMatchingSlug = (str) => {
 export const getDatabaseQueryConfig = (
   cursor = null,
   pageSize = null,
-  database_id = process.env.NOTION_DATABASE_ID,
+  database_id = process.env.NOTION_CLIMB_DATABASE_ID,
   dateProperty = 'date'
 ) => {
   let today = new Date().toISOString()
