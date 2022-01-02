@@ -12,6 +12,10 @@ export const fmt = (field) => {
         return field?.file?.url
       case 'number':
         return field?.number
+      case 'relation':
+        // TODO: pull the item id so we can fetch related items from their respective db
+        console.log(field)
+        return ''
       case 'rich_text':
         return field?.rich_text[0]?.plain_text
       case 'title':
