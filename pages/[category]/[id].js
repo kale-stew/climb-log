@@ -4,7 +4,7 @@ import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import ReactMarkdown from 'react-markdown'
 import { COLORS } from '../../utils/constants'
-import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/posts'
+import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/data/posts'
 import { socialImage } from '../../utils/social-image'
 
 import styles from '../../styles/blog.module.css'
