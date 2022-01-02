@@ -72,7 +72,16 @@ const formatClimbs = (response) => {
   return response.map((result) => {
     const {
       id,
-      properties: { area, date, distance, gain, hike_title, strava, related_slug },
+      properties: {
+        area,
+        date,
+        distance,
+        fallback_img,
+        gain,
+        hike_title,
+        strava,
+        related_slug,
+      },
     } = result
 
     const slug = findMatchingSlug(fmt(related_slug))
@@ -81,7 +90,11 @@ const formatClimbs = (response) => {
       date: fmt(date),
       title: fmt(hike_title),
       slug: slug ? slug : null,
-      previewImgUrl: fmt(result.cover),
+      previewImgUrl: fallback_img
+        ? fmt(fallback_img)
+        : result.cover
+        ? fmt(result.cover)
+        : null,
       distance: fmt(distance),
       gain: fmt(gain),
       area: getLocationData(fmt(area)).area,
@@ -97,7 +110,7 @@ const formatClimbs = (response) => {
  * featured on the home page
  */
 export const fetchMostRecentClimbs = async () => {
-  const config = getDatabaseQueryConfig(null, 2)
+  const config = getDatabaseQueryConfig(null, 3)
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
   return formatClimbs(response.results)
