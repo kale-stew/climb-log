@@ -19,7 +19,7 @@ import {
   TABLE_SORT_ORDER,
 } from '../utils/constants'
 import { event } from '../utils/gtag'
-import { fetchAllClimbs } from '../utils/data/notion'
+import { fetchAllClimbs } from '../utils/data/climbs'
 import { socialImage } from '../utils/social-image'
 
 import tableStyles from '../components/Table.module.css'

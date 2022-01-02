@@ -1,6 +1,10 @@
+// TODO: rename this file to climbs.js
+// dependent on whether or not we can substantiate the notion client in a 2nd file
+//   → if impossible, can we make an agnostic notion.js to be consumed by climbs.js and photos.js?
+
 import { Client, LogLevel } from '@notionhq/client'
+import { fmt, findMatchingSlug } from '../notion'
 import { getLocationData } from '../helpers'
-import { getSortedPostsData } from './posts'
 
 /**
  * Initialize Notion client & configure a default db query
@@ -15,7 +19,6 @@ const notion = new Client({
  */
 const getDatabaseQueryConfig = (cursor = null, pageSize = null) => {
   let today = new Date().toISOString()
-
   const config = {
     database_id: process.env.NOTION_DATABASE_ID,
     filter: {
@@ -35,44 +38,22 @@ const getDatabaseQueryConfig = (cursor = null, pageSize = null) => {
 }
 
 /**
- * Massage data returned from the Notion API into a Table-friendly object
- */
-const fmt = (field) => {
-  if (field !== null) {
-    switch (field.type) {
-      case 'date':
-        return field?.date?.start
-      case 'file':
-        return field?.file?.url
-      case 'number':
-        return field?.number
-      case 'rich_text':
-        return field?.rich_text[0]?.plain_text
-      case 'title':
-        return field?.title[0]?.plain_text
-      case 'url':
-        return field?.url
-    }
-  } else return null
-}
-
-const findMatchingSlug = (str) => {
-  const posts = getSortedPostsData()
-  let foundPost = posts.find((post) => post.id == str)
-  if (foundPost) {
-    return str
-  }
-  return false
-}
-
-/**
  * Formats an array of climbs returned from the Notion query
  */
 const formatClimbs = (response) => {
   return response.map((result) => {
     const {
       id,
-      properties: { area, date, distance, gain, hike_title, strava, related_slug },
+      properties: {
+        area,
+        date,
+        distance,
+        fallback_img,
+        gain,
+        hike_title,
+        strava,
+        related_slug,
+      },
     } = result
 
     const slug = findMatchingSlug(fmt(related_slug))
@@ -81,7 +62,11 @@ const formatClimbs = (response) => {
       date: fmt(date),
       title: fmt(hike_title),
       slug: slug ? slug : null,
-      previewImgUrl: fmt(result.cover),
+      previewImgUrl: fallback_img
+        ? fmt(fallback_img)
+        : result.cover
+        ? fmt(result.cover)
+        : null,
       distance: fmt(distance),
       gain: fmt(gain),
       area: getLocationData(fmt(area)).area,
@@ -96,8 +81,8 @@ const formatClimbs = (response) => {
  * Fetch an array of the 3 most recent climbs logged to be
  * featured on the home page
  */
-export const fetchMostRecentClimbs = async () => {
-  const config = getDatabaseQueryConfig(null, 2)
+const fetchMostRecentClimbs = async () => {
+  const config = getDatabaseQueryConfig(null, 3)
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
   return formatClimbs(response.results)
@@ -106,7 +91,7 @@ export const fetchMostRecentClimbs = async () => {
 /**
  * Fetch list of climbs from Notion db
  */
-export const fetchAllClimbs = async () => {
+const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
@@ -124,3 +109,5 @@ export const fetchAllClimbs = async () => {
 
   return formatClimbs(responseArray)
 }
+
+export { fetchAllClimbs, fetchMostRecentClimbs }
