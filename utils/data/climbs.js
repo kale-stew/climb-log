@@ -1,41 +1,9 @@
 // TODO: rename this file to climbs.js
-// dependent on whether or not we can substantiate the notion client in a 2nd file
 //   → if impossible, can we make an agnostic notion.js to be consumed by climbs.js and photos.js?
+// ^Looks like it is
 
-import { Client, LogLevel } from '@notionhq/client'
-import { fmt, findMatchingSlug } from '../notion'
+import { fmt, findMatchingSlug, getDatabaseQueryConfig, notion } from '../notion'
 import { getLocationData } from '../helpers'
-
-/**
- * Initialize Notion client & configure a default db query
- */
-const notion = new Client({
-  auth: process.env.NOTION_ACCESS_TOKEN,
-  logLevel: LogLevel.DEBUG,
-})
-
-/**
- * Builds our database config
- */
-const getDatabaseQueryConfig = (cursor = null, pageSize = null) => {
-  let today = new Date().toISOString()
-  const config = {
-    database_id: process.env.NOTION_DATABASE_ID,
-    filter: {
-      and: [{ property: 'date', date: { on_or_before: today } }],
-    },
-  }
-
-  if (cursor != null) {
-    config['start_cursor'] = cursor
-  }
-
-  if (pageSize != null) {
-    config['page_size'] = pageSize
-  }
-
-  return config
-}
 
 /**
  * Formats an array of climbs returned from the Notion query
@@ -48,7 +16,7 @@ const formatClimbs = (response) => {
         area,
         date,
         distance,
-        fallback_img,
+        fallback_img, // can we delete this?
         gain,
         hike_title,
         strava,
@@ -59,19 +27,17 @@ const formatClimbs = (response) => {
 
     const slug = findMatchingSlug(fmt(related_slug))
     // TODO: we can deprecate use of fallback_img once related_img is wired up
-    // const previewImg = related_img ? fetchRelatedImage(fmt(related_img)) : result.cover ? fmt(result.cover) : null
+    let previewImg = fmt(related_img)
+    if (previewImg == '') {
+      previewImg = result.cover ? fmt(result.cover) : null
+    }
 
     const finalObj = {
       id,
       date: fmt(date),
       title: fmt(hike_title),
       slug: slug ? slug : null,
-      // previewImgUrl: previewImg,
-      previewImgUrl: fallback_img
-        ? fmt(fallback_img)
-        : result.cover
-        ? fmt(result.cover)
-        : null,
+      previewImgUrl: previewImg,
       distance: fmt(distance),
       gain: fmt(gain),
       area: getLocationData(fmt(area)).area,

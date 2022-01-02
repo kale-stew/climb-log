@@ -26,7 +26,7 @@ const CustomHead = (pageProps) => {
             dataLayer.push({
               'event': 'Pageview',
               'pagePath': 'https://www.kylies.photos${router.asPath}',
-              'pageTitle': '${pageProps.title}',
+              'pageTitle': "${pageProps.title}",
               'visitorType': 'HARD CODED VISITOR'
             })
           `,

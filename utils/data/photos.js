@@ -1,5 +1,11 @@
-import { fmt } from '../notion'
+import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
+/**
+ * This is the notion config we need to query the all-photos database, see working examples in climbs.js
+ * ex: let response = await notion.databases.query(photosConfig)
+ */
+const photosConfig = getDatabaseQueryConfig(null, null, process.env.NOTION_PHOTO_DATABASE_ID
+  )
 /**
  * Formats an array of photos returned from the Notion query
  */
@@ -25,8 +31,9 @@ const formatPhotos = (response) => {
 
 /**
  * Fetch an image from all-photos based on the linkedDatabase id
- * params: a notion id (l0ng-r4ndom-hash)
- * returns a flickr href
+ * @param {String} id a notion id (l0ng-r4ndom-hash)
+ * @returns {String} returns a flickr href
+ * do we need this?
  */
 const fetchRelatedImg = (id) => {}
 
