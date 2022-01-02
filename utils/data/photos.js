@@ -28,7 +28,7 @@ const formatPhotos = (response) => {
  * params: a notion id (l0ng-r4ndom-hash)
  * returns a flickr href
  */
-const fetchRelatedImg = () => {}
+const fetchRelatedImg = (id) => {}
 
 /**
  * Fetch all images from the all-photos db

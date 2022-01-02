@@ -52,16 +52,21 @@ const formatClimbs = (response) => {
         gain,
         hike_title,
         strava,
+        related_img,
         related_slug,
       },
     } = result
 
     const slug = findMatchingSlug(fmt(related_slug))
+    // TODO: we can deprecate use of fallback_img once related_img is wired up
+    // const previewImg = related_img ? fetchRelatedImage(fmt(related_img)) : result.cover ? fmt(result.cover) : null
+
     const finalObj = {
       id,
       date: fmt(date),
       title: fmt(hike_title),
       slug: slug ? slug : null,
+      // previewImgUrl: previewImg,
       previewImgUrl: fallback_img
         ? fmt(fallback_img)
         : result.cover
