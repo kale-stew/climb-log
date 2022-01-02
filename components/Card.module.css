@@ -11,14 +11,28 @@
   transform: scale(1.05);
 }
 
+.cardTitle {
+  margin-bottom: 1vh;
+}
+
+.cardTitle:hover {
+  box-shadow: none;
+  text-decoration: underline;
+}
+
 .cardTitle a {
   color: #1d1d1d;
   padding: 0;
 }
 
-.cardTitle a:hover {
-  box-shadow: none;
-  text-decoration: underline;
+.cardTitle h2 {
+  margin-bottom: 0;
+}
+
+.cardTitle h4 {
+  font-weight: 300;
+  margin-top: 0;
+  font-style: italic;
 }
 
 .cardText {

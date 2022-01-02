@@ -5,31 +5,38 @@ import { PREVIEW_IMAGES } from '../utils/constants'
 
 import styles from './Card.module.css'
 
-const Card = ({ postData }) => (
-  <Link href={postData.href}>
-    <div className={styles.card}>
-      <div className={styles.headerImg}>
-        <Image
-          src={
-            postData.previewImgUrl
-              ? postData.previewImgUrl
-              : PREVIEW_IMAGES.FALLBACK_IMAGE
-          }
-          width={'100%'}
-          height={'100%'}
-          layout="responsive"
-        />
-      </div>
+const Card = ({ postData }) => {
+  const isClimb = postData.href.indexOf('/climb-log?') === 0
 
-      <div className={styles.cardText}>
-        <h2 className={styles.cardTitle}>
-          <Link href={postData.href}>{postData.title}</Link>
-        </h2>
-        <FormattedDate dateString={postData.date} withDOW />
-        <p>{postData.description}</p>
+  return (
+    <Link href={postData.href}>
+      <div className={styles.card}>
+        <div className={styles.headerImg}>
+          <Image
+            src={
+              postData.previewImgUrl
+                ? postData.previewImgUrl
+                : PREVIEW_IMAGES.FALLBACK_IMAGE
+            }
+            width={'100%'}
+            height={'100%'}
+            layout="responsive"
+          />
+        </div>
+
+        <div className={styles.cardText}>
+          <div className={styles.cardTitle}>
+            <Link href={postData.href}>
+              <h2>{postData.title}</h2>
+            </Link>
+            {isClimb ? <h4>→ on the Climb Log</h4> : null}
+          </div>
+          <FormattedDate dateString={postData.date} withDOW />
+          <p>{postData.description}</p>
+        </div>
       </div>
-    </div>
-  </Link>
-)
+    </Link>
+  )
+}
 
 export default Card
