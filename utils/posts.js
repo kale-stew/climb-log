@@ -141,7 +141,7 @@ export function getSortedPostsData() {
 // Create an array of five most recent objects to present
 // on the landing page (2 blog posts + 3 climbs)
 export async function getRecentPosts() {
-  const recentBlogs = getSortedPostsData().splice(0, 3)
+  const recentBlogs = getSortedPostsData().splice(0, 4)
   const featuredBlogs = recentBlogs.map((post) => {
     return {
       id: post.id,
