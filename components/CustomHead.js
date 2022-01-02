@@ -6,9 +6,9 @@ import { METADATA } from '../utils/constants'
 const CustomHead = (pageProps) => {
   const router = useRouter()
   const getPageUrl = () => {
-    if (pageProps.baseName.indexOf('post-') === 0) {
+    if (pageProps.baseName && pageProps.baseName.indexOf('post-') === 0) {
       return `https://${METADATA.SITE_NAME}/${pageProps.postData.category}/${pageProps.postData.id}`
-    } else if (pageProps.baseName === 'home') {
+    } else if (pageProps.baseName && pageProps.baseName === 'home') {
       return `https://${METADATA.SITE_NAME}`
     }
 

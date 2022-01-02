@@ -100,7 +100,7 @@ export async function getStaticProps() {
         description,
         baseName: 'blog',
         bgColor: COLORS.yellow,
-        textColor: COLORS.navy
+        textColor: COLORS.navy,
       })),
     },
   }
