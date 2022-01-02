@@ -51,12 +51,12 @@ export const findMatchingSlug = (str) => {
   return false
 }
 
-export const getDatabaseQueryConfig = (cursor = null, pageSize = null, database_id = process.env.NOTION_DATABASE_ID) => {
+export const getDatabaseQueryConfig = (cursor = null, pageSize = null, database_id = process.env.NOTION_DATABASE_ID, dateProperty = 'date') => {
   let today = new Date().toISOString()
   const config = {
     database_id,
     filter: {
-      and: [{ property: 'date', date: { on_or_before: today } }],
+      and: [{ property: dateProperty, date: { on_or_before: today } }],
     },
   }
 

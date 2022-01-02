@@ -3,11 +3,11 @@ import styles from './ImageGallery.module.css'
 const ImageGallery = ({ photos }) => (
   <ul className={styles.galleryWrapper}>
     {photos.map((photo) => (
-      <li key={photo.src}>
-        <img src={photo.src} alt={photo.alt} loading="lazy" />
+      <li key={photo.href}>
+        <img src={photo.href} alt={photo.title} loading="lazy" />
       </li>
     ))}
-    <li></li>
+    <li key={'end-li'}></li>
   </ul>
 )
 

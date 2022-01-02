@@ -2,11 +2,11 @@ import ImageGallery from '../components/ImageGallery'
 import Layout from '../components/Layout'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { socialImage } from '../utils/social-image'
-import * as allPhotos from '../utils/data/DUMMY_DATA'
 
 import utilStyles from '../styles/utils.module.css'
+import { fetchAllImages } from '../utils/data/photos'
 
-export default function AllPhotosPage({ title }) {
+export default function AllPhotosPage({ title, allPhotos }) {
   return (
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
@@ -18,12 +18,13 @@ export default function AllPhotosPage({ title }) {
 export async function getStaticProps() {
   const title = 'All Photos'
   const description = `${METADATA.FULL_NAME} is a photographer, hiker, and web developer.`
+  const response = await fetchAllImages()
 
   return {
     props: {
       title,
       description,
-      allPhotos,
+      allPhotos: response,
       ...(await socialImage({
         title,
         description,
