@@ -18,6 +18,7 @@
 .cardTitle:hover {
   box-shadow: none;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .cardTitle a {
