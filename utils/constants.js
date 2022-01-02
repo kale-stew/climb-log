@@ -45,6 +45,14 @@ export const CATEGORY_TYPE = {
   THOUGHTS: 'thoughts',
 }
 
+export const COLORS = {
+  blue: '#2078ae',
+  grey: '#3a3a3a',
+  navy: '#11162b',
+  white: '#f1f1f1',
+  yellow: '#bc8d02',
+}
+
 export const CONNECT = [
   { title: 'Instagram', href: 'https://www.instagram.com/kalestews/' },
   { title: 'AllTrails', href: 'https://www.alltrails.com/members/kylie-stewart-1' },

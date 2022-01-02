@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Inline+Display:wght@600;700&family=Domine&display=swap');
 
 .wrapper {
   display: flex;
   align-items: stretch;
-  color: #3a3a3a;
+  color: {{{ textColor }}};
 }
 
 .side {
@@ -12,7 +12,7 @@
   flex-direction: column;
   gap: 12vh;
 
-  background-color: #f1f1f1;
+  background-color: {{{ bgColor }}};
   padding: 2vw;
 }
 
@@ -23,7 +23,8 @@
 #title {
   margin-top: 0;
   font-size: 0.01rem; /* textFit calcs the correct size */
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Big Shoulders Inline Display', cursive;
+  font-weight: 800;
   height: 100%;
 }
 
@@ -43,7 +44,7 @@
 .brand-name {
   margin: 0;
   font-size: 9vh;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Domine', serif;
 }
 
 .main {
@@ -61,7 +62,7 @@
   position: absolute;
   left: -1px;
   top: 0;
-  background-color: #f1f1f1;
+  background-color: {{{ bgColor }}};
   width: 8vh;
   height: 100%;
   clip-path: polygon(

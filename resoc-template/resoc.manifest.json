@@ -10,10 +10,12 @@
       "demoValue": "A picture is worth a thousand words"
     },
     {
-      "label": "Main image",
+      "label": "preview image",
       "name": "previewImgUrl",
       "type": "imageUrl",
       "demoValue": "https://live.staticflickr.com/65535/51791023814_bd142234b2_b.jpg"
-    }
+    },
+    { "name": "bgColor", "type": "color", "demoValue": "#3a3a3a" },
+    { "name": "textColor", "type": "color", "demoValue": "#f1f1f1" }
   ]
 }
