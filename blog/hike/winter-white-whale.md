@@ -9,7 +9,7 @@ In the fall of 2020, The Year of the Pandemic, I was let go from my role as a so
 
 Humboldt was my third "snowflake" 14er attempt. When I say "snowflake", I'm referring to a peak obtained within calendar winter (this window typically begins late December and ends mid-March). The qualifications being set to such a limited period of time, during which conditions are usually the worst a hiker can experience, snowflake summits are something to be proud of. A bragging point for some experienced mountaineers. I had successfully ascended Pikes Peak and Mount Democrat (two class two routes, one of which I had climbed in the summer prior) that calendar winter and I was eager to bag a few more. Humboldt seemed like a reasonable next goal, and being in the Sangres it had a special appeal.
 
-![mount-democrat](https://live.staticflickr.com/65535/51731522372_1b3c436175_k.jpg)
+![mount-democrat](https://live.staticflickr.com/65535/51731522372_81e71a21de_b.jpg)
 
 _A photo from my snowflake ascent of Mount Democrat the same year._
 

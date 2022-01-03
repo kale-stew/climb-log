@@ -1,15 +1,56 @@
+import { useState } from 'react'
 import ImageGallery from '../components/ImageGallery'
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { checkMonth, checkYear } from '../utils/helpers'
+import { fetchAllImages } from '../utils/data/photos'
 import { lightFormat } from 'date-fns'
 import { socialImage } from '../utils/social-image'
 
+import styles from '../styles/allPhotos.module.css'
 import utilStyles from '../styles/utils.module.css'
-import { fetchAllImages } from '../utils/data/photos'
 
 export default function AllPhotosPage({ title, allPhotos }) {
+  const [allPhotosPure, setAllPhotos] = useState(allPhotos)
+  const [allPhotosData, setAllPhotosData] = useState(allPhotos)
+
+  /**
+   * Searches all phots by month, photo title, state, year, and area
+   */
+  const searchPhotos = (query) => {
+    let upperQuery = query.toUpperCase().trim()
+
+    // Set photos list back to all if the search query is blank
+    if (upperQuery == '') {
+      setPhotosData()
+      return
+    }
+
+    // Otherwise search for the query
+    let searchResults = allPhotos.filter((photo) => {
+      return (
+        photo.title.toUpperCase().includes(upperQuery) ||
+        checkMonth(upperQuery, photo.date) ||
+        photo.area?.toUpperCase().includes(upperQuery) ||
+        photo.state?.toUpperCase().includes(upperQuery) ||
+        (isNaN(upperQuery) ? null : checkYear(Number(upperQuery), photo.date))
+      )
+    })
+
+    setPhotosData(searchResults)
+  }
+
+  /**
+   * Sets which photos are displayed by updating the state of allPhotosData
+   * If nothing is passed to the function, display all of the photos in the
+   * all-photos db by setting the state `allPhotosPure`, the original arr.
+   */
+  const setPhotosData = (photosToDisplay = allPhotosPure) => {
+    setAllPhotosData(photosToDisplay)
+  }
+
   const getAllYears = () => {
-    const arr = allPhotos.map(({ date }) => {
+    const arr = allPhotosData.map(({ date }) => {
       const year = lightFormat(new Date(date), 'y')
       return year
     })
@@ -21,8 +62,18 @@ export default function AllPhotosPage({ title, allPhotos }) {
   return (
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
+      <div className={`${utilStyles.singleRow} ${styles.filterWrapper}`}>
+        {/* Search all Photos */}
+        <p>Search all entries:</p>
+        <input
+          className={styles.searchInput}
+          type={'search'}
+          placeholder="Try 'Sunrise' or 'Goat'"
+          onChange={(e) => searchPhotos(e.target.value)}
+        />
+      </div>
       {getAllYears().map((year) => {
-        const filteredPhotos = filterByYear(allPhotos, year)
+        const filteredPhotos = filterByYear(allPhotosData, year)
         return (
           <ImageGallery key={`${year}-gallery`} photos={filteredPhotos} header={year} />
         )

@@ -1,4 +1,3 @@
-import getMonth from 'date-fns/getMonth'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import Layout from '../components/Layout'
@@ -10,7 +9,6 @@ import {
   createStateSelects,
 } from '../utils/builders'
 import {
-  ALL_MONTHS,
   AREA_TYPE,
   CATEGORY_TYPE,
   COLORS,
@@ -18,6 +16,7 @@ import {
   PREVIEW_IMAGES,
   TABLE_SORT_ORDER,
 } from '../utils/constants'
+import { checkMonth } from '../utils/helpers'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/data/climbs'
 import { socialImage } from '../utils/social-image'
@@ -41,7 +40,6 @@ const ClimbLog = ({ allClimbs }) => {
 
   const router = useRouter()
   const firstUpdate = useRef(true)
-  const title = `${METADATA.SITE_NAME} | Climb Log`
 
   /**
    * refreshData utilizes Next.js's router to replace the path with the current one,
@@ -183,14 +181,6 @@ const ClimbLog = ({ allClimbs }) => {
     })
     setFilteredClimbs(filteredData)
     sortData(filteredData, selectedFilter)
-  }
-
-  const checkMonth = (queryMonth, date) => {
-    const dateNum = getMonth(new Date(date))
-    const foundMonths = ALL_MONTHS.filter((month) => month.includes(queryMonth)).map(
-      (month) => ALL_MONTHS.indexOf(month)
-    )
-    return foundMonths.includes(dateNum)
   }
 
   const searchClimbLog = (e) => {

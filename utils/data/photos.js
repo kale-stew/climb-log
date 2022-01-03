@@ -19,11 +19,19 @@ const formatPhotos = (response) => {
   return response.map((result) => {
     const {
       id,
-      properties: { accent_color, height, href, taken_on, title, width },
+      properties: { accent_color, height, href, taken_on, title, width, area },
     } = result
-
+    let areaFormatted = fmt(area)
+    let region = null
+    let state = null
+    if (areaFormatted != '') {
+      region = areaFormatted.split(', ')[0]
+      state = areaFormatted.split(', ')[1]
+    }
     const finalObj = {
       id,
+      area: region,
+      state,
       title: fmt(title),
       date: fmt(taken_on),
       href: fmt(href),
