@@ -21,13 +21,13 @@
   border-radius: 15px;
 }
 
-/* Adjusted so iPads get the desktop experience on this page */
-@media (max-width: 741px) {
+@media (max-width: 1024px) {
   .aboutBlock {
     flex-direction: column;
+    gap: 1vh;
     padding: 0 1.75rem;
     align-items: center;
-    max-width: 80vw;
+    max-width: 60vw;
   }
 
   .aboutBlockText {
@@ -43,13 +43,19 @@
   }
 
   .aboutImageMobile {
-    display: flex;
-    justify-content: center;
+    width: 80%;
+    margin: auto;
+  }
+
+  .brandSummary {
+    text-align: center;
+    font-style: italic;
   }
 }
 
-@media (max-width: 500px) {
-  .aboutBlock p {
-    padding: 0.5rem 0;
+@media (max-width: 740px) {
+  .aboutBlock {
+    max-width: 80vw;
+    padding: 0 1vw;
   }
 }

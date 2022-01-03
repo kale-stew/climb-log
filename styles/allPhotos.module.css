@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 75vw;
 }
 
 .filterWrapper p {
@@ -12,6 +13,7 @@
   margin-left: 0.75rem;
   font-size: 14px;
   padding: 0.2rem 0.4rem;
+  margin: 0;
   width: 25%;
   border: 1px solid grey;
   border-radius: 5px;
@@ -24,6 +26,16 @@
 
 @media (max-width: 1024px) {
   .searchInput {
-    width: 60%;
+    width: 30%;
+  }
+
+  .filterWrapper {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 740px) {
+  .searchInput {
+    width: 70%;
   }
 }

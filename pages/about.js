@@ -22,7 +22,7 @@ const AboutPage = () => (
         desktopDimensions={{ width: 300, height: 412 }}
         mobileImg={HeadshotMobile}
         mobileCn={`${utilStyles.roundImage} ${styles.aboutImage}`}
-        mobileDimensions={{ width: 250, height: 250 }}
+        mobileDimensions={{ width: 175, height: 175 }}
       />
 
       <div className={styles.aboutBlockText}>
@@ -57,7 +57,7 @@ const AboutPage = () => (
         <br />
         <h2>Brands</h2>
         <div>
-          Kylie is an ambassador for...
+          <p className={styles.brandSummary}>Kylie is an ambassador for...</p>
           <ul>
             {BRANDS.map((brand) => (
               <li key={brand.name}>

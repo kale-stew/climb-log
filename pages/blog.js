@@ -49,8 +49,10 @@ export default function BlogLandingPage({ allPostsData }) {
 
   return (
     <Layout>
-      <h1 className={utilStyles.headingXl}>Blog</h1>
-      <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
+      <div className={styles.blogHeaders}>
+        <h1 className={utilStyles.headingXl}>Blog</h1>
+        <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
+      </div>
 
       <section
         className={`${utilStyles.headingMd} ${utilStyles.padding1px} ${styles.blogSection}`}

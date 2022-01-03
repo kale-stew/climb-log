@@ -113,42 +113,42 @@ export default function Table({
 
   return (
     <>
-      <h1>Kylie's Climb Log</h1>
-
-      {/* Buttons: Switch between Imperial and Metric num values */}
-      <div className={utilStyles.singleRow}>
-        <button
-          className={metric ? 'categoryButton' : categoryStyles.categorySelected}
-          onClick={() => toggleUnits(false)}
-        >
-          Imperial
-        </button>
-        <button
-          className={metric ? categoryStyles.categorySelected : 'categoryButton'}
-          onClick={() => toggleUnits(true)}
-        >
-          Metric
-        </button>
+      <div className={styles.tableHeaders}>
+        <h1>Kylie's Climb Log</h1>
+        {/* Buttons: Switch between Imperial and Metric num values */}
+        <div className={utilStyles.singleRow}>
+          <button
+            className={metric ? 'categoryButton' : categoryStyles.categorySelected}
+            onClick={() => toggleUnits(false)}
+          >
+            Imperial
+          </button>
+          <button
+            className={metric ? categoryStyles.categorySelected : 'categoryButton'}
+            onClick={() => toggleUnits(true)}
+          >
+            Metric
+          </button>
+        </div>
+        {/* Filter: by Area */}
+        <div className={`${utilStyles.singleRow} ${styles.areaFilter}`}>
+          <p className={styles.filterTitle}>Filter by area:</p>
+          {buildFilterByArea()}
+        </div>
+        {/* Search all Climbs */}
+        <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
+          <p className={styles.filterTitle}>Search all entries:</p>
+          <input
+            className={styles.searchInput}
+            type={'search'}
+            placeholder="Try 'October' or 'Attempt'"
+            onChange={(e) => {
+              setUserSearch(e.target.value)
+            }}
+          />
+        </div>
       </div>
 
-      {/* Filter: by Area */}
-      <div className={`${utilStyles.singleRow} ${styles.areaFilter}`}>
-        <p className={styles.filterTitle}>Filter by area:</p>
-        {buildFilterByArea()}
-      </div>
-
-      {/* Search all Climbs */}
-      <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
-        <p className={styles.filterTitle}>Search all entries:</p>
-        <input
-          className={styles.searchInput}
-          type={'search'}
-          placeholder="Try 'October' or 'Attempt'"
-          onChange={(e) => {
-            setUserSearch(e.target.value)
-          }}
-        />
-      </div>
       <table>
         <caption>
           Click on a row to expand more details about that hike. Click on a header to sort

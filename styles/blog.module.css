@@ -42,10 +42,6 @@
   color: #020202;
 }
 
-.blogSection {
-  width: 760px;
-}
-
 .categoryFilterWrapper {
   margin-bottom: 1.25rem;
 }
@@ -55,13 +51,18 @@
     display: flex;
   }
 
+  .blogHeaders {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
   .blogSubheader {
     justify-content: center;
   }
-}
 
-@media (max-width: 760px) {
-  .blogSection {
-    width: auto;
+  .categoryFilterWrapper {
+    text-align: center;
   }
 }

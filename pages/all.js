@@ -72,6 +72,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
           onChange={(e) => searchPhotos(e.target.value)}
         />
       </div>
+
       {getAllYears().map((year) => {
         const filteredPhotos = filterByYear(allPhotosData, year)
         return (
