@@ -1,22 +1,21 @@
+import { useState } from 'react'
 import ImageGallery from '../components/ImageGallery'
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { checkMonth, checkYear } from '../utils/helpers'
+import { fetchAllImages } from '../utils/data/photos'
 import { lightFormat } from 'date-fns'
 import { socialImage } from '../utils/social-image'
 
+import styles from '../styles/allPhotos.module.css'
 import utilStyles from '../styles/utils.module.css'
-import { fetchAllImages } from '../utils/data/photos'
-import { checkMonth, checkYear } from '../utils/helpers'
-import { useState } from 'react'
 
 export default function AllPhotosPage({ title, allPhotos }) {
   const [allPhotosPure, setAllPhotos] = useState(allPhotos)
   const [allPhotosData, setAllPhotosData] = useState(allPhotos)
 
   /**
-   * Searches all phots by month, photo title, state, year, and area (as of 01/02/2022)
-   * @param {String} query
-   * @returns {null}
+   * Searches all phots by month, photo title, state, year, and area
    */
   const searchPhotos = (query) => {
     let upperQuery = query.toUpperCase().trim()
@@ -42,10 +41,9 @@ export default function AllPhotosPage({ title, allPhotos }) {
   }
 
   /**
-   * This function will set which photos are displayed by updating the state: allPhotosData.
-   * If nothing is passed to the function, it will display all of the photos in the all-photos database.
-   * This is done by setting the state: allPhotosPure, to the notion database response.
-   * @param {Array} photosToDisplay
+   * Sets which photos are displayed by updating the state of allPhotosData
+   * If nothing is passed to the function, display all of the photos in the
+   * all-photos db by setting the state `allPhotosPure`, the original arr.
    */
   const setPhotosData = (photosToDisplay = allPhotosPure) => {
     setAllPhotosData(photosToDisplay)
@@ -64,13 +62,13 @@ export default function AllPhotosPage({ title, allPhotos }) {
   return (
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
-      {/* Search Photos */}
-      <div className={`${utilStyles.singleRow}`}>
-        <p className={'styles.filterTitle' /*TODO: fix styles*/}>Search all entries:</p>
+      <div className={`${utilStyles.singleRow} ${styles.filterWrapper}`}>
+        {/* Search all Photos */}
+        <p>Search all entries:</p>
         <input
-          className={'styles.searchInput'} // TODO: fix styles
+          className={styles.searchInput}
           type={'search'}
-          placeholder="Try 'October' or 'Sunset'"
+          placeholder="Try 'Sunrise' or 'Goat'"
           onChange={(e) => searchPhotos(e.target.value)}
         />
       </div>

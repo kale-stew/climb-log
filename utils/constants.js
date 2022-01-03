@@ -71,6 +71,7 @@ export const EXPLORE = [
   // { title: 'My Gear', href: '/gear' },
   { title: 'Climb Log', href: '/climb-log' },
   { title: 'Trip Reports', href: `/blog?${CATEGORY_TYPE.HIKE}` },
+  { title: 'All Photos', href: '/all' },
   { title: 'About Kylie', href: '/about' },
 ]
 

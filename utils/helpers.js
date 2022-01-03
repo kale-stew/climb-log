@@ -2,6 +2,7 @@ import format from 'date-fns/format'
 import getMonth from 'date-fns/getMonth'
 import getYear from 'date-fns/getYear'
 import { ALL_MONTHS } from './constants'
+
 const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
 const capitalizeEachWord = (string) => {
@@ -36,12 +37,13 @@ const getLocationData = (str) => {
 }
 
 /**
- * This will let us know if a month input by the user is the same month as a photo or post.
- * It uses date-fns's getMonth to get the month of the photo/post as a number and stores it in the dateNum variable.
- * Then it takes the user's query month and compares it to the ALL_MONTHS constant (all of the months in order),
- * and builds an array of month numbers to compare the dateNum against ( ex: [0, 3, 10] ).
- * @param {String} queryMonth the query month from the user that we are checking, ex: "December".
- * @param {String} date usually in the format '2021-10-09'
+ * Checks if user-input month is the same month as a photo or post.
+ * It uses date-fns's `getMonth` to grab the month of the photo/post as a number & then
+ * stores it in the `dateNum` variable. Then, take user's query str and compare it to
+ * ALL_MONTHS const (all of the months in order). Builds an array of month numbers to
+ * compare the `dateNum` against ( ex: [0, 3, 10] ).
+ * @param {String} queryMonth user-input string, ex: "December".
+ * @param {String} date formatted, ex: '2021-10-09'
  * @returns {Boolean}
  */
 const checkMonth = (queryMonth, date) => {
@@ -54,8 +56,8 @@ const checkMonth = (queryMonth, date) => {
 
 /**
  * Checks to see if a query number is the same year as a photo/post
- * @param {Number} queryDate the year the user is inputting
- * @param {String} dateToCheck the date of the photo/post
+ * @param {Number} queryDate user-input str, ex: "2020"
+ * @param {String} dateToCheck
  * @returns {Boolean}
  */
 const checkYear = (queryDate, dateToCheck) => {

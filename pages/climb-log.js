@@ -16,10 +16,10 @@ import {
   PREVIEW_IMAGES,
   TABLE_SORT_ORDER,
 } from '../utils/constants'
+import { checkMonth } from '../utils/helpers'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/data/climbs'
 import { socialImage } from '../utils/social-image'
-import { checkMonth } from '../utils/helpers'
 
 import tableStyles from '../components/Table.module.css'
 
@@ -40,7 +40,6 @@ const ClimbLog = ({ allClimbs }) => {
 
   const router = useRouter()
   const firstUpdate = useRef(true)
-  const title = `${METADATA.SITE_NAME} | Climb Log`
 
   /**
    * refreshData utilizes Next.js's router to replace the path with the current one,

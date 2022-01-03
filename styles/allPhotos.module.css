@@ -1,0 +1,29 @@
+.filterWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.filterWrapper p {
+  margin-bottom: 0.6vh;
+}
+
+.searchInput {
+  margin-left: 0.75rem;
+  font-size: 14px;
+  padding: 0.2rem 0.4rem;
+  width: 25%;
+  border: 1px solid grey;
+  border-radius: 5px;
+
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+@media (max-width: 1024px) {
+  .searchInput {
+    width: 60%;
+  }
+}
