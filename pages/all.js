@@ -18,7 +18,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
    * @returns {null}
    */
   const searchPhotos = (query) => {
-    let upperQuery = query.toUpperCase()
+    let upperQuery = query.toUpperCase().trim()
 
     // Set photos list back to all if the search query is blank
     if (upperQuery == '') {
