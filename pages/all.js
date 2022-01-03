@@ -51,7 +51,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
   }
 
   const getAllYears = () => {
-    const arr = allPhotos.map(({ date }) => {
+    const arr = allPhotosData.map(({ date }) => {
       const year = lightFormat(new Date(date), 'y')
       return year
     })
