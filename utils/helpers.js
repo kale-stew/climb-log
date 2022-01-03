@@ -1,5 +1,6 @@
 import format from 'date-fns/format'
 import getMonth from 'date-fns/getMonth'
+import getYear from 'date-fns/getYear'
 import { ALL_MONTHS } from './constants'
 const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
@@ -51,6 +52,22 @@ const checkMonth = (queryMonth, date) => {
   return foundMonths.includes(dateNum)
 }
 
+/**
+ * Checks to see if a query number is the same year as a photo/post
+ * @param {Number} queryDate the year the user is inputting
+ * @param {String} dateToCheck the date of the photo/post
+ * @returns {Boolean}
+ */
+const checkYear = (queryDate, dateToCheck) => {
+  let dateSplit = dateToCheck.split('-')
+  if (!isNaN(dateSplit[0])) {
+    let queryYear = getYear(new Date(queryDate, 1, 1))
+    let checkYear = getYear(new Date(Number(dateSplit[0]), 1, 1))
+    return queryYear == checkYear
+  }
+  return false
+}
+
 // Imperial to Metric conversions
 const milesToKilometers = (num) => roundDecimal(num * 1.609)
 const feetToMeters = (num) => addCommas(roundDecimal(num / 3.281))
@@ -60,6 +77,7 @@ export {
   addCommas,
   capitalizeEachWord,
   checkMonth,
+  checkYear,
   feetToMeters,
   formatDate,
   getLocationData,
