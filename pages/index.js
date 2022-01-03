@@ -1,7 +1,7 @@
 import Card from '../components/Card'
 import Layout from '../components/Layout'
 import ResponsiveImage from '../components/ResponsiveImage'
-import { COLORS, METADATA } from '../utils/constants'
+import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { getRecentPosts } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 
@@ -55,7 +55,8 @@ export async function getStaticProps() {
         title,
         description,
         baseName: 'home',
-        bgColor: COLORS.blue,
+        previewImgUrl: PREVIEW_IMAGES.HOME_IMAGE,
+        bgColor: COLORS.green,
       })),
     },
   }

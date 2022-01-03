@@ -2,7 +2,7 @@ import styles from './ImageGallery.module.css'
 
 const ImageGallery = ({ header, photos }) => (
   <>
-    {header && <h2 key={header}>{header}</h2>}
+    {photos.length !== 0 && <h2 key={header}>{header}</h2>}
     <ul className={styles.galleryWrapper}>
       {photos.map((photo) => (
         <li key={photo.href} className={styles.galleryItem}>

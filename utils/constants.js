@@ -47,6 +47,7 @@ export const CATEGORY_TYPE = {
 
 export const COLORS = {
   blue: '#2078ae',
+  green: '#5f6e20',
   grey: '#3a3a3a',
   navy: '#11162b',
   teal: '#285f76',
@@ -87,6 +88,7 @@ export const PREVIEW_IMAGES = {
   BLOG_FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51716926587_ba8bbedd69_b.jpg',
   CLIMB_LOG_IMAGE: 'https://live.staticflickr.com/65535/51789832732_041ee645fa_k.jpg',
   FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51721573796_c2143acb54_b.jpg',
+  HOME_IMAGE: 'https://live.staticflickr.com/65535/51793981577_eef09b49f5_c.jpg',
   NOT_FOUND_IMAGE: 'https://live.staticflickr.com/65535/51789853637_0e1329495c_b.jpg',
 }
 
