@@ -13,7 +13,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
   const [allPhotosData, setAllPhotosData] = useState(allPhotos)
 
   /**
-   * Searches all phots by month and photo title (as of 01/02/2022)
+   * Searches all phots by month, photo title, state, and area (as of 01/02/2022)
    * @param {String} query
    * @returns {null}
    */
@@ -30,7 +30,9 @@ export default function AllPhotosPage({ title, allPhotos }) {
     let searchResults = allPhotos.filter((photo) => {
       return (
         photo.title.toUpperCase().includes(upperQuery) ||
-        checkMonth(upperQuery, photo.date)
+        checkMonth(upperQuery, photo.date) ||
+        photo.area?.toUpperCase().includes(upperQuery) ||
+        photo.state?.toUpperCase().includes(upperQuery)
       )
     })
 
