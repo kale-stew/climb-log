@@ -1,6 +1,7 @@
 import ImageGallery from '../components/ImageGallery'
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { lightFormat } from 'date-fns'
 import { socialImage } from '../utils/social-image'
 
 import utilStyles from '../styles/utils.module.css'
@@ -49,10 +50,19 @@ export default function AllPhotosPage({ title, allPhotos }) {
     setAllPhotosData(photosToDisplay)
   }
 
+  const getAllYears = () => {
+    const arr = allPhotos.map(({ date }) => {
+      const year = lightFormat(new Date(date), 'y')
+      return year
+    })
+    return Array.from(new Set(arr))
+  }
+
+  const filterByYear = (arr, year) => arr.filter(({ date }) => date.indexOf(year) >= 0)
+
   return (
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
-
       {/* Search Photos */}
       <div className={`${utilStyles.singleRow}`}>
         <p className={'styles.filterTitle' /*TODO: fix styles*/}>Search all entries:</p>
@@ -63,8 +73,12 @@ export default function AllPhotosPage({ title, allPhotos }) {
           onChange={(e) => searchPhotos(e.target.value)}
         />
       </div>
-
-      <ImageGallery photos={allPhotosData} />
+      {getAllYears().map((year) => {
+        const filteredPhotos = filterByYear(allPhotosData, year)
+        return (
+          <ImageGallery key={`${year}-gallery`} photos={filteredPhotos} header={year} />
+        )
+      })}
     </Layout>
   )
 }
