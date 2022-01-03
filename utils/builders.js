@@ -7,10 +7,9 @@ import { AREA_TYPE } from './constants'
  */
 const buildAreaName = (area) => {
   const areaStrings = area.split(' ')
-  const arr = areaStrings.map((str) => {
-    return AREA_TYPE[str] ? AREA_TYPE[str] : str
-  })
-
+  const arr = areaStrings.map((str) =>
+    AREA_TYPE[str.toUpperCase()] ? AREA_TYPE[str.toUpperCase()] : str
+  )
   const reformattedArea = arr.toString().replace(/,/g, ' ')
   return capitalizeEachWord(`${reformattedArea.trim()}`)
 }

@@ -1,3 +1,4 @@
+import { buildAreaName } from '../builders'
 import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
 /**
@@ -19,25 +20,51 @@ const formatPhotos = (response) => {
   return response.map((result) => {
     const {
       id,
-      properties: { accent_color, height, href, taken_on, title, width, area },
+      properties: {
+        accent_color,
+        area,
+        area_fallback,
+        height,
+        href,
+        tags,
+        taken_on,
+        title,
+        width,
+      },
     } = result
-    let areaFormatted = fmt(area)
-    let region = null
-    let state = null
-    if (areaFormatted != '') {
-      region = areaFormatted.split(', ')[0]
-      state = areaFormatted.split(', ')[1]
+
+    const determinePhotoArea = () => {
+      let areaFormatted = fmt(area)
+      let fallbackArea = fmt(area_fallback)
+      if (areaFormatted && areaFormatted != '') {
+        return {
+          region: areaFormatted.split(', ')[0],
+          state: areaFormatted.split(', ')[1],
+        }
+      } else if (fallbackArea && fallbackArea != '') {
+        return {
+          region: fallbackArea.split(', ')[0],
+          state: fallbackArea.split(', ')[1],
+        }
+      }
+
+      return {
+        region: null,
+        state: null,
+      }
     }
+
     const finalObj = {
       id,
-      area: region,
-      state,
+      area: buildAreaName(determinePhotoArea().region),
+      state: determinePhotoArea().state,
       title: fmt(title),
       date: fmt(taken_on),
       href: fmt(href),
       width: fmt(width),
       height: fmt(height),
-      bgColor: fmt(accent_color) == undefined ? null : fmt(accent_color),
+      bgColor: fmt(accent_color) ? fmt(accent_color) : null,
+      tags: fmt(tags) ? fmt(tags) : null,
     }
     return finalObj
   }, [])

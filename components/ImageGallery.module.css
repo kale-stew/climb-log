@@ -32,6 +32,11 @@
   list-style: none;
 }
 
+.imageCaption {
+  display: flex;
+  flex-direction: column;
+}
+
 @media (max-width: 1024px) {
   .galleryItem {
     height: auto;
@@ -42,7 +47,6 @@
   .galleryItem img {
     width: 100%;
     min-width: 0;
-    margin-bottom: 1vh;
   }
 
   .galleryItem img:hover {
@@ -52,5 +56,10 @@
 
   .galleryWrapper {
     flex-direction: row;
+  }
+
+  .imageCaption {
+    justify-content: flex-start;
+    margin-bottom: 1.75vh;
   }
 }

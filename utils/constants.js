@@ -14,13 +14,13 @@ export const ALL_MONTHS = [
 ]
 
 export const AREA_TYPE = {
-  nf: 'National Forest',
-  np: 'National Park',
-  os: 'Open Space',
-  ra: 'Recreation Area',
-  rp: 'Regional Park',
-  sp: 'State Park',
-  wa: 'Wilderness',
+  NF: 'National Forest',
+  NP: 'National Park',
+  OS: 'Open Space',
+  RA: 'Recreation Area',
+  RP: 'Regional Park',
+  SP: 'State Park',
+  WA: 'Wilderness',
 }
 
 export const BRANDS = [

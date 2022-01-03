@@ -29,10 +29,11 @@ export default function AllPhotosPage({ title, allPhotos }) {
     // Otherwise search for the query
     let searchResults = allPhotos.filter((photo) => {
       return (
-        photo.title.toUpperCase().includes(upperQuery) ||
         checkMonth(upperQuery, photo.date) ||
         photo.area?.toUpperCase().includes(upperQuery) ||
         photo.state?.toUpperCase().includes(upperQuery) ||
+        photo.tags?.toUpperCase().includes(upperQuery) ||
+        photo.title.toUpperCase().includes(upperQuery) ||
         (isNaN(upperQuery) ? null : checkYear(Number(upperQuery), photo.date))
       )
     })
