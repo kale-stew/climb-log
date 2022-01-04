@@ -15,12 +15,13 @@ import utilStyles from '../styles/utils.module.css'
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
   const router = useRouter()
+  const queryPayload = router.query
+  
   useEffect(() => {
-    const queryPayload = router.query
     if (Object.keys(queryPayload).length > 0) {
       setCategory(Object.keys(queryPayload)[0])
     }
-  }, [])
+  }, [queryPayload])
 
   const buildCategories = () =>
     Object.entries(CATEGORY_TYPE).map(([key, value]) => {
