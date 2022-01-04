@@ -62,13 +62,22 @@ button:hover {
 a {
   color: #4e8a00;
   text-decoration: none;
-  padding: 0.25em;
+  padding: 0.07em;
 }
 
-a:hover {
-  box-shadow: inset 0 -75px 0 0 #4e8a00;
+p a,
+ul a {
+  color: #4e8a00;
+  text-decoration: none;
+  font-weight: 600;
+  vertical-align: middle;
+  box-shadow: inset 0 -0.07em #7fce17, inset 0 -0.15em #4e8a00;
+}
+
+p a:hover,
+ul a:hover {
+  box-shadow: inset 0 -2em 0 0 #4e8a00cb;
   color: white;
-  border-radius: 15px;
 }
 
 caption {
