@@ -6,7 +6,8 @@
 .tallGalleryItem {
   position: relative;
   height: 35vh;
-  width: 450px;
+  width: 20vw;
+  max-width: 35vw;
   overflow: hidden;
 }
 
@@ -14,7 +15,7 @@
   -webkit-transition: all 0.4s ease-in-out;
   -moz-transition: all 0.4s ease-in-out;
   -o-transition: all 0.4s ease-in-out;
-  -ms-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
 }
 
 .tallGalleryImg {
@@ -49,10 +50,10 @@
 }
 
 .tallGalleryImg:hover {
-  -webkit-transform: translateX(-50%) translateY(-50%) scale(0.6);
-  -moz-transform: translateX(-50%) translateY(-50%) scale(0.6);
-  -o-transform: translateX(-50%) translateY(-50%) scale(0.6);
-  transform: translateX(-50%) translateY(-50%) scale(0.6);
+  -webkit-transform: translateX(-50%) translateY(-50%) scale(0.75);
+  -moz-transform: translateX(-50%) translateY(-50%) scale(0.75);
+  -o-transform: translateX(-50%) translateY(-50%) scale(0.75);
+  transform: translateX(-50%) translateY(-50%) scale(0.75);
 }
 
 .galleryWrapper {
@@ -83,19 +84,7 @@
     min-width: 0;
   }
 
-  .tallGalleryImg {
-    padding-bottom: 3.75vh;
-    position: inherit;
-    width: 100%;
-    min-width: 0;
-  }
-
   .galleryItem img:hover {
-    transform: none;
-    border-radius: 0;
-  }
-
-  .tallGalleryImg:hover {
     transform: none;
     border-radius: 0;
   }
@@ -107,5 +96,15 @@
   .imageCaption {
     justify-content: flex-start;
     margin-bottom: 1.75vh;
+  }
+
+  .tallGalleryImg {
+    position: inherit;
+    transition: none;
+  }
+
+  .tallGalleryImg li:hover {
+    width: 100%;
+    transform: none;
   }
 }
