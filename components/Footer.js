@@ -25,11 +25,15 @@ export default function Footer() {
         <div className={styles.footerColumn}>
           <h3>Explore</h3>
           <hr className={styles.footerDivider}></hr>
-          {exploreLinks.map((item) => (
+          {exploreLinks.map((item) => {
+          // console.log("-->", item)
+          return (
+            
             <Link href={item.href} key={`url-${item.title}`}>
               {item.title}
             </Link>
-          ))}
+          )
+})}
         </div>
 
         <div className={styles.footerColumn}>
