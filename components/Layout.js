@@ -18,7 +18,6 @@ export default function Layout({ children, home }) {
       <div className={!home ? styles.wrapper : styles.landingPage}>
         {home ? <LandingNavigation /> : <Navigation />}
         <main>{!loading ? children : <Loading />}</main>
-
         {!home && (
           <div className={utilStyles.backToHome}>
             <Link href="/">
@@ -27,8 +26,7 @@ export default function Layout({ children, home }) {
           </div>
         )}
       </div>
-
-      {!home && <Footer />}
+      <Footer />
     </>
   )
 }

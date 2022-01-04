@@ -49,39 +49,41 @@ export default function BlogLandingPage({ allPostsData }) {
 
   return (
     <Layout>
-      <div className={styles.blogHeaders}>
-        <h1 className={utilStyles.headingXl}>Blog</h1>
-        <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
-      </div>
+      <div className={styles.blogPage}>
+        <div className={styles.blogHeaders}>
+          <h1 className={utilStyles.headingXl}>Blog</h1>
+          <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
+        </div>
 
-      <section
-        className={`${utilStyles.headingMd} ${utilStyles.padding1px} ${styles.blogSection}`}
-      >
-        <ul className={utilStyles.list}>
-          {allPostsData.map(({ id, category, date, preview, title }) => (
-            <li
-              className={utilStyles.listItem}
-              key={id}
-              style={{
-                display:
-                  viewCategory === category || viewCategory === CATEGORY_TYPE.ALL
-                    ? 'block'
-                    : 'none',
-              }}
-            >
-              <Link href="/[category]/[id]" as={`/${category}/${id}`}>
-                <a className={styles.blogPostHeading}>{title}</a>
-              </Link>
-              <br />
-              <small className={`${utilStyles.lightText} ${styles.blogItemCategory}`}>
-                <FormattedDate dateString={date} />{' '}
-                <Category category={category} pushToRouter={false} />
-              </small>
-              <small className={utilStyles.listItem}>{preview}</small>
-            </li>
-          ))}
-        </ul>
-      </section>
+        <section
+          className={`${utilStyles.headingMd} ${utilStyles.padding1px} ${styles.blogSection}`}
+        >
+          <ul className={utilStyles.list}>
+            {allPostsData.map(({ id, category, date, preview, title }) => (
+              <li
+                className={utilStyles.listItem}
+                key={id}
+                style={{
+                  display:
+                    viewCategory === category || viewCategory === CATEGORY_TYPE.ALL
+                      ? 'block'
+                      : 'none',
+                }}
+              >
+                <Link href="/[category]/[id]" as={`/${category}/${id}`}>
+                  <a className={styles.blogPostHeading}>{title}</a>
+                </Link>
+                <br />
+                <small className={`${utilStyles.lightText} ${styles.blogItemCategory}`}>
+                  <FormattedDate dateString={date} />{' '}
+                  <Category category={category} pushToRouter={false} />
+                </small>
+                <small className={utilStyles.listItem}>{preview}</small>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </Layout>
   )
 }

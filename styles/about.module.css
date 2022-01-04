@@ -13,12 +13,15 @@
 
 .brandLink {
   color: #0065b8;
+  text-decoration: none;
+  font-weight: 600;
+  vertical-align: middle;
+  box-shadow: inset 0 -0.07em #3992db, inset 0 -0.15em #0065b8;
 }
 
 .brandLink:hover {
-  box-shadow: inset 0 -75px 0 0 #0065b8;
+  box-shadow: inset 0 -2em 0 0 #0065b8cb;
   color: white;
-  border-radius: 15px;
 }
 
 @media (max-width: 1024px) {

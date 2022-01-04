@@ -50,10 +50,6 @@
 }
 
 @media (max-width: 1024px) {
-  .card {
-    max-width: 75vw;
-  }
-
   .cardText {
     padding: 1vw 3vw;
   }

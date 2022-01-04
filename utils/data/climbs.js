@@ -47,7 +47,7 @@ const formatClimbs = (response) => {
  * featured on the home page
  */
 const fetchMostRecentClimbs = async () => {
-  const config = getDatabaseQueryConfig(null, 3)
+  const config = getDatabaseQueryConfig(null, 5)
   config.sorts = [{ property: 'date', direction: 'descending' }]
   let response = await notion.databases.query(config)
   return formatClimbs(response.results)
