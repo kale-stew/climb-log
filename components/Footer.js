@@ -4,6 +4,7 @@ import { FiExternalLink } from 'react-icons/fi'
 import {
   CONNECT as connectLinks,
   EXPLORE as exploreLinks,
+  METADATA,
   REFERRALS as referralLinks,
 } from '../utils/constants'
 
@@ -45,7 +46,9 @@ export default function Footer() {
 
         <div className={styles.footerLogo}>
           <Logo theme="dark" />
-          <small>© 2022 Kylie Stewart</small>
+          <small>
+            © {new Date().getFullYear()} {METADATA.FULL_NAME}
+          </small>
         </div>
       </div>
     </footer>
