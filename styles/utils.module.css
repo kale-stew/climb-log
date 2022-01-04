@@ -87,7 +87,7 @@
   align-items: center;
 }
 
-.hiddenForMobile > div:first-child{
+.hiddenForMobile > div:first-child {
   display: block !important;
 }
 
