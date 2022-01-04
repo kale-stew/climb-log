@@ -1,16 +1,35 @@
+@keyframes shake {
+  0% {
+    transform: translate(1px, 1px) rotate(0deg);
+  }
+  20% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+  40% {
+    transform: translate(-3px, 0px) rotate(1deg);
+  }
+  60% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+  80% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  100% {
+    transform: translate(-1px, 2px) rotate(-1deg);
+  }
+}
+
 .backToHome {
   margin: 3rem 0;
 }
 
 .backToHome a {
   text-decoration: none;
-  color: #ff953d;
 }
 
-.backToHome a:hover {
-  box-shadow: inset 0 -75px 0 0 #ff953d;
-  color: white;
-  border-radius: 15px;
+.backToHome:hover {
+  animation: shake 0.3s;
+  animation-iteration-count: infinite;
 }
 
 .centerText {
