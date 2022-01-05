@@ -1,0 +1,30 @@
+.socialLink {
+  vertical-align: middle;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0.2em 0.5em;
+}
+
+.socialLink svg {
+  margin: auto 0;
+}
+
+.facebook {
+  color: #365aa9;
+}
+
+.facebook:hover {
+  box-shadow: inset 0 -2em 0 0 #365ba9e5;
+  color: white;
+}
+
+.twitter {
+  color: #5ba4d5;
+}
+
+.twitter:hover {
+  box-shadow: inset 0 -2em 0 0 #5ba4d5e5;
+  color: white;
+}

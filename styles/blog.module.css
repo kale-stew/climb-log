@@ -49,6 +49,13 @@
   color: var(--color-white);
 }
 
+.socialButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 4vh;
+}
+
 @media (max-width: 1024px) {
   .blogPage {
     width: auto;

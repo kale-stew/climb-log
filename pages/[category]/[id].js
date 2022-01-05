@@ -3,6 +3,7 @@ import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import ReactMarkdown from 'react-markdown'
+import ShareButton from '../../components/ShareButton'
 import { COLORS } from '../../utils/constants'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/data/posts'
 import { socialImage } from '../../utils/social-image'
@@ -110,6 +111,10 @@ const Post = ({ postData, postIds }) => {
         </div>
         <ReactMarkdown>{postData.content}</ReactMarkdown>
       </article>
+      <div className={styles.socialButtons}>
+        <ShareButton type="twitter" data={postData} />
+        <ShareButton type="facebook" data={postData} />
+      </div>
       {buildNavigation()}
     </Layout>
   )
