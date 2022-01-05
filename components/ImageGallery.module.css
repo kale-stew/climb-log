@@ -71,23 +71,11 @@
   flex-direction: column;
 }
 
-
-
 @media (max-width: 1024px) {
-  @media (hover: none) {
-    .tallGalleryImg:hover {
-    -webkit-transition: none;
-    -moz-transition: none;
-    -o-transition: none;
-    transition: none;
-     }
-  }
-  .galleryItem,
-  .tallGalleryItem {
+  .galleryItem {
     height: auto;
     overflow: hidden;
     width: 100%;
-    max-width: 100vw;
   }
 
   .galleryItem img {
@@ -108,11 +96,4 @@
     justify-content: flex-start;
     margin-bottom: 1.75vh;
   }
-
-  .tallGalleryImg {
-    position: inherit;
-    transition: none;
-    padding-bottom: 3.75vh;
-  }
-
 }
