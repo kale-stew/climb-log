@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 const ImageGallery = ({ header, photos }) => {
   const [isLargeDisplay, setLargeDisplay] = useState(true)
+
   useEffect(() => {
     const resize = (e) => {
       if (e.matches) {
@@ -12,6 +13,7 @@ const ImageGallery = ({ header, photos }) => {
         setLargeDisplay(false)
       }
     }
+
     let mQuery = window.matchMedia('(min-width: 1024px)')
     mQuery.addEventListener('change', resize)
 
@@ -27,11 +29,13 @@ const ImageGallery = ({ header, photos }) => {
   }, [])
 
   const buildImage = (photo) => {
-    let tallImg = (photo.height / photo.width) > 1.208
+    let tallImg = photo.height / photo.width > 1.208
     return (
       <li
         key={photo.href}
-        className={tallImg && isLargeDisplay ? styles.tallGalleryItem : styles.galleryItem}
+        className={
+          tallImg && isLargeDisplay ? styles.tallGalleryItem : styles.galleryItem
+        }
       >
         <img
           src={photo.href}
