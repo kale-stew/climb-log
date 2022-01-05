@@ -45,8 +45,10 @@
 }
 
 .galleryItem img:hover {
+  position: relative;
   transform: scale(1.1);
   border-radius: 20px;
+  z-index: 200;
 }
 
 .tallGalleryImg:hover {
