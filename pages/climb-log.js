@@ -16,7 +16,7 @@ import {
   PREVIEW_IMAGES,
   TABLE_SORT_ORDER,
 } from '../utils/constants'
-import { checkMonth } from '../utils/helpers'
+import { checkMonth, checkYear } from '../utils/helpers'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/data/climbs'
 import { socialImage } from '../utils/social-image'
@@ -200,7 +200,8 @@ const ClimbLog = ({ allClimbs }) => {
         title.includes(searchQuery) ||
         state.includes(searchQuery) ||
         area.includes(searchQuery) ||
-        checkMonth(searchQuery, date)
+        checkMonth(searchQuery, date) ||
+        (isNaN(searchQuery) ? null : checkYear(Number(searchQuery), date))
       )
     })
     setFilteredClimbs(sorted)
@@ -251,6 +252,7 @@ const ClimbLog = ({ allClimbs }) => {
         setMetric={setMetric}
         setSortOrder={setSortOrder}
         setUserSearch={searchClimbLog}
+        userSearch={userSearch}
         sortOrder={sortOrder}
         togglePopOver={togglePopOver}
       />

@@ -3,7 +3,7 @@ import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
 import { event } from '../utils/gtag'
 import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
-
+import { addCommas, milesToKilometers, feetToMeters, roundDecimal } from '../utils/helpers'
 import categoryStyles from './Category.module.css'
 import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -19,6 +19,7 @@ export default function Table({
   setMetric,
   setSortOrder,
   setUserSearch,
+  userSearch,
   sortOrder,
   togglePopOver,
 }) {
@@ -111,6 +112,27 @@ export default function Table({
     setMetric(isMetric)
   }
 
+  const buildTotals = () => {
+    let distanceTotal = 0
+    let elevationTotal = 0
+    let count = data.length
+    data.forEach((climb) => {
+      let distanceMetric = milesToKilometers(climb.distance)
+      let distanceImp = roundDecimal(climb.distance)
+      let elevationMetric = feetToMeters(climb.gain)
+      let elevationImp = climb.gain
+      distanceTotal += !metric ? distanceImp : distanceMetric
+      elevationTotal += !metric ? elevationImp : elevationMetric
+    })
+    return (
+      <div>
+        <p>Distance Total: {`${addCommas(roundDecimal(distanceTotal))} ${metric ? 'km' : 'mi'}`}</p>
+        <p>Elevation Total: {`${addCommas(roundDecimal(elevationTotal))} ${metric ? 'm' : 'feet'}`}</p>
+        <p>Total Climbs: {`${count}`}</p>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className={styles.tableHeaders}>
@@ -130,6 +152,7 @@ export default function Table({
             Metric
           </button>
         </div>
+        {buildTotals()}
         {/* Filter: by Area */}
         <div className={`${utilStyles.singleRow} ${styles.areaFilter}`}>
           <p className={styles.filterTitle}>Filter by area:</p>
@@ -168,7 +191,7 @@ export default function Table({
           </tr>
 
           {data.length == 0
-            ? 'No Data Found'
+            ? <tr>No Data Found for search query: '{userSearch}'</tr>
             : data.map((climb, i) => (
                 <Popover
                   containerClassName={styles.tablePopover}

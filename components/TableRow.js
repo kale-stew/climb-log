@@ -48,7 +48,7 @@ export default function TableRow({ id, title, data, metric, slug }) {
     case 'gain':
       return (
         <td key={id}>
-          {metric ? data && `${feetToMeters(data)} m` : data && `${addCommas(data)}'`}
+          {metric ? data && `${addCommas(feetToMeters(data))} m` : data && `${addCommas(data)}'`}
         </td>
       )
     case 'state':
