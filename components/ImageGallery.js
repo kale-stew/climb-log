@@ -26,17 +26,17 @@ const ImageGallery = ({ header, photos }) => {
     }
   }, [])
 
-  const buildImage = (photo, isLarge) => {
-    let tallImg = photo.height > photo.width
+  const buildImage = (photo) => {
+    let tallImg = (photo.height / photo.width) > 1.208
     return (
       <li
         key={photo.href}
-        className={tallImg && isLarge ? styles.tallGalleryItem : styles.galleryItem}
+        className={tallImg && isLargeDisplay ? styles.tallGalleryItem : styles.galleryItem}
       >
         <img
           src={photo.href}
           alt={photo.title}
-          className={tallImg && isLarge ? styles.tallGalleryImg : ''}
+          className={tallImg && isLargeDisplay ? styles.tallGalleryImg : ''}
           loading="lazy"
         />
         <div className={`${utilStyles.shownForMobile} ${styles.imageCaption}`}>
@@ -50,7 +50,7 @@ const ImageGallery = ({ header, photos }) => {
     <>
       {photos.length !== 0 && <h2 key={header}>{header}</h2>}
       <ul className={styles.galleryWrapper}>
-        {photos.map((photo) => buildImage(photo, isLargeDisplay))}
+        {photos.map(buildImage)}
         <li key={'end-li'}></li>
       </ul>
     </>
