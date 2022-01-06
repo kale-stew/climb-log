@@ -4,11 +4,12 @@
 }
 
 .categorySelected {
-  background-color: #6d6d6d;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-white);
 }
 
 .categoryPill {
-  color: white;
+  color: var(--color-bg-primary);
   border-radius: 1em;
   margin-left: 0.6rem;
   padding: 0.2em 0.5em;
@@ -17,16 +18,16 @@
 }
 
 .gearCategory {
-  background-color: #e4960498;
+  background-color: var(--color-orange);
   /* Color w/o opacity: e49504 */
 }
 
 .hikeCategory {
-  background-color: #bb03e993;
+  background-color: var(--color-purple);
   /* Color w/o opacity: bb03e9 */
 }
 
 .thoughtsCategory {
-  background-color: #f1045f94;
+  background-color: var(--color-pink);
   /* Color w/o opacity: f1045f */
 }

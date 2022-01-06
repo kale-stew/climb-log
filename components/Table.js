@@ -159,7 +159,7 @@ export default function Table({
             {headers.map((header, i) => (
               <th
                 key={i}
-                className={`${styles[`${header}Header`]} ${utilStyles.uppercase}`}
+                className={styles[`${header}Header`]}
                 onClick={() => sortColumn(header)}
               >
                 {formatHeader(header)}
