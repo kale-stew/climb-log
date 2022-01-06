@@ -10,6 +10,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
     "@notionhq/client": "^0.3.0",
     "date-fns": "^2.27.0",
     "gray-matter": "^4.0.3",

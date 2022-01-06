@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Logo from './Logo'
 import { FiExternalLink } from 'react-icons/fi'
@@ -9,6 +10,10 @@ import {
 } from '../utils/constants'
 
 import styles from './Footer.module.css'
+
+const ThemeToggle = dynamic(() => import('../components/ThemeToggle'), {
+  ssr: false,
+})
 
 export default function Footer() {
   const buildExternalLink = ({ title, href }) => (
@@ -30,6 +35,7 @@ export default function Footer() {
               {item.title}
             </Link>
           ))}
+          <ThemeToggle className={styles.toggleWrapper} />
         </div>
 
         <div className={styles.footerColumn}>

@@ -15,7 +15,7 @@
 }
 
 .footerColumn a {
-  color: #cfcfcf;
+  color: var(--color-offwhite);
   margin: 0.25rem 0;
 }
 
@@ -29,7 +29,7 @@
 
 .footerDivider {
   width: 100%;
-  border-top: 1px solid #cfcfcfcc;
+  border-top: 1px solid var(--color-light-grey);
 }
 
 .footerLinks {
@@ -51,6 +51,10 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+}
+
+.toggleWrapper {
+  margin: 2vh 0;
 }
 
 @media (max-width: 880px) {
