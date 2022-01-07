@@ -266,7 +266,7 @@ const ClimbLog = ({ allClimbs, gear }) => {
   )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const gear = await fetchAllGear()
   const response = await fetchAllClimbs()
   const title = `${METADATA.FIRST_NAME}'s Climb Log`
