@@ -19,13 +19,16 @@ export const fmt = (field) => {
         return field?.date?.start
       case 'file':
         return field?.file?.url
+      case 'files':
+        return field?.files.length > 0 ? field?.files[0].file?.url : null
       case 'formula':
         if (field?.formula?.string || field?.formula?.string == '') {
           return field?.formula?.string
+        } else if (field?.formula?.type == 'number') {
+          return field?.formula?.number
         } else {
           console.warn(
-            field?.formula?.string == '',
-            "Hey 👋 Looks like we are using a formula that isn't evaluated to a string. We need to update the fmt function in notion.js"
+            "Hey 👋 Looks like we are using a formula that isn't evaluated to a string or number. We need to update the fmt function in notion.js"
           )
           return null
         }
@@ -43,6 +46,8 @@ export const fmt = (field) => {
         return field?.title[0]?.plain_text
       case 'url':
         return field?.url
+      case 'multi_select':
+        return field?.multi_select
     }
   } else return null
 }

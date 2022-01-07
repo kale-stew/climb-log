@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
@@ -22,8 +23,9 @@ import { fetchAllClimbs } from '../utils/data/climbs'
 import { socialImage } from '../utils/social-image'
 
 import tableStyles from '../components/Table.module.css'
+import { fetchAllGear } from '../utils/data/gear'
 
-const ClimbLog = ({ allClimbs }) => {
+const ClimbLog = ({ allClimbs, gear }) => {
   const [metric, setMetric] = useState(false)
   const [data, setData] = useState(allClimbs)
   const [sortOrder, setSortOrder] = useState({
@@ -240,6 +242,12 @@ const ClimbLog = ({ allClimbs }) => {
     <Layout>
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
+      <Image
+            src={gear[0].img}
+            width={'100%'}
+            height={'100%'}
+            layout="responsive"
+          />
       <Table
         allAreas={allAreas}
         areaFilter={areaFilter}
@@ -258,16 +266,17 @@ const ClimbLog = ({ allClimbs }) => {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
+  const gear = await fetchAllGear()
   const response = await fetchAllClimbs()
   const title = `${METADATA.FIRST_NAME}'s Climb Log`
   const description = `All of ${METADATA.FIRST_NAME}'s trip reports and hiking stats.`
-
   return {
     props: {
       allClimbs: response,
       title,
       description,
+      gear,
       ...(await socialImage({
         title,
         description,
