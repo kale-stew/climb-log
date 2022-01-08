@@ -6,12 +6,13 @@ import { fmt, getDatabaseQueryConfig, notion } from '../notion'
  * See working examples in climbs.js.
  * ex: let response = await notion.databases.query(photosConfig)
  */
-const photosConfig = getDatabaseQueryConfig(
-  null,
-  null,
-  process.env.NOTION_PHOTO_DATABASE_ID,
-  'taken_on'
-)
+const getPhotosConfig = (nextCursor = null) =>
+  getDatabaseQueryConfig(
+    nextCursor,
+    null,
+    process.env.NOTION_PHOTO_DATABASE_ID,
+    'taken_on'
+  )
 
 /**
  * Formats an array of photos returned from the Notion query
@@ -74,6 +75,7 @@ const formatPhotos = (response) => {
  * Fetch all images from the all-photos db
  */
 const fetchAllImages = async () => {
+  const photosConfig = getPhotosConfig()
   photosConfig.sorts = [{ property: 'taken_on', direction: 'descending' }]
   let response = await notion.databases.query(photosConfig)
   let responseArray = [...response.results]
@@ -82,12 +84,7 @@ const fetchAllImages = async () => {
     // response.has_more tells us if the database has more pages
     // response.next_cursor contains the next page of results,
     //    can be passed as the start_cursor param to the same endpoint
-    const config = getDatabaseQueryConfig(
-      response.next_cursor,
-      null,
-      process.env.NOTION_PHOTO_DATABASE_ID,
-      'taken_on'
-    )
+    const config = getPhotosConfig(response.next_cursor)
     config.sorts = [{ property: 'taken_on', direction: 'descending' }]
     response = await notion.databases.query(config)
     responseArray = [...responseArray, ...response.results]
