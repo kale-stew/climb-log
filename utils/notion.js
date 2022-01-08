@@ -22,7 +22,7 @@ const formatFormulaType = (data) => {
       return data?.formula?.number
     default:
       console.warn(
-        "Hey 👋 Looks like we are using a formula that isn't evaluated to a string or number. We need to update the formatFormulaType function in notion.js"
+        "👋 Looks like we are using a formula that doesn't evaluate to a string or number. We need to update the formatFormulaType fn → notion.js"
       )
       return null
   }
@@ -45,9 +45,8 @@ export const fmt = (field) => {
       case 'number':
         return field?.number
       case 'relation':
-        // TODO: things if we need to use the entire relation
         console.warn(
-          "We haven't set up the relation case in the fmt function in notion.js"
+          "👋 We haven't set this relation case up in the `fmt` function yet. We need to update it → notion.js"
         )
         return null
       case 'rich_text':
@@ -60,7 +59,7 @@ export const fmt = (field) => {
         return field?.multi_select
       default:
         console.warn(
-          "Hey 👋 Looks like we are using a field.type that isn't in the `fmt` function yet. We need to update it in notion.js"
+          "👋 Looks like we are using a field.type that isn't in the `fmt` function yet. We need to update it → notion.js"
         )
         return null
     }

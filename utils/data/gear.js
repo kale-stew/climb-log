@@ -22,33 +22,32 @@ const formatGear = (gearList) =>
     const {
       id,
       properties: {
-        // Current as of 01/07/2022
-        img,
-        url,
-        weight_lb,
-        category,
-        more_info,
         acquired_on,
-        product_name,
-        weight_oz,
+        category,
         cost,
+        img,
+        // more_info,
+        // product_name,
+        title,
+        url,
         weight_g,
-        Name,
+        weight_lb,
+        weight_oz,
       },
     } = gear
     return {
       id,
+      title: fmt(title),
+      acquired_on: fmt(acquired_on),
+      category: fmt(category),
       img: fmt(img),
       url: fmt(url),
-      weight_lb: fmt(weight_lb),
-      category: fmt(category),
-      more_info: null, //fmt(more_info),
-      acquired_on: fmt(acquired_on),
-      product_name: null, //fmt(product_name),
-      weight_oz: fmt(weight_oz),
+      more_info: null, // fmt(more_info),
+      product_name: null, // fmt(product_name),
       cost: fmt(cost),
       weight_g: fmt(weight_g),
-      Name: fmt(Name),
+      weight_lb: fmt(weight_lb),
+      weight_oz: fmt(weight_oz),
     }
   })
 
