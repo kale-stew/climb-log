@@ -259,12 +259,13 @@ const ClimbLog = ({ allClimbs }) => {
 }
 
 export async function getStaticProps() {
-  const response = await fetchAllClimbs()
+  const allClimbs = await fetchAllClimbs()
   const title = `${METADATA.FIRST_NAME}'s Climb Log`
   const description = `All of ${METADATA.FIRST_NAME}'s trip reports and hiking stats.`
+
   return {
     props: {
-      allClimbs: response,
+      allClimbs,
       title,
       description,
       ...(await socialImage({

@@ -69,7 +69,7 @@ export const CONNECT = [
 
 export const EXPLORE = [
   { title: 'Home', href: '/' },
-  // { title: 'My Gear', href: '/gear' },
+  { title: 'My Gear', href: '/gear' },
   { title: 'Climb Log', href: '/climb-log' },
   { title: 'Trip Reports', href: `/blog?${CATEGORY_TYPE.HIKE}` },
   { title: 'All Photos', href: '/all' },
@@ -88,6 +88,7 @@ export const PREVIEW_IMAGES = {
   BLOG_FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51716926587_ba8bbedd69_b.jpg',
   CLIMB_LOG_IMAGE: 'https://live.staticflickr.com/65535/51789832732_041ee645fa_k.jpg',
   FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51721573796_c2143acb54_b.jpg',
+  GEAR_IMAGE: 'https://live.staticflickr.com/65535/51808301878_d84546f4a4_b.jpg',
   HOME_IMAGE: 'https://live.staticflickr.com/65535/51793981577_eef09b49f5_c.jpg',
   NOT_FOUND_IMAGE: 'https://live.staticflickr.com/65535/51789853637_0e1329495c_b.jpg',
 }

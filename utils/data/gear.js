@@ -12,8 +12,23 @@ const gearSorts = [{ property: 'acquired_on', direction: 'descending' }]
 
 const gearFilters = {
   and: [
-    { property: 'category', multi_select: { does_not_contain: 'Retired' } },
     { property: 'acquired_on', date: { is_not_empty: true } },
+    {
+      and: [
+        {
+          property: 'category',
+          select: { does_not_equal: 'Retired' },
+        },
+        {
+          property: 'category',
+          select: { does_not_equal: 'Returned' },
+        },
+        {
+          property: 'category',
+          select: { does_not_equal: 'Resold' },
+        },
+      ],
+    },
   ],
 }
 
@@ -26,8 +41,8 @@ const formatGear = (gearList) =>
         category,
         cost,
         img,
-        // more_info,
-        // product_name,
+        brand,
+        product,
         title,
         url,
         weight_g,
@@ -42,8 +57,8 @@ const formatGear = (gearList) =>
       category: fmt(category),
       img: fmt(img),
       url: fmt(url),
-      more_info: null, // fmt(more_info),
-      product_name: null, // fmt(product_name),
+      brand: fmt(brand),
+      product_str: fmt(product),
       cost: fmt(cost),
       weight_g: fmt(weight_g),
       weight_lb: fmt(weight_lb),
