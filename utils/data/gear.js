@@ -1,11 +1,12 @@
 import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
-const gearConfig = getDatabaseQueryConfig(
-  null,
-  null,
-  process.env.NOTION_GEAR_DATABASE_ID,
-  'acquired_on'
-)
+const getGearConfig = (nextCursor = null) =>
+  getDatabaseQueryConfig(
+    nextCursor,
+    null,
+    process.env.NOTION_GEAR_DATABASE_ID,
+    'acquired_on'
+  )
 
 const gearSorts = [{ property: 'acquired_on', direction: 'descending' }]
 
@@ -52,6 +53,7 @@ const formatGear = (gearList) =>
   })
 
 const fetchAllGear = async () => {
+  const gearConfig = getGearConfig()
   gearConfig.sorts = gearSorts
   gearConfig.filter = gearFilters
   let response = await notion.databases.query(gearConfig)
@@ -60,12 +62,7 @@ const fetchAllGear = async () => {
     // response.has_more tells us if the database has more pages
     // response.next_cursor contains the next page of results,
     //    can be passed as the start_cursor param to the same endpoint
-    const config = getDatabaseQueryConfig(
-      response.next_cursor,
-      null,
-      process.env.NOTION_GEAR_DATABASE_ID,
-      'acquired_on'
-    )
+    const config = getGearConfig(response.next_cursor)
     config.sorts = gearSorts
     config.filter = gearFilters
     response = await notion.databases.query(config)
