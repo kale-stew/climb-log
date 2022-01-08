@@ -22,7 +22,7 @@ const formatFormulaType = (data) => {
       return data?.formula?.number
     default:
       console.warn(
-        "👋 Looks like we are using a formula that doesn't evaluate to a string or number. We need to update the formatFormulaType fn → notion.js"
+        `👋 ${data.formula.type} doesn't evaluate to a string or number. We need to update the formatFormulaType fn → notion.js  `
       )
       return null
   }
@@ -42,6 +42,8 @@ export const fmt = (field) => {
         return field?.files.length > 0 ? field?.files[0].file?.url : null
       case 'formula':
         return formatFormulaType(field)
+      case 'multi_select':
+        return field?.multi_select
       case 'number':
         return field?.number
       case 'relation':
@@ -50,16 +52,16 @@ export const fmt = (field) => {
         )
         return null
       case 'rich_text':
-        return field?.rich_text[0]?.plain_text
+        return field?.rich_text.length > 0 ? field?.rich_text[0]?.plain_text : null
+      case 'select':
+        return field?.select?.name
       case 'title':
         return field?.title[0]?.plain_text
       case 'url':
         return field?.url
-      case 'multi_select':
-        return field?.multi_select
       default:
         console.warn(
-          "👋 Looks like we are using a field.type that isn't in the `fmt` function yet. We need to update it → notion.js"
+          `👋 ${field.type} isn't in the fmt function yet. We need to update it → notion.js`
         )
         return null
     }
