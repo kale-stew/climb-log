@@ -33,26 +33,20 @@
     max-width: 60vw;
   }
 
-  .aboutBlockText {
-    padding-top: 1.75rem;
-  }
-
-  .aboutBlockText h2 {
-    text-align: center;
-  }
-
+  .aboutBlockText,
+  .aboutBlockText h2,
   .aboutBlockText p {
+    padding-top: 1.75rem;
     text-align: center;
+  }
+
+  .aboutBlockText li {
+    text-align: left;
   }
 
   .aboutImageMobile {
     width: 80%;
     margin: auto;
-  }
-
-  .brandSummary {
-    text-align: center;
-    font-style: italic;
   }
 }
 

@@ -57,7 +57,9 @@ const AboutPage = () => (
         <br />
         <h2>Brands</h2>
         <div>
-          <p className={styles.brandSummary}>Kylie is an ambassador for...</p>
+          <p className={utilStyles.centerTextForMobile} style={{ fontStyle: 'italic' }}>
+            Kylie is an ambassador for...
+          </p>
           <ul>
             {BRANDS.map((brand) => (
               <li key={brand.name}>

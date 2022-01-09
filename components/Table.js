@@ -3,8 +3,13 @@ import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
 import { event } from '../utils/gtag'
 import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
+import {
+  addCommas,
+  feetToMeters,
+  milesToKilometers,
+  roundDecimal,
+} from '../utils/helpers'
 
-import categoryStyles from './Category.module.css'
 import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
 
@@ -21,8 +26,9 @@ export default function Table({
   setUserSearch,
   sortOrder,
   togglePopOver,
+  userSearch,
 }) {
-  // Notion data vals we -don't- want in the Table
+  // Notion data values we -don't- want in the Table
   const alwaysExclude = ['href', 'id', 'previewImgUrl', 'slug', 'strava']
 
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
@@ -111,6 +117,36 @@ export default function Table({
     setMetric(isMetric)
   }
 
+  const buildTotals = () => {
+    let distanceTotal = 0
+    let elevationTotal = 0
+    let count = data.length
+    data.forEach((climb) => {
+      let distanceMetric = milesToKilometers(climb.distance)
+      let distanceImp = roundDecimal(climb.distance)
+      let elevationMetric = feetToMeters(climb.gain)
+      let elevationImp = climb.gain
+      distanceTotal += !metric ? distanceImp : distanceMetric
+      elevationTotal += !metric ? elevationImp : elevationMetric
+    })
+    return (
+      <div className={utilStyles.centerTextForMobile} style={{ lineHeight: 1 }}>
+        <p>
+          <strong>Distance Total: </strong>
+          {`${addCommas(roundDecimal(distanceTotal))} ${metric ? 'km' : 'mi'}`}
+        </p>
+        <p>
+          <strong>Elevation Total: </strong>
+          {`${addCommas(roundDecimal(elevationTotal))} ${metric ? 'm' : 'feet'}`}
+        </p>
+        <p>
+          <strong>Total Climbs: </strong>
+          {`${count}`}
+        </p>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className={styles.tableHeaders}>
@@ -118,18 +154,19 @@ export default function Table({
         {/* Buttons: Switch between Imperial and Metric num values */}
         <div className={`${utilStyles.singleRow} ${styles.metricImperialFilters}`}>
           <button
-            className={metric ? 'categoryButton' : styles.categorySelected}
+            className={metric ? 'categoryButton' : styles.filterSelected}
             onClick={() => toggleUnits(false)}
           >
             Imperial
           </button>
           <button
-            className={metric ? styles.categorySelected : 'categoryButton'}
+            className={metric ? styles.filterSelected : 'categoryButton'}
             onClick={() => toggleUnits(true)}
           >
             Metric
           </button>
         </div>
+        {buildTotals()}
         {/* Filter: by Area */}
         <div className={`${utilStyles.singleRow} ${styles.areaFilter}`}>
           <p className={styles.filterTitle}>Filter by area:</p>
@@ -141,7 +178,7 @@ export default function Table({
           <input
             className={styles.searchInput}
             type={'search'}
-            placeholder="Try 'October' or 'Attempt'"
+            placeholder="Try 'October', 'attempt', '2021'"
             onChange={(e) => {
               setUserSearch(e.target.value)
             }}
@@ -167,33 +204,37 @@ export default function Table({
             ))}
           </tr>
 
-          {data.length == 0
-            ? 'No Data Found'
-            : data.map((climb, i) => (
-                <Popover
-                  containerClassName={styles.tablePopover}
-                  key={climb.id}
-                  onClickOutside={() => togglePopOver(i, climb)}
-                  isOpen={isPopoverOpen && rowClicked === i}
-                  positions={['center', 'bottom']} // in order of priority
-                  content={<CustomPopover climb={climb} metric={metric} />}
+          {data.length == 0 ? (
+            <tr>
+              <i>No data found for '{userSearch}'</i>
+            </tr>
+          ) : (
+            data.map((climb, i) => (
+              <Popover
+                containerClassName={styles.tablePopover}
+                key={climb.id}
+                onClickOutside={() => togglePopOver(i, climb)}
+                isOpen={isPopoverOpen && rowClicked === i}
+                positions={['center', 'bottom']} // in order of priority
+                content={<CustomPopover climb={climb} metric={metric} />}
+              >
+                <tr
+                  id={`tableRow${i}`}
+                  className={`tableRow`}
+                  key={i}
+                  onClick={(e) => {
+                    // If we're clicking on a link don't show the popover
+                    if (e.target.nodeName == 'A') {
+                      return
+                    }
+                    togglePopOver(i)
+                  }}
                 >
-                  <tr
-                    id={`tableRow${i}`}
-                    className={`tableRow`}
-                    key={i}
-                    onClick={(e) => {
-                      // If we're clicking on a link don't show the popover
-                      if (e.target.nodeName == 'A') {
-                        return
-                      }
-                      togglePopOver(i)
-                    }}
-                  >
-                    {Object.keys(climb).map((key) => buildTableRow(key, climb))}
-                  </tr>
-                </Popover>
-              ))}
+                  {Object.keys(climb).map((key) => buildTableRow(key, climb))}
+                </tr>
+              </Popover>
+            ))
+          )}
         </tbody>
       </table>
     </>

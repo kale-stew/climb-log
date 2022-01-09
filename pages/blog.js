@@ -8,7 +8,6 @@ import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
-import categoryStyles from '../components/Category.module.css'
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
 
@@ -34,8 +33,8 @@ export default function BlogLandingPage({ allPostsData }) {
           key={key}
           className={
             viewCategory === CATEGORY_TYPE[key]
-              ? categoryStyles.categorySelected
-              : 'categoryButton'
+              ? styles.filterSelected
+              : styles.filterButton
           }
           onClick={() =>
             key == CATEGORY_TYPE.ALL
@@ -57,7 +56,12 @@ export default function BlogLandingPage({ allPostsData }) {
       <div className={styles.blogPage}>
         <div className={styles.blogHeaders}>
           <h1 className={utilStyles.headingXl}>Blog</h1>
-          <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
+          <section
+            className={utilStyles.centerTextForMobile}
+            style={{ marginBottom: '1.25rem' }}
+          >
+            {buildCategories()}
+          </section>
         </div>
 
         <section
@@ -79,7 +83,7 @@ export default function BlogLandingPage({ allPostsData }) {
                   <a className={styles.blogPostHeading}>{title}</a>
                 </Link>
                 <br />
-                <small className={`${utilStyles.lightText} ${styles.blogItemCategory}`}>
+                <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
                   <FormattedDate dateString={date} />{' '}
                   <Category category={category} pushToRouter={false} />
                 </small>

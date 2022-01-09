@@ -72,8 +72,8 @@ const checkYear = (queryDate, dateToCheck) => {
 
 // Imperial to Metric conversions
 const milesToKilometers = (num) => roundDecimal(num * 1.609)
-const feetToMeters = (num) => addCommas(roundDecimal(num / 3.281))
-const roundDecimal = (num) => num && num.toFixed(1)
+const feetToMeters = (num) => roundDecimal(num / 3.281)
+const roundDecimal = (num) => num && Number(num.toFixed(1))
 
 export {
   addCommas,
@@ -84,4 +84,5 @@ export {
   formatDate,
   getLocationData,
   milesToKilometers,
+  roundDecimal,
 }

@@ -62,7 +62,7 @@ const CustomPopover = ({ climb, metric }) => {
       <p>
         <strong>Elevation Gain:</strong>{' '}
         {metric
-          ? climb && `${feetToMeters(climb.gain)} m`
+          ? climb && `${addCommas(feetToMeters(climb.gain))} m`
           : climb && `${addCommas(climb.gain)}'`}
       </p>
       <p>

@@ -3,11 +3,6 @@
   margin: 0 auto;
 }
 
-.blogItemCategory {
-  display: flex;
-  align-items: center;
-}
-
 .blogNavigation {
   display: flex;
   justify-content: space-between;
@@ -48,8 +43,10 @@
   color: var(--color-text-primary);
 }
 
-.categoryFilterWrapper {
-  margin-bottom: 1.25rem;
+.filterButton:hover,
+.filterSelected {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-white);
 }
 
 @media (max-width: 1024px) {
@@ -70,9 +67,5 @@
 
   .blogSubheader {
     justify-content: center;
-  }
-
-  .categoryFilterWrapper {
-    text-align: center;
   }
 }
