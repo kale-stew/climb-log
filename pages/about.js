@@ -50,7 +50,7 @@ const AboutPage = () => (
           send her{' '}
           <a href="mailto:kylie@hey.com" network="email">
             an email
-          </a>{' '}
+          </a>
           .
         </p>
 
@@ -63,8 +63,8 @@ const AboutPage = () => (
           <ul>
             {BRANDS.map((brand) => (
               <li key={brand.name}>
-                <a className={styles.brandLink} href={brand.href}>
-                  {brand.name}
+                <a href={brand.href}>
+                  <strong>{brand.name}</strong>
                 </a>
                 {brand.description && `: ${brand.description}`}
               </li>

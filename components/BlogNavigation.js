@@ -31,6 +31,9 @@ const shakeRight = keyframes`
 const BlogNavigation = styled.div`
   display: flex;
   justify-content: space-between;
+  @media (max-width: 1024px) {
+    gap: 2.5em;
+  }
 `
 
 const NavigationRight = styled.span`

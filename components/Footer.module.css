@@ -41,10 +41,6 @@
   align-items: center !important;
 }
 
-.toggleWrapper {
-  margin: 2vh 0;
-}
-
 @media (max-width: 880px) {
   .footerLinks {
     grid-template-columns: repeat(auto-fill, minmax(135px, 2fr));

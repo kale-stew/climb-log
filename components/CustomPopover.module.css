@@ -7,6 +7,11 @@
   position: relative;
 }
 
+/* Hack to override the default height set for remote urls by next/image */
+.popoverContent > header > div > div {
+  padding-top: 80% !important;
+}
+
 .contentWithImg {
   min-width: 42vw;
   max-width: 75vw;

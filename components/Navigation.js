@@ -9,7 +9,7 @@ const ThemeToggle = dynamic(() => import('../components/ThemeToggle'), {
 })
 
 export const Navigation = () => (
-  <header className={`${styles.navigation} ${utilStyles.vertical}`}>
+  <header className={styles.navigation}>
     <ThemeToggle />
     <div className={utilStyles.singleRow}>
       <Link href="/blog">Blog</Link>
@@ -21,9 +21,7 @@ export const Navigation = () => (
 
 export const LandingNavigation = () => (
   <div className={styles.landingHeader}>
-    <span style={{ marginLeft: '1rem' }}>
-      <ThemeToggle />
-    </span>
+    <ThemeToggle />
     <div className={styles.landingNavigation}>
       <Link href="/blog">Blog</Link>
       <Link href="/climb-log">Climb Log</Link>

@@ -3,6 +3,7 @@
   flex-direction: column;
   justify-content: center;
   width: 75vw;
+  margin: 0 auto;
 }
 
 .filterWrapper p {
@@ -13,18 +14,8 @@
   width: 35%;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 800px) {
   .searchInput {
-    width: 30%;
-  }
-
-  .filterWrapper {
-    margin: 0 auto;
-  }
-}
-
-@media (max-width: 740px) {
-  .searchInput {
-    width: 70%;
+    width: 70vw;
   }
 }

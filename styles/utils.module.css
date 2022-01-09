@@ -36,23 +36,6 @@
   text-align: center;
 }
 
-.gradientTop {
-  background-image: linear-gradient(transparent, var(--color-bg-primary)),
-    url('/photos/lander_top.jpg');
-  height: 30vh;
-  width: 100%;
-  background-size: cover;
-}
-
-.gradientBottom {
-  background-image: linear-gradient(var(--color-bg-primary), transparent),
-    url('/photos/lander_bottom.jpg');
-  height: 25vh;
-  width: 100%;
-  background-size: cover;
-  margin-top: 5vh;
-}
-
 .heading2Xl {
   font-size: 2.8rem;
   line-height: 1.2;
@@ -89,15 +72,7 @@
 }
 
 .lightText {
-  color: #666;
-}
-
-.marginRight {
-  margin-right: 2rem;
-}
-
-.padding1px {
-  padding-top: 1px;
+  color: var(--color-text-tertiary);
 }
 
 .roundImage {
@@ -119,18 +94,10 @@
   align-items: center;
 }
 
-.hiddenForMobile > div:first-child {
-  display: block !important;
-}
-
 @media (max-width: 1024px) {
   .centerTextForMobile {
     text-align: center;
     justify-content: center;
-  }
-
-  .gradientTop {
-    max-height: 25vh;
   }
 
   .hiddenForMobile {

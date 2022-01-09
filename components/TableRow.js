@@ -1,3 +1,4 @@
+import { BsArrowUpRight } from 'react-icons/bs'
 import {
   addCommas,
   capitalizeEachWord,
@@ -17,7 +18,8 @@ export default function TableRow({ id, title, data, metric, slug }) {
         return (
           <td key={id} className={styles.titleData}>
             <a href={`/hike/${slug}`} alt={`View trip report from ${data}`}>
-              {data} ↗
+              {data}
+              <BsArrowUpRight style={{ marginLeft: '0.25em', maxHeight: '12px' }} />
             </a>
           </td>
         )

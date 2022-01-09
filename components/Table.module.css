@@ -91,6 +91,12 @@
     display: inline;
   }
 
+  .searchInput {
+    width: 75vw;
+    margin: 0;
+    margin-top: 0.25vh;
+  }
+
   .tableHeaders {
     display: flex;
     flex-direction: column;
@@ -101,11 +107,5 @@
   .titleHeader,
   .titleData {
     width: 40vw;
-  }
-
-  .searchInput {
-    width: 50vw;
-    margin: 0;
-    margin-top: 0.25vh;
   }
 }
