@@ -1,5 +1,7 @@
-import Image from 'next/image'
+import { BsArrowUpRight } from 'react-icons/bs'
+import { FiExternalLink } from 'react-icons/fi'
 import FormattedDate from './Date'
+import Image from 'next/image'
 import {
   addCommas,
   capitalizeEachWord,
@@ -16,7 +18,10 @@ const CustomPopover = ({ climb, metric }) => {
     if (climb.slug) {
       return (
         <a href={`/hike/${climb.slug}`} alt={`View trip report from ${climb.title}`}>
-          <h2 className={utilStyles.headingLg}>{climb.title} →</h2>
+          <h2 className={utilStyles.headingLg}>
+            {climb.title}
+            <BsArrowUpRight style={{ marginLeft: '0.25em', maxHeight: '18px' }} />
+          </h2>
         </a>
       )
     } else {
@@ -64,8 +69,14 @@ const CustomPopover = ({ climb, metric }) => {
         {capitalizeEachWord(climb.state)}
       </p>
       {climb.strava && (
-        <a href={climb.strava} target="_blank" alt={`View '${climb.title}' on Strava`}>
-          Check out this activity on Strava →
+        <a
+          href={climb.strava}
+          target="_blank"
+          alt={`View '${climb.title}' on Strava`}
+          className={utilStyles.singleRow}
+        >
+          View this activity on Strava
+          <FiExternalLink style={{ marginLeft: '0.25em', maxHeight: '14px' }} />
         </a>
       )}
     </div>
