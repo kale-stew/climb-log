@@ -11,7 +11,7 @@ const GearPage = ({ title, allGear }) => {
   const filterByCategory = (arr, cat) => arr.filter(({ category }) => category === cat)
   const createGearTitle = (item) =>
     capitalizeEachWord(
-      `${item.brand}${item.product_str ? (item.product_str, ' ') : ' '}${item.title}`
+      `${item.brand}${item.product_str ? ` ${item.product_str} ` : ' '}${item.title}`
     )
   const getGearCategories = () => {
     const arr = allGear.map((gear) => gear.category)

@@ -1,14 +1,9 @@
 import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
 const getGearConfig = (nextCursor = null) =>
-  getDatabaseQueryConfig(
-    nextCursor,
-    null,
-    process.env.NOTION_GEAR_DATABASE_ID,
-    'acquired_on'
-  )
+  getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_GEAR_DATABASE_ID, 'title')
 
-const gearSorts = [{ property: 'acquired_on', direction: 'descending' }]
+const gearSorts = [{ property: 'title', direction: 'ascending' }]
 
 const gearFilters = {
   and: [
