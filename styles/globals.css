@@ -28,7 +28,7 @@ body {
 
   /* colors */
   --color-blue: #0071ce;
-  --color-green: #4e8a00;
+  --color-green: #60aa00;
   --color-orange: #e49604d7;
   --color-pink: #f1045fd7;
   --color-purple: #bb03e9d7;
@@ -99,22 +99,17 @@ button:hover {
 a {
   color: var(--color-text-accent);
   text-decoration: none;
-  padding: 0.07em;
 }
 
 p a,
 ul a {
   color: var(--color-text-accent);
   text-decoration: none;
-  font-weight: 600;
-  vertical-align: middle;
-  box-shadow: inset 0 -0.15em var(--color-text-accent);
 }
 
 p a:hover,
 ul a:hover {
-  box-shadow: inset 0 -2em 0 0 var(--color-text-accent);
-  color: white;
+  text-decoration: underline;
 }
 
 caption {
