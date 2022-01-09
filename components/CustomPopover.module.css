@@ -1,6 +1,6 @@
 .popoverContent {
-  background-color: white;
-  border-color: #d2d2d2;
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-bg-secondary);
   border-style: solid;
   border-radius: 15px;
   padding: 15px 30px;

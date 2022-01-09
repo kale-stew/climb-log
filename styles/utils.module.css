@@ -36,6 +36,23 @@
   text-align: center;
 }
 
+.gradientTop {
+  background-image: linear-gradient(transparent, var(--color-bg-primary)),
+    url('/photos/lander_top.jpg');
+  height: 30vh;
+  width: 100%;
+  background-size: cover;
+}
+
+.gradientBottom {
+  background-image: linear-gradient(var(--color-bg-primary), transparent),
+    url('/photos/lander_bottom.jpg');
+  height: 25vh;
+  width: 100%;
+  background-size: cover;
+  margin-top: 5vh;
+}
+
 .heading2Xl {
   font-size: 2.8rem;
   line-height: 1.2;
@@ -88,16 +105,12 @@
 }
 
 .shownForMobile {
-  display: none;
+  display: none !important;
 }
 
 .singleRow {
   display: flex;
   align-items: center;
-}
-
-.uppercase {
-  font-family: 'Playfair Display SC', serif;
 }
 
 .vertical {
@@ -111,6 +124,10 @@
 }
 
 @media (max-width: 1024px) {
+  .gradientTop {
+    max-height: 25vh;
+  }
+
   .hiddenForMobile {
     display: none;
   }

@@ -1,32 +1,35 @@
 .categoryLink:hover {
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  box-shadow: 0 10px 20px var(--color-bg-tertiary), 0 6px 6px var(--color-bg-tertiary);
 }
 
 .categorySelected {
-  background-color: #6d6d6d;
+  background-color: var(--color-bg-accent);
+  color: var(--color-white);
 }
 
 .categoryPill {
-  color: white;
+  color: var(--color-white);
   border-radius: 1em;
-  margin-left: 0.6rem;
-  padding: 0.2em 0.5em;
+  margin-left: 1vw;
+  padding: 0.2em 0.6em;
   line-height: 1.3em;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
 }
 
 .gearCategory {
-  background-color: #e4960498;
+  background-color: var(--color-orange);
   /* Color w/o opacity: e49504 */
 }
 
 .hikeCategory {
-  background-color: #bb03e993;
+  background-color: var(--color-purple);
   /* Color w/o opacity: bb03e9 */
 }
 
 .thoughtsCategory {
-  background-color: #f1045f94;
+  background-color: var(--color-pink);
   /* Color w/o opacity: f1045f */
 }
