@@ -22,7 +22,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0.25em 0;
+  margin: 0.75rem 0.5rem 0.5rem 0.5rem;
 }
 
 .navigation a {
@@ -32,10 +32,6 @@
 }
 
 @media (max-width: 1024px) {
-  .navigation {
-    margin: 0.75rem 0.5rem 0.5rem 0.5rem;
-  }
-
   .landingHeader {
     flex-direction: column;
     align-items: center;
@@ -55,6 +51,6 @@
 
 @media (max-width: 750px) {
   .navigation a {
-    font-size: 2.5vh;
+    font-size: 14px;
   }
 }
