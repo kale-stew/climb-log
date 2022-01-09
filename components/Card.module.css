@@ -13,7 +13,7 @@
 
 .cardTitle {
   margin-bottom: 1vh;
-  color: var(--color-text-primary)
+  color: var(--color-text-primary);
 }
 
 .cardTitle:hover {

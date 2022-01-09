@@ -7,7 +7,7 @@ import { fetchAllImages } from '../utils/data/photos'
 import { lightFormat } from 'date-fns'
 import { socialImage } from '../utils/social-image'
 
-import styles from '../styles/allPhotos.module.css'
+import styles from '../styles/all-photos.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 export default function AllPhotosPage({ title, allPhotos }) {
