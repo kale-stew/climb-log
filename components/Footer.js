@@ -1,4 +1,3 @@
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Logo from './Logo'
 import { FiExternalLink } from 'react-icons/fi'
@@ -10,24 +9,21 @@ import {
 } from '../utils/constants'
 
 import styles from './Footer.module.css'
-
-const ThemeToggle = dynamic(() => import('../components/ThemeToggle'), {
-  ssr: false,
-})
+import utilStyles from '../styles/utils.module.css'
 
 export default function Footer() {
   const buildExternalLink = ({ title, href }) => (
-    <div className={styles.externalLink} key={`url-${title}`}>
-      <a target="_blank" href={href}>
-        {title} <FiExternalLink />
+    <span key={`external-${title}`}>
+      <a className={utilStyles.singleRow} target="_blank" href={href}>
+        {title} <FiExternalLink style={{ marginLeft: '0.5ch' }} />
       </a>
-    </div>
+    </span>
   )
 
   return (
     <footer>
       <div className={styles.footerLinks}>
-        <div className={styles.footerColumn}>
+        <div className={utilStyles.vertical}>
           <h3>Explore</h3>
           <hr className={styles.footerDivider}></hr>
           {exploreLinks.map((item) => (
@@ -35,22 +31,21 @@ export default function Footer() {
               {item.title}
             </Link>
           ))}
-          <ThemeToggle />
         </div>
 
-        <div className={styles.footerColumn}>
+        <div className={utilStyles.vertical}>
           <h3>Connect</h3>
           <hr className={styles.footerDivider}></hr>
           {connectLinks.map((item) => buildExternalLink(item))}
         </div>
 
-        <div className={styles.footerColumn}>
+        <div className={utilStyles.vertical}>
           <h3>Affiliate Links</h3>
           <hr className={styles.footerDivider}></hr>
           {referralLinks.map((item) => buildExternalLink(item))}
         </div>
 
-        <div className={styles.footerLogo}>
+        <div className={`${utilStyles.vertical} ${styles.footerLogo}`}>
           <Logo theme="dark" />
           <small>
             © {new Date().getFullYear()} {METADATA.FULL_NAME}

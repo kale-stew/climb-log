@@ -57,7 +57,12 @@ export default function BlogLandingPage({ allPostsData }) {
       <div className={styles.blogPage}>
         <div className={styles.blogHeaders}>
           <h1 className={utilStyles.headingXl}>Blog</h1>
-          <section className={styles.categoryFilterWrapper}>{buildCategories()}</section>
+          <section
+            className={utilStyles.centerTextForMobile}
+            style={{ marginBottom: '1.25rem' }}
+          >
+            {buildCategories()}
+          </section>
         </div>
 
         <section
@@ -79,7 +84,7 @@ export default function BlogLandingPage({ allPostsData }) {
                   <a className={styles.blogPostHeading}>{title}</a>
                 </Link>
                 <br />
-                <small className={`${utilStyles.lightText} ${styles.blogItemCategory}`}>
+                <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
                   <FormattedDate dateString={date} />{' '}
                   <Category category={category} pushToRouter={false} />
                 </small>

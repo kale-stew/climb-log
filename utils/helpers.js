@@ -84,5 +84,5 @@ export {
   formatDate,
   getLocationData,
   milesToKilometers,
-  roundDecimal
+  roundDecimal,
 }

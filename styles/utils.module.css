@@ -124,6 +124,10 @@
 }
 
 @media (max-width: 1024px) {
+  .centerTextForMobile {
+    text-align: center;
+  }
+
   .gradientTop {
     max-height: 25vh;
   }

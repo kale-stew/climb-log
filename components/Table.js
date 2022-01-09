@@ -3,8 +3,13 @@ import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
 import { event } from '../utils/gtag'
 import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
-import { addCommas, milesToKilometers, feetToMeters, roundDecimal } from '../utils/helpers'
-import categoryStyles from './Category.module.css'
+import {
+  addCommas,
+  feetToMeters,
+  milesToKilometers,
+  roundDecimal,
+} from '../utils/helpers'
+
 import styles from './Table.module.css'
 import utilStyles from '../styles/utils.module.css'
 
@@ -23,7 +28,7 @@ export default function Table({
   sortOrder,
   togglePopOver,
 }) {
-  // Notion data vals we -don't- want in the Table
+  // Notion data values we -don't- want in the Table
   const alwaysExclude = ['href', 'id', 'previewImgUrl', 'slug', 'strava']
 
   // Create an arr of Table Headers by mapping over data so headers are never out of sync
@@ -126,8 +131,14 @@ export default function Table({
     })
     return (
       <div>
-        <p>Distance Total: {`${addCommas(roundDecimal(distanceTotal))} ${metric ? 'km' : 'mi'}`}</p>
-        <p>Elevation Total: {`${addCommas(roundDecimal(elevationTotal))} ${metric ? 'm' : 'feet'}`}</p>
+        <p>
+          Distance Total:{' '}
+          {`${addCommas(roundDecimal(distanceTotal))} ${metric ? 'km' : 'mi'}`}
+        </p>
+        <p>
+          Elevation Total:{' '}
+          {`${addCommas(roundDecimal(elevationTotal))} ${metric ? 'm' : 'feet'}`}
+        </p>
         <p>Total Climbs: {`${count}`}</p>
       </div>
     )
@@ -190,33 +201,35 @@ export default function Table({
             ))}
           </tr>
 
-          {data.length == 0
-            ? <tr>No Data Found for search query: '{userSearch}'</tr>
-            : data.map((climb, i) => (
-                <Popover
-                  containerClassName={styles.tablePopover}
-                  key={climb.id}
-                  onClickOutside={() => togglePopOver(i, climb)}
-                  isOpen={isPopoverOpen && rowClicked === i}
-                  positions={['center', 'bottom']} // in order of priority
-                  content={<CustomPopover climb={climb} metric={metric} />}
+          {data.length == 0 ? (
+            <tr>No Data Found for search query: '{userSearch}'</tr>
+          ) : (
+            data.map((climb, i) => (
+              <Popover
+                containerClassName={styles.tablePopover}
+                key={climb.id}
+                onClickOutside={() => togglePopOver(i, climb)}
+                isOpen={isPopoverOpen && rowClicked === i}
+                positions={['center', 'bottom']} // in order of priority
+                content={<CustomPopover climb={climb} metric={metric} />}
+              >
+                <tr
+                  id={`tableRow${i}`}
+                  className={`tableRow`}
+                  key={i}
+                  onClick={(e) => {
+                    // If we're clicking on a link don't show the popover
+                    if (e.target.nodeName == 'A') {
+                      return
+                    }
+                    togglePopOver(i)
+                  }}
                 >
-                  <tr
-                    id={`tableRow${i}`}
-                    className={`tableRow`}
-                    key={i}
-                    onClick={(e) => {
-                      // If we're clicking on a link don't show the popover
-                      if (e.target.nodeName == 'A') {
-                        return
-                      }
-                      togglePopOver(i)
-                    }}
-                  >
-                    {Object.keys(climb).map((key) => buildTableRow(key, climb))}
-                  </tr>
-                </Popover>
-              ))}
+                  {Object.keys(climb).map((key) => buildTableRow(key, climb))}
+                </tr>
+              </Popover>
+            ))
+          )}
         </tbody>
       </table>
     </>

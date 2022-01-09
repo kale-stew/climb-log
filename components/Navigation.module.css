@@ -10,14 +10,6 @@
   margin: 0.25em 0 1.5em 1.5em;
 }
 
-.landingLogoWrapper {
-  margin-left: 1rem;
-}
-
-.landingLogoWrapper img {
-  width: 65px;
-}
-
 .landingNavigation a {
   color: var(--color-text-primary);
   font-size: 1.25rem;
@@ -28,6 +20,10 @@
 .landingNavigation a:hover {
   text-decoration: underline;
   box-shadow: none;
+}
+
+.navigation {
+  margin: 1.4rem;
 }
 
 .navigation a {
@@ -42,20 +38,7 @@
   box-shadow: none;
 }
 
-.navigation {
-  margin: 1.4rem;
-}
-
 @media (max-width: 1024px) {
-  .landingHeader {
-    margin-bottom: 0;
-    padding: 1em;
-  }
-
-  .landingNavigation a {
-    padding: none;
-  }
-
   .navigation {
     margin: 0.75rem;
   }
@@ -67,16 +50,14 @@
 
   .landingHeader {
     flex-direction: column;
-    height: auto;
     align-items: center;
+    margin-bottom: 0;
+    padding: 1em;
+    height: auto;
   }
 
   .landingHeader h1 {
     margin: 0;
-  }
-
-  .landingLogoWrapper > div > div > img {
-    display: none !important;
   }
 
   .landingNavigation {

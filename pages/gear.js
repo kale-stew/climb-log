@@ -24,7 +24,7 @@ const GearPage = ({ title, allGear }) => {
       <div className={styles.gearWrapper}>
         {getGearCategories().map((cat) => (
           <>
-            <h3>{cat}</h3>
+            <h3 className={utilStyles.centerTextForMobile}>{cat}</h3>
             <ul>
               {filterByCategory(allGear, cat).map((item) => (
                 <li key={item.title}>{createGearTitle(item)}</li>

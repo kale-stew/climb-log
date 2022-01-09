@@ -32,7 +32,7 @@ const ToggleButton = styled.button`
     outline: none;
   }
   &:hover {
-    background: var(--color-text-accent);
+    background: var(--color-bg-tertiary);
   }
 `
 
