@@ -17,7 +17,7 @@ export default function TableRow({ id, title, data, metric, slug }) {
         return (
           <td key={id} className={styles.titleData}>
             <a href={`/hike/${slug}`} alt={`View trip report from ${data}`}>
-              {data} ↗
+              {data} →
             </a>
           </td>
         )

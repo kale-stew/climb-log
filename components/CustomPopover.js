@@ -16,7 +16,7 @@ const CustomPopover = ({ climb, metric }) => {
     if (climb.slug) {
       return (
         <a href={`/hike/${climb.slug}`} alt={`View trip report from ${climb.title}`}>
-          <h2 className={utilStyles.headingLg}>{climb.title} ↗</h2>
+          <h2 className={utilStyles.headingLg}>{climb.title} →</h2>
         </a>
       )
     } else {
@@ -65,7 +65,7 @@ const CustomPopover = ({ climb, metric }) => {
       </p>
       {climb.strava && (
         <a href={climb.strava} target="_blank" alt={`View '${climb.title}' on Strava`}>
-          Check out this activity on Strava ↗
+          Check out this activity on Strava →
         </a>
       )}
     </div>
