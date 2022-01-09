@@ -203,6 +203,22 @@ th {
 }
 
 @media (max-width: 1024px) {
+  article {
+    width: auto;
+  }
+
+  article h1 {
+    text-align: center;
+  }
+
+  article img {
+    max-width: 80vw;
+  }
+
+  table {
+    line-height: 2;
+  }
+
   caption {
     margin-top: 1.25rem;
     line-height: 1.4;
@@ -230,23 +246,5 @@ th {
     padding: 0 0.25em;
     max-width: 25vw;
     font-size: 14px;
-  }
-}
-
-@media (max-width: 1024px) {
-  article {
-    width: auto;
-  }
-
-  article h1 {
-    text-align: center;
-  }
-
-  article img {
-    max-width: 80vw;
-  }
-
-  table {
-    line-height: 2;
   }
 }
