@@ -1,20 +1,22 @@
 .categoryLink:hover {
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  box-shadow: 0 10px 20px var(--color-bg-tertiary), 0 6px 6px var(--color-bg-tertiary);
 }
 
 .categorySelected {
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-dark-grey);
   color: var(--color-white);
 }
 
 .categoryPill {
-  color: var(--color-bg-primary);
+  color: var(--color-white);
   border-radius: 1em;
-  margin-left: 0.6rem;
-  padding: 0.2em 0.5em;
+  margin-left: 1vw;
+  padding: 0.2em 0.6em;
   line-height: 1.3em;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
 }
 
 .gearCategory {

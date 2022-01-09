@@ -47,7 +47,7 @@ body[data-theme='light'] {
 body[data-theme='dark'] {
   --color-text-primary: var(--color-offwhite);
   --color-text-secondary: var(--color-light-grey);
-  --color-text-accent: var(--color-green);
+  --color-text-accent: var(--color-orange);
   --color-bg-primary: var(--color-black);
   --color-bg-secondary: #272727;
   --color-bg-tertiary: #4d4d4d;
@@ -91,6 +91,7 @@ button {
 
 button:hover {
   background-color: var(--color-medium-grey);
+  cursor: pointer;
 }
 
 a {

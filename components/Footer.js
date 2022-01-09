@@ -35,7 +35,7 @@ export default function Footer() {
               {item.title}
             </Link>
           ))}
-          <ThemeToggle className={styles.toggleWrapper} />
+          <ThemeToggle />
         </div>
 
         <div className={styles.footerColumn}>

@@ -116,15 +116,15 @@ export default function Table({
       <div className={styles.tableHeaders}>
         <h1>Kylie's Climb Log</h1>
         {/* Buttons: Switch between Imperial and Metric num values */}
-        <div className={utilStyles.singleRow}>
+        <div className={`${utilStyles.singleRow} ${styles.metricImperialFilters}`}>
           <button
-            className={metric ? 'categoryButton' : categoryStyles.categorySelected}
+            className={metric ? 'categoryButton' : styles.categorySelected}
             onClick={() => toggleUnits(false)}
           >
             Imperial
           </button>
           <button
-            className={metric ? categoryStyles.categorySelected : 'categoryButton'}
+            className={metric ? styles.categorySelected : 'categoryButton'}
             onClick={() => toggleUnits(true)}
           >
             Metric

@@ -75,8 +75,8 @@
     margin: 0;
   }
 
-  .landingLogoWrapper img {
-    width: 175px;
+  .landingLogoWrapper > div > div > img {
+    display: none !important;
   }
 
   .landingNavigation {
