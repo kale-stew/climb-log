@@ -10,18 +10,7 @@
 }
 
 .searchInput {
-  margin-left: 0.75rem;
-  font-size: 14px;
-  padding: 0.2rem 0.4rem;
-  margin: 0;
-  width: 25%;
-  border: 1px solid grey;
-  border-radius: 5px;
-
-  -webkit-appearance: none;
-  -ms-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+  width: 35%;
 }
 
 @media (max-width: 1024px) {

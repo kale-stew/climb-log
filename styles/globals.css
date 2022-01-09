@@ -27,7 +27,7 @@ body {
   --color-dark-grey: #2e2e2e;
 
   /* colors */
-  --color-blue: #0065b8;
+  --color-blue: #0071ce;
   --color-green: #4e8a00;
   --color-orange: #e49604d7;
   --color-pink: #f1045fd7;
@@ -69,17 +69,17 @@ img[alt='vertical'] {
 }
 
 button {
-  background-color: #c5c5c5;
+  background-color: var(--color-bg-secondary);
   display: inline-block;
   padding: 0.3em 1.2em;
   margin: 0 0.8em 0.8em 0;
   border-radius: 2em;
   border: none;
 
+  color: var(--color-text-primary);
   text-decoration: none;
   font-weight: 300;
   font-size: 15px;
-  color: var(--color-bg-primary);
   text-align: center;
   transition: all 0.2s;
 
@@ -90,8 +90,9 @@ button {
 }
 
 button:hover {
-  background-color: var(--color-medium-grey);
   cursor: pointer;
+  background-color: var(--color-text-accent);
+  color: var(--color-white);
 }
 
 a {
@@ -151,9 +152,20 @@ h3 {
   font-weight: 300;
 }
 
-select {
-  margin-left: 0.75rem;
+select,
+input {
   font-size: 16px;
+  border-radius: 5px;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  outline: none;
+  padding: 0.2rem 0.4rem;
+
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 1px solid var(--color-bg-tertiary);
 }
 
 table {
