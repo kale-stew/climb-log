@@ -4,6 +4,12 @@
   text-align: left;
 }
 
+.areaFilter,
+.searchFilter {
+  margin: 0.75em 0 0 0;
+  align-items: baseline;
+}
+
 .blanket {
   position: fixed;
   left: 0;
@@ -25,7 +31,7 @@
 }
 
 .filterTitle {
-  margin-right: 0.75em;
+  margin: 0 0.75em 0 0;
 }
 
 .hiddenInMobile {
@@ -65,6 +71,7 @@
   .searchFilter {
     flex-direction: column;
     margin: 0;
+    align-items: center;
   }
 
   .areaHeader,
@@ -97,7 +104,7 @@
   }
 
   .searchInput {
-    width: 60vw;
+    width: 50vw;
     margin: 0;
     margin-top: 0.25vh;
   }
