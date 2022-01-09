@@ -24,9 +24,9 @@ export default function Table({
   setMetric,
   setSortOrder,
   setUserSearch,
-  userSearch,
   sortOrder,
   togglePopOver,
+  userSearch,
 }) {
   // Notion data values we -don't- want in the Table
   const alwaysExclude = ['href', 'id', 'previewImgUrl', 'slug', 'strava']
@@ -130,16 +130,19 @@ export default function Table({
       elevationTotal += !metric ? elevationImp : elevationMetric
     })
     return (
-      <div>
+      <div className={utilStyles.centerTextForMobile}>
         <p>
-          Distance Total:{' '}
+          <strong>Distance Total: </strong>
           {`${addCommas(roundDecimal(distanceTotal))} ${metric ? 'km' : 'mi'}`}
         </p>
         <p>
-          Elevation Total:{' '}
+          <strong>Elevation Total: </strong>
           {`${addCommas(roundDecimal(elevationTotal))} ${metric ? 'm' : 'feet'}`}
         </p>
-        <p>Total Climbs: {`${count}`}</p>
+        <p>
+          <strong>Total Climbs: </strong>
+          {`${count}`}
+        </p>
       </div>
     )
   }
