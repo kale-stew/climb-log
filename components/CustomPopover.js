@@ -16,17 +16,11 @@ const CustomPopover = ({ climb, metric }) => {
     if (climb.slug) {
       return (
         <a href={`/hike/${climb.slug}`} alt={`View trip report from ${climb.title}`}>
-          <h2 className={`${utilStyles.headingLg} ${utilStyles.padding1px}`}>
-            {climb.title} ↗
-          </h2>
+          <h2 className={utilStyles.headingLg}>{climb.title} ↗</h2>
         </a>
       )
     } else {
-      return (
-        <h2 className={`${utilStyles.headingLg} ${utilStyles.padding1px}`}>
-          {climb.title}
-        </h2>
-      )
+      return <h2 className={utilStyles.headingLg}>{climb.title}</h2>
     }
   }
 

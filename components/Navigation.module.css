@@ -3,61 +3,46 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0.25rem 1.5rem 0.25rem;
-}
-
-.landingHeader h1 {
-  margin: 0.25em 0 1.5em 1.5em;
+  padding: 1em 0.75em 1em 1.75em;
 }
 
 .landingNavigation a {
   color: var(--color-text-primary);
-  font-size: 1.25rem;
   margin: 0.5em 1.5em 1.5em 0;
   padding: 0;
 }
 
 .landingNavigation a:hover {
   text-decoration: underline;
-  box-shadow: none;
 }
 
 .navigation {
-  margin: 1.4rem;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25em 0;
 }
 
 .navigation a {
   color: var(--color-text-primary);
-  padding: 0.25em;
   margin: 0 0.25em;
   font-weight: 400;
 }
 
-.navigation a:hover {
-  text-decoration: underline;
-  box-shadow: none;
-}
-
 @media (max-width: 1024px) {
   .navigation {
-    margin: 0.75rem;
+    margin: 0.75rem 0.5rem 0.5rem 0.5rem;
   }
 
   .navigation a {
-    font-size: 18px;
-    margin: 1rem 0.75rem;
+    font-size: 2.5vh;
   }
 
   .landingHeader {
     flex-direction: column;
     align-items: center;
-    margin-bottom: 0;
-    padding: 1em;
-    height: auto;
-  }
-
-  .landingHeader h1 {
-    margin: 0;
   }
 
   .landingNavigation {
@@ -66,7 +51,8 @@
   }
 
   .landingNavigation a {
+    font-size: 3vh;
     margin: auto;
-    padding: 2.5em 1em 0 1em;
+    padding: 0 1em;
   }
 }

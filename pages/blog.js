@@ -64,9 +64,7 @@ export default function BlogLandingPage({ allPostsData }) {
           </section>
         </div>
 
-        <section
-          className={`${utilStyles.headingMd} ${utilStyles.padding1px} ${styles.blogSection}`}
-        >
+        <section className={`${utilStyles.headingMd} ${styles.blogSection}`}>
           <ul className={utilStyles.list}>
             {allPostsData.map(({ id, category, date, preview, title }) => (
               <li

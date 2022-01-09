@@ -40,6 +40,7 @@ const ToggleButton = styled.button`
   justify-content: center;
   font-size: 1.4rem;
   padding: 1.22rem;
+  margin: 0;
   cursor: pointer;
   transition: background 0.25s ease-in-out;
   &:hover {

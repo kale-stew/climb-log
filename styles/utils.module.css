@@ -89,15 +89,7 @@
 }
 
 .lightText {
-  color: #666;
-}
-
-.marginRight {
-  margin-right: 2rem;
-}
-
-.padding1px {
-  padding-top: 1px;
+  color: var(--color-text-tertiary);
 }
 
 .roundImage {
@@ -117,10 +109,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.hiddenForMobile > div:first-child {
-  display: block !important;
 }
 
 @media (max-width: 1024px) {

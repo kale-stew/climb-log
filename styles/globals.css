@@ -38,6 +38,7 @@ body,
 body[data-theme='light'] {
   --color-text-primary: var(--color-black);
   --color-text-secondary: var(--color-dark-grey);
+  --color-text-tertiary: #696969;
   --color-text-accent: var(--color-blue);
   --color-bg-primary: var(--color-white);
   --color-bg-secondary: var(--color-offwhite);
@@ -48,6 +49,7 @@ body[data-theme='light'] {
 body[data-theme='dark'] {
   --color-text-primary: var(--color-offwhite);
   --color-text-secondary: var(--color-light-grey);
+  --color-text-tertiary: var(--color-medium-grey);
   --color-text-accent: var(--color-green);
   --color-bg-primary: var(--color-black);
   --color-bg-secondary: #272727;
@@ -129,7 +131,7 @@ footer {
 }
 
 header {
-  margin: 1rem 0 2.5rem 0;
+  margin: 1rem 0 1.5rem 0;
 }
 
 header a {

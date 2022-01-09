@@ -20,6 +20,14 @@
   max-width: 85vw;
 }
 
+/* Fallback for ultra-wide displays */
+@media (min-width: 1280px) {
+  .wrapper {
+    margin: 0 auto;
+    max-width: 45vw;
+  }
+}
+
 @media (max-width: 1024px) {
   .wrapper {
     margin: 0 auto;
