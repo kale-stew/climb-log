@@ -42,15 +42,17 @@ body[data-theme='light'] {
   --color-bg-primary: var(--color-white);
   --color-bg-secondary: var(--color-offwhite);
   --color-bg-tertiary: #a7a7a7;
+  --color-bg-accent: var(--color-blue);
 }
 
 body[data-theme='dark'] {
   --color-text-primary: var(--color-offwhite);
   --color-text-secondary: var(--color-light-grey);
-  --color-text-accent: var(--color-orange);
+  --color-text-accent: var(--color-green);
   --color-bg-primary: var(--color-black);
   --color-bg-secondary: #272727;
   --color-bg-tertiary: #4d4d4d;
+  --color-bg-accent: var(--color-green);
 }
 
 article {
@@ -91,7 +93,7 @@ button {
 
 button:hover {
   cursor: pointer;
-  background-color: var(--color-text-accent);
+  background-color: var(--color-bg-accent);
   color: var(--color-white);
 }
 
