@@ -1,25 +1,7 @@
-.blogNavigation {
-  display: flex;
-  justify-content: space-between;
-  gap: 2em;
-}
-
-.blogNavigation a {
-  text-align: center;
-  text-decoration: none;
-  color: var(--color-text-accent);
-  font-style: italic;
-  padding: 0.05em;
-}
-
-.blogNavigation a:hover {
-  box-shadow: inset 0 -0.1em 0 0 var(--color-text-accent);
-}
-
 .blogNavigationSeparator {
   display: none;
   margin: 2px;
-  background: var(--color-text-accent);
+  background: var(--color-text-secondary);
   width: 1px;
 }
 

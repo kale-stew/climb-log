@@ -1,5 +1,61 @@
 import Link from 'next/link'
+import styled from '@emotion/styled'
+import { keyframes } from '@emotion/react'
+
 import styles from './BlogNavigation.module.css'
+
+const shakeLeft = keyframes`
+  0% {
+    transform: translate(1px);
+  }
+  50% {
+    transform: translate(-6px);
+  }
+  100% {
+    transform: translate(0px);
+  }
+`
+
+const shakeRight = keyframes`
+0% {
+  transform: translate(-1px);
+}
+50% {
+  transform: translate(6px);
+}
+100% {
+  transform: translate(0px);
+}
+`
+
+const BlogNavigation = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const NavigationRight = styled.span`
+  text-align: center;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  padding: 0.05em;
+  &:hover {
+    cursor: pointer;
+    animation: ${shakeRight} 0.3s;
+    animation-iteration-count: 2;
+  }
+`
+
+const NavigationLeft = styled.span`
+  text-align: center;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  padding: 0.05em;
+  &:hover {
+    cursor: pointer;
+    animation: ${shakeLeft} 0.3s;
+    animation-iteration-count: 2;
+  }
+`
 
 /**
  * buildNavigation uses the sorted posts data to find it's own index, the next post's,
@@ -22,7 +78,7 @@ export const buildNavigation = (postIds, postData) => {
         href="/[category]/[id]"
         as={`/${postIds[nextPost].category}/${postIds[nextPost].id}`}
       >
-        <a>{postIds[nextPost].title} →</a>
+        <NavigationRight>{postIds[nextPost].title} →</NavigationRight>
       </Link>
     )
   }
@@ -34,50 +90,50 @@ export const buildNavigation = (postIds, postData) => {
         href="/[category]/[id]"
         as={`/${postIds[prevPost].category}/${postIds[prevPost].id}`}
       >
-        <a>← {postIds[prevPost].title}</a>
+        <NavigationLeft>← {postIds[prevPost].title}</NavigationLeft>
       </Link>
     )
   }
   // If there are posts before before and after this one, let's have links leading to each one
   if (nextPost != -1 && prevPost != -1) {
     return (
-      <div className={styles.blogNavigation}>
+      <BlogNavigation>
         {prevPostLink}
         <span className={styles.blogNavigationSeparator}></span>
         {nextPostLink}
-      </div>
+      </BlogNavigation>
     )
   }
   // If there is no previous post, let's have back to blog and next post Links available
   if (prevPost == -1 && nextPost != -1) {
     return (
-      <div className={styles.blogNavigation}>
+      <BlogNavigation>
         <Link href="/blog">
-          <a>← Back to blog</a>
+          <NavigationLeft>← Back to blog</NavigationLeft>
         </Link>
         <span className={styles.blogNavigationSeparator}></span>
         {nextPostLink}
-      </div>
+      </BlogNavigation>
     )
   }
   // If there is no next post but a previous post, let's show that
   if (nextPost == -1 && prevPost != -1) {
     return (
-      <div className={styles.blogNavigation}>
+      <BlogNavigation>
         {prevPostLink}
         <span className={styles.blogNavigationSeparator}></span>
         <Link href="/blog">
-          <a> Back to blog →</a>
+          <NavigationRight> Back to blog →</NavigationRight>
         </Link>
-      </div>
+      </BlogNavigation>
     )
   }
   // Always return something
   return (
-    <div className={styles.blogNavigation}>
+    <BlogNavigation>
       <Link href="/blog">
         <a>← Back to blog</a>
       </Link>
-    </div>
+    </BlogNavigation>
   )
 }
