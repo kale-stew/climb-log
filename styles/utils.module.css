@@ -126,6 +126,7 @@
 @media (max-width: 1024px) {
   .centerTextForMobile {
     text-align: center;
+    justify-content: center;
   }
 
   .gradientTop {

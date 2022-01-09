@@ -1,3 +1,10 @@
+export const METADATA = {
+  FIRST_NAME: 'Kylie',
+  FULL_NAME: 'Kylie Stewart',
+  SITE_NAME: 'kylies.photos',
+  TWITTER_HANDLE: 'kyliestew',
+}
+
 export const ALL_MONTHS = [
   'JANUARY',
   'FEBRUARY',
@@ -64,7 +71,7 @@ export const CONNECT = [
     href: 'https://www.14ers.com/forum/memberlist.php?mode=viewprofile&u=87761',
   },
   { title: 'Flickr', href: 'https://flickr.com/photos/189863825@N02/' },
-  { title: 'Twitter', href: 'https://twitter.com/kyliestew' },
+  { title: 'Twitter', href: `https://twitter.com/${METADATA.TWITTER_HANDLE}` },
 ]
 
 export const EXPLORE = [
@@ -75,12 +82,6 @@ export const EXPLORE = [
   { title: 'All Photos', href: '/all' },
   { title: 'About Kylie', href: '/about' },
 ]
-
-export const METADATA = {
-  FIRST_NAME: 'Kylie',
-  FULL_NAME: 'Kylie Stewart',
-  SITE_NAME: 'kylies.photos',
-}
 
 export const PREVIEW_IMAGES = {
   ABOUT_IMAGE: 'https://live.staticflickr.com/65535/51791228456_aa3e462b7f_k.jpg',
