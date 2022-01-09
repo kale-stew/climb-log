@@ -5,9 +5,9 @@ import { BsMoonStars, BsSun } from 'react-icons/bs'
 import styles from './Footer.module.css'
 
 const ToggleButton = styled.button`
-  --toggle-width: 72px;
-  --toggle-height: 38px;
-  --toggle-padding: 3px;
+  --toggle-width: 70px;
+  --toggle-height: 40px;
+  --toggle-padding: 5px;
   position: relative;
   display: flex;
   align-items: center;
@@ -18,7 +18,7 @@ const ToggleButton = styled.button`
   width: var(--toggle-width);
   height: var(--toggle-height);
   padding: var(--toggle-padding);
-  border: 0;
+  border: 1px solid var(--color-text-primary);
   border-radius: calc(var(--toggle-width) / 2);
 
   cursor: pointer;
@@ -42,8 +42,9 @@ const TogglePoint = styled.span`
   left: var(--toggle-padding);
   width: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
   height: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
+  border: 1px solid var(--color-text-primary);
   border-radius: 50%;
-  background: white;
+  background: var(--color-text-primary);
   transition: transform 0.25s ease-in-out;
   transform: ${(p) =>
     p.activeTheme === 'dark'
