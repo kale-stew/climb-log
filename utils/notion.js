@@ -10,6 +10,25 @@ export const notion = new Client({
 })
 
 /**
+ * Specifically for the formula response from notion, as it always has a .type key
+ * @param {Object} data Notion API Formula response object
+ * @returns {Any} returns the corresponding data type of formula.type or null
+ */
+const formatFormulaType = (data) => {
+  switch (data?.formula?.type) {
+    case 'string':
+      return data?.formula?.string
+    case 'number':
+      return data?.formula?.number
+    default:
+      console.warn(
+        `👋 ${data.formula.type} doesn't evaluate to a string or number. We need to update the formatFormulaType fn → notion.js  `
+      )
+      return null
+  }
+}
+
+/**
  * Massage data returned from the Notion API into a Table-friendly object
  */
 export const fmt = (field) => {
@@ -19,30 +38,32 @@ export const fmt = (field) => {
         return field?.date?.start
       case 'file':
         return field?.file?.url
+      case 'files':
+        return field?.files.length > 0 ? field?.files[0].file?.url : null
       case 'formula':
-        if (field?.formula?.string || field?.formula?.string == '') {
-          return field?.formula?.string
-        } else {
-          console.warn(
-            field?.formula?.string == '',
-            "Hey 👋 Looks like we are using a formula that isn't evaluated to a string. We need to update the fmt function in notion.js"
-          )
-          return null
-        }
+        return formatFormulaType(field)
+      case 'multi_select':
+        return field?.multi_select
       case 'number':
         return field?.number
       case 'relation':
-        // TODO: things if we need to use the entire relation
         console.warn(
-          "We haven't set up the relation case in the fmt function in notion.js"
+          "👋 We haven't set this relation case up in the `fmt` function yet. We need to update it → notion.js"
         )
-        return ''
+        return null
       case 'rich_text':
-        return field?.rich_text[0]?.plain_text
+        return field?.rich_text.length > 0 ? field?.rich_text[0]?.plain_text : null
+      case 'select':
+        return field?.select?.name
       case 'title':
         return field?.title[0]?.plain_text
       case 'url':
         return field?.url
+      default:
+        console.warn(
+          `👋 ${field.type} isn't in the fmt function yet. We need to update it → notion.js`
+        )
+        return null
     }
   } else return null
 }

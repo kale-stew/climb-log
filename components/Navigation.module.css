@@ -15,11 +15,11 @@
 }
 
 .landingLogoWrapper img {
-  width: 115px;
+  width: 65px;
 }
 
 .landingNavigation a {
-  color: #1b1b1b;
+  color: var(--color-text-primary);
   font-size: 1.25rem;
   margin: 0.5em 1.5em 1.5em 0;
   padding: 0;
@@ -31,7 +31,7 @@
 }
 
 .navigation a {
-  color: #1b1b1b;
+  color: var(--color-text-primary);
   padding: 0.25em;
   margin: 0 0.25em;
   font-weight: 400;
@@ -75,8 +75,8 @@
     margin: 0;
   }
 
-  .landingLogoWrapper img {
-    width: 175px;
+  .landingLogoWrapper > div > div > img {
+    display: none !important;
   }
 
   .landingNavigation {

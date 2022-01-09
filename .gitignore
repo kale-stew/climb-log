@@ -12,6 +12,7 @@ yarn-error.log*
 # production
 /build
 .next/
+.vercel
 
 # misc
 .DS_Store

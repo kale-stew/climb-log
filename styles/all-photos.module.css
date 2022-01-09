@@ -1,0 +1,30 @@
+.filterWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 75vw;
+}
+
+.filterWrapper p {
+  margin-bottom: 0.6vh;
+}
+
+.searchInput {
+  width: 35%;
+}
+
+@media (max-width: 1024px) {
+  .searchInput {
+    width: 30%;
+  }
+
+  .filterWrapper {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 740px) {
+  .searchInput {
+    width: 70%;
+  }
+}

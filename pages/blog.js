@@ -18,9 +18,13 @@ export default function BlogLandingPage({ allPostsData }) {
   const queryPayload = router.query
 
   useEffect(() => {
-    if (Object.keys(queryPayload).length > 0) {
-      setCategory(Object.keys(queryPayload)[0])
+    const checkQuery = () => {
+      if (Object.keys(queryPayload).length > 0) {
+        setCategory(Object.keys(queryPayload)[0])
+      }
     }
+    checkQuery()
+    return () => checkQuery
   }, [queryPayload])
 
   const buildCategories = () =>
