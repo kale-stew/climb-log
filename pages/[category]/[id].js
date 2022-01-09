@@ -97,7 +97,7 @@ const Post = ({ postData, postIds }) => {
     <Layout>
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
-        <div className={`${styles.blogSubheader} ${utilStyles.singleRow}`}>
+        <div className={`${utilStyles.singleRow} ${utilStyles.centerTextForMobile}`}>
           <FormattedDate
             dateString={postData.date}
             className={utilStyles.shownForMobile}

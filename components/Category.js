@@ -7,7 +7,7 @@ import styles from './Category.module.css'
 const CategoryButton = styled.button`
   color: var(--color-white);
   border-radius: 1em;
-  margin-left: 1vw;
+  margin: auto 0 auto 1vw;
   padding: 0.2em 0.6em;
   line-height: 1.3em;
   font-size: 12px;
