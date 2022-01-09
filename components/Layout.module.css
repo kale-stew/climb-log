@@ -29,7 +29,7 @@
 
 @media (max-width: 1024px) {
   .wrapper {
-    min-width: 70vw;
+    min-width: 75vw;
   }
 }
 
@@ -42,6 +42,6 @@
   }
 
   .wrapper {
-    max-width: 75vw;
+    max-width: 80vw;
   }
 }

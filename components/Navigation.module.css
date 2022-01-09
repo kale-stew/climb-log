@@ -43,14 +43,14 @@
   }
 
   .landingNavigation a {
-    font-size: 3vh;
+    font-size: 1.5rem;
     margin: auto;
-    padding: 0 1em;
+    padding: 0 0.5em;
   }
 }
 
 @media (max-width: 750px) {
   .navigation a {
-    font-size: 14px;
+    font-size: 1rem;
   }
 }

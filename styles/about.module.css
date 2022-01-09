@@ -14,16 +14,18 @@
 @media (max-width: 1024px) {
   .aboutBlock {
     flex-direction: column;
-    gap: 1vh;
     padding: 0 1.75rem;
     align-items: center;
     max-width: 60vw;
   }
 
+  .aboutBlockText {
+    margin-top: 2rem;
+  }
+
   .aboutBlockText,
   .aboutBlockText h2,
   .aboutBlockText p {
-    padding-top: 1.75rem;
     text-align: center;
   }
 
