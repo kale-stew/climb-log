@@ -93,7 +93,6 @@ button {
 
 button:hover {
   cursor: pointer;
-  background-color: var(--color-bg-accent);
   color: var(--color-white);
 }
 

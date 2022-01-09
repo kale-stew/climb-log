@@ -130,7 +130,7 @@ export default function Table({
       elevationTotal += !metric ? elevationImp : elevationMetric
     })
     return (
-      <div className={utilStyles.centerTextForMobile}>
+      <div className={utilStyles.centerTextForMobile} style={{ lineHeight: 1 }}>
         <p>
           <strong>Distance Total: </strong>
           {`${addCommas(roundDecimal(distanceTotal))} ${metric ? 'km' : 'mi'}`}
@@ -154,13 +154,13 @@ export default function Table({
         {/* Buttons: Switch between Imperial and Metric num values */}
         <div className={`${utilStyles.singleRow} ${styles.metricImperialFilters}`}>
           <button
-            className={metric ? 'categoryButton' : styles.categorySelected}
+            className={metric ? 'categoryButton' : styles.filterSelected}
             onClick={() => toggleUnits(false)}
           >
             Imperial
           </button>
           <button
-            className={metric ? styles.categorySelected : 'categoryButton'}
+            className={metric ? styles.filterSelected : 'categoryButton'}
             onClick={() => toggleUnits(true)}
           >
             Metric
@@ -178,7 +178,7 @@ export default function Table({
           <input
             className={styles.searchInput}
             type={'search'}
-            placeholder="Try 'October' or 'Attempt'"
+            placeholder="Try 'October', 'attempt', '2021'"
             onChange={(e) => {
               setUserSearch(e.target.value)
             }}
@@ -205,7 +205,9 @@ export default function Table({
           </tr>
 
           {data.length == 0 ? (
-            <tr>No Data Found for search query: '{userSearch}'</tr>
+            <tr>
+              <i>No data found for '{userSearch}'</i>
+            </tr>
           ) : (
             data.map((climb, i) => (
               <Popover

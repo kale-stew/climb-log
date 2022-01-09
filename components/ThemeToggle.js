@@ -1,28 +1,25 @@
-import { useState, useEffect } from 'react'
 import styled from '@emotion/styled'
+import { useState, useEffect } from 'react'
 import { BsMoonStars, BsSun } from 'react-icons/bs'
 
 import styles from './Footer.module.css'
 
 const ToggleButton = styled.button`
-  --toggle-width: 70px;
-  --toggle-height: 40px;
-  --toggle-padding: 5px;
+  --toggle-width: 40px;
+  --toggle-height: 20px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-around;
   font-size: 1.5rem;
-  line-height: 1;
-
+  padding: 1.5rem;
+  margin-bottom: 1rem;
   width: var(--toggle-width);
   height: var(--toggle-height);
-  padding: var(--toggle-padding);
   border: 1px solid var(--color-text-primary);
-  border-radius: calc(var(--toggle-width) / 2);
-
+  border-radius: 50%;
   cursor: pointer;
-  background: var(--color-bg-secondary);
+  background: var(--color-bg-primary);
   color: var(--color-text-primary);
   transition: background 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
   &:focus {
@@ -38,13 +35,6 @@ const ToggleButton = styled.button`
 
 const TogglePoint = styled.span`
   position: absolute;
-  top: var(--toggle-padding);
-  left: var(--toggle-padding);
-  width: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
-  height: calc(var(--toggle-height) - (var(--toggle-padding) * 2));
-  border: 1px solid var(--color-text-primary);
-  border-radius: 50%;
-  background: var(--color-text-primary);
   transition: transform 0.25s ease-in-out;
   transform: ${(p) =>
     p.activeTheme === 'dark'
@@ -69,12 +59,8 @@ const ThemeToggle = () => {
         onClick={() => setActiveTheme(inactiveTheme)}
       >
         <TogglePoint activeTheme={activeTheme} />
-        <span>
-          <BsMoonStars />
-        </span>
-        <span>
-          <BsSun />
-        </span>
+        <span>{activeTheme === 'dark' && <BsMoonStars />}</span>
+        <span>{activeTheme === 'light' && <BsSun />}</span>
       </ToggleButton>
     </div>
   )

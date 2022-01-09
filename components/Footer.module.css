@@ -38,7 +38,7 @@
 
 .footerLogo {
   gap: 0.75rem;
-  align-items: center;
+  align-items: center !important;
 }
 
 .toggleWrapper {

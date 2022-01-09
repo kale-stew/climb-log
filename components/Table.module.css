@@ -21,13 +21,13 @@
   z-index: 50;
 }
 
-.categorySelected {
-  background-color: var(--color-bg-accent) !important;
-  color: var(--color-white) !important;
-}
-
 .distanceHeader {
   width: 9vw;
+}
+
+.filterSelected {
+  background-color: var(--color-bg-accent) !important;
+  color: var(--color-white) !important;
 }
 
 .filterTitle {
