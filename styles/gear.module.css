@@ -10,6 +10,10 @@
   padding: 0 2vw 0 0;
 }
 
+.gearWrapper li {
+  margin: 0.25em 0;
+}
+
 .gearWrapper ul {
   margin: 0;
 }
@@ -37,6 +41,6 @@
 
   .gearWrapper ul {
     margin-bottom: 4vh;
-    padding-left: 2rem;
+    padding: 0;
   }
 }
