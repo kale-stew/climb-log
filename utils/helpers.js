@@ -19,6 +19,10 @@ const capitalizeEachWord = (string) => {
 }
 
 const formatDate = (date, type) => {
+  if (typeof date !== Date) {
+    date = new Date(date)
+  }
+
   if (type === 'long') {
     return format(date, 'PPPP')
   } else if (type === 'short') {

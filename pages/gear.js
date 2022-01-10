@@ -1,4 +1,5 @@
 import Layout from '../components/Layout'
+import ToggleItem from '../components/ToggleItem'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { fetchAllGear } from '../utils/data/gear'
 import { capitalizeEachWord } from '../utils/helpers'
@@ -80,16 +81,19 @@ const GearPage = ({ title, allGear }) => {
   return (
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
-      <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
-        <p className={styles.filterTitle}>Search all gear:</p>
-        <input
-          className={utilStyles.searchInput}
-          type={'search'}
-          placeholder="Try 'Helmet' or 'Backpacking'"
-          onChange={(e) => {
-            userSearch(e.target.value)
-          }}
-        />
+      <div className={styles.gearWrapper}>
+        {getGearCategories().map((cat) => (
+          <>
+            <h3 className={utilStyles.centerTextForMobile}>{cat}</h3>
+            <ul>
+              {filterByCategory(allGear, cat).map((item) => (
+                <ToggleItem key={item.title} item={item}>
+                  {createGearTitle(item)}
+                </ToggleItem>
+              ))}
+            </ul>
+          </>
+        ))}
       </div>
       <div className={styles.gearWrapper}>{buildGearList(gearCategories)}</div>
     </Layout>

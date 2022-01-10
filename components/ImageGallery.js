@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react'
 import styles from './ImageGallery.module.css'
 import utilStyles from '../styles/utils.module.css'
-import { useEffect, useState } from 'react'
 
 const ImageGallery = ({ header, photos }) => {
   const [isLargeDisplay, setLargeDisplay] = useState(true)
