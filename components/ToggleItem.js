@@ -2,7 +2,6 @@ import styled from '@emotion/styled'
 import { formatDate } from '../utils/helpers'
 import { useState } from 'react'
 import { FiArrowDown, FiArrowRight } from 'react-icons/fi'
-
 import { appear } from '../styles/animations'
 import utilStyles from '../styles/utils.module.css'
 

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import ToggleItem from '../components/ToggleItem'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
@@ -7,7 +8,6 @@ import { socialImage } from '../utils/social-image'
 
 import styles from '../styles/gear.module.css'
 import utilStyles from '../styles/utils.module.css'
-import { useEffect, useState } from 'react'
 
 const GearPage = ({ title, allGear }) => {
   const [gearCategories, setGearCategories] = useState()
@@ -34,7 +34,6 @@ const GearPage = ({ title, allGear }) => {
     let filteredGear = pureGear.filter((gear) => {
       let booleanVal =
         gear.title?.toUpperCase().includes(upperQuery) ||
-        gear.category?.toUpperCase().includes(upperQuery) ||
         gear.brand?.toUpperCase().includes(upperQuery) ||
         gear.product_str?.toUpperCase().includes(upperQuery)
       return booleanVal
@@ -64,6 +63,7 @@ const GearPage = ({ title, allGear }) => {
         </>
       )
     }
+
     return gearListData.map((cat) => (
       <>
         <h3 key={`h3-${cat}`} className={utilStyles.centerTextForMobile}>
@@ -71,7 +71,9 @@ const GearPage = ({ title, allGear }) => {
         </h3>
         <ul key={`ul-${cat}`}>
           {filterByCategory(gearData, cat).map((item) => (
-            <li key={`${cat}-${item.id}`}>{createGearTitle(item)}</li>
+            <ToggleItem key={`${cat}-${item.id}`} item={item}>
+              {createGearTitle(item)}
+            </ToggleItem>
           ))}
         </ul>
       </>
@@ -81,19 +83,16 @@ const GearPage = ({ title, allGear }) => {
   return (
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
-      <div className={styles.gearWrapper}>
-        {getGearCategories().map((cat) => (
-          <>
-            <h3 className={utilStyles.centerTextForMobile}>{cat}</h3>
-            <ul>
-              {filterByCategory(allGear, cat).map((item) => (
-                <ToggleItem key={item.title} item={item}>
-                  {createGearTitle(item)}
-                </ToggleItem>
-              ))}
-            </ul>
-          </>
-        ))}
+      <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
+        <p className={styles.filterTitle}>Search all gear:</p>
+        <input
+          className={utilStyles.searchInput}
+          type={'search'}
+          placeholder="Try 'tent' or 'puffy'"
+          onChange={(e) => {
+            userSearch(e.target.value)
+          }}
+        />
       </div>
       <div className={styles.gearWrapper}>{buildGearList(gearCategories)}</div>
     </Layout>
