@@ -48,7 +48,11 @@ const ToggleItem = ({ children, item }) => {
       {isToggled ? (
         <Details>
           {item.img ? (
-            <img src={item.img} height={'50vh'} alt={`A stock photo of ${children}.`} />
+            <img
+              height={'50vh'}
+              src={`/gear/${item.img}`}
+              alt={`A stock photo of ${children}.`}
+            />
           ) : null}
           <div
             className={utilStyles.vertical}
