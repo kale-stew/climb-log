@@ -42,10 +42,6 @@
   display: none;
 }
 
-.searchInput {
-  width: 35%;
-}
-
 .metricImperialFilters button {
   color: var(--color-text-primary);
   background-color: var(--color-bg-secondary);
@@ -89,12 +85,6 @@
 
   .hiddenOnDesktop {
     display: inline;
-  }
-
-  .searchInput {
-    width: 75vw;
-    margin: 0;
-    margin-top: 0.25vh;
   }
 
   .tableHeaders {

@@ -67,7 +67,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
         {/* Search all Photos */}
         <p>Search all entries:</p>
         <input
-          className={styles.searchInput}
+          className={utilStyles.searchInput}
           type={'search'}
           placeholder="Try 'Sunrise' or 'Goat'"
           onChange={(e) => searchPhotos(e.target.value)}

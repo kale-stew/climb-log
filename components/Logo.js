@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 export default function Logo({ theme }) {
   return theme === 'dark' ? (
     <Icon fill="#e6e6e6" bgFill="#2e2e2e" />
@@ -13,7 +11,6 @@ const Icon = ({ fill, bgFill }) => {
     <div style={{ textAlign: 'center' }}>
       <svg
         fill={fill}
-        bgFill={bgFill}
         id="logo"
         width={'100%'}
         xmlns="http://www.w3.org/2000/svg"

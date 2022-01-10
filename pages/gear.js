@@ -81,7 +81,7 @@ const GearPage = ({ title, allGear }) => {
       <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
         <p className={styles.filterTitle}>Search all gear:</p>
         <input
-          className={styles.searchInput}
+          className={utilStyles.searchInput}
           type={'search'}
           placeholder="Try 'Helmet' or 'Backpacking'"
           onChange={(e) => {
@@ -89,9 +89,7 @@ const GearPage = ({ title, allGear }) => {
           }}
         />
       </div>
-      <div className={styles.gearWrapper}>
-        {buildGearList(gearCategories)}
-      </div>
+      <div className={styles.gearWrapper}>{buildGearList(gearCategories)}</div>
     </Layout>
   )
 }
