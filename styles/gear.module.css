@@ -10,8 +10,8 @@
   padding: 0 2vw 0 0;
 }
 
-.gearWrapper ul {
-  margin: 0;
+.gearWrapper li {
+  margin: 0.25em 0;
 }
 
 .filterTitle {

@@ -17,7 +17,7 @@ const ListItem = styled.li`
 const SingleLine = styled.span`
   display: inline;
   word-wrap: break-word;
-  line-height: 1;
+  line-height: 1.3;
 `
 
 const Details = styled.div`

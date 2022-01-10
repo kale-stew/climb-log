@@ -34,6 +34,7 @@ const formatGear = (gearList) =>
       properties: {
         acquired_on,
         category,
+        color,
         cost,
         img,
         brand,
@@ -50,6 +51,7 @@ const formatGear = (gearList) =>
       title: fmt(title),
       acquired_on: fmt(acquired_on),
       category: fmt(category),
+      color: fmt(color),
       img: fmt(img),
       url: fmt(url),
       brand: fmt(brand),
