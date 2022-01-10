@@ -58,7 +58,7 @@ const GearPage = ({ title, allGear }) => {
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
       <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
-      <p className={styles.filterTitle}>Search all gear:</p>
+        <p className={styles.filterTitle}>Search all gear:</p>
         <input
           className={styles.searchInput}
           type={'search'}

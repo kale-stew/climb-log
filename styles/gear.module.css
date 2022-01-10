@@ -21,7 +21,18 @@
   width: 35%;
 }
 
+.searchFilter {
+  margin: 0.75em 0 0 0;
+  align-items: baseline;
+}
+
 @media (max-width: 1024px) {
+  .searchFilter {
+    flex-direction: column;
+    margin: 0;
+    align-items: center;
+  }
+
   .filterTitle {
     margin: 1.5rem 0 0.75rem 0;
   }
