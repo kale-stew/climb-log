@@ -1,8 +1,9 @@
 import styled from '@emotion/styled'
+import { formatDate } from '../utils/helpers'
 import { useState } from 'react'
 import { FiArrowDown, FiArrowRight } from 'react-icons/fi'
-import { formatDate } from '../utils/helpers'
 
+import { appear } from '../styles/animations'
 import utilStyles from '../styles/utils.module.css'
 
 const ListItem = styled.li`
@@ -10,6 +11,7 @@ const ListItem = styled.li`
   padding: 0;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 `
 
 const SingleLine = styled.span`
@@ -26,6 +28,7 @@ const Details = styled.div`
   display: flex;
   flex-direction: row;
   padding: 0.5rem 0;
+  animation: ${appear} 0.4s ease-in-out;
 `
 
 const ToggleItem = ({ children, item }) => {

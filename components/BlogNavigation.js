@@ -1,32 +1,7 @@
 import Link from 'next/link'
 import styled from '@emotion/styled'
-import { keyframes } from '@emotion/react'
-
+import { shakeLeft, shakeRight } from '../styles/animations'
 import styles from './BlogNavigation.module.css'
-
-const shakeLeft = keyframes`
-  0% {
-    transform: translate(1px);
-  }
-  50% {
-    transform: translate(-6px);
-  }
-  100% {
-    transform: translate(0px);
-  }
-`
-
-const shakeRight = keyframes`
-0% {
-  transform: translate(-1px);
-}
-50% {
-  transform: translate(6px);
-}
-100% {
-  transform: translate(0px);
-}
-`
 
 const BlogNavigation = styled.div`
   display: flex;

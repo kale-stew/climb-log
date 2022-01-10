@@ -1,34 +1,7 @@
 import styled from '@emotion/styled'
-import { keyframes } from '@emotion/react'
 import { useState, useEffect } from 'react'
 import { BsMoonStars, BsSun } from 'react-icons/bs'
-
-const bounce = keyframes`
-0% {
-  transform: translate(0);
-}
-25% {
-  transform: translate(0, -4px);
-}
-75% {
-  transform: translate(0, 8px);
-}
-100% {
-  transform: translate(0);
-}
-`
-
-const spin = keyframes`
-0% {
-  transform: rotate(-120deg);
-}
-50% {
-  transform: rotate(90deg);
-}
-100% {
-  transform: rotate(0deg);
-}
-`
+import { bounce, spin } from '../styles/animations'
 
 const ToggleButton = styled.button`
   background: transparent;
