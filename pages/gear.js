@@ -34,6 +34,7 @@ const GearPage = ({ title, allGear }) => {
     let filteredGear = pureGear.filter((gear) => {
       let booleanVal =
         gear.title?.toUpperCase().includes(upperQuery) ||
+        gear.color?.toUpperCase().includes(upperQuery) ||
         gear.brand?.toUpperCase().includes(upperQuery) ||
         gear.product_str?.toUpperCase().includes(upperQuery)
       return booleanVal
@@ -88,7 +89,7 @@ const GearPage = ({ title, allGear }) => {
         <input
           className={utilStyles.searchInput}
           type={'search'}
-          placeholder="Try 'tent' or 'puffy'"
+          placeholder="Try 'tent' or 'orange'"
           onChange={(e) => {
             userSearch(e.target.value)
           }}
