@@ -72,15 +72,7 @@
 }
 
 .lightText {
-  color: #666;
-}
-
-.marginRight {
-  margin-right: 2rem;
-}
-
-.padding1px {
-  padding-top: 1px;
+  color: var(--color-text-tertiary);
 }
 
 .roundImage {
@@ -88,16 +80,12 @@
 }
 
 .shownForMobile {
-  display: none;
+  display: none !important;
 }
 
 .singleRow {
   display: flex;
   align-items: center;
-}
-
-.uppercase {
-  font-family: 'Playfair Display SC', serif;
 }
 
 .vertical {
@@ -106,17 +94,18 @@
   align-items: center;
 }
 
-.hiddenForMobile > div:first-child {
-  display: block !important;
-}
-
 @media (max-width: 1024px) {
+  .centerTextForMobile {
+    text-align: center;
+    justify-content: center;
+  }
+
   .hiddenForMobile {
     display: none;
   }
 
   .shownForMobile {
-    display: flex;
+    display: flex !important;
     justify-content: center;
   }
 }

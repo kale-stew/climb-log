@@ -1,0 +1,12 @@
+.blogNavigationSeparator {
+  display: none;
+  margin: 2px;
+  background: var(--color-text-secondary);
+  width: 1px;
+}
+
+@media (max-width: 1024px) {
+  .blogNavigationSeparator {
+    display: flex;
+  }
+}

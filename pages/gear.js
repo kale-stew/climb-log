@@ -57,9 +57,10 @@ const GearPage = ({ title, allGear }) => {
   return (
     <Layout>
       <h1 className={utilStyles.centerText}>{title}</h1>
-      <div>
+      <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
+      <p className={styles.filterTitle}>Search all gear:</p>
         <input
-          // className={styles.searchInput} TODO STYLES
+          className={styles.searchInput}
           type={'search'}
           placeholder="Try 'Helmet' or 'Backpacking'"
           onChange={(e) => {

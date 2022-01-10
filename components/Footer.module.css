@@ -1,25 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
-.externalLink a {
-  display: flex;
-  align-items: center;
+.footerLinks > div {
+  align-items: flex-start;
 }
 
-.externalLink svg {
-  margin-left: 0.5ch;
-}
-
-.footerColumn {
-  display: flex;
-  flex-direction: column;
-}
-
-.footerColumn a {
-  color: #cfcfcf;
+.footerLinks a {
+  color: var(--color-offwhite);
   margin: 0.25rem 0;
 }
 
-.footerColumn h3 {
+.footerLinks h3 {
   font-family: 'Playfair Display SC', serif;
   text-transform: uppercase;
   font-size: 14px;
@@ -29,7 +19,7 @@
 
 .footerDivider {
   width: 100%;
-  border-top: 1px solid #cfcfcfcc;
+  border-top: 1px solid var(--color-light-grey);
 }
 
 .footerLinks {
@@ -47,10 +37,8 @@
 }
 
 .footerLogo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 0.75rem;
+  align-items: center !important;
 }
 
 @media (max-width: 880px) {

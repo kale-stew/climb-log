@@ -13,18 +13,32 @@
   margin: 0;
 }
 
+.filterTitle {
+  margin: 0 0.75em 0 0;
+}
+
+.searchInput {
+  width: 35%;
+}
+
 @media (max-width: 1024px) {
+  .filterTitle {
+    margin: 1.5rem 0 0.75rem 0;
+  }
+
+  .searchInput {
+    width: 75vw;
+    margin: 0;
+    margin-top: 0.25vh;
+  }
   .gearWrapper {
     display: flex;
     flex-direction: column;
     gap: 2vh;
   }
 
-  .gearWrapper h3 {
-    text-align: center;
-  }
-
   .gearWrapper ul {
     margin-bottom: 4vh;
+    padding-left: 2rem;
   }
 }

@@ -1,6 +1,6 @@
 .landingPage {
   width: 100%;
-  background-color: #f9f9f9;
+  background-color: var(--color-bg-primary);
 }
 
 .recentPosts {
@@ -16,22 +16,32 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0 12rem 3rem 12rem;
+  margin: 0 auto;
   max-width: 85vw;
+}
+
+/* Fallback for ultra-wide displays */
+@media (min-width: 1900px) {
+  .wrapper {
+    max-width: 45vw;
+  }
 }
 
 @media (max-width: 1024px) {
   .wrapper {
-    margin: 0 auto;
     min-width: 75vw;
   }
 }
 
-@media (max-width: 650px) {
+@media (max-width: 800px) {
   .recentPosts {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 2.5rem auto;
+  }
+
+  .wrapper {
+    max-width: 80vw;
   }
 }

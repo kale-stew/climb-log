@@ -1,9 +1,9 @@
 .card {
   display: inline-block;
   min-width: 330px;
-  border: 0.25px solid #eee;
+  background-color: var(--color-bg-primary);
   border-radius: 35px 35px 20px 20px;
-  box-shadow: 5px 6px 10px #dddd;
+  box-shadow: 5px 6px 10px var(--color-bg-secondary);
   transition: transform 0.5s;
 }
 
@@ -13,6 +13,7 @@
 
 .cardTitle {
   margin-bottom: 1vh;
+  color: var(--color-text-primary);
 }
 
 .cardTitle:hover {
@@ -22,12 +23,12 @@
 }
 
 .cardTitle a {
-  color: #1d1d1d;
   padding: 0;
 }
 
 .cardTitle h2 {
   margin-bottom: 0;
+  color: var(--color-text-primary);
 }
 
 .cardTitle h4 {
@@ -38,6 +39,7 @@
 
 .cardText {
   padding: 1vw;
+  color: var(--color-text-secondary);
 }
 
 .headerImg {

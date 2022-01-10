@@ -3,80 +3,38 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0.25rem 1.5rem 0.25rem;
-}
-
-.landingHeader h1 {
-  margin: 0.25em 0 1.5em 1.5em;
-}
-
-.landingLogoWrapper {
-  margin-left: 1rem;
-}
-
-.landingLogoWrapper img {
-  width: 115px;
+  padding: 1em 0.75em 1em 1.75em;
 }
 
 .landingNavigation a {
-  color: #1b1b1b;
-  font-size: 1.25rem;
+  color: var(--color-text-primary);
   margin: 0.5em 1.5em 1.5em 0;
   padding: 0;
 }
 
 .landingNavigation a:hover {
   text-decoration: underline;
-  box-shadow: none;
+}
+
+.navigation {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.75rem 0.5rem 0.5rem 0.5rem;
 }
 
 .navigation a {
-  color: #1b1b1b;
-  padding: 0.25em;
+  color: var(--color-text-primary);
   margin: 0 0.25em;
   font-weight: 400;
 }
 
-.navigation a:hover {
-  text-decoration: underline;
-  box-shadow: none;
-}
-
-.navigation {
-  margin: 1.4rem;
-}
-
 @media (max-width: 1024px) {
   .landingHeader {
-    margin-bottom: 0;
-    padding: 1em;
-  }
-
-  .landingNavigation a {
-    padding: none;
-  }
-
-  .navigation {
-    margin: 0.75rem;
-  }
-
-  .navigation a {
-    font-size: 18px;
-    margin: 1rem 0.75rem;
-  }
-
-  .landingHeader {
     flex-direction: column;
-    height: auto;
     align-items: center;
-  }
-
-  .landingHeader h1 {
-    margin: 0;
-  }
-
-  .landingLogoWrapper img {
-    width: 175px;
   }
 
   .landingNavigation {
@@ -85,7 +43,14 @@
   }
 
   .landingNavigation a {
+    font-size: 1.5rem;
     margin: auto;
-    padding: 2.5em 1em 0 1em;
+    padding: 0 0.5em;
+  }
+}
+
+@media (max-width: 750px) {
+  .navigation a {
+    font-size: 1rem;
   }
 }

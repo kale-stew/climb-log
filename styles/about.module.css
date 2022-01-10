@@ -11,48 +11,31 @@
   float: left;
 }
 
-.brandLink {
-  color: #0065b8;
-  text-decoration: none;
-  font-weight: 600;
-  vertical-align: middle;
-  box-shadow: inset 0 -0.07em #3992db, inset 0 -0.15em #0065b8;
-}
-
-.brandLink:hover {
-  box-shadow: inset 0 -2em 0 0 #0065b8cb;
-  color: white;
-}
-
 @media (max-width: 1024px) {
   .aboutBlock {
     flex-direction: column;
-    gap: 1vh;
     padding: 0 1.75rem;
     align-items: center;
     max-width: 60vw;
   }
 
   .aboutBlockText {
-    padding-top: 1.75rem;
+    margin-top: 2rem;
   }
 
-  .aboutBlockText h2 {
-    text-align: center;
-  }
-
+  .aboutBlockText,
+  .aboutBlockText h2,
   .aboutBlockText p {
     text-align: center;
+  }
+
+  .aboutBlockText li {
+    text-align: left;
   }
 
   .aboutImageMobile {
     width: 80%;
     margin: auto;
-  }
-
-  .brandSummary {
-    text-align: center;
-    font-style: italic;
   }
 }
 

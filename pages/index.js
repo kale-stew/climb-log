@@ -1,43 +1,43 @@
+import styled from '@emotion/styled'
 import Card from '../components/Card'
 import Layout from '../components/Layout'
-import ResponsiveImage from '../components/ResponsiveImage'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { getRecentPosts } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 
-// Photos
-import LanderTop from '../public/photos/lander_top.png'
-import LanderBottom from '../public/photos/lander_bottom.png'
-import MobileLanderTop from '../public/photos/Mlander_top.png'
-import MobileLanderBottom from '../public/photos/Mlander_bottom.png'
-
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 
+const GradientTopImage = styled.div`
+  background-image: linear-gradient(transparent, var(--color-bg-primary)),
+    url('/photos/lander_top.jpg');
+  height: 30vh;
+  width: 100%;
+  background-size: cover;
+  @media (max-width: 1024px) {
+    max-height: 25vh;
+  }
+`
+
+const GradientBottomImage = styled.div`
+  background-image: linear-gradient(var(--color-bg-primary), transparent),
+    url('/photos/lander_bottom.jpg');
+  height: 25vh;
+  width: 100%;
+  background-size: cover;
+  margin-top: 5vh;
+`
+
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
-    <ResponsiveImage
-      altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
-      desktopImg={LanderTop}
-      desktopDimensions={{ width: 2100, height: 824 }}
-      mobileImg={MobileLanderTop}
-      mobileDimensions={{ width: 1200, height: 550 }}
-    />
-
+    <GradientTopImage />
     <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>Recent Posts</h1>
     <div className={styles.recentPosts}>
       {featuredPosts.map((post) => (
         <Card postData={post} key={post.id} />
       ))}
     </div>
-
-    <ResponsiveImage
-      altTxt="Looking through fall colors towards Capitol Peak in Aspen, Colorado."
-      desktopImg={LanderBottom}
-      desktopDimensions={{ width: 2100, height: 888 }}
-      mobileImg={MobileLanderBottom}
-      mobileDimensions={{ width: 1200, height: 611 }}
-    />
+    <GradientBottomImage />
   </Layout>
 )
 

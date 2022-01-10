@@ -50,19 +50,21 @@ const AboutPage = () => (
           send her{' '}
           <a href="mailto:kylie@hey.com" network="email">
             an email
-          </a>{' '}
+          </a>
           .
         </p>
 
         <br />
         <h2>Brands</h2>
         <div>
-          <p className={styles.brandSummary}>Kylie is an ambassador for...</p>
+          <p className={utilStyles.centerTextForMobile} style={{ fontStyle: 'italic' }}>
+            Kylie is an ambassador for...
+          </p>
           <ul>
             {BRANDS.map((brand) => (
               <li key={brand.name}>
-                <a className={styles.brandLink} href={brand.href}>
-                  {brand.name}
+                <a href={brand.href}>
+                  <strong>{brand.name}</strong>
                 </a>
                 {brand.description && `: ${brand.description}`}
               </li>
