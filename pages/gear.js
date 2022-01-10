@@ -49,10 +49,31 @@ const GearPage = ({ title, allGear }) => {
   }, [])
 
   const filterByCategory = (arr, cat) => arr.filter(({ category }) => category === cat)
+
   const createGearTitle = (item) =>
     capitalizeEachWord(
       `${item.brand}${item.product_str ? ` ${item.product_str} ` : ' '}${item.title}`
     )
+
+  const buildGearList = (gearListData) => {
+    if (!gearListData || gearListData.length == 0) {
+      return (
+        <>
+          <p>No gear data found for {}.</p>
+        </>
+      )
+    }
+    return gearListData.map((cat) => (
+      <>
+        <h3 key={`h3-${cat}`}>{cat}</h3>
+        <ul key={`ul-${cat}`}>
+          {filterByCategory(gearData, cat).map((item) => (
+            <li key={`${cat}-${item.id}`}>{createGearTitle(item)}</li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
 
   return (
     <Layout>
@@ -69,17 +90,7 @@ const GearPage = ({ title, allGear }) => {
         />
       </div>
       <div className={styles.gearWrapper}>
-        {gearCategories &&
-          gearCategories.map((cat) => (
-            <>
-              <h3 key={`h3-${cat}`}>{cat}</h3>
-              <ul key={`ul-${cat}`}>
-                {filterByCategory(gearData, cat).map((item) => (
-                  <li key={`${cat}-${item.id}`}>{createGearTitle(item)}</li>
-                ))}
-              </ul>
-            </>
-          ))}
+        {buildGearList(gearCategories)}
       </div>
     </Layout>
   )
