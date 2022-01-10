@@ -9,13 +9,3 @@
 .filterWrapper p {
   margin-bottom: 0.6vh;
 }
-
-.searchInput {
-  width: 35%;
-}
-
-@media (max-width: 800px) {
-  .searchInput {
-    width: 70vw;
-  }
-}

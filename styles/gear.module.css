@@ -2,6 +2,7 @@
   display: grid;
   grid-gap: 2.5em;
   grid-template-columns: 1fr 2fr;
+  margin-top: 2.5rem;
 }
 
 .gearWrapper h3 {
@@ -13,7 +14,21 @@
   margin: 0;
 }
 
+.filterTitle {
+  margin: 0 0 0.75em 0;
+}
+
+.searchFilter {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 @media (max-width: 1024px) {
+  .filterTitle {
+    margin: 1.5rem 0 0.75rem 0;
+  }
+
   .gearWrapper {
     display: flex;
     flex-direction: column;

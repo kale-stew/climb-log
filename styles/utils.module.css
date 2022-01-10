@@ -79,6 +79,10 @@
   border-radius: 100%;
 }
 
+.searchInput {
+  width: 35%;
+}
+
 .shownForMobile {
   display: none !important;
 }
@@ -107,5 +111,19 @@
   .shownForMobile {
     display: flex !important;
     justify-content: center;
+  }
+}
+
+@media (max-width: 1024px) {
+  .searchInput {
+    width: 50vw;
+    margin: 0.25vh 0 0 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .searchInput {
+    width: 65vw;
+    margin: 0.25vh 0 0 0;
   }
 }

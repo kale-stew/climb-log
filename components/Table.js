@@ -176,7 +176,7 @@ export default function Table({
         <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
           <p className={styles.filterTitle}>Search all entries:</p>
           <input
-            className={styles.searchInput}
+            className={utilStyles.searchInput}
             type={'search'}
             placeholder="Try 'October', 'attempt', '2021'"
             onChange={(e) => {
