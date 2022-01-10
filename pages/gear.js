@@ -65,7 +65,9 @@ const GearPage = ({ title, allGear }) => {
     }
     return gearListData.map((cat) => (
       <>
-        <h3 key={`h3-${cat}`}>{cat}</h3>
+        <h3 key={`h3-${cat}`} className={utilStyles.centerTextForMobile}>
+          {cat}
+        </h3>
         <ul key={`ul-${cat}`}>
           {filterByCategory(gearData, cat).map((item) => (
             <li key={`${cat}-${item.id}`}>{createGearTitle(item)}</li>

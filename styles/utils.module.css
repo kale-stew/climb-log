@@ -114,9 +114,16 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .searchInput {
+    width: 50vw;
+    margin: 0.25vh 0 0 0;
+  }
+}
+
 @media (max-width: 800px) {
   .searchInput {
-    width: 70vw;
+    width: 65vw;
     margin: 0.25vh 0 0 0;
   }
 }
