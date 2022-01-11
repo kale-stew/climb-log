@@ -6,25 +6,7 @@ const getGearConfig = (nextCursor = null) =>
 const gearSorts = [{ property: 'title', direction: 'ascending' }]
 
 const gearFilters = {
-  and: [
-    { property: 'acquired_on', date: { is_not_empty: true } },
-    {
-      and: [
-        {
-          property: 'category',
-          select: { does_not_equal: 'Retired' },
-        },
-        {
-          property: 'category',
-          select: { does_not_equal: 'Returned' },
-        },
-        {
-          property: 'category',
-          select: { does_not_equal: 'Resold' },
-        },
-      ],
-    },
-  ],
+  and: [{ property: 'acquired_on', date: { is_not_empty: true } }],
 }
 
 const formatGear = (gearList) =>
