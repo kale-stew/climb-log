@@ -1,8 +1,9 @@
 .gearWrapper {
+  max-width: 65vw;
+  margin: 2.5rem auto 0 auto;
   display: grid;
   grid-gap: 2.5em;
-  grid-template-columns: 1fr 40vw;
-  margin-top: 2.5rem;
+  grid-template-columns: 1fr 2fr;
 }
 
 .gearWrapper h3 {
@@ -28,6 +29,12 @@
   align-items: center;
 }
 
+@media (min-width: 2000px) {
+  .gearWrapper {
+    grid-template-columns: 10vw 30vw;
+  }
+}
+
 @media (max-width: 1024px) {
   .filterTitle {
     margin: 1.5rem 0 0.75rem 0;
@@ -37,6 +44,7 @@
     display: flex;
     flex-direction: column;
     gap: 2vh;
+    max-width: 90vw;
   }
 
   .gearWrapper ul {
