@@ -15,10 +15,18 @@ const GearPage = ({ title, allGear }) => {
   const [gearData, setGearData] = useState()
 
   const buildCategories = (gearList = pureGear, setState = false) => {
-    const arr = gearList.map((gear) => gear.category !== 'Retired' && gear.category)
-    arr.push('Retired')
+    let hasRetiredItems = false
+    const arr = gearList.map((gear) => {
+      if (gear.category == '🪦 Retired Items') {
+        hasRetiredItems = true
+        return
+      }
+      return gear.category
+    })
+    if (hasRetiredItems) {
+      arr.push('🪦 Retired Items')
+    }
     const returnArray = Array.from(new Set(arr))
-
     if (setState) {
       setGearCategories(returnArray)
     }
@@ -59,19 +67,15 @@ const GearPage = ({ title, allGear }) => {
       `${item.brand}${item.product_str ? ` ${item.product_str} ` : ' '}${item.title}`
     )
 
-  const buildGearList = (gearListData) => {
-    if (!gearListData || gearListData.length == 0) {
-      return (
-        <>
-          <p>No gear data found.</p>
-        </>
-      )
+  const buildGearList = (gearDataCategories) => {
+    if (!gearDataCategories || gearDataCategories.length == 0) {
+      return <p>No gear data found.</p>
     }
 
-    return gearListData.map((cat) => (
+    return gearDataCategories.map((cat) => (
       <>
         <h3 key={`h3-${cat}`} className={utilStyles.centerTextForMobile}>
-          {cat === 'Retired' ? '🪦 Retired Items' : cat}
+          {cat}
         </h3>
         <ul key={`ul-${cat}`}>
           {filterByCategory(gearData, cat).map((item) => (

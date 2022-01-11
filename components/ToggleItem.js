@@ -11,7 +11,6 @@ const ListItem = styled.li`
   padding: 0;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
 `
 
 const SingleLine = styled.span`
@@ -36,11 +35,11 @@ const Details = styled.div`
 
 const ToggleItem = ({ children, item }) => {
   const [isToggled, setToggleState] = useState(false)
-  const isRetired = item.category === 'Retired'
+  const isRetired = item.category === '🪦 Retired Items'
 
   return (
     <ListItem onClick={() => setToggleState(!isToggled)}>
-      <SingleLine>
+      <SingleLine style={{ cursor: 'pointer' }}>
         {isToggled ? (
           <FiArrowDown style={{ paddingTop: '0.15em' }} />
         ) : (
@@ -66,7 +65,6 @@ const ToggleItem = ({ children, item }) => {
               <strong>Date Acquired: </strong>
               {formatDate(item.acquired_on)}
             </SingleLine>
-
             {isRetired ? (
               <>
                 <SingleLine>
