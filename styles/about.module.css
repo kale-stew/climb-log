@@ -11,6 +11,12 @@
   float: left;
 }
 
+.formCaption {
+  margin: 0 auto 1rem auto;
+  font-size: 14px;
+  text-align: center;
+}
+
 @media (max-width: 1024px) {
   .aboutBlock {
     flex-direction: column;
@@ -36,6 +42,10 @@
   .aboutImageMobile {
     width: 80%;
     margin: auto;
+  }
+
+  .formCaption {
+    max-width: 60vw;
   }
 }
 

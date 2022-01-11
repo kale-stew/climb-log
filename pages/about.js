@@ -28,38 +28,29 @@ const AboutPage = () => (
 
       <div className={styles.aboutBlockText}>
         <p>
-          {METADATA.FULL_NAME} is a web developer, avid hiker, amateur mountaineer and
+          {METADATA.FULL_NAME} is a web developer, avid hiker, mountaineer and
           photo-taker. She spends her time hiking Colorado's high peaks and researching
-          its terrain when she's not working from home alongside her fiancé or walking
-          their dog, Otis, around the local alpine lake.
+          its terrain when she's not working from home or walking the dog with her fiancé.
         </p>
         <p>
-          As an aspiring photographer, Kylie spends a good amount of time testing out what
-          she's learned in the mountains. Living in a small mountain town in the Colorado
-          Rockies, it's usually easy to find something worth taking a photo of.
+          Living in a small mountain town in the Colorado Rockies, {METADATA.FIRST_NAME}{' '}
+          spends a lot of her down time taking photos with her Sony Alpha 6400 and
+          traveling to nearby peaks to test out her longer range lenses.
         </p>
         <p>
-          Although she is taking the first 6 months of 2022 off of hiking to recover from
+          Although she is taking the first 3 months of 2022 off of hiking to recover from
           ankle surgery, she's eager to make the most of this time off by testing out her
-          camera's features from handicap-accessible lots across the state.
-        </p>
-        <p>
-          To stay up to date with Kylie's climbs, follow her{' '}
-          <a href="https://www.instagram.com/kalestews/">on Instagram</a>. If you want to
-          check out some of Kylie's other projects, visit her{' '}
-          <a href="https://kylieis.online">personal site</a>. To discuss working together,
-          send her{' '}
-          <a href="mailto:kylie@hey.com" network="email">
-            an email
-          </a>
-          .
+          camera's features from handicap-accessible lots and 4WD trails across the state.
         </p>
 
         <br />
         <h2>Brands</h2>
         <div>
-          <p className={utilStyles.centerTextForMobile} style={{ fontStyle: 'italic' }}>
-            Kylie is an ambassador for...
+          <p
+            className={utilStyles.centerTextForMobile}
+            style={{ fontStyle: 'italic', fontSize: '14px' }}
+          >
+            {METADATA.FIRST_NAME} is an ambassador for...
           </p>
           <ul>
             {BRANDS.map((brand) => (
@@ -74,7 +65,13 @@ const AboutPage = () => (
         </div>
 
         <br />
-        <h2 className={utilStyles.centerText}>Contact {METADATA.FIRST_NAME}</h2>
+        <h2 className={utilStyles.centerTextForMobile}>Contact {METADATA.FIRST_NAME}</h2>
+        <p className={styles.formCaption}>
+          To stay up to date with {METADATA.FIRST_NAME}'s climbs, follow her{' '}
+          <a href="https://www.instagram.com/kalestews/">on Instagram</a>. To see some of
+          her other projects, visit her <a href="https://kylieis.online">personal site</a>
+          . To discuss working together, use the following form:
+        </p>
         <ContactForm />
       </div>
     </div>

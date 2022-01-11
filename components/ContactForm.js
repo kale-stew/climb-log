@@ -3,19 +3,7 @@ import styled from '@emotion/styled'
 import { GiMountainRoad } from 'react-icons/gi'
 import { CONTACT_ENDPOINT } from '../utils/constants'
 
-const ThankYouWrapper = styled.div`
-  max-width: max-content;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  margin: 0 auto;
-  @media (max-width: 1024px) {
-    max-width: 90vw;
-  }
-`
-
 const StyledForm = styled.form`
-  max-width: 35vw;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
@@ -36,10 +24,9 @@ const SmallInput = styled.input`
 `
 
 const TextInput = styled.textarea`
-  max-width: 50vw;
   font-size: 14px;
   font-family: 'Open Sans', sans-serif;
-  margin-top: 1rem;
+  margin-top: 0.3rem;
   padding: 0.4rem 0.75rem;
   background-color: transparent;
   color: var(--color-text-secondary);
@@ -62,6 +49,17 @@ const SubmitButton = styled.button`
   &:hover {
     background-color: var(--color-text-accent);
     border: 1px solid var(--color-text-accent);
+  }
+`
+
+const ThankYouWrapper = styled.div`
+  max-width: max-content;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin: 0 auto;
+  @media (max-width: 1024px) {
+    max-width: 90vw;
   }
 `
 
