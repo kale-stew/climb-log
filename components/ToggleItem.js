@@ -44,19 +44,20 @@ const ToggleItem = ({ children, item }) => {
         {isToggled ? (
           <FiArrowDown style={{ paddingTop: '0.15em' }} />
         ) : (
-          <HiMinusSm style={{ paddingTop: '0.25em' }} />
+          <HiMinusSm
+            style={{ paddingTop: '0.25em' }}
+            className={utilStyles.rotateOnHover}
+          />
         )}
         {` ${children}`}
       </SingleLine>
       {isToggled ? (
         <Details>
-          {item.img ? (
-            <img
-              height={'50vh'}
-              src={`/gear/${item.img}`}
-              alt={`A stock photo of ${children}.`}
-            />
-          ) : null}
+          <img
+            height={'50vh'}
+            src={`/gear/${item.img}`}
+            alt={`A stock photo of ${children}.`}
+          />
           <div
             className={utilStyles.vertical}
             style={{ alignItems: 'flex-start', marginLeft: '1rem' }}
@@ -65,35 +66,37 @@ const ToggleItem = ({ children, item }) => {
               <strong>Date Acquired: </strong>
               {formatDate(item.acquired_on)}
             </SingleLine>
-            {isRetired && (
-              <SingleLine>
-                <strong>Date Retired: </strong>
-                {formatDate(item.retired_on)}
-              </SingleLine>
-            )}
-            {!isRetired && (
-              <SingleLine>
-                <strong>Brand: </strong>
-                {item.brand}
-              </SingleLine>
-            )}
-            {item.product_str && !isRetired && (
-              <SingleLine>
-                <strong>Product Name: </strong>
-                {item.product_str}
-              </SingleLine>
-            )}
-            {item.color && !isRetired && (
-              <SingleLine>
-                <strong>Color: </strong>
-                {item.color}
-              </SingleLine>
-            )}
-            {isRetired && (
-              <SingleLine>
-                <strong>What Happened: </strong>
-                {item.more_info}
-              </SingleLine>
+
+            {isRetired ? (
+              <>
+                <SingleLine>
+                  <strong>Date Retired: </strong>
+                  {formatDate(item.retired_on)}
+                </SingleLine>
+                <SingleLine>
+                  <strong>What Happened: </strong>
+                  {item.more_info}
+                </SingleLine>
+              </>
+            ) : (
+              <>
+                <SingleLine>
+                  <strong>Brand: </strong>
+                  {item.brand}
+                </SingleLine>
+                {item.product_str && (
+                  <SingleLine>
+                    <strong>Product Name: </strong>
+                    {item.product_str}
+                  </SingleLine>
+                )}
+                {item.color && (
+                  <SingleLine>
+                    <strong>Color: </strong>
+                    {item.color}
+                  </SingleLine>
+                )}
+              </>
             )}
           </div>
         </Details>
