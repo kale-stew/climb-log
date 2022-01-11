@@ -6,25 +6,7 @@ const getGearConfig = (nextCursor = null) =>
 const gearSorts = [{ property: 'title', direction: 'ascending' }]
 
 const gearFilters = {
-  and: [
-    { property: 'acquired_on', date: { is_not_empty: true } },
-    {
-      and: [
-        {
-          property: 'category',
-          select: { does_not_equal: 'Retired' },
-        },
-        {
-          property: 'category',
-          select: { does_not_equal: 'Returned' },
-        },
-        {
-          property: 'category',
-          select: { does_not_equal: 'Resold' },
-        },
-      ],
-    },
-  ],
+  and: [{ property: 'acquired_on', date: { is_not_empty: true } }],
 }
 
 const formatGear = (gearList) =>
@@ -33,16 +15,17 @@ const formatGear = (gearList) =>
       id,
       properties: {
         acquired_on,
+        brand,
         category,
         color,
         cost,
         img_slug,
-        brand,
+        more_info,
         product,
+        retired_on,
         title,
         url,
         weight_g,
-        weight_lb,
         weight_oz,
       },
     } = gear
@@ -50,15 +33,16 @@ const formatGear = (gearList) =>
       id,
       title: fmt(title),
       acquired_on: fmt(acquired_on),
+      brand: fmt(brand),
       category: fmt(category),
       color: fmt(color),
-      img: `${fmt(img_slug)}.png`,
-      url: fmt(url),
-      brand: fmt(brand),
-      product_str: fmt(product),
       cost: fmt(cost),
+      img: `${fmt(img_slug)}.png`,
+      more_info: fmt(more_info),
+      product_str: fmt(product),
+      retired_on: fmt(retired_on),
+      url: fmt(url),
       weight_g: fmt(weight_g),
-      weight_lb: fmt(weight_lb),
       weight_oz: fmt(weight_oz),
     }
   })

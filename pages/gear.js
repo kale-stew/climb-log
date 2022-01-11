@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import ToggleItem from '../components/ToggleItem'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
-import { fetchAllGear } from '../utils/data/gear'
 import { capitalizeEachWord } from '../utils/helpers'
+import { fetchAllGear } from '../utils/data/gear'
 import { socialImage } from '../utils/social-image'
 
 import styles from '../styles/gear.module.css'
@@ -15,9 +15,18 @@ const GearPage = ({ title, allGear }) => {
   const [gearData, setGearData] = useState()
 
   const buildCategories = (gearList = pureGear, setState = false) => {
-    const arr = gearList.map((gear) => gear.category)
+    let hasRetiredItems = false
+    const arr = gearList.map((gear) => {
+      if (gear.category == '🪦 Retired Items') {
+        hasRetiredItems = true
+        return
+      }
+      return gear.category
+    })
+    if (hasRetiredItems) {
+      arr.push('🪦 Retired Items')
+    }
     const returnArray = Array.from(new Set(arr))
-
     if (setState) {
       setGearCategories(returnArray)
     }
@@ -34,8 +43,10 @@ const GearPage = ({ title, allGear }) => {
     let filteredGear = pureGear.filter((gear) => {
       let booleanVal =
         gear.title?.toUpperCase().includes(upperQuery) ||
-        gear.color?.toUpperCase().includes(upperQuery) ||
         gear.brand?.toUpperCase().includes(upperQuery) ||
+        gear.color?.toUpperCase().includes(upperQuery) ||
+        gear.more_info?.toUpperCase().includes(upperQuery) ||
+        gear.img?.toUpperCase().includes(upperQuery) ||
         gear.product_str?.toUpperCase().includes(upperQuery)
       return booleanVal
     })
@@ -56,16 +67,12 @@ const GearPage = ({ title, allGear }) => {
       `${item.brand}${item.product_str ? ` ${item.product_str} ` : ' '}${item.title}`
     )
 
-  const buildGearList = (gearListData) => {
-    if (!gearListData || gearListData.length == 0) {
-      return (
-        <>
-          <p>No gear data found for {}.</p>
-        </>
-      )
+  const buildGearList = (gearDataCategories) => {
+    if (!gearDataCategories || gearDataCategories.length == 0) {
+      return <p>No gear data found.</p>
     }
 
-    return gearListData.map((cat) => (
+    return gearDataCategories.map((cat) => (
       <>
         <h3 key={`h3-${cat}`} className={utilStyles.centerTextForMobile}>
           {cat}
@@ -95,7 +102,7 @@ const GearPage = ({ title, allGear }) => {
           }}
         />
       </div>
-      <div className={styles.gearWrapper}>{buildGearList(gearCategories)}</div>
+      <div className={styles.gearWrapper}>{buildGearList(gearCategories)} </div>
     </Layout>
   )
 }

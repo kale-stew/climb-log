@@ -1,7 +1,7 @@
 .gearWrapper {
   display: grid;
   grid-gap: 2.5em;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 40vw;
   margin-top: 2.5rem;
 }
 
@@ -40,7 +40,7 @@
   }
 
   .gearWrapper ul {
-    margin-bottom: 4vh;
+    margin-bottom: 2vh;
     padding: 0;
   }
 }
