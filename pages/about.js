@@ -1,3 +1,4 @@
+import ContactForm from '../components/ContactForm'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Layout from '../components/Layout'
@@ -71,6 +72,10 @@ const AboutPage = () => (
             ))}
           </ul>
         </div>
+
+        <br />
+        <h2 className={utilStyles.centerText}>Contact {METADATA.FIRST_NAME}</h2>
+        <ContactForm />
       </div>
     </div>
   </Layout>

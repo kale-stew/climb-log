@@ -74,6 +74,9 @@ export const CONNECT = [
   { title: 'Twitter', href: `https://twitter.com/${METADATA.TWITTER_HANDLE}` },
 ]
 
+export const CONTACT_ENDPOINT =
+  'https://public.herotofu.com/v1/528dd450-728b-11ec-b2d5-af79f33d926c'
+
 export const EXPLORE = [
   { title: 'Home', href: '/' },
   { title: 'My Gear', href: '/gear' },

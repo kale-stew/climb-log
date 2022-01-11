@@ -14,9 +14,11 @@ const ListItem = styled.li`
 `
 
 const SingleLine = styled.span`
+  padding-left: 30px;
   display: inline;
   word-wrap: break-word;
-  line-height: 1.3;
+  text-indent: -20px;
+  line-height: 1.35;
 `
 
 const Details = styled.div`
@@ -29,7 +31,7 @@ const Details = styled.div`
   animation: ${appear} 0.4s ease-in-out;
   @media (max-width: 1024px) {
     font-size: 14px;
-    max-width: 50vw;
+    max-width: 90vw;
   }
 `
 
