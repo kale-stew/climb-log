@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
@@ -28,6 +30,16 @@ export default function Table({
   togglePopOver,
   userSearch,
 }) {
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const queryPayload = router.query
+    if (Object.keys(queryPayload).length > 0) {
+      togglePopOver(Object.keys(queryPayload)[0])
+    }
+  }, [])
+
   // Notion data values we -don't- want in the Table
   const alwaysExclude = ['href', 'id', 'previewImgUrl', 'slug', 'strava']
 

@@ -102,10 +102,6 @@ const ClimbLog = ({ allClimbs }) => {
   // Build the area categories on the first load (populating dropdown)
   useEffect(() => {
     buildCategories()
-    const queryPayload = router.query
-    if (Object.keys(queryPayload).length > 0) {
-      togglePopOver(Object.keys(queryPayload)[0])
-    }
   }, [])
 
   const buildCategories = () => {
