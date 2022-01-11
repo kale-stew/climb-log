@@ -70,12 +70,14 @@ const ContactForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     const inputs = e.target.elements
+    const injectedData = {}
     const data = {}
     for (let i = 0; i < inputs.length; i++) {
       if (inputs[i].name) {
         data[inputs[i].name] = inputs[i].value
       }
     }
+    Object.assign(data, injectedData)
 
     fetch(CONTACT_ENDPOINT, {
       method: 'POST',
