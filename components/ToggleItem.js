@@ -26,14 +26,17 @@ const Details = styled.div`
   display: flex;
   flex-direction: row;
   padding: 0.5rem 0;
+  max-width: 35vw;
   animation: ${appear} 0.4s ease-in-out;
   @media (max-width: 1024px) {
     font-size: 14px;
+    max-width: 50vw;
   }
 `
 
 const ToggleItem = ({ children, item }) => {
   const [isToggled, setToggleState] = useState(false)
+  const isRetired = item.category === 'Retired'
 
   return (
     <ListItem onClick={() => setToggleState(!isToggled)}>
@@ -62,20 +65,34 @@ const ToggleItem = ({ children, item }) => {
               <strong>Date Acquired: </strong>
               {formatDate(item.acquired_on)}
             </SingleLine>
-            <SingleLine>
-              <strong>Brand: </strong>
-              {item.brand}
-            </SingleLine>
-            {item.product_str && (
+            {isRetired && (
+              <SingleLine>
+                <strong>Date Retired: </strong>
+                {formatDate(item.retired_on)}
+              </SingleLine>
+            )}
+            {!isRetired && (
+              <SingleLine>
+                <strong>Brand: </strong>
+                {item.brand}
+              </SingleLine>
+            )}
+            {item.product_str && !isRetired && (
               <SingleLine>
                 <strong>Product Name: </strong>
                 {item.product_str}
               </SingleLine>
             )}
-            {item.color && (
+            {item.color && !isRetired && (
               <SingleLine>
                 <strong>Color: </strong>
                 {item.color}
+              </SingleLine>
+            )}
+            {isRetired && (
+              <SingleLine>
+                <strong>What Happened: </strong>
+                {item.more_info}
               </SingleLine>
             )}
           </div>

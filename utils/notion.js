@@ -35,7 +35,7 @@ export const fmt = (field) => {
   if (field !== null) {
     switch (field.type) {
       case 'date':
-        return field?.date?.start
+        return field?.date?.start || null
       case 'file':
         return field?.file?.url
       case 'files':
