@@ -1,21 +1,16 @@
 import Link from 'next/link'
 import styled from '@emotion/styled'
 import { shakeLeft, shakeRight } from '../styles/animations'
-import styles from './BlogNavigation.module.css'
 
 const BlogNavigation = styled.div`
-  display: flex;
-  justify-content: space-between;
-  @media (max-width: 1024px) {
-    gap: 2.5em;
-  }
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
 `
 
 const NavigationRight = styled.span`
-  text-align: center;
+  text-align: right;
   text-decoration: none;
   color: var(--color-text-secondary);
-  padding: 0.05em;
   &:hover {
     cursor: pointer;
     animation: ${shakeRight} 0.3s;
@@ -24,14 +19,21 @@ const NavigationRight = styled.span`
 `
 
 const NavigationLeft = styled.span`
-  text-align: center;
+  text-align: left;
   text-decoration: none;
   color: var(--color-text-secondary);
-  padding: 0.05em;
   &:hover {
     cursor: pointer;
     animation: ${shakeLeft} 0.3s;
     animation-iteration-count: 2;
+  }
+`
+
+const NavigationDivider = styled.hr`
+  border: 1px solid transparent;
+  @media (max-width: 800px) {
+    border: 1px solid var(--color-text-primary);
+    margin: 0 6vw;
   }
 `
 
@@ -77,7 +79,7 @@ export const buildNavigation = (postIds, postData) => {
     return (
       <BlogNavigation>
         {prevPostLink}
-        <span className={styles.blogNavigationSeparator}></span>
+        <NavigationDivider></NavigationDivider>
         {nextPostLink}
       </BlogNavigation>
     )
@@ -89,7 +91,7 @@ export const buildNavigation = (postIds, postData) => {
         <Link href="/blog">
           <NavigationLeft>← Back to blog</NavigationLeft>
         </Link>
-        <span className={styles.blogNavigationSeparator}></span>
+        <NavigationDivider></NavigationDivider>
         {nextPostLink}
       </BlogNavigation>
     )
@@ -99,18 +101,18 @@ export const buildNavigation = (postIds, postData) => {
     return (
       <BlogNavigation>
         {prevPostLink}
-        <span className={styles.blogNavigationSeparator}></span>
+        <NavigationDivider></NavigationDivider>
         <Link href="/blog">
           <NavigationRight> Back to blog →</NavigationRight>
         </Link>
       </BlogNavigation>
     )
   }
-  // Always return something
+
   return (
     <BlogNavigation>
       <Link href="/blog">
-        <a>← Back to blog</a>
+        <NavigationLeft>← Back to blog</NavigationLeft>
       </Link>
     </BlogNavigation>
   )
