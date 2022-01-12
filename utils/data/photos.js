@@ -81,9 +81,7 @@ const fetchAllImages = async () => {
   let responseArray = [...response.results]
 
   while (response.has_more) {
-    // response.has_more tells us if the database has more pages
-    // response.next_cursor contains the next page of results,
-    //    can be passed as the start_cursor param to the same endpoint
+    // continue to query if next_cursor is returned
     const config = getPhotosConfig(response.next_cursor)
     config.sorts = [{ property: 'taken_on', direction: 'descending' }]
     response = await notion.databases.query(config)

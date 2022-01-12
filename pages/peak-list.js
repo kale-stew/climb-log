@@ -1,6 +1,7 @@
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { fetchAllPeaks } from '../utils/data/peaks'
+import { addCommas } from '../utils/helpers'
 import { socialImage } from '../utils/social-image'
 
 // import utilStyles from '../styles/utils.module.css'
@@ -9,8 +10,21 @@ const PeakListPage = ({ allPeaks, title }) => {
   return (
     <Layout>
       <h1>{title}</h1>
-      <p>Peaks that {METADATA.FIRST_NAME} has summitted.</p>
-      {allPeaks.map((peak) => peak.title)}
+      <p>The 100 highest peaks in Colorado.</p>
+      {allPeaks.map((peak) => (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '2.5em',
+            alignItems: 'center',
+          }}
+        >
+          <h2>{peak.title}</h2>
+          <h3>{addCommas(peak.elevation)}</h3>
+          <p>{peak.number_of_summits.rollup.number}</p>
+        </div>
+      ))}
     </Layout>
   )
 }
