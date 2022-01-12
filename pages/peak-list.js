@@ -1,14 +1,16 @@
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { fetchAllPeaks } from '../utils/data/peaks'
 import { socialImage } from '../utils/social-image'
 
 // import utilStyles from '../styles/utils.module.css'
 
-const PeakListPage = ({ title }) => {
+const PeakListPage = ({ allPeaks, title }) => {
   return (
     <Layout>
       <h1>{title}</h1>
       <p>Peaks that {METADATA.FIRST_NAME} has summitted.</p>
+      {allPeaks.map((peak) => peak.title)}
     </Layout>
   )
 }
@@ -16,9 +18,11 @@ const PeakListPage = ({ title }) => {
 export async function getStaticProps() {
   const title = 'Centennial Summit Checklist'
   const description = `Peaks that ${METADATA.FIRST_NAME} has summitted.`
+  const allPeaks = await fetchAllPeaks()
 
   return {
     props: {
+      allPeaks,
       title,
       description,
       ...(await socialImage({

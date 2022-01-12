@@ -1,6 +1,8 @@
 import { fmt, findMatchingSlug, getDatabaseQueryConfig, notion } from '../notion'
 import { getLocationData } from '../helpers'
 
+let today = new Date().toISOString()
+
 /**
  * Formats an array of climbs returned from the Notion query
  */
@@ -49,6 +51,9 @@ const formatClimbs = (response) => {
 const fetchMostRecentClimbs = async () => {
   const config = getDatabaseQueryConfig(null, 5)
   config.sorts = [{ property: 'date', direction: 'descending' }]
+  config.filter = {
+    and: [{ property: 'date', date: { on_or_before: today } }],
+  }
   let response = await notion.databases.query(config)
   return formatClimbs(response.results)
 }
@@ -59,6 +64,9 @@ const fetchMostRecentClimbs = async () => {
 const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
   config.sorts = [{ property: 'date', direction: 'descending' }]
+  config.filter = {
+    and: [{ property: 'date', date: { on_or_before: today } }],
+  }
   let response = await notion.databases.query(config)
   let responseArray = [...response.results]
 
@@ -68,6 +76,9 @@ const fetchAllClimbs = async () => {
     //    can be passed as the start_cursor param to the same endpoint
     const config = getDatabaseQueryConfig(response.next_cursor)
     config.sorts = [{ property: 'date', direction: 'descending' }]
+    config.filter = {
+      and: [{ property: 'date', date: { on_or_before: today } }],
+    }
     response = await notion.databases.query(config)
     responseArray = [...responseArray, ...response.results]
   }

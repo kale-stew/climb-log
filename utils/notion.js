@@ -80,15 +80,10 @@ export const findMatchingSlug = (str) => {
 export const getDatabaseQueryConfig = (
   cursor = null,
   pageSize = null,
-  database_id = process.env.NOTION_CLIMB_DATABASE_ID,
-  dateProperty = 'date'
+  database_id = process.env.NOTION_CLIMB_DATABASE_ID
 ) => {
-  let today = new Date().toISOString()
   const config = {
     database_id,
-    filter: {
-      and: [{ property: dateProperty, date: { on_or_before: today } }],
-    },
   }
 
   if (cursor != null) {
