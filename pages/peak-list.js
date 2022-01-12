@@ -1,10 +1,8 @@
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { fetchAllPeaks } from '../utils/data/peaks'
-import { addCommas } from '../utils/helpers'
+import { addCommas, formatDate } from '../utils/helpers'
 import { socialImage } from '../utils/social-image'
-
-// import utilStyles from '../styles/utils.module.css'
 
 const PeakListPage = ({ allPeaks, title }) => {
   return (
@@ -14,15 +12,16 @@ const PeakListPage = ({ allPeaks, title }) => {
       {allPeaks.map((peak) => (
         <div
           style={{
+            border: '1px solid grey',
             display: 'flex',
             flexDirection: 'row',
-            gap: '2.5em',
+            gap: '1.5rem',
             alignItems: 'center',
           }}
         >
           <h2>{peak.title}</h2>
           <h3>{addCommas(peak.elevation)}</h3>
-          <p>{peak.number_of_summits.rollup.number}</p>
+          {peak.first_completed && <p>{formatDate(peak.first_completed)}</p>}
         </div>
       ))}
     </Layout>
