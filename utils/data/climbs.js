@@ -2,10 +2,11 @@ import { fmt, findMatchingSlug, getDatabaseQueryConfig, notion } from '../notion
 import { getLocationData } from '../helpers'
 
 let today = new Date().toISOString()
+const climbSorts = [{ property: 'date', direction: 'descending' }]
+const climbFilters = {
+  and: [{ property: 'date', date: { on_or_before: today } }],
+}
 
-/**
- * Formats an array of climbs returned from the Notion query
- */
 const formatClimbs = (response) => {
   return response.map((result) => {
     const {
@@ -28,7 +29,7 @@ const formatClimbs = (response) => {
       previewImg = result.cover ? fmt(result.cover) : null
     }
 
-    const finalObj = {
+    return {
       id,
       date: fmt(date),
       title: fmt(hike_title),
@@ -40,7 +41,6 @@ const formatClimbs = (response) => {
       state: getLocationData(fmt(area)).state,
       strava: fmt(strava),
     }
-    return finalObj
   }, [])
 }
 
@@ -50,10 +50,8 @@ const formatClimbs = (response) => {
  */
 const fetchMostRecentClimbs = async () => {
   const config = getDatabaseQueryConfig(null, 5)
-  config.sorts = [{ property: 'date', direction: 'descending' }]
-  config.filter = {
-    and: [{ property: 'date', date: { on_or_before: today } }],
-  }
+  config.sorts = climbSorts
+  config.filter = climbFilters
   let response = await notion.databases.query(config)
   return formatClimbs(response.results)
 }
@@ -63,20 +61,16 @@ const fetchMostRecentClimbs = async () => {
  */
 const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
-  config.sorts = [{ property: 'date', direction: 'descending' }]
-  config.filter = {
-    and: [{ property: 'date', date: { on_or_before: today } }],
-  }
+  config.sorts = climbSorts
+  config.filter = climbFilters
   let response = await notion.databases.query(config)
   let responseArray = [...response.results]
 
   while (response.has_more) {
     // continue to query if next_cursor is returned
     const config = getDatabaseQueryConfig(response.next_cursor)
-    config.sorts = [{ property: 'date', direction: 'descending' }]
-    config.filter = {
-      and: [{ property: 'date', date: { on_or_before: today } }],
-    }
+    config.sorts = climbSorts
+    config.filter = climbFilters
     response = await notion.databases.query(config)
     responseArray = [...responseArray, ...response.results]
   }

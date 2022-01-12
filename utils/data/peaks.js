@@ -1,13 +1,7 @@
 import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
 const getPeakConfig = (nextCursor = null) =>
-  getDatabaseQueryConfig(
-    nextCursor,
-    null,
-    process.env.NOTION_PEAK_DATABASE_ID,
-    'peak_name'
-  )
-
+  getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_PEAK_DATABASE_ID)
 const peakSorts = [{ property: 'elevation', direction: 'descending' }]
 
 const getDateFirstCompleted = (completed_on) => {

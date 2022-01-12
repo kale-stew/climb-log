@@ -4,46 +4,28 @@ const getGearConfig = (nextCursor = null) =>
   getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_GEAR_DATABASE_ID, 'title')
 
 const gearSorts = [{ property: 'title', direction: 'ascending' }]
-
 const gearFilters = {
   and: [{ property: 'acquired_on', date: { is_not_empty: true } }],
 }
 
 const formatGear = (gearList) =>
   gearList.map((gear) => {
-    const {
-      id,
-      properties: {
-        acquired_on,
-        brand,
-        category,
-        color,
-        cost,
-        img_slug,
-        more_info,
-        product,
-        retired_on,
-        title,
-        url,
-        weight_g,
-        weight_oz,
-      },
-    } = gear
+    const { id, properties } = gear
     return {
       id,
-      title: fmt(title),
-      acquired_on: fmt(acquired_on),
-      brand: fmt(brand),
-      category: fmt(category),
-      color: fmt(color),
-      cost: fmt(cost),
-      img: `${fmt(img_slug)}.png`,
-      more_info: fmt(more_info),
-      product_str: fmt(product),
-      retired_on: fmt(retired_on),
-      url: fmt(url),
-      weight_g: fmt(weight_g),
-      weight_oz: fmt(weight_oz),
+      title: fmt(properties.title),
+      acquired_on: fmt(properties.acquired_on),
+      brand: fmt(properties.brand),
+      category: fmt(properties.category),
+      color: fmt(properties.color),
+      // cost: fmt(properties.cost),
+      img: `${fmt(properties.img_slug)}.png`,
+      more_info: fmt(properties.more_info),
+      product_str: fmt(properties.product),
+      retired_on: fmt(properties.retired_on),
+      // url: fmt(properties.url),
+      // weight_g: fmt(properties.weight_g),
+      // weight_oz: fmt(properties.weight_oz),
     }
   })
 
