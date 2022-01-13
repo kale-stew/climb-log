@@ -16,11 +16,11 @@ const PeakCard = styled.div`
   align-self: center;
   border-radius: 5px;
   margin: 0.5rem 0;
-  max-width: 420px;
+  width: 420px;
   font-weight: 500;
   ${(p) =>
     p.isCompleted
-      ? `border: 2px solid var(--color-${p.color});
+      ? `border: 2px solid var(--color-bg-secondary);
         color: var(--color-white);
         background-image: linear-gradient(to bottom, var(--color-bg-primary), var(--color-${
           p.color
@@ -34,11 +34,9 @@ const PeakCard = styled.div`
         }
         padding: 0 1rem 2rem 1rem;`
       : `padding: 0 1rem;
-        border: 3px solid var(--color-${p.color})`};
+        border: 2.5px solid var(--color-${p.color})`};
   @media (max-width: 1024px) {
     width: inherit;
-    max-width: 80vw;
-    margin: 0.5em 0;
   }
 `
 
@@ -58,7 +56,7 @@ const PeakListPage = ({ allPeaks, title }) => {
         {allPeaks.map((peak) => {
           const isCompleted = peak.first_completed ? true : false
           return (
-            <PeakCard color={peak.range.color} isCompleted={isCompleted}>
+            <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
               <span className={styles.peakTitle}>
                 <h2>{peak.title}</h2>
                 <h3>{addCommas(peak.elevation)}</h3>

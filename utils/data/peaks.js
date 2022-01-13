@@ -13,7 +13,7 @@ const formatPeaks = (peakList) =>
       elevation: fmt(properties.elevation),
       first_completed: fmt(properties.first_completed_on),
       range: properties.range.select,
-      img: properties.img_url ? properties.img_url : null,
+      img: properties.img_url ? fmt(properties.img_url) : null,
     }
   })
 

@@ -2,6 +2,7 @@
   width: 80vw;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  column-gap: 2em;
   justify-items: center;
   margin: 1rem auto 0 auto;
 }
@@ -11,4 +12,12 @@
   flex-direction: row;
   align-items: center;
   gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .peakListWrapper {
+    max-width: 65vw;
+    display: flex;
+    flex-direction: column;
+  }
 }
