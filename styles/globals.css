@@ -29,15 +29,18 @@ body {
   /* solid colors */
   --color-solid-blue: #0071ce;
   --color-solid-green: #60aa00;
-
-  /* transparent colors */
-  --color-blue: #0071ced7;
-  --color-green: #60aa00d7;
-  --color-brown: #850202d7;
   --color-orange: #e49604d7;
   --color-pink: #f1045fd7;
   --color-purple: #bb03e9d7;
-  --color-yellow: #fdef28d7;
+
+  /* transparent colors */
+  --color-card-blue: #277da1d7;
+  --color-card-green: #90be6dd7;
+  --color-card-orange: #f3722cd7;
+  --color-card-pink: #f8961ed7;
+  --color-card-purple: #577590d7;
+  --color-card-red: #f94144d7;
+  --color-card-yellow: #f9c74fd7;
 }
 
 body,
@@ -49,6 +52,7 @@ body[data-theme='light'] {
   --color-bg-primary: var(--color-white);
   --color-bg-secondary: var(--color-offwhite);
   --color-bg-tertiary: #a7a7a7;
+  --color-card-bg: #f9f9f9d7;
   --color-bg-accent: var(--color-solid-blue);
 }
 
@@ -60,6 +64,7 @@ body[data-theme='dark'] {
   --color-bg-primary: var(--color-black);
   --color-bg-secondary: #272727;
   --color-bg-tertiary: #4d4d4d;
+  --color-card-bg: #1f1f1fd7;
   --color-bg-accent: var(--color-solid-green);
 }
 

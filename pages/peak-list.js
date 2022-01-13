@@ -17,12 +17,12 @@ const PeakCard = styled.div`
   border-radius: 5px;
   margin: 0.5rem 0;
   width: 420px;
-  font-weight: 500;
+  font-weight: 600;
   ${(p) =>
     p.isCompleted
       ? `border: 2px solid var(--color-bg-secondary);
         color: var(--color-white);
-        background-image: linear-gradient(to bottom, var(--color-bg-primary), var(--color-${
+        background-image: linear-gradient(to bottom, var(--color-card-bg), var(--color-card-${
           p.color
         })),
         url(${p.img ? p.img : '/photos/lander_top.jpg'});
@@ -34,7 +34,7 @@ const PeakCard = styled.div`
         }
         padding: 0 1rem 2rem 1rem;`
       : `padding: 0 1rem;
-        border: 2.5px solid var(--color-${p.color})`};
+        border: 2px solid var(--color-card-${p.color})`};
   @media (max-width: 1024px) {
     width: inherit;
   }
@@ -47,8 +47,10 @@ const PeakListPage = ({ allPeaks, title }) => {
       <div className={utilStyles.centerText}>
         <h1>{title}</h1>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          <p>The 100 highest peaks in Colorado. </p>{' '}
-          <p style={{ marginLeft: '1ch' }}> {COUNT_DONE}/105</p>
+          <p>The 100 highest peaks in Colorado.</p>
+          <p style={{ marginLeft: '1ch' }}>
+            {COUNT_DONE}/{allPeaks.length}
+          </p>
         </div>
       </div>
 
@@ -58,6 +60,9 @@ const PeakListPage = ({ allPeaks, title }) => {
           return (
             <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
               <span className={styles.peakTitle}>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
+                  {peak.rank}
+                </span>
                 <h2>{peak.title}</h2>
                 <h3>{addCommas(peak.elevation)}</h3>
               </span>
