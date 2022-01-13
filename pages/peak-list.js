@@ -44,9 +44,7 @@ export default function PeakListPage({ allPeaks, title }) {
         <FilterButton
           key={id}
           color={color}
-          onClick={() =>
-            setFilters(filters.length >= 6 ? [] : [...new Set([name, ...filters])])
-          }
+          onClick={() => setAllFilters(name)}
           isSelected={filters.includes(name)}
         >
           {name}
@@ -55,6 +53,17 @@ export default function PeakListPage({ allPeaks, title }) {
     </div>
   )
 
+  const setAllFilters = (str) => {
+    if (filters.length === 0) {
+      setAllPeaks(allPeaks)
+    }
+    const filtersToSet = filters.length >= 6 ? [] : [...new Set([str, ...filters])]
+    setFilters(filtersToSet)
+    const filtered = allPeaks.filter((peak) => filtersToSet.includes(peak.range.name))
+    setAllPeaks(filtered)
+    return
+  }
+
   const searchPeaks = (query) => {
     let upperQuery = query.toUpperCase().trim()
     if (upperQuery == '') {
@@ -62,7 +71,7 @@ export default function PeakListPage({ allPeaks, title }) {
       return
     }
 
-    let searchResults = allPeaks.filter(
+    let searchResults = allPeaksData.filter(
       (peak) =>
         peak.title?.toUpperCase().includes(upperQuery) ||
         peak.range?.name?.toUpperCase().includes(upperQuery) ||
@@ -125,35 +134,7 @@ export default function PeakListPage({ allPeaks, title }) {
         {allPeaksData.length !== 0 ? (
           allPeaksData.map((peak) => {
             const isCompleted = peak.first_completed ? true : false
-            const isFiltered = filters.length !== 0
-            return isFiltered ? (
-              filters.includes(peak.range.name) && (
-                <PeakCard
-                  color={peak.range.color}
-                  isCompleted={isCompleted}
-                  img={peak.img}
-                >
-                  <span className={styles.peakTitle}>
-                    <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
-                    <h2>{peak.title}</h2>
-                    <h3>{addCommas(peak.elevation)}'</h3>
-                  </span>
-                  {isCompleted && (
-                    <span
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        fontFamily: "'Playfair Display', serif",
-                      }}
-                    >
-                      <p style={{ margin: 0, fontSize: '14px' }}>
-                        <i>First summitted on:</i> {formatDate(peak.first_completed)}
-                      </p>
-                    </span>
-                  )}
-                </PeakCard>
-              )
-            ) : (
+            return (
               <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
                 <span className={styles.peakTitle}>
                   <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
