@@ -170,6 +170,7 @@ const ClimbLog = ({ allClimbs }) => {
       setFilteredClimbs(allClimbs)
       sortData(allClimbs, CATEGORY_TYPE.ALL)
       setUserSearch(e)
+      selectAreaFilter('all')
       return
     }
     let sorted = allClimbs.filter((climb) => {
