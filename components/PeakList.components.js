@@ -33,10 +33,10 @@ export const PeakCard = styled.div`
   margin: 0.5rem 0;
   width: 350px;
   font-weight: 600;
+  color: var(--color-text-primary);
   ${(p) =>
     p.isCompleted
       ? `border: 2px solid var(--color-bg-secondary);
-        color: var(--color-white);
         background-image: linear-gradient(to bottom, var(--color-card-bg), var(--color-card-${
           p.color
         })),
@@ -58,5 +58,5 @@ export const PeakCard = styled.div`
 export const RankNumber = styled.span`
   font-size: 12px;
   font-weight: 400;
-  color: ${(p) => (p.isCompleted ? 'var(--color-white' : 'var(--color-text-secondary)')};
+  color: var(--color-text-tertiary);
 `

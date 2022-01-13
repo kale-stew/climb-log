@@ -66,7 +66,7 @@ export default function PeakListPage({ allPeaks, title }) {
     )
     let filtersToSet
     if (alreadySelected != -1) {
-      filtersState.pop(alreadySelected)
+      filtersState.splice(alreadySelected, 1)
       filtersToSet = maxedOut ? [] : [...new Set([...filtersState])]
     } else {
       filtersToSet = maxedOut ? [] : [...new Set([str, ...filtersState])]
@@ -150,7 +150,7 @@ export default function PeakListPage({ allPeaks, title }) {
             return (
               <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
                 <span className={styles.peakTitle}>
-                  <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
+                  <RankNumber>{peak.rank}</RankNumber>
                   <h2>{peak.title}</h2>
                   <h3>{addCommas(peak.elevation)}'</h3>
                 </span>
@@ -171,9 +171,17 @@ export default function PeakListPage({ allPeaks, title }) {
             )
           })
         ) : (
-          <i className={utilStyles.centerText}>
-            No peaks found for that search, maybe try "elk".
-          </i>
+          <span
+            style={{
+              fontStyle: 'italic',
+              display: 'flex',
+              justifyContent: 'center',
+              margin: '0 auto',
+              width: 'inherit',
+            }}
+          >
+            No peaks found for that query.
+          </span>
         )}
       </div>
     </Layout>
