@@ -54,13 +54,23 @@ export default function PeakListPage({ allPeaks, title }) {
   )
 
   const setAllFilters = (str) => {
+    let filtersState = filters
     if (str === 'all') {
       setFilters([])
       setAllPeaks(allPeaks)
       return
     }
-    const maxedOut = filters.length >= 6
-    const filtersToSet = maxedOut ? [] : [...new Set([str, ...filters])]
+    const maxedOut = filtersState.length >= 6
+    const alreadySelected = filtersState.findIndex(
+      (filter) => filter.toUpperCase() == str.toUpperCase()
+    )
+    let filtersToSet
+    if (alreadySelected != -1) {
+      filtersState.pop(alreadySelected)
+      filtersToSet = maxedOut ? [] : [...new Set([...filtersState])]
+    } else {
+      filtersToSet = maxedOut ? [] : [...new Set([str, ...filtersState])]
+    }
     setFilters(filtersToSet)
     const filtered = allPeaks.filter((peak) => filtersToSet.includes(peak.range.name))
     setAllPeaks(maxedOut ? allPeaks : filtered)
