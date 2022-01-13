@@ -65,7 +65,7 @@ const checkMonth = (queryMonth, date) => {
  * @returns {Boolean}
  */
 const checkYear = (queryDate, dateToCheck) => {
-  let dateSplit = dateToCheck.split('-')
+  let dateSplit = dateToCheck !== null && dateToCheck.split('-')
   if (!isNaN(dateSplit[0])) {
     let queryYear = getYear(new Date(queryDate, 1, 1))
     let checkYear = getYear(new Date(Number(dateSplit[0]), 1, 1))

@@ -3,17 +3,29 @@ import styled from '@emotion/styled'
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { fetchAllPeaks } from '../utils/data/peaks'
-import { addCommas, checkMonth, formatDate } from '../utils/helpers'
+import { addCommas, checkMonth, checkYear, formatDate } from '../utils/helpers'
 import { socialImage } from '../utils/social-image'
 
 import styles from '../styles/peak-list.module.css'
 import utilStyles from '../styles/utils.module.css'
+
+const FilterButton = styled.button`
+  background-color: ${(p) => `var(--color-card-${p.color})`};
+  color: var(--color-white);
+  width: max-content;
+  font-weight: 500;
+  font-size: 14px;
+  &:hover {
+    box-shadow: 0 10px 20px var(--color-bg-tertiary), 0 6px 6px var(--color-bg-tertiary);
+  }
+`
 
 const CompletedCount = styled.span`
   margin: 0 auto 1rem auto;
   font-weight: 600;
   font-size: 14px;
   background-color: var(--color-bg-tertiary);
+  color: var(--color-white);
   width: max-content;
   padding: 0.25em 0.4em;
   border-radius: 5px;
@@ -61,6 +73,30 @@ export default function PeakListPage({ allPeaks, title }) {
   const [allPeaksData, setAllPeaks] = useState(allPeaks)
   const COUNT_DONE = allPeaksData.filter((peak) => peak.first_completed).length
 
+  const buildRangeArr = () => {
+    const allRanges = allPeaks.map((peak) => peak.range)
+    const seen = new Set()
+    return allRanges.filter((el) => {
+      const duplicate = seen.has(el.id)
+      seen.add(el.id)
+      return !duplicate
+    })
+  }
+
+  const buildButtons = () => {
+    const ranges = buildRangeArr()
+    console.log(ranges)
+    return (
+      <div style={{ display: 'inline', marginTop: '1.25rem' }}>
+        {ranges.map(({ id, name, color }) => (
+          <FilterButton key={id} color={color}>
+            {name}
+          </FilterButton>
+        ))}
+      </div>
+    )
+  }
+
   const searchPeaks = (query) => {
     let upperQuery = query.toUpperCase().trim()
     if (upperQuery == '') {
@@ -72,7 +108,8 @@ export default function PeakListPage({ allPeaks, title }) {
       (peak) =>
         peak.title?.toUpperCase().includes(upperQuery) ||
         peak.range?.name?.toUpperCase().includes(upperQuery) ||
-        checkMonth(upperQuery, peak.first_completed)
+        checkMonth(upperQuery, peak.first_completed) ||
+        (!isNaN(upperQuery) && checkYear(Number(upperQuery), peak.first_completed))
     )
 
     setAllPeaks(searchResults)
@@ -91,14 +128,27 @@ export default function PeakListPage({ allPeaks, title }) {
           }}
         >
           <p className={styles.description}>
-            The 100 highest peaks in Colorado, sorted from tallest (14,433') to shortest
-            (13,809') and color-coordinated by range.
+            The 100 highest peaks in Colorado, sorted from tallest (Mount Elbert at
+            14,433') to shortest (Dallas Peak at 13,809'). Ranking, if available, is
+            listed to the left of the peak name. Peaks without a number are technincally
+            unranked.
+          </p>
+          <p className={styles.description}>
+            Peaks that {METADATA.FIRST_NAME} has climbed have a colored background of an
+            image she took on that mountain. The color aligns with the mountain range it
+            lies in. For a complete key of the ranges, see the colored filters available
+            below.
           </p>
 
           {/* Completed Count in Current View */}
           <CompletedCount>
             {COUNT_DONE} / {allPeaksData.length}
           </CompletedCount>
+
+          {/* Preset Queries as Filters */}
+          {/* 13er, 14er (by elevation, greaterThan) */}
+          {/* ranges: Sangre de Cristo, San Juan, Front, Tenmile, Sawatch, Mosquito, Elk */}
+          {buildButtons()}
 
           <div style={{ marginBottom: '2rem' }}>
             {/* Search all Peaks */}
@@ -114,31 +164,37 @@ export default function PeakListPage({ allPeaks, title }) {
       </div>
 
       <div className={styles.peakListWrapper}>
-        {allPeaksData.map((peak) => {
-          const isCompleted = peak.first_completed ? true : false
-          return (
-            <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
-              <span className={styles.peakTitle}>
-                <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
-                <h2>{peak.title}</h2>
-                <h3>{addCommas(peak.elevation)}'</h3>
-              </span>
-              {isCompleted && (
-                <span
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    fontFamily: "'Playfair Display', serif",
-                  }}
-                >
-                  <p style={{ margin: 0, fontSize: '14px' }}>
-                    <i>First summitted on:</i> {formatDate(peak.first_completed)}
-                  </p>
+        {allPeaksData.length !== 0 ? (
+          allPeaksData.map((peak) => {
+            const isCompleted = peak.first_completed ? true : false
+            return (
+              <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
+                <span className={styles.peakTitle}>
+                  <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
+                  <h2>{peak.title}</h2>
+                  <h3>{addCommas(peak.elevation)}'</h3>
                 </span>
-              )}
-            </PeakCard>
-          )
-        })}
+                {isCompleted && (
+                  <span
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      fontFamily: "'Playfair Display', serif",
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: '14px' }}>
+                      <i>First summitted on:</i> {formatDate(peak.first_completed)}
+                    </p>
+                  </span>
+                )}
+              </PeakCard>
+            )
+          })
+        ) : (
+          <i className={utilStyles.centerText}>
+            No peaks found for that search, maybe try "elk".
+          </i>
+        )}
       </div>
     </Layout>
   )
