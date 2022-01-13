@@ -1,6 +1,5 @@
 import { capitalizeEachWord } from './helpers'
 import { AREA_TYPE } from './constants'
-import { fmt } from './notion'
 
 /**
  * Format the area rich_text that is returned from the Notion API.
