@@ -33,7 +33,6 @@ const PeakCard = styled.div`
         })),
         url(${p.img ? p.img : '/photos/lander_top.jpg'});
         height: auto;
-        width: 100%;
         background-size: cover;
         @media (max-width: 1024px) {
           max-height: 25vh;
@@ -69,7 +68,7 @@ const PeakListPage = ({ allPeaks, title }) => {
               <span className={styles.peakTitle}>
                 <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
                 <h2>{peak.title}</h2>
-                <h3>{addCommas(peak.elevation)}</h3>
+                <h3>{addCommas(peak.elevation)}'</h3>
               </span>
               {isCompleted && (
                 <span

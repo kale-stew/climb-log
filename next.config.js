@@ -10,4 +10,13 @@ module.exports = {
   images: {
     domains: ['s3.us-west-2.amazonaws.com', 'live.staticflickr.com'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/centennials',
+        destination: '/peak-list',
+        permanent: true,
+      },
+    ]
+  },
 }
