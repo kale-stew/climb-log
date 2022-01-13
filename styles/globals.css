@@ -32,6 +32,7 @@ body {
   --color-white: #f9f9f9;
 
   /* transparent colors for the peak-list */
+  --color-card-fallback: var(--color-bg-secondary);
   --color-card-blue: #277da1d7;
   --color-card-green: #90be6dd7;
   --color-card-orange: #f3722cd7;

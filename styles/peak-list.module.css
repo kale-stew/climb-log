@@ -1,7 +1,8 @@
 .description {
   font-size: 14px;
-  max-width: 50%;
+  max-width: 60%;
   margin: 0 auto 1em auto;
+  line-height: 1.4;
 }
 
 .peakListWrapper {
@@ -22,7 +23,7 @@
 
 @media (max-width: 1024px) {
   .description {
-    max-width: 85%;
+    max-width: 90%;
   }
 
   .peakListWrapper {
