@@ -1,0 +1,14 @@
+.peakListWrapper {
+  width: 80vw;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  justify-items: center;
+  margin: 1rem auto 0 auto;
+}
+
+.peakTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
