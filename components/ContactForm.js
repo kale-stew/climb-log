@@ -103,7 +103,6 @@ const ContactForm = () => {
         if (response.status !== 200) {
           throw new Error(response.statusText)
         }
-        console.log(response.status)
         return response.json()
       })
       .then(() => setStatus("I'll get back to you soon."))

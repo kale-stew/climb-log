@@ -1,65 +1,68 @@
 import { useState } from 'react'
-import styled from '@emotion/styled'
 import Layout from '../components/Layout'
+import {
+  CompletedCount,
+  FilterButton,
+  PeakCard,
+  RankNumber,
+} from '../components/PeakList.components'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { fetchAllPeaks } from '../utils/data/peaks'
-import { addCommas, checkMonth, formatDate } from '../utils/helpers'
+import { addCommas, checkMonth, checkYear, formatDate } from '../utils/helpers'
 import { socialImage } from '../utils/social-image'
 
 import styles from '../styles/peak-list.module.css'
 import utilStyles from '../styles/utils.module.css'
 
-const CompletedCount = styled.span`
-  margin: 0 auto 1rem auto;
-  font-weight: 600;
-  font-size: 14px;
-  background-color: var(--color-bg-tertiary);
-  width: max-content;
-  padding: 0.25em 0.4em;
-  border-radius: 5px;
-`
-
-const RankNumber = styled.span`
-  font-size: 12px;
-  font-weight: 400;
-  color: ${(p) => (p.isCompleted ? 'var(--color-white' : 'var(--color-text-secondary)')};
-`
-
-const PeakCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  align-self: center;
-  border-radius: 5px;
-  margin: 0.5rem 0;
-  width: 350px;
-  font-weight: 600;
-  ${(p) =>
-    p.isCompleted
-      ? `border: 2px solid var(--color-bg-secondary);
-        color: var(--color-white);
-        background-image: linear-gradient(to bottom, var(--color-card-bg), var(--color-card-${
-          p.color
-        })),
-        url(${p.img ? p.img : '/photos/lander_top.jpg'});
-        height: auto;
-        background-size: cover;
-        @media (max-width: 1024px) {
-          max-height: 25vh;
-        }
-        padding: 0 1rem 2rem 1rem;`
-      : `padding: 0 1rem;
-        border: 2px solid var(--color-card-${p.color})`};
-  @media (max-width: 1024px) {
-    width: inherit;
-    padding: auto 0.5em;
-  }
-`
-
 export default function PeakListPage({ allPeaks, title }) {
   const [allPeaksData, setAllPeaks] = useState(allPeaks)
+  const [filters, setFilters] = useState([])
   const COUNT_DONE = allPeaksData.filter((peak) => peak.first_completed).length
+
+  const buildRangeArr = () => {
+    const allRanges = allPeaks.map((peak) => peak.range)
+    const seen = new Set()
+    return allRanges.filter((el) => {
+      const duplicate = seen.has(el.id)
+      seen.add(el.id)
+      return !duplicate
+    })
+  }
+
+  const buildButtons = () => (
+    <div style={{ display: 'inline', marginTop: '1.25rem' }}>
+      <FilterButton
+        key="all-button"
+        color="fallback"
+        onClick={() => setFilters([])}
+        isSelected={filters.length === 0}
+        style={{ color: 'var(--color-text-primary)' }}
+      >
+        All Ranges
+      </FilterButton>
+      {buildRangeArr().map(({ id, name, color }) => (
+        <FilterButton
+          key={id}
+          color={color}
+          onClick={() => setAllFilters(name)}
+          isSelected={filters.includes(name)}
+        >
+          {name}
+        </FilterButton>
+      ))}
+    </div>
+  )
+
+  const setAllFilters = (str) => {
+    if (filters.length === 0) {
+      setAllPeaks(allPeaks)
+    }
+    const filtersToSet = filters.length >= 6 ? [] : [...new Set([str, ...filters])]
+    setFilters(filtersToSet)
+    const filtered = allPeaks.filter((peak) => filtersToSet.includes(peak.range.name))
+    setAllPeaks(filtered)
+    return
+  }
 
   const searchPeaks = (query) => {
     let upperQuery = query.toUpperCase().trim()
@@ -68,11 +71,12 @@ export default function PeakListPage({ allPeaks, title }) {
       return
     }
 
-    let searchResults = allPeaks.filter(
+    let searchResults = allPeaksData.filter(
       (peak) =>
         peak.title?.toUpperCase().includes(upperQuery) ||
         peak.range?.name?.toUpperCase().includes(upperQuery) ||
-        checkMonth(upperQuery, peak.first_completed)
+        checkMonth(upperQuery, peak.first_completed) ||
+        (!isNaN(upperQuery) && checkYear(Number(upperQuery), peak.first_completed))
     )
 
     setAllPeaks(searchResults)
@@ -91,14 +95,27 @@ export default function PeakListPage({ allPeaks, title }) {
           }}
         >
           <p className={styles.description}>
-            The 100 highest peaks in Colorado, sorted from tallest (14,433') to shortest
-            (13,809') and color-coordinated by range.
+            The 100 highest peaks in Colorado, sorted from tallest (Mount Elbert at
+            14,433') to shortest (Dallas Peak at 13,809'). Ranking, if available, is
+            listed to the left of the peak name. Peaks without a number are technically
+            unranked.
+          </p>
+          <p className={styles.description}>
+            Peaks that {METADATA.FIRST_NAME} has climbed have a colored background of an
+            image she took on that mountain. The color aligns with the mountain range it
+            lies in. For a complete key of the ranges, see the colored filters available
+            below.
           </p>
 
           {/* Completed Count in Current View */}
           <CompletedCount>
             {COUNT_DONE} / {allPeaksData.length}
           </CompletedCount>
+
+          {/* Preset Queries as Filters */}
+          {/* 13er, 14er (by elevation, greaterThan) */}
+          {/* ranges: Sangre de Cristo, San Juan, Front, Tenmile, Sawatch, Mosquito, Elk */}
+          {buildButtons()}
 
           <div style={{ marginBottom: '2rem' }}>
             {/* Search all Peaks */}
@@ -114,31 +131,37 @@ export default function PeakListPage({ allPeaks, title }) {
       </div>
 
       <div className={styles.peakListWrapper}>
-        {allPeaksData.map((peak) => {
-          const isCompleted = peak.first_completed ? true : false
-          return (
-            <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
-              <span className={styles.peakTitle}>
-                <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
-                <h2>{peak.title}</h2>
-                <h3>{addCommas(peak.elevation)}'</h3>
-              </span>
-              {isCompleted && (
-                <span
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    fontFamily: "'Playfair Display', serif",
-                  }}
-                >
-                  <p style={{ margin: 0, fontSize: '14px' }}>
-                    <i>First summitted on:</i> {formatDate(peak.first_completed)}
-                  </p>
+        {allPeaksData.length !== 0 ? (
+          allPeaksData.map((peak) => {
+            const isCompleted = peak.first_completed ? true : false
+            return (
+              <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
+                <span className={styles.peakTitle}>
+                  <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
+                  <h2>{peak.title}</h2>
+                  <h3>{addCommas(peak.elevation)}'</h3>
                 </span>
-              )}
-            </PeakCard>
-          )
-        })}
+                {isCompleted && (
+                  <span
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      fontFamily: "'Playfair Display', serif",
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: '14px' }}>
+                      <i>First summitted on:</i> {formatDate(peak.first_completed)}
+                    </p>
+                  </span>
+                )}
+              </PeakCard>
+            )
+          })
+        ) : (
+          <i className={utilStyles.centerText}>
+            No peaks found for that search, maybe try "elk".
+          </i>
+        )}
       </div>
     </Layout>
   )
