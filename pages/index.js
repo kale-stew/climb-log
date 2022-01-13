@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import Card from '../components/Card'
+import PostPreview from '../components/PostPreview'
 import Layout from '../components/Layout'
 import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { getRecentPosts } from '../utils/data/posts'
@@ -34,7 +34,7 @@ const HomePage = ({ featuredPosts }) => (
     <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>Recent Posts</h1>
     <div className={styles.recentPosts}>
       {featuredPosts.map((post) => (
-        <Card postData={post} key={post.id} />
+        <PostPreview postData={post} key={post.id} />
       ))}
     </div>
     <GradientBottomImage />

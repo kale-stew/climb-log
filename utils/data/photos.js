@@ -1,22 +1,10 @@
 import { buildAreaName } from '../builders'
 import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
-/**
- * This is the notion config we need to query the all-photos database.
- * See working examples in climbs.js.
- * ex: let response = await notion.databases.query(photosConfig)
- */
 const getPhotosConfig = (nextCursor = null) =>
-  getDatabaseQueryConfig(
-    nextCursor,
-    null,
-    process.env.NOTION_PHOTO_DATABASE_ID,
-    'taken_on'
-  )
+  getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_PHOTO_DATABASE_ID)
+const photosSort = [{ property: 'taken_on', direction: 'descending' }]
 
-/**
- * Formats an array of photos returned from the Notion query
- */
 const formatPhotos = (response) => {
   return response.map((result) => {
     const {
@@ -48,14 +36,13 @@ const formatPhotos = (response) => {
           state: fallbackArea.split(', ')[1],
         }
       }
-
       return {
         region: null,
         state: null,
       }
     }
 
-    const finalObj = {
+    return {
       id,
       area: buildAreaName(determinePhotoArea().region),
       state: determinePhotoArea().state,
@@ -67,25 +54,19 @@ const formatPhotos = (response) => {
       bgColor: fmt(accent_color) ? fmt(accent_color) : null,
       tags: fmt(tags) ? fmt(tags) : null,
     }
-    return finalObj
   }, [])
 }
 
-/**
- * Fetch all images from the all-photos db
- */
 const fetchAllImages = async () => {
   const photosConfig = getPhotosConfig()
-  photosConfig.sorts = [{ property: 'taken_on', direction: 'descending' }]
+  photosConfig.sorts = photosSort
   let response = await notion.databases.query(photosConfig)
   let responseArray = [...response.results]
 
   while (response.has_more) {
-    // response.has_more tells us if the database has more pages
-    // response.next_cursor contains the next page of results,
-    //    can be passed as the start_cursor param to the same endpoint
+    // continue to query if next_cursor is returned
     const config = getPhotosConfig(response.next_cursor)
-    config.sorts = [{ property: 'taken_on', direction: 'descending' }]
+    config.sorts = photosSort
     response = await notion.databases.query(config)
     responseArray = [...responseArray, ...response.results]
   }

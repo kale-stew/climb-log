@@ -1,9 +1,12 @@
 import { fmt, findMatchingSlug, getDatabaseQueryConfig, notion } from '../notion'
 import { getLocationData } from '../helpers'
 
-/**
- * Formats an array of climbs returned from the Notion query
- */
+let today = new Date().toISOString()
+const climbSorts = [{ property: 'date', direction: 'descending' }]
+const climbFilters = {
+  and: [{ property: 'date', date: { on_or_before: today } }],
+}
+
 const formatClimbs = (response) => {
   return response.map((result) => {
     const {
@@ -26,7 +29,7 @@ const formatClimbs = (response) => {
       previewImg = result.cover ? fmt(result.cover) : null
     }
 
-    const finalObj = {
+    return {
       id,
       date: fmt(date),
       title: fmt(hike_title),
@@ -38,7 +41,6 @@ const formatClimbs = (response) => {
       state: getLocationData(fmt(area)).state,
       strava: fmt(strava),
     }
-    return finalObj
   }, [])
 }
 
@@ -48,7 +50,8 @@ const formatClimbs = (response) => {
  */
 const fetchMostRecentClimbs = async () => {
   const config = getDatabaseQueryConfig(null, 5)
-  config.sorts = [{ property: 'date', direction: 'descending' }]
+  config.sorts = climbSorts
+  config.filter = climbFilters
   let response = await notion.databases.query(config)
   return formatClimbs(response.results)
 }
@@ -58,16 +61,16 @@ const fetchMostRecentClimbs = async () => {
  */
 const fetchAllClimbs = async () => {
   const config = getDatabaseQueryConfig()
-  config.sorts = [{ property: 'date', direction: 'descending' }]
+  config.sorts = climbSorts
+  config.filter = climbFilters
   let response = await notion.databases.query(config)
   let responseArray = [...response.results]
 
   while (response.has_more) {
-    // response.has_more tells us if the database has more pages
-    // response.next_cursor contains the next page of results,
-    //    can be passed as the start_cursor param to the same endpoint
+    // continue to query if next_cursor is returned
     const config = getDatabaseQueryConfig(response.next_cursor)
-    config.sorts = [{ property: 'date', direction: 'descending' }]
+    config.sorts = climbSorts
+    config.filter = climbFilters
     response = await notion.databases.query(config)
     responseArray = [...responseArray, ...response.results]
   }

@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import FormattedDate from '../components/Date'
+import FormattedDate from './Date'
 import { PREVIEW_IMAGES } from '../utils/constants'
 
-import styles from './Card.module.css'
+import styles from './PostPreview.module.css'
 
-const Card = ({ postData }) => {
+const PostPreview = ({ postData }) => {
   const isClimb = postData.href.indexOf('/climb-log?') === 0
 
   return (
@@ -39,4 +39,4 @@ const Card = ({ postData }) => {
   )
 }
 
-export default Card
+export default PostPreview
