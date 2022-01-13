@@ -8,6 +8,12 @@ import { socialImage } from '../utils/social-image'
 import styles from '../styles/peak-list.module.css'
 import utilStyles from '../styles/utils.module.css'
 
+const RankNumber = styled.span`
+  font-size: 12px;
+  font-weight: 400;
+  color: ${(p) => (p.isCompleted ? 'var(--color-white' : 'var(--color-text-secondary)')};
+`
+
 const PeakCard = styled.div`
   display: flex;
   flex-direction: column;
@@ -61,9 +67,7 @@ const PeakListPage = ({ allPeaks, title }) => {
           return (
             <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
               <span className={styles.peakTitle}>
-                <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
-                  {peak.rank}
-                </span>
+                <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
                 <h2>{peak.title}</h2>
                 <h3>{addCommas(peak.elevation)}</h3>
               </span>
