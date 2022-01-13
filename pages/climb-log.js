@@ -3,13 +3,11 @@ import { useRouter } from 'next/router'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
 import {
-  containsAreaType,
   createAreaSelects,
   createAreaTypeSelects,
   createStateSelects,
 } from '../utils/builders'
 import {
-  AREA_TYPE,
   CATEGORY_TYPE,
   COLORS,
   METADATA,
@@ -159,7 +157,10 @@ const ClimbLog = ({ allClimbs }) => {
     }
     // Otherwise let's filter down to what we want based on the filter type
     let filteredData = allClimbs.filter((climb) => {
-      return climb[filterType].toUpperCase().trim().includes(selectedFilter.toUpperCase().trim())
+      return climb[filterType]
+        .toUpperCase()
+        .trim()
+        .includes(selectedFilter.toUpperCase().trim())
     })
     setFilteredClimbs(filteredData)
     sortData(filteredData, selectedFilter)
