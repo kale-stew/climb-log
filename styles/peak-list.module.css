@@ -20,4 +20,18 @@
     display: flex;
     flex-direction: column;
   }
+
+  .peakTitle {
+    width: 100%;
+    gap: none;
+  }
+
+  .peakTitle h2 {
+    width: 60%;
+  }
+
+  .peakTitle h3 {
+    text-align: right;
+    width: 20%;
+  }
 }

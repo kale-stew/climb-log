@@ -37,6 +37,7 @@ const PeakCard = styled.div`
         border: 2px solid var(--color-card-${p.color})`};
   @media (max-width: 1024px) {
     width: inherit;
+    padding: auto 0.5em;
   }
 `
 
