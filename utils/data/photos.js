@@ -6,6 +6,25 @@ const getPhotosConfig = (nextCursor = null) =>
 const photosSort = [{ property: 'taken_on', direction: 'descending' }]
 
 const formatPhotos = (response) => {
+  const determineArea = (area, area_fallback = null) => {
+    let areaFormatted = fmt(area)
+    let fallbackArea = fmt(area_fallback)
+    if (areaFormatted && areaFormatted != '') {
+      return {
+        region: areaFormatted.split(', ')[0],
+        state: areaFormatted.split(', ')[1],
+      }
+    } else if (fallbackArea && fallbackArea != '') {
+      return {
+        region: fallbackArea.split(', ')[0],
+        state: fallbackArea.split(', ')[1],
+      }
+    }
+    return {
+      region: null,
+      state: null,
+    }
+  }
   return response.map((result) => {
     const {
       id,
@@ -22,30 +41,12 @@ const formatPhotos = (response) => {
       },
     } = result
 
-    const determinePhotoArea = () => {
-      let areaFormatted = fmt(area)
-      let fallbackArea = fmt(area_fallback)
-      if (areaFormatted && areaFormatted != '') {
-        return {
-          region: areaFormatted.split(', ')[0],
-          state: areaFormatted.split(', ')[1],
-        }
-      } else if (fallbackArea && fallbackArea != '') {
-        return {
-          region: fallbackArea.split(', ')[0],
-          state: fallbackArea.split(', ')[1],
-        }
-      }
-      return {
-        region: null,
-        state: null,
-      }
-    }
+    const photoArea = determineArea(area, area_fallback)
 
     return {
       id,
-      area: buildAreaName(determinePhotoArea().region),
-      state: determinePhotoArea().state,
+      area: buildAreaName(photoArea.region),
+      state: photoArea.state,
       title: fmt(title),
       date: fmt(taken_on),
       href: fmt(href),
