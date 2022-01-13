@@ -1,7 +1,13 @@
+.description {
+  font-size: 14px;
+  max-width: 50%;
+  margin: 0 auto 1em auto;
+}
+
 .peakListWrapper {
   width: 80vw;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 3fr));
   column-gap: 2em;
   justify-items: center;
   margin: 1rem auto 0 auto;
@@ -15,6 +21,10 @@
 }
 
 @media (max-width: 1024px) {
+  .description {
+    max-width: 85%;
+  }
+
   .peakListWrapper {
     max-width: 65vw;
     display: flex;

@@ -79,10 +79,11 @@ export const CONTACT_ENDPOINT =
 
 export const EXPLORE = [
   { title: 'Home', href: '/' },
-  { title: 'My Gear', href: '/gear' },
+  { title: 'All Photos', href: '/all' },
   { title: 'Climb Log', href: '/climb-log' },
   { title: 'Trip Reports', href: `/blog?${CATEGORY_TYPE.HIKE}` },
-  { title: 'All Photos', href: '/all' },
+  { title: 'Peak Checklist', href: '/centennials' },
+  { title: 'Gear List', href: '/gear' },
   { title: 'About Kylie', href: '/about' },
 ]
 
