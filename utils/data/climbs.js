@@ -1,5 +1,6 @@
 import { fmt, findMatchingSlug, getDatabaseQueryConfig, notion } from '../notion'
 import { getLocationData } from '../helpers'
+import { buildAreaName } from '../builders'
 
 let today = new Date().toISOString()
 const climbSorts = [{ property: 'date', direction: 'descending' }]
@@ -8,6 +9,25 @@ const climbFilters = {
 }
 
 const formatClimbs = (response) => {
+  const determinePhotoArea = (area) => {
+    let areaFormatted = fmt(area)
+    if (areaFormatted && areaFormatted != '') {
+      return {
+        region: areaFormatted.split(', ')[0],
+        state: areaFormatted.split(', ')[1],
+      }
+    } else if (fallbackArea && fallbackArea != '') {
+      return {
+        region: fallbackArea.split(', ')[0],
+        state: fallbackArea.split(', ')[1],
+      }
+    }
+    return {
+      region: null,
+      state: null,
+    }
+  }
+
   return response.map((result) => {
     const {
       id,
@@ -37,7 +57,7 @@ const formatClimbs = (response) => {
       previewImgUrl: previewImg,
       distance: fmt(distance),
       gain: fmt(gain),
-      area: getLocationData(fmt(area)).area,
+      area: buildAreaName(determinePhotoArea(area).region),
       state: getLocationData(fmt(area)).state,
       strava: fmt(strava),
     }

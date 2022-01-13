@@ -1,5 +1,6 @@
 import { capitalizeEachWord } from './helpers'
 import { AREA_TYPE } from './constants'
+import { fmt } from './notion'
 
 /**
  * Format the area rich_text that is returned from the Notion API.
@@ -81,10 +82,31 @@ const containsAreaType = (area) => {
   })
 }
 
+const determineArea = (area, area_fallback = null) => {
+  let areaFormatted = fmt(area)
+  let fallbackArea = fmt(area_fallback)
+  if (areaFormatted && areaFormatted != '') {
+    return {
+      region: areaFormatted.split(', ')[0],
+      state: areaFormatted.split(', ')[1],
+    }
+  } else if (fallbackArea && fallbackArea != '') {
+    return {
+      region: fallbackArea.split(', ')[0],
+      state: fallbackArea.split(', ')[1],
+    }
+  }
+  return {
+    region: null,
+    state: null,
+  }
+}
+
 export {
   buildAreaName,
   createAreaSelects,
   createAreaTypeSelects,
   createStateSelects,
   containsAreaType,
+  determineArea,
 }

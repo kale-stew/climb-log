@@ -206,7 +206,9 @@ export default function Table({
 
           {data.length == 0 ? (
             <tr>
-              <i>No data found for '{userSearch}'</i>
+              <td>
+                <i>No data found for '{userSearch}'</i>
+              </td>
             </tr>
           ) : (
             data.map((climb, i) => (
