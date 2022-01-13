@@ -80,13 +80,8 @@ export const findMatchingSlug = (str) => {
 export const getDatabaseQueryConfig = (
   cursor = null,
   pageSize = null,
-  database_id = null
+  database_id = process.env.NOTION_CLIMB_DATABASE_ID
 ) => {
-  console.log('getDatabaseQueryConfig', database_id)
-  if (database_id == null) {
-    database_id = process.env.NOTION_CLIMB_DATABASE_ID
-  }
-  console.log('-->', database_id)
   const config = {
     database_id,
   }
