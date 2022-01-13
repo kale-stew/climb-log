@@ -159,25 +159,7 @@ const ClimbLog = ({ allClimbs }) => {
     }
     // Otherwise let's filter down to what we want based on the filter type
     let filteredData = allClimbs.filter((climb) => {
-      // Let's see if the selected filter is an existing area type
-      let climbAreaTypeStr = containsAreaType(climb[filterType])
-      let areaTypes = Object.values(AREA_TYPE)
-      if (climbAreaTypeStr && areaTypes.includes(selectedFilter)) {
-        // We have found that the climb is one of the AREA_TYPE, that means the
-        // selected filter is 'National Park', 'State Park', 'Wilderness', etc.
-
-        // If the filter is a single word, Wilderness, don't split it
-        if (selectedFilter == AREA_TYPE.wa) {
-          return climb.area.slice(-2) == 'wa'
-        }
-
-        // For the rest of the filters, grab the first letters of the selected filter
-        // and compare to this climb's area type (climbAreaTypeStr)
-        let selectedFilterSplit = selectedFilter.split(' ')
-        let selectedFirstLetters = selectedFilterSplit[0][0] + selectedFilterSplit[1][0]
-        return climbAreaTypeStr.toUpperCase() == selectedFirstLetters.toUpperCase()
-      }
-      return climb[filterType].trim() == selectedFilter.trim()
+      return climb[filterType].toUpperCase().trim().includes(selectedFilter.toUpperCase().trim())
     })
     setFilteredClimbs(filteredData)
     sortData(filteredData, selectedFilter)
