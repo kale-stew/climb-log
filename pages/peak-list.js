@@ -34,7 +34,7 @@ export default function PeakListPage({ allPeaks, title }) {
       <FilterButton
         key="all-button"
         color="fallback"
-        onClick={() => setFilters([])}
+        onClick={() => setAllFilters('all')}
         isSelected={filters.length === 0}
         style={{ color: 'var(--color-text-primary)' }}
       >
@@ -54,13 +54,16 @@ export default function PeakListPage({ allPeaks, title }) {
   )
 
   const setAllFilters = (str) => {
-    if (filters.length === 0) {
+    if (str === 'all') {
+      setFilters([])
       setAllPeaks(allPeaks)
+      return
     }
-    const filtersToSet = filters.length >= 6 ? [] : [...new Set([str, ...filters])]
+    const maxedOut = filters.length >= 6
+    const filtersToSet = maxedOut ? [] : [...new Set([str, ...filters])]
     setFilters(filtersToSet)
     const filtered = allPeaks.filter((peak) => filtersToSet.includes(peak.range.name))
-    setAllPeaks(filtered)
+    setAllPeaks(maxedOut ? allPeaks : filtered)
     return
   }
 
