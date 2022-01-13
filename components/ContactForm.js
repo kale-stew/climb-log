@@ -18,7 +18,7 @@ const SmallInput = styled.input`
   border-radius: 5px;
   &:focus {
     outline: none;
-    border: 1px solid var(--color-solid-green);
+    border: 1px solid var(--color-green);
     box-shadow: 0 0 10px var(--color-offwhite);
   }
 `
@@ -34,7 +34,7 @@ const TextInput = styled.textarea`
   border-radius: 5px;
   &:focus {
     outline: none;
-    border: 1px solid var(--color-solid-green);
+    border: 1px solid var(--color-green);
     box-shadow: 0 0 10px var(--color-offwhite);
   }
   @media (max-width: 1024px) {
