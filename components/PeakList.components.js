@@ -33,7 +33,6 @@ export const PeakCard = styled.div`
   margin: 0.5rem 0;
   width: 350px;
   font-weight: 600;
-  color: var(--color-text-primary);
   ${(p) =>
     p.isCompleted
       ? `border: 2px solid var(--color-bg-secondary);
@@ -42,11 +41,15 @@ export const PeakCard = styled.div`
         })),
         url(${p.img ? p.img : '/photos/lander_top.jpg'});
         height: auto;
+        color: var(--color-white);
         background-size: cover;
+        padding: 0 1rem 2rem 1rem;
         @media (max-width: 1024px) {
           max-height: 25vh;
         }
-        padding: 0 1rem 2rem 1rem;`
+        h2 {
+          font-weight: 600;
+        }`
       : `padding: 0 1rem;
         border: 2px solid var(--color-card-${p.color})`};
   @media (max-width: 1024px) {
@@ -57,6 +60,6 @@ export const PeakCard = styled.div`
 
 export const RankNumber = styled.span`
   font-size: 12px;
-  font-weight: 400;
-  color: var(--color-text-tertiary);
+  font-weight: 500;
+  color: ${(p) => (p.isCompleted ? 'var(--color-white)' : 'var(--color-text-tertiary)')};
 `

@@ -150,7 +150,7 @@ export default function PeakListPage({ allPeaks, title }) {
             return (
               <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
                 <span className={styles.peakTitle}>
-                  <RankNumber>{peak.rank}</RankNumber>
+                  <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
                   <h2>{peak.title}</h2>
                   <h3>{addCommas(peak.elevation)}'</h3>
                 </span>
