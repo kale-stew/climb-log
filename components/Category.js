@@ -1,8 +1,10 @@
 import { useRouter } from 'next/router'
-import { CATEGORY_TYPE, ROLE_NAVIGATION } from '../utils/constants'
+import { CATEGORY_TYPE } from '../utils/constants'
 import styled from '@emotion/styled'
 
 import styles from './Category.module.css'
+
+const ROLE_NAVIGATION = 'navigation'
 
 export const CATEGORY_COLORS = {
   'text-tertiary': CATEGORY_TYPE.ALL,
@@ -35,7 +37,7 @@ const Category = ({ category, pushToRouter }) => {
 
   return (
     <CategoryButton
-      onClick={() => pushProps(CATEGORY_TYPE[category])}
+      onClick={() => pushProps(category)}
       className={pushToRouter ? styles.categoryLink : ''}
       role={pushToRouter ? ROLE_NAVIGATION : ''}
       color={Object.keys(CATEGORY_COLORS).find(

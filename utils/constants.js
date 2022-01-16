@@ -103,8 +103,6 @@ export const REFERRALS = [
   { title: 'AllTrails Pro', href: 'https://www.alltrails.com/invite/N0NW0I' },
 ]
 
-export const ROLE_NAVIGATION = 'navigation'
-
 export const TABLE_SORT_ORDER = {
   ASC: 'ascending',
   DESC: 'descending',
