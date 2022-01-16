@@ -2,7 +2,8 @@ import Category from '../components/Category'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import { CATEGORY_TYPE, COLORS, METADATA } from '../utils/constants'
+import styled from '@emotion/styled'
+import { CATEGORY_TYPE, PREVIEW_CARD_COLORS, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
@@ -10,6 +11,23 @@ import { useRouter } from 'next/router'
 
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
+
+const CATEGORY_COLORS = {
+  'text-tertiary': CATEGORY_TYPE.ALL,
+  orange: CATEGORY_TYPE.GEAR,
+  pink: CATEGORY_TYPE.THOUGHTS,
+  purple: CATEGORY_TYPE.HIKE,
+}
+
+const BlogCategoryFilterButton = styled.button`
+  background-color: ${(p) =>
+    p.isSelected
+      ? `var(--color-${Object.keys(CATEGORY_COLORS).find(
+          (key) => CATEGORY_COLORS[key] === p.color
+        )})`
+      : 'var(--color-bg-tertiary);'};
+  color: var(--color-white);
+`
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
@@ -27,29 +45,24 @@ export default function BlogLandingPage({ allPostsData }) {
   }, [queryPayload])
 
   const buildCategories = () =>
-    Object.entries(CATEGORY_TYPE).map(([key, value]) => {
-      return (
-        <button
-          key={key}
-          className={
-            viewCategory === CATEGORY_TYPE[key]
-              ? styles.filterSelected
-              : styles.filterButton
-          }
-          onClick={() =>
-            key == CATEGORY_TYPE.ALL
-              ? router.push({ pathname: '/blog' }) && setCategory(CATEGORY_TYPE.ALL)
-              : setCategory(
-                  viewCategory === CATEGORY_TYPE[key]
-                    ? CATEGORY_TYPE.ALL
-                    : CATEGORY_TYPE[key]
-                )
-          }
-        >
-          {value === CATEGORY_TYPE.HIKE ? 'trip reports' : value}
-        </button>
-      )
-    })
+    Object.entries(CATEGORY_TYPE).map(([key, value]) => (
+      <BlogCategoryFilterButton
+        key={key}
+        color={value}
+        isSelected={viewCategory === CATEGORY_TYPE[key]}
+        onClick={() =>
+          key == CATEGORY_TYPE.ALL
+            ? router.push({ pathname: '/blog' }) && setCategory(CATEGORY_TYPE.ALL)
+            : setCategory(
+                viewCategory === CATEGORY_TYPE[key]
+                  ? CATEGORY_TYPE.ALL
+                  : CATEGORY_TYPE[key]
+              )
+        }
+      >
+        {value === CATEGORY_TYPE.HIKE ? 'trip reports' : value}
+      </BlogCategoryFilterButton>
+    ))
 
   return (
     <Layout>
@@ -109,8 +122,8 @@ export async function getStaticProps() {
         title,
         description,
         baseName: 'blog',
-        bgColor: COLORS.yellow,
-        textColor: COLORS.navy,
+        bgColor: PREVIEW_CARD_COLORS.yellow,
+        textColor: PREVIEW_CARD_COLORS.navy,
       })),
     },
   }
