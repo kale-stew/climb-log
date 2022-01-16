@@ -1,3 +1,7 @@
+.blogListItem {
+  margin: 0 0 1.2em;
+}
+
 .blogPage {
   width: 50vw;
   margin: 0 auto;

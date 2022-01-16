@@ -91,7 +91,7 @@ export default function BlogLandingPage({ allPostsData }) {
           <ul className={utilStyles.list}>
             {allPostsData.map(({ id, category, date, preview, title }) => (
               <li
-                className={utilStyles.listItem}
+                className={styles.blogListItem}
                 key={id}
                 style={{
                   display:
@@ -103,12 +103,11 @@ export default function BlogLandingPage({ allPostsData }) {
                 <Link href="/[category]/[id]" as={`/${category}/${id}`}>
                   <a className={styles.blogPostHeading}>{title}</a>
                 </Link>
-                <br />
                 <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
                   <FormattedDate dateString={date} />{' '}
                   <Category category={category} pushToRouter={false} />
                 </small>
-                <small className={utilStyles.listItem}>{preview}</small>
+                <small style={{ lineHeight: 1.3 }}>{preview}</small>
               </li>
             ))}
           </ul>

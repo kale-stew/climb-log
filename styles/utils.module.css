@@ -67,10 +67,6 @@
   margin: 0;
 }
 
-.listItem {
-  margin: 0 0 1.9rem;
-}
-
 .lightText {
   color: var(--color-text-tertiary);
 }
