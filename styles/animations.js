@@ -26,6 +26,27 @@ export const bounce = keyframes`
 }
 `
 
+export const shake = keyframes`
+  0% {
+    transform: translate(1px, 1px) rotate(0deg);
+  }
+  20% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+  40% {
+    transform: translate(-3px, 0px) rotate(1deg);
+  }
+  60% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+  80% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  100% {
+    transform: translate(-1px, 2px) rotate(-1deg);
+  }
+`
+
 export const shakeLeft = keyframes`
   0% {
     transform: translate(1px);
