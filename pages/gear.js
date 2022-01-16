@@ -91,7 +91,17 @@ const GearPage = ({ title, allGear }) => {
   return (
     <Layout>
       <h1 className={`${utilStyles.centerText} ${utilStyles.headingXl}`}>{title}</h1>
-      <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
+      <div className={`${utilStyles.centerText} ${utilStyles.pageDescription}`}>
+        All of {METADATA.FIRST_NAME}'s hiking, climbing, and camping gear. Items are
+        sorted by descending date acquired, with the most recently gained items at the top
+        of each sub-section. Gear that has been retired is at the very bottom of this
+        page.
+      </div>
+      <div className={`${utilStyles.centerText} ${utilStyles.pageDescription}`}>
+        Click on an item to view details like brand name, color, a preview image, or why
+        it was retired.
+      </div>
+      <div className={utilStyles.vertical}>
         <p className={styles.filterTitle}>Search all gear:</p>
         <input
           className={utilStyles.searchInput}

@@ -3,7 +3,7 @@ import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 const getGearConfig = (nextCursor = null) =>
   getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_GEAR_DATABASE_ID, 'title')
 
-const gearSorts = [{ property: 'title', direction: 'ascending' }]
+const gearSorts = [{ property: 'acquired_on', direction: 'descending' }]
 const gearFilters = {
   and: [{ property: 'acquired_on', date: { is_not_empty: true } }],
 }
