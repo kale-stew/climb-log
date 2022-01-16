@@ -23,10 +23,26 @@ const BlogCategoryFilterButton = styled.button`
   background-color: ${(p) =>
     p.isSelected
       ? `var(--color-${Object.keys(CATEGORY_COLORS).find(
-          (key) => CATEGORY_COLORS[key] === p.color
+          (key) => CATEGORY_COLORS[key] === p.name
         )})`
       : 'var(--color-bg-tertiary);'};
-  color: var(--color-white);
+  color: ${(p) =>
+    p.name === CATEGORY_TYPE.ALL && p.isSelected
+      ? 'var(--color-bg-primary)'
+      : 'var(--color-white)'};
+  font-weight: 400;
+  font-size: 13px;
+  &:hover {
+    background-color: ${(p) =>
+      `var(--color-${Object.keys(CATEGORY_COLORS).find(
+        (key) => CATEGORY_COLORS[key] === p.name
+      )})`};
+    color: ${(p) =>
+      p.name === CATEGORY_TYPE.ALL ? 'var(--color-bg-primary)' : 'var(--color-white)'};
+  }
+  @media (max-width: 650px) {
+    font-size: 12px;
+  }
 `
 
 export default function BlogLandingPage({ allPostsData }) {
@@ -48,7 +64,7 @@ export default function BlogLandingPage({ allPostsData }) {
     Object.entries(CATEGORY_TYPE).map(([key, value]) => (
       <BlogCategoryFilterButton
         key={key}
-        color={value}
+        name={value}
         isSelected={viewCategory === CATEGORY_TYPE[key]}
         onClick={() =>
           key == CATEGORY_TYPE.ALL
