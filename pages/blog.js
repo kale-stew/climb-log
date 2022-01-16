@@ -3,6 +3,7 @@ import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
 import Link from 'next/link'
 import styled from '@emotion/styled'
+import { CATEGORY_COLORS } from '../components/Category'
 import { CATEGORY_TYPE, PREVIEW_CARD_COLORS, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
@@ -11,13 +12,6 @@ import { useRouter } from 'next/router'
 
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
-
-const CATEGORY_COLORS = {
-  'text-tertiary': CATEGORY_TYPE.ALL,
-  orange: CATEGORY_TYPE.GEAR,
-  pink: CATEGORY_TYPE.THOUGHTS,
-  purple: CATEGORY_TYPE.HIKE,
-}
 
 const BlogCategoryFilterButton = styled.button`
   background-color: ${(p) =>
