@@ -1,12 +1,24 @@
-import { useEffect, useState } from 'react'
 import Footer from './Footer'
-import { LandingNavigation, Navigation } from './Navigation'
 import Link from 'next/link'
 import Loading from './Loading'
+import styled from '@emotion/styled'
+import { LandingNavigation, Navigation } from './Navigation'
+import { shake } from '../styles/animations'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import styles from './Layout.module.css'
-import utilStyles from '../styles/utils.module.css'
+
+const BackToHomeButton = styled.span`
+  margin: 3rem 0;
+  a {
+    text-decoration: none;
+  }
+  &:hover {
+    animation: ${shake} 0.3s;
+    animation-iteration-count: infinite;
+  }
+`
 
 export default function Layout({ children, home }) {
   const [loading, setLoading] = useState(false)
@@ -14,12 +26,12 @@ export default function Layout({ children, home }) {
 
   useEffect(() => {
     const isLoading = (url = '') => setLoading(true)
-    const isntLoading = (url = '') => setLoading(false)
+    const isNotLoading = (url = '') => setLoading(false)
     router.events.on('routeChangeStart', isLoading)
-    router.events.on('routeChangeComplete', isntLoading)
+    router.events.on('routeChangeComplete', isNotLoading)
     return () => {
       router.events.off('routeChangeStart', isLoading)
-      router.events.off('routeChangeComplete', isntLoading)
+      router.events.off('routeChangeComplete', isNotLoading)
     }
   }, [router.events])
 
@@ -29,11 +41,9 @@ export default function Layout({ children, home }) {
         {home ? <LandingNavigation /> : <Navigation />}
         <main>{!loading ? children : <Loading />}</main>
         {!home && (
-          <div className={utilStyles.backToHome}>
-            <Link href="/">
-              <a>📍🏠</a>
-            </Link>
-          </div>
+          <BackToHomeButton>
+            <Link href="/">📍🏠</Link>
+          </BackToHomeButton>
         )}
       </div>
       <Footer />

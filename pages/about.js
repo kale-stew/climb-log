@@ -52,7 +52,7 @@ const AboutPage = () => (
           >
             {METADATA.FIRST_NAME} is an ambassador for...
           </p>
-          <ul>
+          <ul style={{ paddingLeft: '1em' }}>
             {BRANDS.map((brand) => (
               <li key={brand.name}>
                 <a href={brand.href}>
@@ -70,7 +70,7 @@ const AboutPage = () => (
           To stay up to date with {METADATA.FIRST_NAME}'s climbs, follow her{' '}
           <a href="https://www.instagram.com/kalestews/">on Instagram</a>. To see some of
           her other projects, visit her <a href="https://kylieis.online">personal site</a>
-          . To discuss working together, use the following form:
+          . To discuss working together, or to just say hi, use the following form:
         </p>
         <ContactForm />
       </div>

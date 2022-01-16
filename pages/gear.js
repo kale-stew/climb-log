@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import ToggleItem from '../components/ToggleItem'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllGear } from '../utils/data/gear'
 import { socialImage } from '../utils/social-image'
+import { useEffect, useState } from 'react'
 
 import styles from '../styles/gear.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -90,7 +90,7 @@ const GearPage = ({ title, allGear }) => {
 
   return (
     <Layout>
-      <h1 className={utilStyles.centerText}>{title}</h1>
+      <h1 className={`${utilStyles.centerText} ${utilStyles.headingXl}`}>{title}</h1>
       <div className={`${utilStyles.singleRow} ${styles.searchFilter}`}>
         <p className={styles.filterTitle}>Search all gear:</p>
         <input

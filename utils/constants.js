@@ -69,11 +69,11 @@ export const CONTACT_ENDPOINT =
 
 export const EXPLORE = [
   { title: 'Home', href: '/' },
-  { title: 'All Photos', href: '/all' },
+  { title: 'Centennial Summits', href: '/centennials' },
   { title: 'Climb Log', href: '/climb-log' },
   { title: 'Trip Reports', href: `/blog?${CATEGORY_TYPE.HIKE}` },
-  { title: 'Peak Checklist', href: '/centennials' },
   { title: 'Gear List', href: '/gear' },
+  { title: 'All Photos', href: '/all' },
   { title: 'About Kylie', href: '/about' },
 ]
 
@@ -102,8 +102,6 @@ export const PREVIEW_IMAGES = {
 export const REFERRALS = [
   { title: 'AllTrails Pro', href: 'https://www.alltrails.com/invite/N0NW0I' },
 ]
-
-export const ROLE_NAVIGATION = 'navigation'
 
 export const TABLE_SORT_ORDER = {
   ASC: 'ascending',

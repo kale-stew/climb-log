@@ -18,6 +18,8 @@ const capitalizeEachWord = (string) => {
   return capitalize
 }
 
+const filterByYear = (arr, year) => arr.filter(({ date }) => date.indexOf(year) >= 0)
+
 const formatDate = (date, type) => {
   if (typeof date !== Date) {
     date = new Date(date)
@@ -85,6 +87,7 @@ export {
   checkMonth,
   checkYear,
   feetToMeters,
+  filterByYear,
   formatDate,
   getLocationData,
   milesToKilometers,

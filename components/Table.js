@@ -1,8 +1,8 @@
-import { Popover } from 'react-tiny-popover'
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
-import { event } from '../utils/gtag'
 import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
+import { Popover } from 'react-tiny-popover'
+import { event } from '../utils/gtag'
 import {
   addCommas,
   feetToMeters,
@@ -150,7 +150,6 @@ export default function Table({
   return (
     <>
       <div className={styles.tableHeaders}>
-        <h1>Kylie's Climb Log</h1>
         {/* Buttons: Switch between Imperial and Metric num values */}
         <div className={`${utilStyles.singleRow} ${styles.metricImperialFilters}`}>
           <button

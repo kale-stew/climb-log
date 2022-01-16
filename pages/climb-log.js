@@ -20,6 +20,7 @@ import { fetchAllClimbs } from '../utils/data/climbs'
 import { socialImage } from '../utils/social-image'
 
 import tableStyles from '../components/Table.module.css'
+import utilStyles from '../styles/utils.module.css'
 
 const ClimbLog = ({ allClimbs }) => {
   const [metric, setMetric] = useState(false)
@@ -227,6 +228,9 @@ const ClimbLog = ({ allClimbs }) => {
     <Layout>
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
+      <h1 className={`${utilStyles.centerText} ${utilStyles.headingXl}`}>
+        Kylie's Climb Log
+      </h1>
       <Table
         allAreas={allAreas}
         areaFilter={areaFilter}
