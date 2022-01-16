@@ -52,16 +52,6 @@ export const CATEGORY_TYPE = {
   THOUGHTS: 'thoughts',
 }
 
-export const COLORS = {
-  blue: '#2078ae',
-  green: '#5f6e20',
-  grey: '#3a3a3a',
-  navy: '#11162b',
-  teal: '#285f76',
-  white: '#f1f1f1',
-  yellow: '#bc8d02',
-}
-
 export const CONNECT = [
   { title: 'Instagram', href: 'https://www.instagram.com/kalestews/' },
   { title: 'AllTrails', href: 'https://www.alltrails.com/members/kylie-stewart-1' },
@@ -86,6 +76,16 @@ export const EXPLORE = [
   { title: 'Gear List', href: '/gear' },
   { title: 'About Kylie', href: '/about' },
 ]
+
+export const PREVIEW_CARD_COLORS = {
+  blue: '#2078ae',
+  green: '#5f6e20',
+  grey: '#3a3a3a',
+  navy: '#11162b',
+  teal: '#285f76',
+  white: '#f1f1f1',
+  yellow: '#bc8d02',
+}
 
 export const PREVIEW_IMAGES = {
   ABOUT_IMAGE: 'https://live.staticflickr.com/65535/51791228456_aa3e462b7f_k.jpg',

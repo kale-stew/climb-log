@@ -3,7 +3,7 @@ import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import ReactMarkdown from 'react-markdown'
 import ShareButton from '../../components/ShareButton'
-import { COLORS } from '../../utils/constants'
+import { PREVIEW_CARD_COLORS } from '../../utils/constants'
 import { buildNavigation } from '../../components/BlogNavigation'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/data/posts'
 import { socialImage } from '../../utils/social-image'
@@ -59,8 +59,8 @@ export async function getStaticProps({ params }) {
         description,
         previewImgUrl: postData.previewImgUrl,
         baseName: `post-${params.id}`,
-        bgColor: postData.bgColor ? postData.bgColor : COLORS.teal,
-        textColor: postData.textColor ? postData.textColor : COLORS.white,
+        bgColor: postData.bgColor ? postData.bgColor : PREVIEW_CARD_COLORS.teal,
+        textColor: postData.textColor ? postData.textColor : PREVIEW_CARD_COLORS.white,
       })),
     },
   }

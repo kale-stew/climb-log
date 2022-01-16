@@ -1,15 +1,15 @@
 import path from 'path'
 import { compileLocalTemplate } from '@resoc/create-img'
 import { FacebookOpenGraph } from '@resoc/core'
-import { COLORS } from './constants'
+import { PREVIEW_CARD_COLORS } from './constants'
 
 async function socialImage({
   title,
   description,
   baseName,
   previewImgUrl,
-  bgColor = COLORS.grey,
-  textColor = COLORS.white,
+  bgColor = PREVIEW_CARD_COLORS.grey,
+  textColor = PREVIEW_CARD_COLORS.white,
 }) {
   const ogImage = await compileLocalTemplate(
     'resoc-template/resoc.manifest.json',

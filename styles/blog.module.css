@@ -18,12 +18,6 @@
   color: var(--color-text-primary);
 }
 
-.filterButton:hover,
-.filterSelected {
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-white);
-}
-
 .socialButtons {
   display: flex;
   flex-direction: column;
