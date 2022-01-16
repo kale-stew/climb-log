@@ -5,6 +5,7 @@ import Link from 'next/link'
 import styled from '@emotion/styled'
 import { CATEGORY_COLORS } from '../components/Category'
 import { CATEGORY_TYPE, PREVIEW_CARD_COLORS, METADATA } from '../utils/constants'
+import { FiArrowRight } from 'react-icons/fi'
 import { getSortedPostsData } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
@@ -36,6 +37,17 @@ const BlogCategoryFilterButton = styled.button`
   }
   @media (max-width: 650px) {
     font-size: 12px;
+  }
+`
+
+const ReadMore = styled.span`
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-style: italic;
+  font-weight: 600;
+  &:hover {
+    text-decoration: underline;
   }
 `
 
@@ -88,7 +100,7 @@ export default function BlogLandingPage({ allPostsData }) {
         </div>
 
         <section className={`${utilStyles.headingMd} ${styles.blogSection}`}>
-          <ul className={utilStyles.list}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {allPostsData.map(({ id, category, date, preview, title }) => (
               <li
                 className={styles.blogListItem}
@@ -107,7 +119,18 @@ export default function BlogLandingPage({ allPostsData }) {
                   <FormattedDate dateString={date} />{' '}
                   <Category category={category} pushToRouter={false} />
                 </small>
-                <small style={{ lineHeight: 1.3 }}>{preview}</small>
+                <div
+                  style={{
+                    lineHeight: 1.5,
+                    fontSize: '14.5px',
+                    color: 'var(--color-text-secondary)',
+                  }}
+                >
+                  {preview}{' '}
+                  <ReadMore>
+                    read more <FiArrowRight size="0.6rem" />
+                  </ReadMore>
+                </div>
               </li>
             ))}
           </ul>

@@ -98,7 +98,7 @@ export default function PeakListPage({ allPeaks, title }) {
   return (
     <Layout>
       <div className={utilStyles.centerText}>
-        <h1>{title}</h1>
+        <h1 className={utilStyles.headingXl}>{title}</h1>
         <div
           style={{
             display: 'flex',
@@ -120,14 +120,12 @@ export default function PeakListPage({ allPeaks, title }) {
             below.
           </p>
 
-          {/* Completed Count in Current View */}
+          {/* Completed number of peaks in current view */}
           <CompletedCount>
             {COUNT_DONE} / {allPeaksData.length}
           </CompletedCount>
 
-          {/* Preset Queries as Filters */}
-          {/* 13er, 14er (by elevation, greaterThan) */}
-          {/* ranges: Sangre de Cristo, San Juan, Front, Tenmile, Sawatch, Mosquito, Elk */}
+          {/* Preset queries as Filters */}
           {buildButtons()}
 
           <div style={{ marginBottom: '2rem' }}>

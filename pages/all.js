@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import ImageGallery from '../components/ImageGallery'
 import Layout from '../components/Layout'
 import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
@@ -6,6 +5,7 @@ import { checkMonth, checkYear } from '../utils/helpers'
 import { fetchAllImages } from '../utils/data/photos'
 import { lightFormat } from 'date-fns'
 import { socialImage } from '../utils/social-image'
+import { useState } from 'react'
 
 import styles from '../styles/all-photos.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -61,7 +61,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
 
   return (
     <Layout>
-      <h1 className={utilStyles.centerText}>{title}</h1>
+      <h1 className={`${utilStyles.centerText} ${utilStyles.headingXl}`}>{title}</h1>
       <div className={`${utilStyles.singleRow} ${styles.filterWrapper}`}>
         {/* Search all Photos */}
         <p>Search all entries:</p>

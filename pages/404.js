@@ -9,7 +9,7 @@ import utilStyles from '../styles/utils.module.css'
 const NotFoundPage = () => {
   return (
     <Layout>
-      <h1>Well this is awkward...</h1>
+      <h1 className={utilStyles.headingXl}>Well this is awkward...</h1>
       <Image src={ImageGoats} />
       <div className={utilStyles.vertical}>
         <h2>You've found a page that does not exist.</h2>
