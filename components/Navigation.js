@@ -4,6 +4,10 @@ import styled from '@emotion/styled'
 import { IoEllipsisVertical, IoCloseCircleOutline } from 'react-icons/io5'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import {
+  DESKTOP_NAV as desktopNavLinks,
+  MOBILE_NAV as mobileNavLinks,
+} from '../utils/constants'
 
 import styles from './Navigation.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -11,21 +15,6 @@ import utilStyles from '../styles/utils.module.css'
 const ThemeToggle = dynamic(() => import('../components/ThemeToggle'), {
   ssr: false,
 })
-
-const DESKTOP_NAV_LINKS = [
-  { name: 'Blog', href: 'blog' },
-  { name: 'Climb Log', href: 'climb-log' },
-  { name: 'About', href: 'about' },
-]
-
-const MOBILE_NAV_LINKS = [
-  { name: 'Blog', href: 'blog' },
-  { name: 'Climb Log', href: 'climb-log' },
-  { name: 'Centennials List', href: 'peak-list' },
-  { name: 'Gear List', href: 'gear' },
-  { name: 'All Photos', href: 'all' },
-  { name: 'About', href: 'about' },
-]
 
 const MenuToggleButton = styled.button`
   display: none;
@@ -85,7 +74,7 @@ export const Navigation = ({ isHome }) => {
               <IoCloseCircleOutline size="1.5rem" />
             </MenuToggleButton>
             {!isHome && <Link href="/">Home</Link>}
-            {MOBILE_NAV_LINKS.map(({ href, name }) => (
+            {mobileNavLinks.map(({ href, name }) => (
               <Link href={`/${href}`}>
                 {currentRoute.includes(href) ? (
                   <SelectedRoute>{name}</SelectedRoute>
@@ -99,7 +88,7 @@ export const Navigation = ({ isHome }) => {
           <>
             <div className={utilStyles.hiddenForMobile}>
               {!isHome && <Link href="/">Home</Link>}
-              {DESKTOP_NAV_LINKS.map(({ href, name }) => (
+              {desktopNavLinks.map(({ href, name }) => (
                 <Link href={`/${href}`}>
                   {currentRoute.includes(href) ? (
                     <SelectedRoute>{name}</SelectedRoute>

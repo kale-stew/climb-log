@@ -78,6 +78,21 @@ export const EXPLORE = [
   { title: 'About Kylie', href: '/about' },
 ]
 
+export const DESKTOP_NAV = [
+  { name: 'Blog', href: 'blog' },
+  { name: 'Climb Log', href: 'climb-log' },
+  { name: 'About', href: 'about' },
+]
+
+export const MOBILE_NAV = [
+  { name: 'Blog', href: 'blog' },
+  { name: 'Climb Log', href: 'climb-log' },
+  { name: 'Centennials List', href: 'peak-list' },
+  { name: 'Gear List', href: 'gear' },
+  { name: 'All Photos', href: 'all' },
+  { name: 'About', href: 'about' },
+]
+
 export const PREVIEW_CARD_COLORS = {
   blue: '#2078ae',
   green: '#5f6e20',
