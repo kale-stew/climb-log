@@ -2,6 +2,7 @@ export const METADATA = {
   FIRST_NAME: 'Kylie',
   FULL_NAME: 'Kylie Stewart',
   SITE_NAME: 'kylies.photos',
+  SOURCE_CODE: 'https://github.com/kale-stew/climb-log',
   TWITTER_HANDLE: 'kyliestew',
 }
 

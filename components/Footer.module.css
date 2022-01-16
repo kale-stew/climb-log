@@ -1,14 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
-.footerLinks > div {
-  align-items: flex-start;
-}
-
-.footerLinks a {
-  color: var(--color-offwhite);
-  margin: 0.25rem 0;
-}
-
 .footerLinks h3 {
   font-family: 'Playfair Display SC', serif;
   text-transform: uppercase;
@@ -31,13 +22,25 @@
   margin: auto;
 }
 
+.footerLinks > div {
+  align-items: flex-start;
+}
+
+.footerLinks a {
+  color: var(--color-offwhite);
+  margin: 0.25rem 0;
+}
+
 .footerLinks a:hover {
   box-shadow: none;
   text-decoration: underline;
 }
 
+.footerLinks > div {
+  align-items: flex-start;
+}
+
 .footerLogo {
-  gap: 0.75rem;
   align-items: center !important;
 }
 
