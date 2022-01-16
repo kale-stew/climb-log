@@ -49,6 +49,10 @@ const ExpandedNavigation = styled.div`
     width: 45vw;
     padding: 1rem;
     font-size: 18px;
+    line-height: 1;
+  }
+  a:hover {
+    text-decoration: underline;
   }
 `
 
