@@ -107,13 +107,13 @@ export default function PeakListPage({ allPeaks, title }) {
             lineHeight: 1,
           }}
         >
-          <p className={styles.description}>
+          <p className={utilStyles.pageDescription}>
             The 100 highest peaks in Colorado, sorted from tallest (Mount Elbert at
             14,433') to shortest (Dallas Peak at 13,809'). Ranking, if available, is
             listed to the left of the peak name. Peaks without a number are technically
             unranked.
           </p>
-          <p className={styles.description}>
+          <p className={utilStyles.pageDescription}>
             Peaks that {METADATA.FIRST_NAME} has climbed have a colored background of an
             image she took on that mountain. The color aligns with the mountain range it
             lies in. For a complete key of the ranges, see the colored filters available
