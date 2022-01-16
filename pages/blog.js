@@ -5,7 +5,6 @@ import Link from 'next/link'
 import styled from '@emotion/styled'
 import { CATEGORY_COLORS } from '../components/Category'
 import { CATEGORY_TYPE, PREVIEW_CARD_COLORS, METADATA } from '../utils/constants'
-import { FiArrowRight } from 'react-icons/fi'
 import { getSortedPostsData } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
@@ -41,13 +40,16 @@ const BlogCategoryFilterButton = styled.button`
 `
 
 const ReadMore = styled.span`
-  color: var(--color-text-primary);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-style: italic;
   font-weight: 600;
+  font-family: 'Playfair Display', serif;
   &:hover {
     text-decoration: underline;
+  }
+  a {
+    color: var(--color-text-primary);
   }
 `
 
@@ -128,7 +130,9 @@ export default function BlogLandingPage({ allPostsData }) {
                 >
                   {preview}{' '}
                   <ReadMore>
-                    read more <FiArrowRight size="0.6rem" />
+                    <Link href="/[category]/[id]" as={`/${category}/${id}`}>
+                      read more →
+                    </Link>
                   </ReadMore>
                 </div>
               </li>
