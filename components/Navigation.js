@@ -2,6 +2,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import styled from '@emotion/styled'
 import { IoEllipsisVertical, IoCloseCircleOutline } from 'react-icons/io5'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import styles from './Navigation.module.css'
@@ -20,7 +21,7 @@ const DESKTOP_NAV_LINKS = [
 const MOBILE_NAV_LINKS = [
   { name: 'Blog', href: 'blog' },
   { name: 'Climb Log', href: 'climb-log' },
-  { name: 'Centennials List', href: 'centennials' },
+  { name: 'Centennials List', href: 'peak-list' },
   { name: 'Gear List', href: 'gear' },
   { name: 'All Photos', href: 'all' },
   { name: 'About', href: 'about' },
@@ -49,9 +50,9 @@ const ExpandedNavigation = styled.div`
   flex-direction: column;
   border-radius: 5px;
   gap: 1rem;
+  -webkit-transform: translate3d(0, 0, 0);
   @media (max-width: 1024px) {
     height: max-content;
-    -webkit-transform: translate3d(0, 0, 0);
     gap: 1;
   }
   @media (max-width: 700px) {
@@ -62,8 +63,14 @@ const ExpandedNavigation = styled.div`
   }
 `
 
+const SelectedRoute = styled.span`
+  font-weight: 600;
+`
+
 export const Navigation = ({ isHome }) => {
   const [showMenu, toggleShowMenu] = useState(false)
+  const router = useRouter()
+  const currentRoute = router.asPath
 
   return (
     <header className={isHome ? styles.landingHeader : styles.navigation}>
@@ -79,7 +86,13 @@ export const Navigation = ({ isHome }) => {
             </MenuToggleButton>
             {!isHome && <Link href="/">Home</Link>}
             {MOBILE_NAV_LINKS.map(({ href, name }) => (
-              <Link href={`/${href}`}>{name}</Link>
+              <Link href={`/${href}`}>
+                {currentRoute.includes(href) ? (
+                  <SelectedRoute>{name}</SelectedRoute>
+                ) : (
+                  name
+                )}
+              </Link>
             ))}
           </ExpandedNavigation>
         ) : (
@@ -87,7 +100,13 @@ export const Navigation = ({ isHome }) => {
             <div className={utilStyles.hiddenForMobile}>
               {!isHome && <Link href="/">Home</Link>}
               {DESKTOP_NAV_LINKS.map(({ href, name }) => (
-                <Link href={`/${href}`}>{name}</Link>
+                <Link href={`/${href}`}>
+                  {currentRoute.includes(href) ? (
+                    <SelectedRoute>{name}</SelectedRoute>
+                  ) : (
+                    name
+                  )}
+                </Link>
               ))}
             </div>
             <MenuToggleButton onClick={() => toggleShowMenu(!showMenu)}>
