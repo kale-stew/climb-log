@@ -4,6 +4,13 @@ import styled from '@emotion/styled'
 
 import styles from './Category.module.css'
 
+export const CATEGORY_COLORS = {
+  'text-tertiary': CATEGORY_TYPE.ALL,
+  orange: CATEGORY_TYPE.GEAR,
+  pink: CATEGORY_TYPE.THOUGHTS,
+  purple: CATEGORY_TYPE.HIKE,
+}
+
 const CategoryButton = styled.button`
   color: var(--color-white);
   border-radius: 1em;
@@ -26,41 +33,18 @@ const Category = ({ category, pushToRouter }) => {
     })
   }
 
-  switch (category) {
-    case CATEGORY_TYPE.GEAR:
-      return (
-        <CategoryButton
-          onClick={() => pushProps(CATEGORY_TYPE.GEAR)}
-          className={pushToRouter ? styles.categoryLink : ''}
-          role={pushToRouter ? ROLE_NAVIGATION : ''}
-          color="orange"
-        >
-          gear
-        </CategoryButton>
-      )
-    case CATEGORY_TYPE.THOUGHTS:
-      return (
-        <CategoryButton
-          onClick={() => pushProps(CATEGORY_TYPE.THOUGHTS)}
-          className={pushToRouter ? styles.categoryLink : ''}
-          role={pushToRouter ? ROLE_NAVIGATION : ''}
-          color="pink"
-        >
-          thoughts
-        </CategoryButton>
-      )
-    case CATEGORY_TYPE.HIKE:
-      return (
-        <CategoryButton
-          onClick={() => pushProps(CATEGORY_TYPE.HIKE)}
-          className={pushToRouter ? styles.categoryLink : ''}
-          role={pushToRouter ? ROLE_NAVIGATION : ''}
-          color="purple"
-        >
-          trip reports
-        </CategoryButton>
-      )
-  }
+  return (
+    <CategoryButton
+      onClick={() => pushProps(CATEGORY_TYPE[category])}
+      className={pushToRouter ? styles.categoryLink : ''}
+      role={pushToRouter ? ROLE_NAVIGATION : ''}
+      color={Object.keys(CATEGORY_COLORS).find(
+        (key) => CATEGORY_COLORS[key] === category
+      )}
+    >
+      {category === 'hike' ? 'trip reports' : category}
+    </CategoryButton>
+  )
 }
 
 export default Category

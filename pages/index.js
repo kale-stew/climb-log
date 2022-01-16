@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import PostPreview from '../components/PostPreview'
 import Layout from '../components/Layout'
-import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
 import { getRecentPosts } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 
@@ -31,6 +31,7 @@ const GradientBottomImage = styled.div`
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
     <GradientTopImage />
+    {/* Update introductory paragraph */}
     <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>Recent Posts</h1>
     <div className={styles.recentPosts}>
       {featuredPosts.map((post) => (
@@ -56,7 +57,7 @@ export async function getStaticProps() {
         description,
         baseName: 'home',
         previewImgUrl: PREVIEW_IMAGES.HOME_IMAGE,
-        bgColor: COLORS.green,
+        bgColor: PREVIEW_CARD_COLORS.green,
       })),
     },
   }

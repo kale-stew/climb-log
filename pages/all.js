@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ImageGallery from '../components/ImageGallery'
 import Layout from '../components/Layout'
-import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
 import { checkMonth, checkYear } from '../utils/helpers'
 import { fetchAllImages } from '../utils/data/photos'
 import { lightFormat } from 'date-fns'
@@ -98,7 +98,7 @@ export async function getStaticProps() {
         description,
         previewImgUrl: PREVIEW_IMAGES.ALL_PHOTOS_IMAGE,
         baseName: 'photos',
-        bgColor: COLORS.blue,
+        bgColor: PREVIEW_CARD_COLORS.blue,
       })),
     },
   }

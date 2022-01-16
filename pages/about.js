@@ -20,7 +20,7 @@ const AboutPage = () => (
         altTxt={`A photo of the author, ${METADATA.FULL_NAME}`}
         desktopImg={HeadshotFull}
         wrapperCn={styles.aboutImage}
-        desktopDimensions={{ width: 300, height: 412 }}
+        desktopDimensions={{ width: 240, height: 330 }}
         mobileImg={HeadshotMobile}
         mobileCn={`${utilStyles.roundImage} ${styles.aboutImage}`}
         mobileDimensions={{ width: 175, height: 175 }}

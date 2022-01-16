@@ -2,7 +2,9 @@ import Category from '../components/Category'
 import FormattedDate from '../components/Date'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import { CATEGORY_TYPE, COLORS, METADATA } from '../utils/constants'
+import styled from '@emotion/styled'
+import { CATEGORY_COLORS } from '../components/Category'
+import { CATEGORY_TYPE, PREVIEW_CARD_COLORS, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
@@ -10,6 +12,32 @@ import { useRouter } from 'next/router'
 
 import styles from '../styles/blog.module.css'
 import utilStyles from '../styles/utils.module.css'
+
+const BlogCategoryFilterButton = styled.button`
+  background-color: ${(p) =>
+    p.isSelected
+      ? `var(--color-${Object.keys(CATEGORY_COLORS).find(
+          (key) => CATEGORY_COLORS[key] === p.name
+        )})`
+      : 'var(--color-bg-tertiary);'};
+  color: ${(p) =>
+    p.name === CATEGORY_TYPE.ALL && p.isSelected
+      ? 'var(--color-bg-primary)'
+      : 'var(--color-white)'};
+  font-weight: 400;
+  font-size: 13px;
+  &:hover {
+    background-color: ${(p) =>
+      `var(--color-${Object.keys(CATEGORY_COLORS).find(
+        (key) => CATEGORY_COLORS[key] === p.name
+      )})`};
+    color: ${(p) =>
+      p.name === CATEGORY_TYPE.ALL ? 'var(--color-bg-primary)' : 'var(--color-white)'};
+  }
+  @media (max-width: 650px) {
+    font-size: 12px;
+  }
+`
 
 export default function BlogLandingPage({ allPostsData }) {
   const [viewCategory, setCategory] = useState(CATEGORY_TYPE.ALL)
@@ -27,29 +55,24 @@ export default function BlogLandingPage({ allPostsData }) {
   }, [queryPayload])
 
   const buildCategories = () =>
-    Object.entries(CATEGORY_TYPE).map(([key, value]) => {
-      return (
-        <button
-          key={key}
-          className={
-            viewCategory === CATEGORY_TYPE[key]
-              ? styles.filterSelected
-              : styles.filterButton
-          }
-          onClick={() =>
-            key == CATEGORY_TYPE.ALL
-              ? router.push({ pathname: '/blog' }) && setCategory(CATEGORY_TYPE.ALL)
-              : setCategory(
-                  viewCategory === CATEGORY_TYPE[key]
-                    ? CATEGORY_TYPE.ALL
-                    : CATEGORY_TYPE[key]
-                )
-          }
-        >
-          {value === CATEGORY_TYPE.HIKE ? 'trip reports' : value}
-        </button>
-      )
-    })
+    Object.entries(CATEGORY_TYPE).map(([key, value]) => (
+      <BlogCategoryFilterButton
+        key={key}
+        name={value}
+        isSelected={viewCategory === CATEGORY_TYPE[key]}
+        onClick={() =>
+          key == CATEGORY_TYPE.ALL
+            ? router.push({ pathname: '/blog' }) && setCategory(CATEGORY_TYPE.ALL)
+            : setCategory(
+                viewCategory === CATEGORY_TYPE[key]
+                  ? CATEGORY_TYPE.ALL
+                  : CATEGORY_TYPE[key]
+              )
+        }
+      >
+        {value === CATEGORY_TYPE.HIKE ? 'trip reports' : value}
+      </BlogCategoryFilterButton>
+    ))
 
   return (
     <Layout>
@@ -68,7 +91,7 @@ export default function BlogLandingPage({ allPostsData }) {
           <ul className={utilStyles.list}>
             {allPostsData.map(({ id, category, date, preview, title }) => (
               <li
-                className={utilStyles.listItem}
+                className={styles.blogListItem}
                 key={id}
                 style={{
                   display:
@@ -80,12 +103,11 @@ export default function BlogLandingPage({ allPostsData }) {
                 <Link href="/[category]/[id]" as={`/${category}/${id}`}>
                   <a className={styles.blogPostHeading}>{title}</a>
                 </Link>
-                <br />
                 <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
                   <FormattedDate dateString={date} />{' '}
                   <Category category={category} pushToRouter={false} />
                 </small>
-                <small className={utilStyles.listItem}>{preview}</small>
+                <small style={{ lineHeight: 1.3 }}>{preview}</small>
               </li>
             ))}
           </ul>
@@ -109,8 +131,8 @@ export async function getStaticProps() {
         title,
         description,
         baseName: 'blog',
-        bgColor: COLORS.yellow,
-        textColor: COLORS.navy,
+        bgColor: PREVIEW_CARD_COLORS.yellow,
+        textColor: PREVIEW_CARD_COLORS.navy,
       })),
     },
   }

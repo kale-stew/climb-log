@@ -80,7 +80,7 @@ export function getSortedPostsData() {
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
     const { data, content } = matter(fileContents)
-    const longPreview = content.substring(0, 350)
+    const longPreview = content.substring(0, 215)
     const category = CATEGORY_TYPE.GEAR
 
     return {
@@ -97,7 +97,7 @@ export function getSortedPostsData() {
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
     const { data, content } = matter(fileContents)
-    const longPreview = content.substring(0, 350)
+    const longPreview = content.substring(0, 215)
     const category = CATEGORY_TYPE.THOUGHTS
 
     return {
@@ -114,7 +114,7 @@ export function getSortedPostsData() {
     const fileContents = fs.readFileSync(fullPath, 'utf8')
 
     const { data, content } = matter(fileContents)
-    const longPreview = content.substring(0, 350)
+    const longPreview = content.substring(0, 215)
     const category = CATEGORY_TYPE.HIKE
 
     return {

@@ -9,8 +9,8 @@ import {
 } from '../utils/builders'
 import {
   CATEGORY_TYPE,
-  COLORS,
   METADATA,
+  PREVIEW_CARD_COLORS,
   PREVIEW_IMAGES,
   TABLE_SORT_ORDER,
 } from '../utils/constants'
@@ -261,7 +261,7 @@ export async function getStaticProps() {
         description,
         previewImgUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
         baseName: 'climb-log',
-        bgColor: COLORS.navy,
+        bgColor: PREVIEW_CARD_COLORS.navy,
       })),
     },
   }

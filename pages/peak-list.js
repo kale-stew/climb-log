@@ -6,7 +6,7 @@ import {
   PeakCard,
   RankNumber,
 } from '../components/PeakList.components'
-import { COLORS, METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
 import { fetchAllPeaks } from '../utils/data/peaks'
 import { addCommas, checkMonth, checkYear, formatDate } from '../utils/helpers'
 import { socialImage } from '../utils/social-image'
@@ -203,7 +203,7 @@ export async function getStaticProps() {
         description,
         previewImgUrl: PREVIEW_IMAGES.PEAK_LIST_IMAGE,
         baseName: 'peak-list',
-        bgColor: COLORS.blue,
+        bgColor: PREVIEW_CARD_COLORS.blue,
       })),
     },
   }
