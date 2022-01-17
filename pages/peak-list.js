@@ -29,6 +29,23 @@ export default function PeakListPage({ allPeaks, title }) {
     })
   }
 
+  const buildFilters = () => {
+    const rangeFilters = buildRangeArr()
+    const elevationFilters = [
+      {
+        id: '13er',
+        name: '13ers',
+        color: 'fallback',
+      },
+      {
+        id: '14er',
+        name: '14ers',
+        color: 'fallback',
+      },
+    ]
+    return [...rangeFilters, ...elevationFilters]
+  }
+
   const buildButtons = () => (
     <div style={{ display: 'inline', marginTop: '1.25rem' }}>
       <FilterButton
@@ -40,7 +57,7 @@ export default function PeakListPage({ allPeaks, title }) {
       >
         All Ranges
       </FilterButton>
-      {buildRangeArr().map(({ id, name, color }) => (
+      {buildFilters().map(({ id, name, color }) => (
         <FilterButton
           key={id}
           color={color}
@@ -53,13 +70,36 @@ export default function PeakListPage({ allPeaks, title }) {
     </div>
   )
 
+  const resetFilters = () => {
+    setFilters([])
+    setAllPeaks(allPeaks)
+  }
+
+  const filterPeaks = (filters) => {
+    const findKnownId = (str) =>
+      filters.findIndex((filter) => filter.toUpperCase() == str.toUpperCase())
+
+    let filtered = allPeaks.filter((peak) => filters.includes(peak.range.name))
+    if (filters.includes('13ers')) {
+      const knownId = findKnownId('14ers')
+      setFilters(knownId !== -1 ? filters.splice(knownId, 1) : filters)
+      return filtered.filter((peak) => peak.elevation >= 13000 && peak.elevation < 14000)
+    } else if (filters.includes('14ers')) {
+      const knownId = findKnownId('13ers')
+      setFilters(knownId !== -1 ? filters.splice(knownId, 1) : filters)
+      return filtered.filter((peak) => peak.elevation >= 14000)
+    }
+
+    return filtered
+  }
+
   const setAllFilters = (str) => {
     let filtersState = filters
     if (str === 'all') {
-      setFilters([])
-      setAllPeaks(allPeaks)
+      resetFilters()
       return
     }
+    // TODO- update to accommodate 2 new filters (length >= 8?)
     const maxedOut = filtersState.length >= 6
     const alreadySelected = filtersState.findIndex(
       (filter) => filter.toUpperCase() == str.toUpperCase()
@@ -72,8 +112,10 @@ export default function PeakListPage({ allPeaks, title }) {
       filtersToSet = maxedOut ? [] : [...new Set([str, ...filtersState])]
     }
     setFilters(filtersToSet)
-    const filtered = allPeaks.filter((peak) => filtersToSet.includes(peak.range.name))
-    setAllPeaks(maxedOut ? allPeaks : filtered)
+    const filtered = filterPeaks(filtersToSet)
+    console.log('POST-FILTER', filtersToSet, filtered.length)
+    const toReset = maxedOut || filtersToSet.length === 0
+    setAllPeaks(toReset ? allPeaks : filtered)
     return
   }
 
@@ -83,7 +125,6 @@ export default function PeakListPage({ allPeaks, title }) {
       setAllPeaks(allPeaks)
       return
     }
-
     let searchResults = allPeaksData.filter(
       (peak) =>
         peak.title?.toUpperCase().includes(upperQuery) ||
@@ -91,7 +132,6 @@ export default function PeakListPage({ allPeaks, title }) {
         checkMonth(upperQuery, peak.first_completed) ||
         (!isNaN(upperQuery) && checkYear(Number(upperQuery), peak.first_completed))
     )
-
     setAllPeaks(searchResults)
   }
 
