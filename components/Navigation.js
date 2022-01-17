@@ -9,12 +9,23 @@ import {
   MOBILE_NAV as mobileNavLinks,
 } from '../utils/constants'
 
-import styles from './Navigation.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const ThemeToggle = dynamic(() => import('../components/ThemeToggle'), {
   ssr: false,
 })
+
+const LinkWrapper = styled.div`
+  a {
+    color: var(--color-text-primary);
+    margin: 0 0.25em;
+  }
+  @media (min-width: 1024px) {
+    a:last-child {
+      margin: 0;
+    }
+  }
+`
 
 const MenuToggleButton = styled.button`
   display: none;
@@ -30,26 +41,21 @@ const MenuToggleButton = styled.button`
 `
 
 const ExpandedNavigation = styled.div`
-  z-index: 200;
-  width: 15vw;
+  width: 200px;
   height: min-content;
-  margin: auto 0 auto auto;
-  padding: 2vh 2vw;
   display: flex;
   flex-direction: column;
   border-radius: 5px;
-  gap: 1rem;
-  -webkit-transform: translate3d(0, 0, 0);
+  line-height: 1;
+  padding: 0 1rem;
+  margin: auto 0 auto auto;
   @media (max-width: 1024px) {
     height: max-content;
     gap: 1;
   }
   @media (max-width: 700px) {
     margin: 0 0 auto auto;
-    width: 45vw;
-    padding: 1rem;
     font-size: 18px;
-    line-height: 1;
   }
   a:hover {
     text-decoration: underline;
@@ -58,6 +64,8 @@ const ExpandedNavigation = styled.div`
 
 const SelectedRoute = styled.span`
   font-weight: 600;
+  font-size: 16px;
+  padding: 0.6rem 0.2rem;
 `
 
 export const Navigation = ({ isHome }) => {
@@ -66,16 +74,16 @@ export const Navigation = ({ isHome }) => {
   const currentRoute = router.asPath
 
   return (
-    <header className={isHome ? styles.landingHeader : styles.navigation}>
+    <header style={isHome && { fontFamily: "'Playfair Display', serif" }}>
       <ThemeToggle />
-      <div className={isHome ? styles.landingNavigation : utilStyles.singleRow}>
+      <LinkWrapper>
         {showMenu ? (
           <ExpandedNavigation>
             <MenuToggleButton
               onClick={() => toggleShowMenu(!showMenu)}
               style={{ textAlign: 'right' }}
             >
-              <IoCloseCircleOutline size="1.5rem" />
+              <IoCloseCircleOutline size="1.25rem" />
             </MenuToggleButton>
             {!isHome && <Link href="/">Home</Link>}
             {mobileNavLinks.map(({ href, name }) => (
@@ -95,7 +103,7 @@ export const Navigation = ({ isHome }) => {
               {desktopNavLinks.map(({ href, name }) => (
                 <Link href={`/${href}`}>
                   {currentRoute.includes(href) ? (
-                    <SelectedRoute>{name}</SelectedRoute>
+                    <SelectedRoute>{`📍 ${name}`}</SelectedRoute>
                   ) : (
                     name
                   )}
@@ -107,7 +115,7 @@ export const Navigation = ({ isHome }) => {
             </MenuToggleButton>
           </>
         )}
-      </div>
+      </LinkWrapper>
     </header>
   )
 }
