@@ -2,6 +2,7 @@ export const METADATA = {
   FIRST_NAME: 'Kylie',
   FULL_NAME: 'Kylie Stewart',
   SITE_NAME: 'kylies.photos',
+  SOURCE_CODE: 'https://github.com/kale-stew/climb-log',
   TWITTER_HANDLE: 'kyliestew',
 }
 
@@ -75,6 +76,21 @@ export const EXPLORE = [
   { title: 'Gear List', href: '/gear' },
   { title: 'All Photos', href: '/all' },
   { title: 'About Kylie', href: '/about' },
+]
+
+export const DESKTOP_NAV = [
+  { name: 'Blog', href: 'blog' },
+  { name: 'Climb Log', href: 'climb-log' },
+  { name: 'About', href: 'about' },
+]
+
+export const MOBILE_NAV = [
+  { name: 'Blog', href: 'blog' },
+  { name: 'Climb Log', href: 'climb-log' },
+  { name: 'Centennials List', href: 'peak-list' },
+  { name: 'Gear List', href: 'gear' },
+  { name: 'All Photos', href: 'all' },
+  { name: 'About', href: 'about' },
 ]
 
 export const PREVIEW_CARD_COLORS = {

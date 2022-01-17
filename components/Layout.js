@@ -2,7 +2,7 @@ import Footer from './Footer'
 import Link from 'next/link'
 import Loading from './Loading'
 import styled from '@emotion/styled'
-import { LandingNavigation, Navigation } from './Navigation'
+import { Navigation } from './Navigation'
 import { shake } from '../styles/animations'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
@@ -38,7 +38,7 @@ export default function Layout({ children, home }) {
   return (
     <>
       <div className={!home ? styles.wrapper : styles.landingPage}>
-        {home ? <LandingNavigation /> : <Navigation />}
+        <Navigation isHome={home} />
         <main>{!loading ? children : <Loading />}</main>
         {!home && (
           <BackToHomeButton>

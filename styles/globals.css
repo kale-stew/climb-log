@@ -140,6 +140,14 @@ footer {
   justify-content: center;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 2vw;
+  width: 100vw;
+}
+
 header a {
   text-decoration: none;
   padding: 0.6rem;

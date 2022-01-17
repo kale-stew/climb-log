@@ -1,31 +1,121 @@
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+import styled from '@emotion/styled'
+import { IoEllipsisVertical, IoCloseCircleOutline } from 'react-icons/io5'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import {
+  DESKTOP_NAV as desktopNavLinks,
+  MOBILE_NAV as mobileNavLinks,
+} from '../utils/constants'
 
-import styles from './Navigation.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 const ThemeToggle = dynamic(() => import('../components/ThemeToggle'), {
   ssr: false,
 })
 
-export const Navigation = () => (
-  <header className={styles.navigation}>
-    <ThemeToggle />
-    <div className={utilStyles.singleRow}>
-      <Link href="/blog">Blog</Link>
-      <Link href="/climb-log">Climb Log</Link>
-      <Link href="/about">About</Link>
-    </div>
-  </header>
-)
+const LinkWrapper = styled.div`
+  a {
+    color: var(--color-text-primary);
+    margin: 0 0.25em;
+  }
+  @media (min-width: 1024px) {
+    a:last-child {
+      margin: 0;
+    }
+  }
+`
 
-export const LandingNavigation = () => (
-  <div className={styles.landingHeader}>
-    <ThemeToggle />
-    <div className={styles.landingNavigation}>
-      <Link href="/blog">Blog</Link>
-      <Link href="/climb-log">Climb Log</Link>
-      <Link href="/about">About</Link>
-    </div>
-  </div>
-)
+const MenuToggleButton = styled.button`
+  display: none;
+  margin: 0;
+  &:hover {
+    color: var(--color-text-accent);
+  }
+  @media (max-width: 1024px) {
+    display: block;
+    background: transparent;
+    cursor: pointer;
+  }
+`
+
+const ExpandedNavigation = styled.div`
+  width: 200px;
+  height: min-content;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  line-height: 1;
+  padding: 0 1rem;
+  margin: auto 0 auto auto;
+  @media (max-width: 1024px) {
+    height: max-content;
+    gap: 1;
+  }
+  @media (max-width: 700px) {
+    margin: 0 0 auto auto;
+    font-size: 18px;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+`
+
+const SelectedRoute = styled.span`
+  font-weight: 600;
+  font-size: 16px;
+  padding: 0.6rem 0.2rem;
+`
+
+export const Navigation = ({ isHome }) => {
+  const [showMenu, toggleShowMenu] = useState(false)
+  const router = useRouter()
+  const currentRoute = router.asPath
+
+  return (
+    <header style={isHome && { fontFamily: "'Playfair Display', serif" }}>
+      <ThemeToggle />
+      <LinkWrapper>
+        {showMenu ? (
+          <ExpandedNavigation>
+            <MenuToggleButton
+              onClick={() => toggleShowMenu(!showMenu)}
+              style={{ textAlign: 'right' }}
+            >
+              <IoCloseCircleOutline size="1.25rem" />
+            </MenuToggleButton>
+            {!isHome && <Link href="/">Home</Link>}
+            {mobileNavLinks.map(({ href, name }) => (
+              <Link href={`/${href}`}>
+                {currentRoute.includes(href) ? (
+                  <SelectedRoute>{name}</SelectedRoute>
+                ) : (
+                  name
+                )}
+              </Link>
+            ))}
+          </ExpandedNavigation>
+        ) : (
+          <>
+            <div className={utilStyles.hiddenForMobile}>
+              {!isHome && <Link href="/">Home</Link>}
+              {desktopNavLinks.map(({ href, name }) => (
+                <Link href={`/${href}`}>
+                  {currentRoute.includes(href) ? (
+                    <SelectedRoute>{`📍 ${name}`}</SelectedRoute>
+                  ) : (
+                    name
+                  )}
+                </Link>
+              ))}
+            </div>
+            <MenuToggleButton onClick={() => toggleShowMenu(!showMenu)}>
+              <IoEllipsisVertical size="1.5rem" />
+            </MenuToggleButton>
+          </>
+        )}
+      </LinkWrapper>
+    </header>
+  )
+}
