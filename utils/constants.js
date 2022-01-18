@@ -123,3 +123,6 @@ export const TABLE_SORT_ORDER = {
   ASC: 'ascending',
   DESC: 'descending',
 }
+
+export const THIRTEENERS = '13ers'
+export const FOURTEENERS = '14ers'
