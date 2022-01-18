@@ -112,7 +112,7 @@ export default function PeakListPage({ allPeaks, title }) {
   const searchPeaks = (query) => {
     let upperQuery = query.toUpperCase().trim()
     if (upperQuery == '') {
-      setAllPeaks(allPeaks)
+      resetFilters()
       return
     }
     let searchResults = allPeaksData.filter(
@@ -123,6 +123,8 @@ export default function PeakListPage({ allPeaks, title }) {
         (!isNaN(upperQuery) && checkYear(Number(upperQuery), peak.first_completed))
     )
     setAllPeaks(searchResults)
+    setRangeFilters([])
+    setElevationRange('')
   }
 
   const buildButtons = () => (
