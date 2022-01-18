@@ -52,28 +52,36 @@ export default function PeakListPage({ allPeaks, title }) {
   }
 
   const filterByElevation = (str) => {
+    // Determine if we need to filter by range *and* elevation, or just elevation
     const elevationAlreadySelected = elevationRange.length !== 0
     const mountainRangesSelected = rangeFilters.length !== 0
-    const peakData = !elevationAlreadySelected
-      ? allPeaks
-      : mountainRangesSelected
-      ? returnOnlyGivenMountainRange(allPeaks, rangeFilters)
-      : allPeaks
-    if (str === THIRTEENERS) {
+    const peakData =
+      !elevationAlreadySelected && !mountainRangesSelected
+        ? allPeaks
+        : mountainRangesSelected
+        ? returnOnlyGivenMountainRange(allPeaks, rangeFilters)
+        : allPeaks
+    if (str === elevationRange) {
+      // If the current elevation filter is the same as what's being passed in,
+      // reset the elevation filters
+      setElevationRange('')
+      setAllPeaks(peakData)
+      return
+    } else if (str === THIRTEENERS) {
       setElevationRange(THIRTEENERS)
       setAllPeaks(returnOnlyThirteeners(peakData))
       return
     } else if (str === FOURTEENERS) {
       setElevationRange(FOURTEENERS)
       setAllPeaks(returnOnlyFourteeners(peakData))
-      return
     }
     return peakData
   }
 
   const filterByMountainRange = (range) => {
     let filtersState = rangeFilters
-    const maxedOut = filtersState.length >= 7
+    // Reset if every available filter has been selected
+    const maxedOut = filtersState.length >= 6
     const alreadySelected = filtersState.findIndex(
       (filter) => filter.toUpperCase() == range.toUpperCase()
     )
@@ -88,7 +96,6 @@ export default function PeakListPage({ allPeaks, title }) {
     const peakData = filtersToSet.length > rangeFilters.length ? allPeaks : allPeaksData
     let filtered = returnOnlyGivenMountainRange(peakData, filtersToSet)
     if (elevationRange !== '') {
-      console.log('IN THIS WEIRD CASE', elevationRange, filtered.length)
       const filteredByElevation =
         elevationRange === THIRTEENERS
           ? returnOnlyThirteeners(filtered)
@@ -96,10 +103,9 @@ export default function PeakListPage({ allPeaks, title }) {
           ? returnOnlyFourteeners(filtered)
           : filtered
       filtered = filteredByElevation
-      return
     }
     const toReset = maxedOut || filtersToSet.length === 0
-    setAllPeaks(toReset ? allPeaks : filtered)
+    toReset ? resetFilters() : setAllPeaks(filtered)
     return
   }
 
