@@ -6,7 +6,13 @@ import {
   PeakCard,
   RankNumber,
 } from '../components/PeakList.components'
-import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
+import {
+  FOURTEENERS,
+  METADATA,
+  PREVIEW_CARD_COLORS,
+  PREVIEW_IMAGES,
+  THIRTEENERS,
+} from '../utils/constants'
 import { fetchAllPeaks } from '../utils/data/peaks'
 import { addCommas, checkMonth, checkYear, formatDate } from '../utils/helpers'
 import { socialImage } from '../utils/social-image'
@@ -16,10 +22,12 @@ import utilStyles from '../styles/utils.module.css'
 
 export default function PeakListPage({ allPeaks, title }) {
   const [allPeaksData, setAllPeaks] = useState(allPeaks)
-  const [filters, setFilters] = useState([])
+  const [elevationRange, setElevationRange] = useState('')
+  const [rangeFilters, setRangeFilters] = useState([])
+
   const COUNT_DONE = allPeaksData.filter((peak) => peak.first_completed).length
 
-  const buildRangeArr = () => {
+  const buildMountainRangeArr = () => {
     const allRanges = allPeaks.map((peak) => peak.range)
     const seen = new Set()
     return allRanges.filter((el) => {
@@ -29,61 +37,84 @@ export default function PeakListPage({ allPeaks, title }) {
     })
   }
 
-  const buildButtons = () => (
-    <div style={{ display: 'inline', marginTop: '1.25rem' }}>
-      <FilterButton
-        key="all-button"
-        color="fallback"
-        onClick={() => setAllFilters('all')}
-        isSelected={filters.length === 0}
-        style={{ color: 'var(--color-text-primary)' }}
-      >
-        All Ranges
-      </FilterButton>
-      {buildRangeArr().map(({ id, name, color }) => (
-        <FilterButton
-          key={id}
-          color={color}
-          onClick={() => setAllFilters(name)}
-          isSelected={filters.includes(name)}
-        >
-          {name}
-        </FilterButton>
-      ))}
-    </div>
-  )
+  const returnOnlyThirteeners = (arr) =>
+    arr.filter((peak) => peak.elevation >= 13000 && peak.elevation < 14000)
 
-  const setAllFilters = (str) => {
-    let filtersState = filters
-    if (str === 'all') {
-      setFilters([])
-      setAllPeaks(allPeaks)
+  const returnOnlyFourteeners = (arr) => arr.filter((peak) => peak.elevation >= 14000)
+
+  const returnOnlyGivenMountainRange = (arr, ranges) =>
+    arr.filter((peak) => ranges.includes(peak.range.name))
+
+  const resetFilters = () => {
+    setRangeFilters([])
+    setElevationRange('')
+    setAllPeaks(allPeaks)
+  }
+
+  const filterByElevation = (str) => {
+    // Determine if we need to filter by range *and* elevation, or just elevation
+    const elevationAlreadySelected = elevationRange.length !== 0
+    const mountainRangesSelected = rangeFilters.length !== 0
+    const peakData =
+      !elevationAlreadySelected && !mountainRangesSelected
+        ? allPeaks
+        : mountainRangesSelected
+        ? returnOnlyGivenMountainRange(allPeaks, rangeFilters)
+        : allPeaks
+    if (str === elevationRange) {
+      // If the current elevation filter is the same as what's being passed in,
+      // reset the elevation filters
+      setElevationRange('')
+      setAllPeaks(peakData)
       return
+    } else if (str === THIRTEENERS) {
+      setElevationRange(THIRTEENERS)
+      setAllPeaks(returnOnlyThirteeners(peakData))
+      return
+    } else if (str === FOURTEENERS) {
+      setElevationRange(FOURTEENERS)
+      setAllPeaks(returnOnlyFourteeners(peakData))
     }
+    return peakData
+  }
+
+  const filterByMountainRange = (range) => {
+    let filtersState = rangeFilters
+    // Reset if every available filter has been selected
     const maxedOut = filtersState.length >= 6
     const alreadySelected = filtersState.findIndex(
-      (filter) => filter.toUpperCase() == str.toUpperCase()
+      (filter) => filter.toUpperCase() == range.toUpperCase()
     )
     let filtersToSet
     if (alreadySelected != -1) {
       filtersState.splice(alreadySelected, 1)
       filtersToSet = maxedOut ? [] : [...new Set([...filtersState])]
     } else {
-      filtersToSet = maxedOut ? [] : [...new Set([str, ...filtersState])]
+      filtersToSet = maxedOut ? [] : [...new Set([range, ...filtersState])]
     }
-    setFilters(filtersToSet)
-    const filtered = allPeaks.filter((peak) => filtersToSet.includes(peak.range.name))
-    setAllPeaks(maxedOut ? allPeaks : filtered)
+    setRangeFilters(filtersToSet)
+    const peakData = filtersToSet.length > rangeFilters.length ? allPeaks : allPeaksData
+    let filtered = returnOnlyGivenMountainRange(peakData, filtersToSet)
+    if (elevationRange !== '') {
+      const filteredByElevation =
+        elevationRange === THIRTEENERS
+          ? returnOnlyThirteeners(filtered)
+          : elevationRange === FOURTEENERS
+          ? returnOnlyFourteeners(filtered)
+          : filtered
+      filtered = filteredByElevation
+    }
+    const toReset = maxedOut || filtersToSet.length === 0
+    toReset ? resetFilters() : setAllPeaks(filtered)
     return
   }
 
   const searchPeaks = (query) => {
     let upperQuery = query.toUpperCase().trim()
     if (upperQuery == '') {
-      setAllPeaks(allPeaks)
+      resetFilters()
       return
     }
-
     let searchResults = allPeaksData.filter(
       (peak) =>
         peak.title?.toUpperCase().includes(upperQuery) ||
@@ -91,9 +122,50 @@ export default function PeakListPage({ allPeaks, title }) {
         checkMonth(upperQuery, peak.first_completed) ||
         (!isNaN(upperQuery) && checkYear(Number(upperQuery), peak.first_completed))
     )
-
     setAllPeaks(searchResults)
+    setRangeFilters([])
+    setElevationRange('')
   }
+
+  const buildButtons = () => (
+    <div style={{ display: 'inline', marginTop: '1.25rem' }}>
+      <FilterButton
+        key="all-button"
+        color="fallback"
+        onClick={() => resetFilters()}
+        isSelected={rangeFilters.length === 0}
+        style={{ color: 'var(--color-text-primary)' }}
+      >
+        All Ranges
+      </FilterButton>
+      {buildMountainRangeArr().map(({ id, name, color }) => (
+        <FilterButton
+          key={id}
+          color={color}
+          onClick={() => filterByMountainRange(name)}
+          isSelected={rangeFilters.includes(name)}
+        >
+          {name}
+        </FilterButton>
+      ))}
+      <FilterButton
+        key="14er"
+        color={'green'}
+        onClick={() => filterByElevation(FOURTEENERS)}
+        isSelected={elevationRange === FOURTEENERS}
+      >
+        {FOURTEENERS}
+      </FilterButton>
+      <FilterButton
+        key="13er"
+        color={'red'}
+        onClick={() => filterByElevation(THIRTEENERS)}
+        isSelected={elevationRange === THIRTEENERS}
+      >
+        {THIRTEENERS}
+      </FilterButton>
+    </div>
+  )
 
   return (
     <Layout>
