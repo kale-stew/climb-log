@@ -37,53 +37,64 @@ export default function PeakListPage({ allPeaks, title }) {
     })
   }
 
+  const returnOnlyThirteeners = (arr) =>
+    arr.filter((peak) => peak.elevation >= 13000 && peak.elevation < 14000)
+
+  const returnOnlyFourteeners = (arr) => arr.filter((peak) => peak.elevation >= 14000)
+
+  const returnOnlyGivenMountainRange = (arr, ranges) =>
+    arr.filter((peak) => ranges.includes(peak.range.name))
+
   const resetFilters = () => {
     setRangeFilters([])
     setElevationRange('')
     setAllPeaks(allPeaks)
   }
 
-  const filterByElevation = (str, arr) => {
-    const toggled = elevationRange.length !== 0 && str !== elevationRange
-    // TODO- handle the case where '13ers' is selected while '14ers' is
-    //       current and mountainRanges are also selected
-    const peakData = elevationRange !== '' && !toggled ? arr : allPeaks
+  const filterByElevation = (str) => {
+    const elevationAlreadySelected = elevationRange.length !== 0
+    const mountainRangesSelected = rangeFilters.length !== 0
+    const peakData = !elevationAlreadySelected
+      ? allPeaks
+      : mountainRangesSelected
+      ? returnOnlyGivenMountainRange(allPeaks, rangeFilters)
+      : allPeaks
     if (str === THIRTEENERS) {
       setElevationRange(THIRTEENERS)
-      setAllPeaks(
-        peakData.filter((peak) => peak.elevation >= 13000 && peak.elevation < 14000)
-      )
+      setAllPeaks(returnOnlyThirteeners(peakData))
       return
     } else if (str === FOURTEENERS) {
       setElevationRange(FOURTEENERS)
-      setAllPeaks(peakData.filter((peak) => peak.elevation >= 14000))
+      setAllPeaks(returnOnlyFourteeners(peakData))
       return
     }
     return peakData
   }
 
-  const filterByMountainRange = (str) => {
+  const filterByMountainRange = (range) => {
     let filtersState = rangeFilters
-    if (str === 'all') {
-      resetFilters()
-      return
-    }
     const maxedOut = filtersState.length >= 7
     const alreadySelected = filtersState.findIndex(
-      (filter) => filter.toUpperCase() == str.toUpperCase()
+      (filter) => filter.toUpperCase() == range.toUpperCase()
     )
     let filtersToSet
     if (alreadySelected != -1) {
       filtersState.splice(alreadySelected, 1)
       filtersToSet = maxedOut ? [] : [...new Set([...filtersState])]
     } else {
-      filtersToSet = maxedOut ? [] : [...new Set([str, ...filtersState])]
+      filtersToSet = maxedOut ? [] : [...new Set([range, ...filtersState])]
     }
     setRangeFilters(filtersToSet)
     const peakData = filtersToSet.length > rangeFilters.length ? allPeaks : allPeaksData
-    let filtered = peakData.filter((peak) => filtersToSet.includes(peak.range.name))
+    let filtered = returnOnlyGivenMountainRange(peakData, filtersToSet)
     if (elevationRange !== '') {
-      const filteredByElevation = filterByElevation(elevationRange, filtered)
+      console.log('IN THIS WEIRD CASE', elevationRange, filtered.length)
+      const filteredByElevation =
+        elevationRange === THIRTEENERS
+          ? returnOnlyThirteeners(filtered)
+          : elevationRange === FOURTEENERS
+          ? returnOnlyFourteeners(filtered)
+          : filtered
       filtered = filteredByElevation
       return
     }
@@ -113,7 +124,7 @@ export default function PeakListPage({ allPeaks, title }) {
       <FilterButton
         key="all-button"
         color="fallback"
-        onClick={() => filterByMountainRange('all')}
+        onClick={() => resetFilters()}
         isSelected={rangeFilters.length === 0}
         style={{ color: 'var(--color-text-primary)' }}
       >
@@ -132,7 +143,7 @@ export default function PeakListPage({ allPeaks, title }) {
       <FilterButton
         key="14er"
         color={'green'}
-        onClick={() => filterByElevation(FOURTEENERS, allPeaksData)}
+        onClick={() => filterByElevation(FOURTEENERS)}
         isSelected={elevationRange === FOURTEENERS}
       >
         {FOURTEENERS}
@@ -140,7 +151,7 @@ export default function PeakListPage({ allPeaks, title }) {
       <FilterButton
         key="13er"
         color={'red'}
-        onClick={() => filterByElevation(THIRTEENERS, allPeaksData)}
+        onClick={() => filterByElevation(THIRTEENERS)}
         isSelected={elevationRange === THIRTEENERS}
       >
         {THIRTEENERS}
