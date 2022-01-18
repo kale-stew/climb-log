@@ -24,9 +24,10 @@ export default function PeakListPage({ allPeaks, title }) {
   const [allPeaksData, setAllPeaks] = useState(allPeaks)
   const [elevationRange, setElevationRange] = useState('')
   const [rangeFilters, setRangeFilters] = useState([])
+
   const COUNT_DONE = allPeaksData.filter((peak) => peak.first_completed).length
 
-  const buildRangeArr = () => {
+  const buildMountainRangeArr = () => {
     const allRanges = allPeaks.map((peak) => peak.range)
     const seen = new Set()
     return allRanges.filter((el) => {
@@ -47,7 +48,7 @@ export default function PeakListPage({ allPeaks, title }) {
       >
         All Ranges
       </FilterButton>
-      {buildRangeArr().map(({ id, name, color }) => (
+      {buildMountainRangeArr().map(({ id, name, color }) => (
         <FilterButton
           key={id}
           color={color}
@@ -84,6 +85,7 @@ export default function PeakListPage({ allPeaks, title }) {
 
   const filterByElevation = (str) => {
     // Don't use peak data state if an elevation range was toggled prior, no data will return
+    // TODO- Handle range filters _if_ ranges are in elevationRange state
     const peakData = elevationRange.length > 0 ? allPeaks : allPeaksData
     if (str === THIRTEENERS) {
       setElevationRange(THIRTEENERS)
