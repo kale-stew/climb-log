@@ -9,25 +9,20 @@ const gearFilters = {
 }
 
 const formatGear = (gearList) =>
-  gearList.map((gear) => {
-    const { id, properties } = gear
-    return {
-      id,
-      title: fmt(properties.title),
-      acquired_on: fmt(properties.acquired_on),
-      brand: fmt(properties.brand),
-      category: fmt(properties.category),
-      color: fmt(properties.color),
-      // cost: fmt(properties.cost),
-      img: `${fmt(properties.img_slug)}.png`,
-      more_info: fmt(properties.more_info),
-      product_str: fmt(properties.product),
-      retired_on: fmt(properties.retired_on),
-      // url: fmt(properties.url),
-      // weight_g: fmt(properties.weight_g),
-      // weight_oz: fmt(properties.weight_oz),
-    }
-  })
+  gearList.map(({ id, properties }) => ({
+    id,
+    title: fmt(properties.title),
+    acquired_on: fmt(properties.acquired_on),
+    brand: fmt(properties.brand),
+    category: fmt(properties.category),
+    color: fmt(properties.color),
+    img: `${fmt(properties.img_slug)}.png`,
+    more_info: fmt(properties.more_info),
+    pack_list: fmt(properties.pack_list),
+    product_str: fmt(properties.product),
+    retired_on: fmt(properties.retired_on),
+    url: fmt(properties.url),
+  }))
 
 const fetchAllGear = async () => {
   const gearConfig = getGearConfig()

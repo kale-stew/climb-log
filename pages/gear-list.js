@@ -11,10 +11,9 @@ import utilStyles from '../styles/utils.module.css'
 
 const GearPage = ({ title, allGear }) => {
   const [gearCategories, setGearCategories] = useState()
-  const [pureGear, setPure] = useState()
   const [gearData, setGearData] = useState()
 
-  const buildCategories = (gearList = pureGear, setState = false) => {
+  const buildCategories = (gearList = gearData, setState = false) => {
     let hasRetiredItems = false
     const arr = gearList.map((gear) => {
       if (gear.category == '🪦 Retired Items') {
@@ -23,6 +22,7 @@ const GearPage = ({ title, allGear }) => {
       }
       return gear.category
     })
+
     if (hasRetiredItems) {
       arr.push('🪦 Retired Items')
     }
@@ -30,17 +30,18 @@ const GearPage = ({ title, allGear }) => {
     if (setState) {
       setGearCategories(returnArray)
     }
+
     return returnArray
   }
 
   const userSearch = (query) => {
     const upperQuery = query.toUpperCase().trim()
     if (upperQuery == '') {
-      buildCategories(pureGear, true)
-      setGearData(pureGear)
+      buildCategories(gearData, true)
+      setGearData(allGear)
       return
     }
-    let filteredGear = pureGear.filter((gear) => {
+    let filteredGear = gearData.filter((gear) => {
       let booleanVal =
         gear.title?.toUpperCase().includes(upperQuery) ||
         gear.brand?.toUpperCase().includes(upperQuery) ||
@@ -55,7 +56,6 @@ const GearPage = ({ title, allGear }) => {
   }
 
   useEffect(() => {
-    setPure(allGear)
     setGearData(allGear)
     buildCategories(allGear, true)
   }, [])
@@ -74,9 +74,7 @@ const GearPage = ({ title, allGear }) => {
 
     return gearDataCategories.map((cat) => (
       <>
-        <h3 key={`h3-${cat}`} className={utilStyles.centerTextForMobile}>
-          {cat}
-        </h3>
+        <h3 className={utilStyles.centerTextForMobile}>{cat}</h3>
         <ul key={`ul-${cat}`}>
           {filterByCategory(gearData, cat).map((item) => (
             <ToggleItem key={`${cat}-${item.id}`} item={item}>
