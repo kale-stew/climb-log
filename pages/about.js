@@ -65,7 +65,7 @@ const AboutPage = () => (
         </div>
 
         <br />
-        <h2 className={utilStyles.centerTextForMobile}>Contact {METADATA.FIRST_NAME}</h2>
+        <h2 className={utilStyles.centerTextForMobile}>📬 Get in Touch</h2>
         <p className={styles.formCaption}>
           To stay up to date with {METADATA.FIRST_NAME}'s climbs, follow her{' '}
           <a href="https://www.instagram.com/kalestews/">on Instagram</a>. To see some of

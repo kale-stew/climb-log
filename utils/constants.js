@@ -81,6 +81,7 @@ export const EXPLORE = [
 export const DESKTOP_NAV = [
   { name: 'Blog', href: 'blog' },
   { name: 'Climb Log', href: 'climb-log' },
+  { name: 'Peaks', href: 'peak-list' },
   { name: 'About', href: 'about' },
 ]
 
