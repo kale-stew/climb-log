@@ -62,3 +62,19 @@ The east ridge route up to Humboldt Peak is funny because you don't see the Cres
 ![humboldt-summit](https://live.staticflickr.com/65535/51790214482_31c994dd38_b.jpg)
 
 _A wider view of the Crestones from the summit of Humboldt Peak._
+
+---
+
+## Climb Stats
+
+Tracked on [Strava](https://www.strava.com/activities/5064636717) and [AllTrails](https://www.alltrails.com/explore/recording/activity-6545424312-3207551):
+
+**Distance:** 13.19 miles
+
+**Elevation gain:** 4,997 feet
+
+**Time:** 11.5 hours
+
+**Difficulty:** C2
+
+More information about this route can be found [here](https://kalestew.notion.site/Humboldt-s-East-Ridge-b741aa4be48549cfbba8839f3789c6e4).
