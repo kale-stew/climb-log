@@ -5,7 +5,7 @@ previewImgUrl: 'https://live.staticflickr.com/65535/51848131036_8f62019a9b_b.jpg
 bgColor: '#97754c'
 ---
 
-On a random Thursday in July, I decided to target a scramble near our home in Clear Creek county. Herman Gulch is known for its vibrant and profusive wildflower season so it already seemed like the perfect time to go up that way, and the last time I had been in this area it was covered in snow and visibility was no further than 200' or so. I wanted to see what the basin looked like on a clear day but also get a mild and preferably lesser traveled climb in.
+On a random Thursday this past July, I decided to target a scramble near our home in Clear Creek county. Herman Gulch is known for its vibrant and profusive wildflower season so it already seemed like the perfect time to go up that way, and the last time I had been in this area it was covered in snow and visibility was no further than 200' or so. I wanted to see what the basin looked like on a clear day but also get a mild and preferably lesser traveled climb in.
 
 Comparing options in the area, The Citadel cropped up as a solid option because it had class 4 variations I could opt for (Pettingell or Bard Peak, other 13ers accessible from this area, are only class 2 from this side).
 
@@ -55,29 +55,49 @@ _Left over rope and anchor is visible at the bottom of this photo, the chute I'v
 
 This was a humbling sight and brought back the reality that I was only halfway done with my day at this point. Sure, I had gained the chute just fine, but I still had to get back down and although I was hopeful the c3 gully would be a viable descent option, I still hadn't seen it firsthand.
 
+The first high point I gained initially seemed like the summit and even had a summit registry, but was only 13,108' at its highest. The true summit was still maybe a quarter mile and gully away. I took a break on this first high point, read the registry (found out it had only been placed in 2018), and had a snack before continuing on to the 13,294' summit.
+
 ![False Summit](https://live.staticflickr.com/65535/51848780770_a751d7411d_b.jpg)
 
 _Standing on the initial false summit of The Citadel, looking over to the real summit block._
+
+Traversing between these two points took me a cool 6 minutes, which is shorter than it felt. Leaving the first high point was a bit of a loose scramble down to a rocky, scree-filled saddle. I had to jump down maybe 8 feet to actually get to the saddle after down-climbing a set of ledges, and I started to lose confidence in my ability to navigate the gully I knew was on the other side of this second high point to get back to the c2 descent.
+
+Gaining the second summit was easier than descending the first. The summit itself was a set of toothy rocks, all about 6-8 feet tall. One can scramble up to the top of these teeth if you're up for a challenge, which I did.
 
 ![True Summit](https://live.staticflickr.com/65535/51848780400_4210213e27_b.jpg)
 
 _Looking over to Pettingell from the Citadel’s true summit._
 
+The views of the surrounding peaks from this summit is expansive and the first high point I had come over looked like a single, sharp tooth from the higher angle. The sharp lines contrasted with wide basins makes this summit feel more like an Elk peak than a Front range one.
+
+![vertical](https://live.staticflickr.com/65535/51817385803_e157b9a084_b.jpg)
+
+_Looking back to the first high point from Citadel's true summit._
+
+Descending the c3 gully to The Citadel's west was as loose and unsupported as I had expected. I carefully planned my line and moved slowly on the way down, but still managed to kick some rocks free. This was where I managed to bruise myself the most all day, it's easy to kick medium sized rocks into your feet on this side of the mountain. Finally returning to solid ground after 22 minutes of cautious navigation was a big relief.
+
 ## Bushwhacking Out
+
+Getting back down the shoulder was simple and I still hadn't seen a soul above this ridge. I wouldn't see anyone else until I linked back up with Herman Gulch's main trail. Getting back to the main trail, however, was a bushwhack and a half, with the occasional misstep into deep wetland. I kept my impact on the land at the forefront of my mind as I tried to avoid stepping on any fragile land, plants, or animals.
 
 ![Wildflowers on the Descent](https://live.staticflickr.com/65535/51847156697_8c2ed660d8_b.jpg)
 
 _Bushwhacking through the a wildflower-filled field to return to the main Herman Gulch trail._
 
+There are two river crossings worth noting but no real trail to follow. The second and largest river crossing was about a half mile from the main trail connection and from there was an easy 46 minute walk out to the lot.
+
 ![vertical](https://live.staticflickr.com/65535/51847156292_9f154d1979_b.jpg)
 
 _One of the two river crossings required to get back to the main trail. This one had a stable rock path through, even though it was rushing._
+
+All-in-all, this was a very rewarding solo hike. Doing it as a loop extended the solitary part of my day and I was grateful for the time to myself. The beautiful, wildflower-filled wilderness is the cherry on top of an excellent route. If you were looking for a mildly difficult and lesser traveled climb in the front range, I would recommend The Citadel's southern ridge. But **it's important to note** the level of experience required for an alpine scramble of this class (I would not do this alone if I had no or little experience scrambling c4 and above) and the impact individuals have on bushwhack trails. Traveling an unmarked trail through fragile wilderness should be done with caution and awareness, and groups larger than three can have a much larger impact on the terrain long-term. Please consider [Leave No Trace principles](https://lnt.org/why/7-principles/) before recreating in any wilderness area.
 
 ---
 
 ## Climb Stats
 
-According to [my strava track](https://www.strava.com/activities/5633844165):
+Tracked on [Strava](https://www.strava.com/activities/5633844165) and [AllTrails](https://www.alltrails.com/explore/recording/activity-7132272166-ddf3542):
 
 **Distance:** 9.38 miles
 
