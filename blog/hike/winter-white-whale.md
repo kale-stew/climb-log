@@ -23,13 +23,13 @@ The next morning, everyone was quick to wake and we set out for the 2WD parking 
 
 The first couple of miles snowshoeing the road before the Rainbow Trail turn were uneventful. I think we were all eager for the first sign of alpenglow and hoping to position ourselves for a killer view before it happened. As we gained the Rainbow Trail ridge and began our bushwhack up the east ridge, light hit our backs and warmed the scene around us. Navigating through the trees, the snow glistened like it had been coated with glitter, while the fresh powder made it seem like no one had broken trail in several months.
 
-![First Light {768x576}](https://live.staticflickr.com/65535/51732591448_cbc12127da_k.jpg)
+![First Light](https://live.staticflickr.com/65535/51732591448_cbc12127da_k.jpg)
 
 _First light seen along Humboldt's east ridge approach._
 
 About 3.5 miles in, we realized we were all working especially hard but not seeming to gain quite as much elevation as is to be expected at this point along the trail. It seemed like we were moving straight, not up. Our group had begun to drift, with two leading and two holding up the rear, just barely out of audible communication distance. We later learned that the leading group had unintentional followed some SAR tracks off route, but we were all determined to get up this thing so we continued to trudge even after we realized we had made a mistake.
 
-![The Moonset {768x576}](https://live.staticflickr.com/65535/51732583708_ed244b2cf5_k.jpg)
+![The Moonset](https://live.staticflickr.com/65535/51732583708_ed244b2cf5_k.jpg)
 
 _The moonset, seen right around first light._
 

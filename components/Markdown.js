@@ -13,7 +13,7 @@ export default function BlogMarkdown({ markdown }) {
         const metaWidth = image.properties.alt.match(/{([^}]+)x/)
         const metaHeight = image.properties.alt.match(/x([^}]+)}/)
         const width = metaWidth ? metaWidth[1] : '768'
-        const height = metaHeight ? metaHeight[1] : '432'
+        const height = metaHeight ? metaHeight[1] : '576'
 
         return (
           <Image
