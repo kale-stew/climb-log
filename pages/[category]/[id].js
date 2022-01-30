@@ -1,7 +1,7 @@
+import BlogMarkdown from '../../components/Markdown'
 import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
-import ReactMarkdown from 'react-markdown'
 import ShareButton from '../../components/ShareButton'
 import { PREVIEW_CARD_COLORS } from '../../utils/constants'
 import { buildNavigation } from '../../components/BlogNavigation'
@@ -24,7 +24,7 @@ const Post = ({ postData, postIds }) => (
         />
         <Category category={postData.category} pushToRouter={true} />
       </div>
-      <ReactMarkdown>{postData.content}</ReactMarkdown>
+      <BlogMarkdown markdown={postData.content} />
     </article>
     <div className={styles.socialButtons}>
       <ShareButton type="twitter" data={postData} />
