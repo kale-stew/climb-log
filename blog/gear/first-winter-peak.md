@@ -13,13 +13,14 @@ To clarify, when I call a peak a 'snowflake', I am referring to the time of year
 
 As a frequent user of the [14ers.com](https://www.14ers.com) forum, I understand this term to derive from the ❄️ snowflake emoji your peak list gains when you complete a climb during calendar winter. There are likely other terms used among mountaineers for this accomplishment, but the claim is the same: summiting a peak during some of the roughest possible conditions.
 
-![peak-checklist-screenshot](https://live.staticflickr.com/65535/51758027680_55a2260745_w.jpg)
+![Peak Checklist Screenshot {399x310}](https://live.staticflickr.com/65535/51758027680_55a2260745_w.jpg)
 
 _A screenshot of my peak checklist on 14ers.com. See how the Snowflake appears opposite the standard mark of completion._
 
 ## Why Climb in the Winter?
 
-![la-plata-snowflake](https://live.staticflickr.com/65535/51757385408_0386c75cb2_k.jpg)
+![La Plata Snowflake {768x432}](https://live.staticflickr.com/65535/51757385408_0386c75cb2_k.jpg)
+
 _Ascending La Plata in March of 2021. We were post-holing up to our waist at times._
 
 Colorado winters up in the alpine are something special. It’s not easy to convey the serenity one feels when slogging up a snowy hill on a 0℉ winter morning. Or how a sunrise inversion reflecting off of a fresh blanket of snow can stay in your mind for years. Or the accomplishment one feels when summiting a 14,000 foot peak despite icy winds and waist-deep pockets of powder. And if you’re a downhill enthusiast, you’ll find yourself at the top of some of the best ski lines in the world. The payoff for your effort seems tenfold in the winter, and I would argue the peaks look their best wearing a fresh white coat.
@@ -42,7 +43,7 @@ Some free resources you can use to learn more about recreating in avalanche terr
 
 - [In Person & Virtual Events offered by Friends of Berthoud Pass](https://www.berthoudpass.org/event-schedule.html)
 
-![group-ascending-la-plata](https://live.staticflickr.com/65535/51722449700_9dfcb5609d_k.jpg)
+![Group Ascending La Plata {768x432}](https://live.staticflickr.com/65535/51722449700_9dfcb5609d_k.jpg)
 
 _A look back at our group ascending La Plata Peak._
 
@@ -80,7 +81,8 @@ In addition to the standard safety and shelter items I outline in my [post about
 
 - An **ice axe** isn't necessary for most class one and two climbs, but it can make descending an icy slope of any grade just a bit safer and easier. You cold use hiking poles to stabilize you for a descent, but an ice axe can be a worthwhile investment as it helps you self-arrest if you lose your footing.
 
-![mount-democrat-snowflake](https://live.staticflickr.com/65535/51758010860_9b71276d75_k.jpg)
+![Democrat Snowflake Ascent](https://live.staticflickr.com/65535/51758010860_9b71276d75_k.jpg)
+
 _Ascending Mount Democrat in January of 2021, Mount Cameron in the background._
 
 ## Finding Winter Routes
@@ -90,7 +92,7 @@ Without repeating too much info from the free resources I’ve linked above, the
 - **Slope Angle**
 
   One of the most straightforward ways to assess risk on a winter route is identifying the slope angle you might be traveling under or across. The aspect of the mountain you intend to climb can also impact slide risk (e.g. the north side gets less sun in winter months, causing more snow to stay accumulated a.k.a. slope load), but seeing your line on a topographical map (I like the slope angle filter on [gaia](https://www.gaiagps.com)’s app) can be a much more clear-cut way to identify risk.
-  ![screenshot comparing two route’s angles](https://live.staticflickr.com/65535/51758050945_e4c3de86f3_k.jpg)
+  ![Screenshot Comparing the Route's Angles {768x341}](https://live.staticflickr.com/65535/51758050945_e4c3de86f3_k.jpg)
 
   _Can you see why the line on the right might be riskier?_
 
@@ -123,6 +125,6 @@ I'm not saying any of these are easy, but there are some winter routes with lowe
   - Technically a bushwhack made a little easier with snowpack, this approach to Humboldt Peak is the safer option in winter months as you don't pass under the potentially loaded slopes that the South Colony Lakes road snakes through. If you're lucky enough to find a trench, this snowshoe is a little less of a slog, but without one you'll be breaking trail for 3 or so miles in the trees up the Rainbow Trail before you get above treeline.
   - _Roundtrip stats:_ 13 miles & 4,900 feet of gain.
 
-![la-plata-gain](https://live.staticflickr.com/65535/51722450695_e544cbd385_k.jpg)
+![Gaining La Plata's Headwall {768x264}](https://live.staticflickr.com/65535/51722450695_e544cbd385_k.jpg)
 
 _Just after we gained the headwall of La Plata's standard route, the peak out of sight on the other side of this hump along the ridgeline._
