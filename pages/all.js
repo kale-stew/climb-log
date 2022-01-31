@@ -77,7 +77,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
         <input
           className={utilStyles.searchInput}
           type={'search'}
-          placeholder="Try 'Sunrise' or 'Goat'"
+          placeholder="Try '2020', 'wildlife', or 'sun'"
           onChange={(e) => searchPhotos(e.target.value)}
         />
       </div>
@@ -96,12 +96,13 @@ export async function getStaticProps() {
   const title = 'All Photos'
   const description = `${METADATA.FULL_NAME} is a photographer, hiker, and web developer.`
   const response = await fetchAllImages()
+  const allPhotos = response.filter((photo) => photo.exclude !== true)
 
   return {
     props: {
       title,
       description,
-      allPhotos: response,
+      allPhotos,
       ...(await socialImage({
         title,
         description,

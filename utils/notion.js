@@ -34,6 +34,8 @@ const formatFormulaType = (data) => {
 export const fmt = (field) => {
   if (field !== null) {
     switch (field.type) {
+      case 'checkbox':
+        return field?.checkbox
       case 'date':
         return field?.date?.start || null
       case 'file':

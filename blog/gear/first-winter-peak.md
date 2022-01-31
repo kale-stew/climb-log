@@ -81,7 +81,7 @@ In addition to the standard safety and shelter items I outline in my [post about
 
 - An **ice axe** isn't necessary for most class one and two climbs, but it can make descending an icy slope of any grade just a bit safer and easier. You cold use hiking poles to stabilize you for a descent, but an ice axe can be a worthwhile investment as it helps you self-arrest if you lose your footing.
 
-![Democrat Snowflake Ascent](https://live.staticflickr.com/65535/51758010860_9b71276d75_k.jpg)
+![Democrat Snowflake Ascent {768x371}](https://live.staticflickr.com/65535/51855258355_f8237f22de_b.jpg)
 
 _Ascending Mount Democrat in January of 2021, Mount Cameron in the background._
 

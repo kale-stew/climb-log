@@ -113,7 +113,7 @@ export const PREVIEW_IMAGES = {
   GEAR_IMAGE: 'https://live.staticflickr.com/65535/51808301878_d84546f4a4_b.jpg',
   HOME_IMAGE: 'https://live.staticflickr.com/65535/51793981577_eef09b49f5_c.jpg',
   NOT_FOUND_IMAGE: 'https://live.staticflickr.com/65535/51789853637_0e1329495c_b.jpg',
-  PEAK_LIST_IMAGE: 'https://live.staticflickr.com/65535/51795118588_1dcaa4593f_b.jpg',
+  PEAK_LIST_IMAGE: 'https://live.staticflickr.com/65535/51795118588_6c8c161b51_b.jpg',
 }
 
 export const REFERRALS = [
