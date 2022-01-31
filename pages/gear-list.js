@@ -131,7 +131,7 @@ export async function getStaticProps() {
         title,
         description,
         previewImgUrl: PREVIEW_IMAGES.GEAR_IMAGE,
-        baseName: 'gear',
+        baseName: 'gear-list',
         bgColor: '#d3562c',
       })),
     },

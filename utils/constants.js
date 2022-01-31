@@ -73,7 +73,7 @@ export const EXPLORE = [
   { title: 'Centennial Summits', href: '/centennials' },
   { title: 'Climb Log', href: '/climb-log' },
   { title: 'Trip Reports', href: `/blog?${CATEGORY_TYPE.HIKE}` },
-  { title: 'Gear List', href: '/gear' },
+  { title: 'Gear List', href: '/gear-list' },
   { title: 'All Photos', href: '/all' },
   { title: 'About Kylie', href: '/about' },
 ]
@@ -89,7 +89,7 @@ export const MOBILE_NAV = [
   { name: 'Blog', href: 'blog' },
   { name: 'Climb Log', href: 'climb-log' },
   { name: 'Centennials List', href: 'peak-list' },
-  { name: 'Gear List', href: 'gear' },
+  { name: 'Gear List', href: 'gear-list' },
   { name: 'All Photos', href: 'all' },
   { name: 'About', href: 'about' },
 ]
