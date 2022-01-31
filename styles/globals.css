@@ -34,6 +34,7 @@ body {
   /* transparent colors for the peak-list */
   --color-card-fallback: var(--color-bg-secondary);
   --color-card-blue: #277da1d7;
+  --color-card-gray: #7c7c7c;
   --color-card-green: #90be6dd7;
   --color-card-orange: #f3722cd7;
   --color-card-pink: #f8961ed7;
