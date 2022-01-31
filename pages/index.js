@@ -31,7 +31,6 @@ const GradientBottomImage = styled.div`
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
     <GradientTopImage />
-    {/* Update introductory paragraph */}
     <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>Recent Posts</h1>
     <div className={styles.recentPosts}>
       {featuredPosts.map((post) => (
