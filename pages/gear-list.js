@@ -13,6 +13,11 @@ const GearPage = ({ title, allGear }) => {
   const [gearCategories, setGearCategories] = useState()
   const [gearData, setGearData] = useState()
 
+  useEffect(() => {
+    setGearData(allGear)
+    buildCategories(allGear, true)
+  }, [])
+
   const buildCategories = (gearList = gearData, setState = false) => {
     let hasRetiredItems = false
     const arr = gearList.map((gear) => {
@@ -34,6 +39,8 @@ const GearPage = ({ title, allGear }) => {
     return returnArray
   }
 
+  const buildPackLists = () => {}
+
   const userSearch = (query) => {
     const upperQuery = query.toUpperCase().trim()
     if (upperQuery == '') {
@@ -54,11 +61,6 @@ const GearPage = ({ title, allGear }) => {
     buildCategories(filteredGear, true)
     setGearData(filteredGear)
   }
-
-  useEffect(() => {
-    setGearData(allGear)
-    buildCategories(allGear, true)
-  }, [])
 
   const filterByCategory = (arr, cat) => arr.filter(({ category }) => category === cat)
 

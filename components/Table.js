@@ -1,6 +1,6 @@
 import CustomPopover from './CustomPopover'
 import TableRow from './TableRow'
-import { CATEGORY_TYPE, TABLE_SORT_ORDER, METADATA } from '../utils/constants'
+import { CATEGORY_TYPE, METADATA, TABLE_SORT_ORDER } from '../utils/constants'
 import { Popover } from 'react-tiny-popover'
 import { event } from '../utils/gtag'
 import {
@@ -110,7 +110,7 @@ export default function Table({
     event(
       'gtm.click',
       `${isMetric ? 'metric' : 'imperial'}`,
-      `https://www.kylies.photos/climb-log`,
+      `https://www.${METADATA.SITE_NAME}/climb-log`,
       'UntiToggle',
       `${METADATA.SITE_NAME} | Climb Log`
     )
