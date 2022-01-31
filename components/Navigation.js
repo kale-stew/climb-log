@@ -73,6 +73,22 @@ export const Navigation = ({ isHome }) => {
   const router = useRouter()
   const currentRoute = router.asPath
 
+  const isCurrentRoute = (url, current) => {
+    const urlArr = current.split('/')
+    const categoryMatch = ['hike', 'thoughts', 'gear'].map(
+      (category) => urlArr[1] === category
+    )
+    const containsBlogCategory = categoryMatch.filter((val) => val === true).length
+
+    if (current.includes(url) && !containsBlogCategory) {
+      return true
+    } else if (containsBlogCategory) {
+      return url === 'blog' ? true : false
+    }
+
+    return false
+  }
+
   return (
     <header style={isHome && { fontFamily: "'Playfair Display', serif" }}>
       <ThemeToggle />
@@ -88,7 +104,7 @@ export const Navigation = ({ isHome }) => {
             {!isHome && <Link href="/">Home</Link>}
             {mobileNavLinks.map(({ href, name }) => (
               <Link href={`/${href}`}>
-                {currentRoute.includes(href) ? (
+                {isCurrentRoute(href, currentRoute) ? (
                   <SelectedRoute>{name}</SelectedRoute>
                 ) : (
                   name
@@ -102,7 +118,7 @@ export const Navigation = ({ isHome }) => {
               {!isHome && <Link href="/">Home</Link>}
               {desktopNavLinks.map(({ href, name }) => (
                 <Link href={`/${href}`}>
-                  {currentRoute.includes(href) ? (
+                  {isCurrentRoute(href, currentRoute) ? (
                     <SelectedRoute>{`📍 ${name}`}</SelectedRoute>
                   ) : (
                     name
