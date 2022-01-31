@@ -21,6 +21,11 @@ module.exports = {
         destination: '/peak-list',
         permanent: true,
       },
+      {
+        source: '/gear',
+        destination: '/gear-list',
+        permanent: true,
+      },
     ]
   },
 }
