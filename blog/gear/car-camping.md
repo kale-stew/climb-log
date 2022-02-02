@@ -92,7 +92,7 @@ We take these items with us if we plan to car camp. I've taken a selection of th
 - Liners and sleeping bags if not sheets and a blanket
 - [Big Agnes](https://www.rei.com/product/129001/big-agnes-mtnglo-tent-camp-lights) mtnGLO battery-powered camp lights
 - Handmade insulation panels (created using materials from [Amazon](https://smile.amazon.com/gp/product/B07PLKLZFM))
-- 240kWh Portable Jackery (with the solar charging panel that recharges it if we're traveling over multiple days in the summer)
+- 240kWh Portable [Jackery](https://www.jackery.com/pages/portable-power-stations) (with the solar charging panel that recharges it if we're traveling over multiple days in the summer)
 - weBoost Range extender (registered with Verizon, purchased from [Amazon](https://smile.amazon.com/gp/product/B07PDVTMM6))
 
 ![Stephen's Gulch {768x524}](https://live.staticflickr.com/65535/51857592640_e0e93ee4d8_b.jpg)
