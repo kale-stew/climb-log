@@ -99,6 +99,8 @@ All-in-all, this was a very rewarding solo hike. Doing it as a loop extended the
 
 Tracked on [Strava](https://www.strava.com/activities/5633844165) and [AllTrails](https://www.alltrails.com/explore/recording/activity-7132272166-ddf3542):
 
+**Date Climbed:** Thursday July 15th, 2021
+
 **Distance:** 9.38 miles
 
 **Elevation gain:** 2,874 feet

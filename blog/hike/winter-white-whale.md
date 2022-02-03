@@ -69,6 +69,8 @@ _A wider view of the Crestones from the summit of Humboldt Peak._
 
 Tracked on [Strava](https://www.strava.com/activities/5064636717) and [AllTrails](https://www.alltrails.com/explore/recording/activity-6545424312-3207551):
 
+**Date(s) Climbed:** Sunday January 31st · Saturday March 27th · Saturday April 3rd, 2021
+
 **Distance:** 13.19 miles
 
 **Elevation gain:** 4,997 feet
