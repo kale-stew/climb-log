@@ -8,11 +8,7 @@ module.exports = {
     NOTION_PHOTO_DATABASE_ID: process.env.NOTION_PHOTO_DATABASE_ID,
   },
   images: {
-    domains: [
-      's3.us-west-2.amazonaws.com',
-      'live.staticflickr.com',
-      'raw.githubusercontent.com',
-    ],
+    domains: ['s3.us-west-2.amazonaws.com', 'live.staticflickr.com'],
   },
   async redirects() {
     return [
