@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@resoc/core": "^0.9.1",
-    "@resoc/create-img": "^0.9.1",
+    "@resoc/create-img": "^0.7.1",
     "prettier": "^2.3.2"
   },
   "browserslist": {
