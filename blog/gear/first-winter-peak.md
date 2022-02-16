@@ -127,4 +127,4 @@ I'm not saying any of these are easy, but there are some winter routes with lowe
 
 ![Gaining La Plata's Headwall {768x264}](https://live.staticflickr.com/65535/51722450695_e544cbd385_k.jpg)
 
-_Just after we gained the headwall of La Plata's standard route, the peak out of sight on the other side of this hump along the ridgeline._
+_Just after we gained the headwall of La Plata's standard route, the final false summit barely visible._
