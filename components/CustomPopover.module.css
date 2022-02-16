@@ -8,8 +8,9 @@
 }
 
 /* Hack to override the default height set for remote urls by next/image */
-.popoverContent > header > div > div {
-  padding-top: 80% !important;
+.popoverContent > div > div > div {
+  margin: -75px 0;
+  padding: 1rem 0;
 }
 
 .contentWithImg {
