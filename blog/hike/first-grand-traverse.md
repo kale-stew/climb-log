@@ -37,13 +37,13 @@ _Me, nearing the top of the 2800 Feet. Photo by my climbing partner Luis._
 
 ## Topping Out On the Initial Suck
 
-About 400 below the top of this "Suck", I either started to feel better or motivated by how much we had gained in such a short amount of time. I'm not sure what turned things around for me, but the remainder of this section went by easier than the first half had. And then suddenly, you have your first close-up view of the final objective.
+About 400 below the top of this "Suck", I either started to feel better or was motivated by how much we had gained in such a short amount of time. I'm not sure what turned things around for me, but the remainder of this section went by easier than the first half had. And then suddenly, you have your first close-up view of the final objective.
 
 ![Topping Out {768x522}](https://live.staticflickr.com/65535/51849929577_c02513a160_b.jpg)
 
 _You get your first look at Maroon’s summit after topping out on the “2,800 feet of suck”._
 
-At this point, we took a quick break to get ready for the climbing ahead. Helmets on, hip pocket snacks refreshed, and we were ready to go. As we began the ridge walk my excitement for the route ahead grew. Now we were getting into the good stuff.
+At this point, we took a quick break to get ready for the climbing ahead. Helmets on, hip pocket snacks refreshed, and we were ready to go. As we began the ridge walk, my excitement for the route ahead grew. Now we were getting into the good stuff.
 
 ![Maroon's South Ridge](https://live.staticflickr.com/65535/51851221064_34d8b59806_b.jpg)
 
@@ -69,7 +69,7 @@ I knew I had North Maroon's descent route downloaded to my phone, as well as the
 
 _A closer look at a well-marked section of Maroon Peak’s southwest ridge trail._
 
-As we turned a corner on these ledges, we got a closer look at the two gullies one can choose between to continue up Maroon. The climber that had passed us was navigating a loose and seemingly steep section of the far gully. We watched him kick some rocks down as he tried to carefully pick a line up the gully and chose to take the closer gully up as it appeared to have supported bands instead of the loose scree.
+As we turned a corner on these ledges, we got a closer look at the two gullies that continue up Maroon. The climber that had passed us was navigating a loose and seemingly steep section of the far chute. We watched him kick some rocks down as he tried to carefully pick his line before opting to take the closer gully up as it appeared to have supported bands instead of the loose scree.
 
 Moving carefully and quickly, we were out of the gullies in 14 minutes. At the top of these gullies is a narrow trail that turns another corner to reveal a ~40-foot robot guardian towering over the trail. Here you can continue behind him and to the right.
 
@@ -79,7 +79,7 @@ _This robot-shaped guardian lets you know you're near a turning point._
 
 A 400-foot final scramble to the summit awaits you behind the robot. These are some of the steepest sections of this route, but without the drop-offs seen on the ledges earlier. Pushing up to the summit takes about a half hour from this point.
 
-About 200 feet below the summit we finally caught that climber that had passed us on the lower slopes at sunrise. He was doing alright but looked beat and maybe a little discouraged. He told us he had been looking for someone to partner on the traverse with, as he didn't want to do it alone. At this point we revealed that we had been discussing changing our own plan to connect the peaks and come back down North Maroon, and I think the decision was then made. We would all continue on together after summitting Maroon.
+About 200 feet below the summit we finally caught that climber that had passed us on the lower slopes at sunrise. He was doing alright but looked beat and maybe a little discouraged. He told us he had been looking for someone to partner on the traverse with, as he didn't want to do it alone. <reeval-sentence> At this point we revealed that we had been discussing changing our own plan to connect the peaks and come back down North Maroon, and I think the decision was then made. We would all continue on together after summitting Maroon.
 
 ## Summitting Maroon Peak
 
@@ -111,7 +111,7 @@ _Looking back at the last bit of Maroon's descent from across the Bell Cord. Zoo
 
 Once we crossed the top of the Bell Cord we began to regain North Maroon, a journey that would cover double the distance we had just dropped down (from 0.2 to 0.5 miles). Our first obstacle was a chimney up to a flat area where we would need to assess some more technical terrain.
 
-The views all day have been otherwordly, but at this point along the route they are especially incredible: Pyramid Peak standing at eye-level close by to your right, Capitol, Snowmass, and their surrounding lakes to your left.
+The views all day had been otherwordly, but at this point along the route they were especially incredible: Pyramid Peak standing at eye-level close by to your right, Capitol, Snowmass, and their surrounding lakes to your left.
 
 ![Snowmass and Capitol](https://live.staticflickr.com/65535/51794989006_940a4e0385_b.jpg)
 
@@ -127,7 +127,7 @@ There was an interesting ledge to the right of the second spire, but it didn't a
 
 _Looking for a line on the second spire._
 
-After topping out on the second spire, there is a nice flat ridgeline to walk along before you approach the third and largest challenge of this traverse. The third spire stands tall and clearly in your way, blocking the view of North Maroon while you assess your line. While the climbing to gain this spire's summit was fairly straightforward on solid holds, there is a point where you will need to mitigate an overhang near the top that will test your exposure limit once again.
+After topping out on the second spire, there is a nice flat ridgeline to walk along before you approach the third and largest challenge of this traverse. The third spire stands tall and clearly in your way, blocking the view of North Maroon while you assess your line. While the climbing to gain this spire's summit is fairly straightforward on solid holds, there is a point where you will need to mitigate an overhang near the top that will once again test your exposure limit.
 
 ![Spire 3 {768x408}](https://live.staticflickr.com/65535/51850892226_611149cc85_b.jpg)
 
@@ -143,7 +143,7 @@ Snaking along a thin section of ridge, we paused to take in this view of the rem
 
 _Jason looking up at the remaining route to North Maroon from a gap crossing past the third spire._
 
-All that was left was a continued snake along this ridge until it dumped you into a screefield with some larger ribs to the right that would be all that remained between us and the summit at that point. I once again felt the summit fever set in as I gained this final block and pushed until there was no more height to gain.
+All that was left between us and the summit was a continued snake along a ridge until you are dumped into a screefield with some larger ribs to the right. I once again felt the summit fever set in as I gained this final block and pushed until there was no more height to gain.
 
 ![Almost There](https://live.staticflickr.com/65535/51850891641_c58f2f0697_b.jpg)
 
@@ -177,9 +177,9 @@ _Luis walking off of The Precipice._
 
 And then suddenly, you're passed it and onto the next obstacle. This was how most of the tough features came to pass.
 
-The most difficult move along this route is just below The Precipice, around 13,680': a class 4 chimney directly down through a rock band. There is a bypass available to the left (to the right on your way up), but as has been the case on this descent, it's not very apparent what's below you until you're on top of it and by the time we were on top of this chimney it seemed more worthwhile to attempt a downclimb than backtracking and locating the class 3 option would be.
+The most difficult move along this route is just below The Precipice, around 13,680': a class 4 chimney directly down through a rock band. There is a bypass available to the left (to the right on your way up), but as has been the case on this descent, it's not very apparent what's below you until you're on top of it. By the time we were on top of this chimney it seemed more worthwhile to attempt a downclimb than backtracking and locating the class 3 option.
 
-I will say, this was the most nerve-wracking part of the day for me. I went second out of our group of three, and even though I watched one of my partners comfortably descend, I didn't feel confident about my own drop. There is a very flat ledge at the top that I chose to slide off of, and after danging with my feet a few feet off of the lower ledge, arms fully extended for a cool 30 seconds, I let go. It wasn't nearly as bad as I had expected, but it still got my heart rate going. I was relieved to be down by the time I got my pack back on and the final member of our group had navigated it as well and could finally appreciate the clear view we suddenly had of the lakes below.
+I will say, this was the most nerve-wracking part of the day for me. I went second out of our group of three, and even though I watched one of my partners comfortably descend, I didn't feel confident about my own drop. There is a very flat ledge at the top that I chose to slide off of and hold. After dangling with my feet a few feet off of the lower ledge, arms fully extended for a cool 30 seconds, I let go. It wasn't nearly as bad as I had expected, but it still got my heart rate going. <reeval-sentence> I was relieved to be down by the time I got my pack back on and the final member of our group had navigated it as well and could finally appreciate the clear view we suddenly had of the lakes below.
 
 ![Crater and Maroon Lakes](https://live.staticflickr.com/65535/51795336294_415ffb95c6_b.jpg)
 
@@ -193,25 +193,25 @@ The seemingly endless gullies begin. Standing at the top of the first (second if
 
 _Near the top of the first gully descending North Maroon with Pyramid Peak in view._
 
-As we dropped into this gully and tried not to kick rocks at each others' heads, shouting whenever something was dislodged, time felt like it nearly came to a stop. This part of the descent just felt like it took forever, and that might be due to the tedious nature of navigating this type of terrain. I think spending so much time in your head considering the impact of each step and how much weight you should be applying to every inch of that loose rock is quite a bit more tiring than soloing a 40 foot vertical chimney. And then, every time you look up, the view has only barely changed.
+As we dropped into this gully, time felt like it nearly came to a stop. This part of the descent just felt like it took forever, and that might be due to the tedious nature of navigating this type of terrain. We tried not to kick rocks at each others' heads, shouting whenever something was dislodged. I think spending so much time in your head considering the impact of each step and how much weight you should be applying to every inch of that loose rock is quite a bit more tiring than soloing a 40 foot vertical chimney. And then, every time you look up, the view has only barely changed.
 
 ![Gullies](https://live.staticflickr.com/65535/51793945747_8cd281fd9c_b.jpg)
 
 _Continuing to descend North Maroon’s maze of gullies._
 
-The rock was loose and the trail as not well defined. I'm not sure exactly how long it took us to navigate both of these gullies, but it felt like double the time we spent moving between the two peaks. There were no good spots to take a break, either, so we all just grumbled through it.
+The rock was loose and the trail is not well defined. I'm not sure exactly how long it took us to navigate both of these gullies, but it felt like double the time we spent moving between the two peaks. There were no good spots to take a break, either, so we all just grumbled through it.
 
-Finally reaching the bottom of the second gully and looking back was an incredible feeling. Seeing Maroon's shoulder behind North Maroon's pointy top beyond this wall of gully we had just maneuvered our way down inspired a feeling of pride. We had just achieved something I hadn't even considered feasible for myself earlier the week prior.
+Finally reaching the bottom of the second gully and looking back was an incredible feeling. Seeing Maroon's shoulder behind North Maroon's pointy top beyond this wall of gully inspired a feeling of pride. We had just achieved something I hadn't even considered feasible for myself the week prior.
 
 ![Gully 2 {768x460}](https://live.staticflickr.com/65535/51849926367_8fd25e1bb4_b.jpg)
 
 _At the bottom of North Maroon’s second gully, looking back towards the two peaks._
 
-We took some time to rest, evaluate the remaining route, and each eat a snack. While the most difficult climbing might have been behind us at this point, we still had some more tedious terrain to voyage before we would be back to a well-worn dirt path.
+We took some time to rest, evaluate the remaining route, and eat a snack. While the most difficult climbing might have been behind us at this point, we still had some more tedious terrain to voyage before we would be back to a well-worn dirt path.
 
 ## Perfect Timing
 
-Standing at the bottom of the gully, we were all more wiped than I think any of us expected to be. Jason let us continue on without him as he had plans to meet his wife at their camp near Crater Lake and Luis had a night shift in the front range to get to. I got a little turned trying to identify our descent route after the snack break, but after a couple of tight circles we located it and continued down. At the bottom of the gullies is a sharp corner marked by a couple of precariously rooted trees, and just beyond that corner is a long and seemingly never-ending talus field.
+Standing at the bottom of the gully, we were all more wiped than I think any of us expected to be. Jason let us continue on without him as he had plans to meet his wife at their camp near Crater Lake and Luis had a night shift in the front range to get to. I got a little turned around trying to identify our descent route after the snack break, but after a couple of tight circles we located it and continued down. At the bottom of the gullies is a sharp corner marked by a couple of precariously rooted trees, and just beyond that corner is a long and seemingly never-ending talus field.
 
 This rock slope was filled with human-sized boulders separated by dramatic, human-sized gaps. Every few gaps were gated with a thick spider web that I was unlucky enough to walk mouth-first into no less than three times.
 
