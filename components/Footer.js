@@ -51,7 +51,7 @@ export default function Footer() {
             © {new Date().getFullYear()} {METADATA.FULL_NAME}
           </small>
           <small style={{ fontSize: '10px', textAlign: 'center' }}>
-            built with next.js & notion.so{' '}
+            built with ♡{' '}
             <a href={METADATA.SOURCE_CODE} target="_blank">
               on github
             </a>
