@@ -124,8 +124,9 @@ export default function BlogLandingPage({ allPostsData }) {
                 <div
                   style={{
                     lineHeight: 1.5,
-                    fontSize: '14.5px',
+                    fontSize: '16px',
                     color: 'var(--color-text-secondary)',
+                    marginTop: '0.5em',
                   }}
                 >
                   {preview}{' '}
