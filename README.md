@@ -4,13 +4,11 @@ This website serves as a public mirror of my private climbing calendar. It gets 
 
 The public site can be seen here 👉 [kylies.photos](https://climb-log.vercel.app).
 
-<!-- To read more about how I built this, check out [my blog post about it](@TODO). -->
-
 ## Technologies
 
 - [React](https://reactjs.org) on the frontend
 - [NextJS](http://nextjs.org) as a build system & for deployment
-- [Notion](https://developers.notion.com/) on the backend 😎
+- [Notion](https://developers.notion.com/) on the backend
 
 ### Prerequisites to Run Locally
 

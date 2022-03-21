@@ -38,7 +38,7 @@ const AboutPage = () => (
           traveling to nearby peaks to test out her longer range lenses.
         </p>
         <p>
-          Although she is taking the first 3 months of 2022 off of hiking to recover from
+          Although she is taking the first 5 months of 2022 off of hiking to recover from
           ankle surgery, she's eager to make the most of this time off by testing out her
           camera's features from handicap-accessible lots and 4WD trails across the state.
         </p>

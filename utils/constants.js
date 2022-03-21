@@ -33,16 +33,22 @@ export const AREA_TYPE = {
 
 export const BRANDS = [
   {
-    name: 'Keep Nature Wild',
-    href: 'https://keepnaturewild.com',
+    name: 'Goodr',
+    href: 'https://goodr.com',
     description:
-      'An eco-minded outdoor brand that promises to pick up 1lb of trash for every product sold.',
+      'Affordable and functional nonslip sunglasses, made for everybody by runners.',
   },
   {
     name: 'Notion.so',
     href: 'https://notion.so',
     description:
       'A productivity app used for everything from personal note-taking to professional project management work. Fun fact: the climb log on this website is built using it!',
+  },
+  {
+    name: 'Keep Nature Wild',
+    href: 'https://keepnaturewild.com',
+    description:
+      'An eco-minded outdoor brand that pledges to pick up 1lb of trash for every product sold.',
   },
 ]
 
