@@ -19,7 +19,7 @@ const CategoryButton = styled.button`
   margin: auto 0 auto 1vw;
   padding: 0.2em 0.6em;
   line-height: 1.3em;
-  font-size: 12px;
+  font-size: 0.8rem;
   font-weight: 600;
   opacity: 0.8;
   background-color: ${(p) => `var(--color-${p.color})`};

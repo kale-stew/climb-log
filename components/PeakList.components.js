@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 export const CompletedCount = styled.span`
   margin: 0 auto 1rem auto;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.8rem;
   background-color: var(--color-bg-tertiary);
   color: var(--color-white);
   width: max-content;
@@ -16,7 +16,7 @@ export const FilterButton = styled.button`
   color: var(--color-white);
   width: max-content;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.9rem;
   &:hover {
     box-shadow: 0 10px 20px var(--color-bg-tertiary), 0 6px 6px var(--color-bg-tertiary);
   }

@@ -29,8 +29,8 @@ const Details = styled.div`
   padding: 0.5rem 0;
   max-width: 35vw;
   animation: ${appear} 0.4s ease-in-out;
+  cursor: n-resize;
   @media (max-width: 1024px) {
-    font-size: 14px;
     max-width: 90vw;
   }
 `
@@ -41,7 +41,7 @@ const ToggleItem = ({ children, item }) => {
 
   return (
     <ListItem onClick={() => setToggleState(!isToggled)}>
-      <SingleLine style={{ cursor: 'pointer' }}>
+      <SingleLine style={{ cursor: `${!isToggled ? 's' : 'n'}-resize` }}>
         {isToggled ? (
           <FiArrowDown style={{ paddingTop: '0.15em' }} />
         ) : (

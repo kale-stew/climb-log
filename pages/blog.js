@@ -25,7 +25,7 @@ const BlogCategoryFilterButton = styled.button`
       ? 'var(--color-bg-primary)'
       : 'var(--color-white)'};
   font-weight: 400;
-  font-size: 13px;
+  font-size: 0.8rem;
   &:hover {
     background-color: ${(p) =>
       `var(--color-${Object.keys(CATEGORY_COLORS).find(
@@ -34,13 +34,9 @@ const BlogCategoryFilterButton = styled.button`
     color: ${(p) =>
       p.name === CATEGORY_TYPE.ALL ? 'var(--color-bg-primary)' : 'var(--color-white)'};
   }
-  @media (max-width: 650px) {
-    font-size: 12px;
-  }
 `
 
 const ReadMore = styled.span`
-  cursor: pointer;
   font-size: 0.8rem;
   font-style: italic;
   font-weight: 600;

@@ -93,7 +93,7 @@ button {
   color: var(--color-text-primary);
   text-decoration: none;
   font-weight: 300;
-  font-size: 15px;
+  font-size: 0.9rem;
   text-align: center;
   transition: all 0.2s;
 
@@ -126,7 +126,7 @@ ul a:hover {
 
 caption {
   padding: 0.5rem 1rem;
-  font-size: 14px;
+  font-size: 0.8rem;
   color: #6b6b6b;
 }
 
@@ -166,7 +166,7 @@ h3 {
 
 select,
 input {
-  font-size: 16px;
+  font-size: 1rem;
   border-radius: 5px;
   background-color: transparent;
   color: var(--color-text-secondary);
@@ -196,12 +196,13 @@ table tr:nth-child(even) {
 
 table .tableRow:hover {
   background-color: var(--color-bg-tertiary);
+  cursor: context-menu;
 }
 
 tbody {
   width: 100%;
   text-align: center;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 td {
@@ -243,7 +244,7 @@ th {
   }
 
   header a {
-    font-size: 14px;
+    font-size: 1rem;
     padding: 0.4rem;
   }
 
@@ -259,6 +260,6 @@ th {
   td {
     padding: 0 0.25em;
     max-width: 25vw;
-    font-size: 14px;
+    font-size: 0.8rem;
   }
 }

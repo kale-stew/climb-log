@@ -55,7 +55,7 @@ const ExpandedNavigation = styled.div`
   }
   @media (max-width: 700px) {
     margin: 0 0 auto auto;
-    font-size: 18px;
+    font-size: 1.2rem;
   }
   a:hover {
     text-decoration: underline;
@@ -64,7 +64,7 @@ const ExpandedNavigation = styled.div`
 
 const SelectedRoute = styled.span`
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1.1rem;
   padding: 0.6rem 0.2rem;
 `
 

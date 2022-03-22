@@ -14,7 +14,7 @@ const StyledForm = styled.form`
 
 const SmallInput = styled.input`
   padding: 0.4rem 0.75rem;
-  font-size: 15px;
+  font-size: 0.9rem;
   border-radius: 5px;
   &:focus {
     outline: none;
@@ -24,7 +24,7 @@ const SmallInput = styled.input`
 `
 
 const TextInput = styled.textarea`
-  font-size: 14px;
+  font-size: 0.9rem;
   font-family: 'Open Sans', sans-serif;
   margin-top: 0.3rem;
   padding: 0.4rem 0.75rem;

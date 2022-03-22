@@ -221,7 +221,7 @@ export default function Table({
               >
                 <tr
                   id={`tableRow${i}`}
-                  className={`tableRow`}
+                  className="tableRow"
                   key={i}
                   onClick={(e) => {
                     // If we're clicking on a link don't show the popover
