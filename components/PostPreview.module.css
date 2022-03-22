@@ -43,12 +43,12 @@
 }
 
 .headerImg {
-  min-width: 330px;
-  height: 155px;
+  min-height: 14rem;
+  max-height: 20rem;
   object-fit: cover;
   overflow: hidden;
-  object-position: center top;
-  border-radius: 35px 35px 0 0;
+  position: relative;
+  border-radius: 25px 25px 0 0;
 }
 
 @media (max-width: 1024px) {

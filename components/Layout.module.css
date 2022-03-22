@@ -5,10 +5,10 @@
 
 .recentPosts {
   display: grid;
-  grid-gap: 2.5em;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   padding: 0 10vw;
-  margin: 2.2em auto;
+  margin: 2rem auto;
 }
 
 .wrapper {
@@ -20,28 +20,12 @@
   max-width: 85vw;
 }
 
-/* Fallback for ultra-wide displays */
-@media (min-width: 1900px) {
-  .wrapper {
-    max-width: 45vw;
-  }
-}
-
-@media (max-width: 1024px) {
-  .wrapper {
-    min-width: 75vw;
-  }
-}
-
-@media (max-width: 800px) {
+@media (max-width: 712px) {
   .recentPosts {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 2.5rem auto;
-  }
-
-  .wrapper {
-    max-width: 80vw;
+    max-width: 75%;
   }
 }
