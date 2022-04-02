@@ -218,7 +218,12 @@ export default function PeakListPage({ allPeaks, title }) {
           allPeaksData.map((peak) => {
             const isCompleted = peak.first_completed ? true : false
             return (
-              <PeakCard color={peak.range.color} isCompleted={isCompleted} img={peak.img}>
+              <PeakCard
+                color={peak.range.color}
+                isCompleted={isCompleted}
+                img={peak.img}
+                key={peak.title}
+              >
                 <span className={styles.peakTitle}>
                   <RankNumber isCompleted={isCompleted}>{peak.rank}</RankNumber>
                   <h2>{peak.title}</h2>

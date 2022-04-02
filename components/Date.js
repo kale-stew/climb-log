@@ -1,8 +1,9 @@
 import { formatDate } from '../utils/helpers'
+import { parseISO } from 'date-fns'
 import utilStyles from '../styles/utils.module.css'
 
 const FormattedDate = ({ dateString, withDOW, className = '' }) => {
-  const date = new Date(dateString)
+  const date = typeof dateString === Date ? dateString : parseISO(dateString)
 
   return (
     <time className={`${utilStyles.lightText} ${className}`} dateTime={dateString}>

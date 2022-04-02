@@ -7,6 +7,7 @@ import {
   milesToKilometers,
 } from '../utils/helpers'
 import { buildAreaName } from '../utils/builders'
+import { parseISO } from 'date-fns'
 
 import styles from './Table.module.css'
 
@@ -30,7 +31,7 @@ export default function TableRow({ id, title, data, metric, slug }) {
           </td>
         )
     case 'date':
-      const dateStr = new Date(data)
+      const dateStr = parseISO(data)
       return (
         <>
           <td key={`${id}-short`} className={styles.hiddenOnDesktop}>

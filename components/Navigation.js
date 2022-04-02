@@ -103,7 +103,7 @@ export const Navigation = ({ isHome }) => {
             </MenuToggleButton>
             {!isHome && <Link href="/">Home</Link>}
             {mobileNavLinks.map(({ href, name }) => (
-              <Link href={`/${href}`}>
+              <Link href={`/${href}`} key={name}>
                 {isCurrentRoute(href, currentRoute) ? (
                   <SelectedRoute>{name}</SelectedRoute>
                 ) : (
@@ -117,7 +117,7 @@ export const Navigation = ({ isHome }) => {
             <div className={utilStyles.hiddenForMobile}>
               {!isHome && <Link href="/">Home</Link>}
               {desktopNavLinks.map(({ href, name }) => (
-                <Link href={`/${href}`}>
+                <Link href={`/${href}`} key={name}>
                   {isCurrentRoute(href, currentRoute) ? (
                     <SelectedRoute>{`📍 ${name}`}</SelectedRoute>
                   ) : (
