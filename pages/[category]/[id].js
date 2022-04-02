@@ -3,7 +3,7 @@ import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
 import ShareButton from '../../components/ShareButton'
-import { PREVIEW_CARD_COLORS } from '../../utils/constants'
+import { METADATA, PREVIEW_CARD_COLORS } from '../../utils/constants'
 import { buildNavigation } from '../../components/BlogNavigation'
 import { getAllPostIds, getPostData, getSortedPostsData } from '../../utils/data/posts'
 import { socialImage } from '../../utils/social-image'
@@ -46,7 +46,7 @@ export async function getStaticProps({ params }) {
   const postData = await getPostData(params.category, params.id)
   const postIds = getSortedPostsData()
   const title = postData.title
-  const description = 'by Kylie Stewart'
+  const description = `by ${METADATA.FULL_NAME}`
 
   return {
     props: {

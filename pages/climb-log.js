@@ -229,7 +229,7 @@ const ClimbLog = ({ allClimbs }) => {
       {/* This 'blanket' div allows us to dim the background on popup using css 🙌🏻 */}
       <div className={blanketEnabled ? tableStyles.blanket : ''}></div>
       <h1 className={`${utilStyles.centerText} ${utilStyles.headingXl}`}>
-        Kylie's Climb Log
+        {METADATA.FIRST_NAME}'s Climb Log
       </h1>
       <Table
         allAreas={allAreas}

@@ -1,6 +1,6 @@
 export const METADATA = {
   FIRST_NAME: 'Kylie',
-  FULL_NAME: 'Kylie Stewart',
+  FULL_NAME: 'Kylie Czajkowski',
   SITE_NAME: 'kylies.photos',
   SOURCE_CODE: 'https://github.com/kale-stew/climb-log',
   TWITTER_HANDLE: 'kyliestew',
@@ -36,7 +36,7 @@ export const BRANDS = [
     name: 'Goodr',
     href: 'https://goodr.com',
     description:
-      'Affordable and functional nonslip sunglasses, made for everybody by runners.',
+      'Extremely functional and affordable nonslip sunglasses made to be worn everywhere, from high peaks to the dog park to the local brewery.',
   },
   {
     name: 'Notion.so',
@@ -60,7 +60,7 @@ export const CATEGORY_TYPE = {
 }
 
 export const CONNECT = [
-  { title: 'Instagram', href: 'https://www.instagram.com/kalestews/' },
+  { title: 'Instagram', href: 'https://www.instagram.com/kalestewski/' },
   { title: 'AllTrails', href: 'https://www.alltrails.com/members/kylie-stewart-1' },
   { title: 'Strava', href: 'https://www.strava.com/athletes/46336787' },
   {
