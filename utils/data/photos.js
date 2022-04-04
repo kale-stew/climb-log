@@ -43,19 +43,24 @@ const formatPhotos = (response) => {
     } = result
 
     const photoArea = determineArea(area, area_fallback)
+    const fullWidth = fmt(width)
+    const fullHeight = fmt(height)
 
     return {
       id,
+      caption: fmt(title),
+      src: fmt(href),
+      thumbnail: fmt(href),
       area: buildAreaName(photoArea.region),
       state: photoArea.state,
-      title: fmt(title),
-      exclude: fmt(exclude),
       date: fmt(taken_on),
-      href: fmt(href),
-      width: fmt(width),
-      height: fmt(height),
+      width: fullWidth,
+      thumbnailWidth: Math.round(fullWidth * 1e2),
+      height: fullHeight,
+      thumbnailHeight: Math.round(fullHeight * 1e2),
       bgColor: fmt(accent_color) ? fmt(accent_color) : null,
-      tags: fmt(tags) ? fmt(tags) : null,
+      searchTags: fmt(tags) ? fmt(tags) : null,
+      exclude: fmt(exclude),
     }
   }, [])
 }

@@ -1,4 +1,4 @@
-import ImageGallery from '../components/ImageGallery'
+import Gallery from 'react-grid-gallery'
 import Layout from '../components/Layout'
 import Link from 'next/link'
 import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
@@ -33,8 +33,8 @@ export default function AllPhotosPage({ title, allPhotos }) {
         checkMonth(upperQuery, photo.date) ||
         photo.area?.toUpperCase().includes(upperQuery) ||
         photo.state?.toUpperCase().includes(upperQuery) ||
-        photo.tags?.toUpperCase().includes(upperQuery) ||
-        photo.title.toUpperCase().includes(upperQuery) ||
+        photo.searchTags?.toUpperCase().includes(upperQuery) ||
+        photo.caption.toUpperCase().includes(upperQuery) ||
         (isNaN(upperQuery) ? null : checkYear(Number(upperQuery), photo.date))
     )
 
@@ -82,12 +82,21 @@ export default function AllPhotosPage({ title, allPhotos }) {
         />
       </div>
 
-      {getAllYears().map((year) => {
-        const filteredPhotos = filterByYear(allPhotosData, year)
-        return (
-          <ImageGallery key={`${year}-gallery`} photos={filteredPhotos} header={year} />
-        )
-      })}
+      <div className={utilStyles.vertical}>
+        {getAllYears().map((year) => {
+          const filteredPhotos = filterByYear(allPhotosData, year)
+          return (
+            <div key={`${year}-gallery`}>
+              {filteredPhotos.length !== 0 && <h2 key={year}>{year}</h2>}
+              <Gallery
+                images={filteredPhotos}
+                backdropClosesModal={true}
+                enableImageSelection={false}
+              />
+            </div>
+          )
+        })}
+      </div>
     </Layout>
   )
 }
