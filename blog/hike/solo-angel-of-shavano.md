@@ -6,7 +6,7 @@ bgColor: '#a4b4c7'
 textColor: '#000000'
 ---
 
-Spring is know for being a transitional season, and this is especially true in Colorado. With spring comes a mud-riddled shoulder season, but slightly more stable snowpack and prime couloir climbing time. "Couloir" is a term of French origin that refers to the deep and steep gullies that cut up a mountain, and plenty of these lines exist on some of the most beautiful mountains in our state.
+Spring is known for being a transitional season, and this is especially true in Colorado. With spring comes a mud-riddled shoulder season, but also slightly more stable snowpack and prime couloir climbing time. "Couloir" is a term of French origin that refers to the deep and steep gullies that cut up a mountain, and plenty of these lines exist on some of the most beautiful mountains in our state.
 
 While avalanche danger isn't negligible in the spring, it is significantly decreased as snow no longer accumulates on top of the cold and hard early season snow. Additionally, the prolonged sun exposure stabilizes snow fields, making them less likely to slide.
 

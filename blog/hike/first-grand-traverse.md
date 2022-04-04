@@ -83,7 +83,7 @@ The initial drop off of Maroon Peak toward the Cord saddle is intimidating, and 
 
 There is one final 20-30 foot pitch of rock to negotiate before you reach the proper saddle of these two peaks. This is the second significant test of your tolerance for exposure along the traverse, and the hazards only increase from here.
 
-![Looking back at the last bit of Maroon's descent from across the Bell Cord. Zoom in to see our climbing partner Jason working his was down the 20 foot wall. {557x768}](https://live.staticflickr.com/65535/51860988639_b09fd29977_b.jpg)
+![Looking back at the last bit of Maroon's descent from across the Bell Cord. Zoom in to see our climbing partner Jason y down the 20 foot wall. {557x768}](https://live.staticflickr.com/65535/51860988639_b09fd29977_b.jpg)
 
 Once we crossed the top of the Bell Cord we began to gain North Maroon, a journey that would cover double the distance we had just dropped down (from 0.2 to 0.5 miles). Our first obstacle was a chimney up to a flat area where we would need to then assess some more technical terrain.
 
