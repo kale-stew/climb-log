@@ -15,15 +15,11 @@ The approach to this climb is an easy and popular day hike up Herman Gulch. At t
 
 There are wildflowers aplenty if you're hiking this in the early summer. Late June through mid-July is considered the peak season to see these flowers, but it can vary year to year. Being such a lush valley, you can find yourself among some large crowds if you choose to hike it on a weekend during this time of year.
 
-![Herman Gulch Ascent {768x484}](https://live.staticflickr.com/65535/51848193323_d26506f354_b.jpg)
-
-_Wildflowers seen on the ascent of Herman Gulch._
+![Wildflowers seen along the standard route up Herman Gulch. {768x484}](https://live.staticflickr.com/65535/51848193323_d26506f354_b.jpg)
 
 After turning left at the lake and heading up a narrow trail to a marshy area, you'll lose sight of cairns. As is the case with many 13ers, there's another path visible gaining the shoulder that I chose to cut the edge of the marsh to get to, but I'm sure there are alternatives that will take you directly to this path. For what it's worth, I did try to target that trail on my descent but did not find any well-traveled or marked connection back to the main path. You will need to bushwhack a little bit to get to this peak.
 
-![Above the Basin {768x527}](https://live.staticflickr.com/65535/51848192873_34fc12320d_b.jpg))
-
-_Looking back after leaving the basin to gain The Citadel's southern shoulder._
+![Looking out towards Mount Bethel after leaving the basin to gain The Citadel's southern shoulder. {768x527}](https://live.staticflickr.com/65535/51848192873_34fc12320d_b.jpg))
 
 Once you gain the saddle between Hagar and The Citadel, Golden Bear and a section of the CDT come into view. The ridgeline connecting the two unofficially named peaks ("The Citadel" and "Golden Bear") looks daunting but doable. I made a mental note to come back here someday to see how doable it actually is.
 
@@ -31,15 +27,11 @@ Once you gain the saddle between Hagar and The Citadel, Golden Bear and a sectio
 
 After switching up the ridge through some steeper terrain, I finally got a good look at the climbing ahead.
 
-![Facing the Climb {768x524}](https://live.staticflickr.com/65535/51848131036_8f62019a9b_b.jpg)
-
-_Looking at the route options to ascend: gully (C3) is to the left, chutes (C4+) to the right._
+![Evaluating options to ascend: gully (C3) is to the left, chutes (C4+) to the right. {768x524}](https://live.staticflickr.com/65535/51848131036_8f62019a9b_b.jpg)
 
 At this point I chose to put my helmet on and stash my poles so they wouldn't get in the way of my ascent. I knew there was a vertical class 4+ (debatably class 5, some folks recommended rope) chute to the right that I wanted to try. Upon closer inspection, it looked solid and I felt confident going for this 30 foot wall alone.
 
-![Looking up the Chute {576x768}](https://live.staticflickr.com/65535/51848781765_7694b723da_b.jpg)
-
-_Looking towards the chute I chose to climb, visible as a crack on the far right._
+![Looking up the chute I chose to climb, visible as a crack on the far right. {576x768}](https://live.staticflickr.com/65535/51848781765_7694b723da_b.jpg)
 
 Admittedly I did hit my helmet once on a roof moving through the zig-zagged crack, but my helmet held up just fine. While I did feel forced to consider my mortality for a quick moment, I didn't feel too rattled so I continued up after a beat.
 
@@ -49,31 +41,23 @@ Moving up this wall was the highlight of my day, and when I topped out after 10 
 
 Looking back, I saw a leftover rope and anchor from someone's climb prior.
 
-![Leftover climbing tools {576x768}](https://live.staticflickr.com/65535/51848781220_8f0d9eec2e_b.jpg)
-
-_Leftover rope and anchor is visible at the bottom of this photo, the chute I've just climbed is on the right._
+![Blue rope and an anchor is visible closer to the bottom of this photo, the chute I've just climbed to the right. Grays and Torreys on the horizon. {576x768}](https://live.staticflickr.com/65535/51848781220_8f0d9eec2e_b.jpg)
 
 This was a humbling sight and brought back the reality that I was only halfway done with my day at this point. Sure, I had gained the chute just fine, but I still had to get back down and although I was hopeful the class 3 gully would be a viable descent option, I still hadn't seen it firsthand.
 
 The first high point I gained initially seemed like the summit and even had a summit registry, but was only 13,108' at its highest. The true summit was still maybe a quarter mile and gully away. I took a break on this first high point, read the registry (found out it had only been placed in 2018), and had a snack before continuing on to the 13,294' summit.
 
-![False Summit {768x514}](https://live.staticflickr.com/65535/51848780770_a751d7411d_b.jpg)
-
-_Standing on the initial false summit of The Citadel, looking over to the real summit block._
+![Standing on the initial false summit of The Citadel, looking over to the real summit block. {768x514}](https://live.staticflickr.com/65535/51848780770_a751d7411d_b.jpg)
 
 Traversing between these two points took me only 6 minutes according to my GPX track, shorter than it felt. Leaving the first high point was a bit of a loose scramble down to a rocky, scree-filled saddle. I had to jump down maybe 8 feet to actually get to the saddle after down-climbing a set of ledges, and I started to lose confidence in my ability to navigate the gully I knew was on the other side of this second high point to get back to the c2 descent.
 
 Gaining the second summit was easier than descending the first. The summit itself was a set of toothy rocks, all about 6-8 feet tall. One can scramble up to the top of these teeth if you're up for a challenge, which I did.
 
-![True Summit {768x524}](https://live.staticflickr.com/65535/51848780400_4210213e27_b.jpg)
-
-_Looking over to Pettingell from the Citadel’s true summit._
+![Standing on Citadel’s true summit, looking over to Pettingell. {768x524}](https://live.staticflickr.com/65535/51848780400_4210213e27_b.jpg)
 
 The views of the surrounding peaks from this summit is expansive and the first high point I had come over looked like a single, sharp tooth from the higher angle. The sharp lines contrasted with wide basins makes this summit feel more like an Elk peak than a Front range one.
 
-![Summit Spire {591x768}](https://live.staticflickr.com/65535/51817385803_e157b9a084_b.jpg))
-
-_Looking back to the first high point from Citadel's true summit._
+![Looking back to the first high point from Citadel's true summit. {591x768}](https://live.staticflickr.com/65535/51817385803_e157b9a084_b.jpg))
 
 Descending the gully to The Citadel's west was as loose and unsupported as I had expected. I carefully planned my line and moved slowly on the way down, but still managed to kick some rocks free. This was where I managed to bruise myself the most all day, it's easy to kick medium sized rocks into your feet on this side of the mountain. Finally returning to solid ground after 22 minutes of cautious navigation was a big relief.
 
@@ -81,15 +65,11 @@ Descending the gully to The Citadel's west was as loose and unsupported as I had
 
 Getting back down the shoulder was simple and I still hadn't seen a soul above this ridge. I wouldn't see anyone else until I linked back up with Herman Gulch's main trail. Getting back to the main trail, however, was a bushwhack and a half, with the occasional misstep into deep wetland. I kept my impact on the land at the forefront of my mind as I tried to avoid stepping on any fragile land, plants, or animals.
 
-![Wildflowers on the Descent {768x545}](https://live.staticflickr.com/65535/51847156697_8c2ed660d8_b.jpg)
-
-_Bushwhacking through the a wildflower-filled field to return to the main Herman Gulch trail._
+![Bushwhacking through the a wildflower-filled field to return to the main Herman Gulch trail. {768x545}](https://live.staticflickr.com/65535/51847156697_8c2ed660d8_b.jpg)
 
 There are two river crossings worth noting but no real trail to follow. The second and largest river crossing was about a half mile from the main trail connection and from there was an easy 46 minute walk out to the lot.
 
-![River Crossing {605x768}](https://live.staticflickr.com/65535/51847156292_9f154d1979_b.jpg)
-
-_One of the two river crossings required to get back to the main trail. This one had a stable rock path through, even though it was rushing._
+![One of the two river crossings required to get back to the main trail. This one had a stable rock path through even though it was rushing. {605x768}](https://live.staticflickr.com/65535/51847156292_9f154d1979_b.jpg)
 
 All-in-all, this was a very rewarding solo hike. Doing it as a loop extended the solitary part of my day and I was grateful for the time to myself. The beautiful, wildflower-filled wilderness is the cherry on top of an excellent route. If you were looking for a mildly difficult and lesser traveled climb in the front range, I would recommend The Citadel's southern ridge. But **it's important to note** the level of experience required for an alpine scramble of this class (I would not do this alone if I had no or little experience scrambling c4 and above) and the impact individuals have on bushwhack trails. Traveling an unmarked trail through fragile wilderness should be done with caution and awareness, and groups larger than three can have a much larger impact on the terrain long-term. Please consider [Leave No Trace principles](https://lnt.org/why/7-principles/) before recreating in any wilderness area.
 

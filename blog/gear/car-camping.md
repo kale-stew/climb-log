@@ -17,22 +17,20 @@ Opting to sleep in the car instead of a tent is also a nice choice when temperat
 
 There are plenty of benefits to car camping, but there are downsides to consider as well.
 
-![Curecanti Sunset {768x498}](https://live.staticflickr.com/65535/51851872120_6b865c6c04_b.jpg)
-
-_Watching the sun set over Gunnison Reservoir in Curecanti Recreation Area._
+![Watching the sun set over Gunnison Reservoir in Curecanti Recreation Area. {768x498}](https://live.staticflickr.com/65535/51851872120_6b865c6c04_b.jpg)
 
 ## Benefits to Car Camping
 
-- Less cleanup! When camping, you need to set aside a portion of your morning to deflating your sleeping items and breaking down a tent. The same cleanup is not required when you're sleeping in your car, and depending how big of a vehicle you drive you might not need to break down any of the sleep setup to get going in the AM.
-- Minor security. A moose can't trample you if you're sleeping in a metal box. It's not easy for a bear to break into your car, but that doesn't mean you should be comfortable sleeping with your food inside of the vehicle. I still tend to stash my bear can outside of the vehicle when in bear country if not just for the peace of mind.
-- Warmth! This can be a downside on the hottest of summer nights, but I don't typically recommend car camping in the summer for this reason. Temperatures above a certain level can be sweltering in the car, especially if you don't remember to crack a window or two.
+- **Less cleanup!** When camping, you need to set aside a portion of your morning to deflating your sleeping items and breaking down a tent. The same cleanup is not required when you're sleeping in your car, and depending how big of a vehicle you drive you might not need to break down any of the sleep setup to get going in the AM.
+- **A sense of security.** A moose can't trample you if you're sleeping in a metal box. It's not easy for a bear to break into your car, but that doesn't mean you should be comfortable sleeping with your food inside of the vehicle. I still tend to stash my bear can outside of the vehicle when in bear country if not just for the peace of mind.
+- **Warmth!** This can be a downside on the hottest of summer nights, but I don't typically recommend car camping in the summer for this reason. Temperatures above a certain level can be sweltering in the car, especially if you don't remember to crack a window or two.
 
 ## Downfalls of Car Camping
 
-- Overwhelming an area. Fragile alpine tundra is sensitive to cars, and some Off-Highway Vehicle (OHV) roads have suffered from folks taking their 4x4 vehicles further than they should. Alpine basins and desert locations have been damaged beyond repair by off-roading traffic. It's important to keep the [7 Leave No Trace Principles](https://lnt.org/why/7-principles/) at the forefront of your mind when overlanding.
-- False sense of security. At the end of the day, you're still asleep in your vehicle and that can be a dangerous state for someone trying to car camp in a more populated area. Bears are also capable of opening car doors, so if you forget to lock one you could be in for an unpleasant wake up call.
-- Exhausting your car battery. If you leave items plugged in to an outlet in your car, or leave an internal light on just a little too long, you could kill your car battery in a remote location. This situation is made worse if you don't have an external source nearby to jump start your car back to functioning. We carry a [battery starter](https://smile.amazon.com/GOOLOO-SuperSafe-Starter-Battery-Portable/dp/B084YQSVZ6) just in case this happens.
-- Carbon monoxide risk. We know cars emit carbon monoxide gas and we expose ourselves to that by running a car in an enclosed space, but carbon monoxide can leak into the car other ways too. A hole in the floor of your trunk or the body of your car can leak small amounts of CO that aren't realized until you've spent an entire night in your car. It's recommended you keep a [CO detector](https://smile.amazon.com/gp/product/B004Y6V6K4) in your car, if not just when you're camping, for this reason.
+- **Overwhelming an area.** Fragile alpine tundra is sensitive to cars, and some Off-Highway Vehicle (OHV) roads have suffered from folks taking their 4x4 vehicles further than they should. Alpine basins and desert locations have been damaged beyond repair by off-roading traffic. It's important to keep the [7 Leave No Trace Principles](https://lnt.org/why/7-principles/) at the forefront of your mind when overlanding.
+- **False sense of security.** At the end of the day, you're still asleep in your vehicle and that can be a dangerous state for someone trying to car camp in a more populated area. Bears are also capable of opening car doors, so if you forget to lock one you could be in for an unpleasant wake up call.
+- **Exhausting your car battery.** If you leave items plugged in to an outlet in your car, or leave an internal light on just a little too long, you could kill your car battery in a remote location. This situation is made worse if you don't have an external source nearby to jump start your car back to functioning. We carry a [battery starter](https://smile.amazon.com/GOOLOO-SuperSafe-Starter-Battery-Portable/dp/B084YQSVZ6) just in case this happens.
+- **Carbon monoxide risk.** We know cars emit carbon monoxide gas and we expose ourselves to that by running a car in an enclosed space, but carbon monoxide can leak into the car other ways too. A hole in the floor of your trunk or the body of your car can leak small amounts of CO that aren't realized until you've spent an entire night in your car. It's recommended you keep a [CO detector](https://smile.amazon.com/gp/product/B004Y6V6K4) in your car, if not just when you're camping, for this reason.
 
 ## Accessing 4x4 Areas
 
@@ -40,9 +38,7 @@ As I mentioned, Leave No Trace is important to consider when recreating in the b
 
 One of the most difficult roads I drove after we put the kit on near the end of summer 2021 was Saxon Mountain, a 7 mile 4x4 road boasting 23 switchbacks that takes you up to an old gold and silver mine at the 11,400' summit. I was grateful for the additional clearance when we took each of those 23 hairpin turns, some of the obstacles were daunting at first site but the Expo handled them with ease.
 
-![Above the Switchbacks {768x462}](https://live.staticflickr.com/65535/51851872200_79d285d5dc_b.jpg)
-
-_Gaining the switchbacks up Saxon Mountain above Georgetown, I-70 visible on the lower right._
+![Gaining the switchbacks above Georgetown, I-70 visible on the lower right. {768x462}](https://live.staticflickr.com/65535/51851872200_79d285d5dc_b.jpg)
 
 The most harrowing point along this route came near the top of the switchbacks, before Georgetown leaves your view with 2.2 miles remaining to the summit: a sharp rock marks the wall to your right, and a small boulder marks the edge of the road to your left before a steep, 1800' drop-off just beyond it. This road leading up to this narrow crossing is steep and quickly drops off on the other side, making it a more threatening challenge than something without this additional hindrance might be.
 
@@ -56,9 +52,7 @@ I don't necessarily seek out OHV roads as much as I need to travel on them to ge
 
 As for finding car camping sites, the same website I linked above is a great resource for determining what kind of camping I might be able to do at or near a trailhead. When I'm not evaluating a site for a climb, I like to look at [this free campsite finder](https://freecampsites.net) as a starting point. If I can't find any sites that suit my needs there, I'll look up my intended area on Google Maps and check the satellite view for viable sites within a certain perimeter. The official sites for State and National Parks typically have helpful information for figuring out where you might be able to stay nearby, and whether you should use a tent or car.
 
-![Offroading in the Fall {576x768}](https://live.staticflickr.com/65535/51851277603_0f3ded6060_c.jpg)
-
-_Off-roading around Argentine Pass._
+![Offroading around Argentine Pass. {576x768}](https://live.staticflickr.com/65535/51851277603_0f3ded6060_c.jpg)
 
 ## Gear
 
@@ -95,9 +89,7 @@ We take these items with us if we plan to car camp. I've taken a selection of th
 - 240kWh Portable [Jackery](https://www.jackery.com/pages/portable-power-stations) (with the solar charging panel that recharges it if we're traveling over multiple days in the summer)
 - weBoost Range extender (registered with Verizon, purchased from [Amazon](https://smile.amazon.com/gp/product/B07PDVTMM6))
 
-![Stephen's Gulch {768x524}](https://live.staticflickr.com/65535/51857592640_e0e93ee4d8_b.jpg)
-
-_Parked at Stephen's Gulch, Mount Edwards visible in the background._
+![Parked at Stephen's Gulch, Mount Edwards visible in the background. {768x524}](https://live.staticflickr.com/65535/51857592640_e0e93ee4d8_b.jpg)
 
 ## Learn More
 

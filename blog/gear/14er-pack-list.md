@@ -7,9 +7,7 @@ I'm incredibly embarrassed to admit it, but I used to think you could get away w
 
 When preparing for any high elevation peak, I follow a formula to pack my bag the night before. Hopefully my method helps you pack for your own peaks, too! Or at least encourages you to consider some new items to bring along on your next ascent.
 
-![Stephen's Gulch](https://live.staticflickr.com/65535/51795047198_68e246b5e4_c.jpg)
-
-_The view from Stephen's Gulch, seen while climbing my first high peak in July 2019._
+![The view from Stephen's Gulch, seen while climbing my first high peak in July 2019.](https://live.staticflickr.com/65535/51795047198_68e246b5e4_c.jpg)
 
 ## Clothes
 
@@ -35,9 +33,7 @@ Whatever you don't wear, you should have packed. Some of these items could be co
 - Extra **hoodie**. Even on top of the wool layer, it's nice to have one with a cinched hood ready to layer under your wind layer if things start to get intense (as they often do above 13k).
 - Extra **socks**, **gloves**, **beanie**. Again, in all seasons. Summer in Front Range isn't quite the same as summer at double the elevation.
 
-![Descending Uncompahgre](https://live.staticflickr.com/65535/51789832732_4de85ea534_b.jpg)
-
-_Descending Uncompahgre's south ridge in October 2021, my climbing partner Luis in sight._
+![Descending Uncompahgre's south ridge in October 2021, my climbing partner Luis in sight.](https://live.staticflickr.com/65535/51789832732_4de85ea534_b.jpg)
 
 ## Survival Gear
 
@@ -59,9 +55,7 @@ Not only can you use a SatCom device like the Garmin InReach to text your loved 
 
 Again, these aren't necessary for folks just getting started, but if you find yourself hiking solo more often than with a group, or want to offer some peace of mind to your far-away relatives, purchasing and carrying a SatCom is an excellent way to do this.
 
-![Redcloud Peak](https://live.staticflickr.com/65535/51807025013_a5d55db3be_b.jpg)
-
-_Dropping off of Redcloud Peak to ascend its neighbor, Sunshine Peak. July 2021._
+![Dropping off of Redcloud Peak to ascend its neighbor, Sunshine Peak. July 2021.](https://live.staticflickr.com/65535/51807025013_a5d55db3be_b.jpg)
 
 ## Miscellaneous Gear
 
@@ -73,9 +67,7 @@ In addition to the clothes and emergency gear listed above, I carry a subset of 
 - **Multi-tool**: One with pliers is especially nice, you'd be surprised how often this tool is used to quick-fix gear on the trail.
 - **Duct tape**: A few feet of duct tape rolled around a Sharpie and a handful of small zipties can go a long way in a number of situations. I keep these in a dry bag with some other emergency gear I don't want getting wet at the bottom of my 28L bag.
 
-![Ally on Lindsey Ridge](https://live.staticflickr.com/65535/51817988165_febd3f2b4f_b.jpg)
-
-_My climbing partner Ally moving along Mount Lindsey's lower ridge._
+![My climbing partner Ally moving along Mount Lindsey's lower ridge.](https://live.staticflickr.com/65535/51817988165_febd3f2b4f_b.jpg)
 
 ## Snacks & Hydration
 
@@ -86,6 +78,4 @@ One of the keys to _comfortably_ surviving your first 14er peak is caloric intak
 - I've started packing **liquid powder packs** to substitute Gatorade on summits. This allows me to drink multiple throughout the hike: every time the bottle is emptied, I can refill it using more water and a second or even third rehydration pack.
 - **Protein bars** are a another staple I haven't gotten sick of... yet. Especially when there are so many different brands and flavors available. Bobo's lemon or Clif's hazelnut butter bars in particular, though, are top notch.
 
-![Granite Pass Squirrel {768x480}](https://live.staticflickr.com/65535/51795298419_4261144216_b.jpg)
-
-_A squirrel enjoying a snack on Granite Pass, just below the Longs Peak boulderfield._
+![A squirrel enjoying a snack on Granite Pass, just below the Longs Peak boulderfield. {768x480}](https://live.staticflickr.com/65535/51795298419_4261144216_b.jpg)
