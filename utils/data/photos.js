@@ -11,12 +11,12 @@ const formatPhotos = (response) => {
     let fallbackArea = fmt(area_fallback)
     if (areaFormatted && areaFormatted != '') {
       return {
-        region: areaFormatted.split(', ')[0],
+        region: buildAreaName(areaFormatted.split(', ')[0]),
         state: areaFormatted.split(', ')[1],
       }
     } else if (fallbackArea && fallbackArea != '') {
       return {
-        region: fallbackArea.split(', ')[0],
+        region: buildAreaName(fallbackArea.split(', ')[0]),
         state: fallbackArea.split(', ')[1],
       }
     }
@@ -25,11 +25,11 @@ const formatPhotos = (response) => {
       state: null,
     }
   }
+
   return response.map((result) => {
     const {
       id,
       properties: {
-        accent_color,
         area,
         area_fallback,
         exclude,
@@ -42,15 +42,18 @@ const formatPhotos = (response) => {
       },
     } = result
 
+    const src = fmt(href)
     const photoArea = determineArea(area, area_fallback)
+    const caption = `${fmt(title)}. ${photoArea.region}, ${photoArea.state}.`
     const fullWidth = fmt(width)
     const fullHeight = fmt(height)
 
     return {
       id,
-      caption: fmt(title),
-      src: fmt(href),
-      thumbnail: fmt(href),
+      title: fmt(title),
+      caption,
+      src,
+      thumbnail: src,
       area: buildAreaName(photoArea.region),
       state: photoArea.state,
       date: fmt(taken_on),
@@ -58,7 +61,6 @@ const formatPhotos = (response) => {
       thumbnailWidth: Math.round(fullWidth * 1e2),
       height: fullHeight,
       thumbnailHeight: Math.round(fullHeight * 1e2),
-      bgColor: fmt(accent_color) ? fmt(accent_color) : null,
       searchTags: fmt(tags) ? fmt(tags) : null,
       exclude: fmt(exclude),
     }
