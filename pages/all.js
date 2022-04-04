@@ -86,7 +86,7 @@ export default function AllPhotosPage({ title, allPhotos }) {
         {getAllYears().map((year) => {
           const filteredPhotos = filterByYear(allPhotosData, year)
           return (
-            <div key={`${year}-gallery`}>
+            <div key={`${year}-gallery`} style={{ width: '100%' }}>
               {filteredPhotos.length !== 0 && <h2 key={year}>{year}</h2>}
               <Gallery
                 images={filteredPhotos}
