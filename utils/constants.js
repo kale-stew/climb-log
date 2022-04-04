@@ -117,7 +117,7 @@ export const PREVIEW_IMAGES = {
   CLIMB_LOG_IMAGE: 'https://live.staticflickr.com/65535/51789832732_041ee645fa_k.jpg',
   FALLBACK_IMAGE: 'https://live.staticflickr.com/65535/51721573796_c2143acb54_b.jpg',
   GEAR_IMAGE: 'https://live.staticflickr.com/65535/51808301878_d84546f4a4_b.jpg',
-  HOME_IMAGE: 'https://live.staticflickr.com/65535/51793981577_eef09b49f5_c.jpg',
+  HOME_IMAGE: 'https://live.staticflickr.com/65535/51892023599_f53cf9a763_b.jpg',
   NOT_FOUND_IMAGE: 'https://live.staticflickr.com/65535/51789853637_0e1329495c_b.jpg',
   PEAK_LIST_IMAGE: 'https://live.staticflickr.com/65535/51795118588_6c8c161b51_b.jpg',
 }

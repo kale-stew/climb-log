@@ -3,6 +3,7 @@ import Link from 'next/link'
 import PostPreview from '../components/PostPreview'
 import styled from '@emotion/styled'
 import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
+import { fadeIn } from '../styles/animations'
 import { getRecentPosts } from '../utils/data/posts'
 import { socialImage } from '../utils/social-image'
 
@@ -11,7 +12,7 @@ import utilStyles from '../styles/utils.module.css'
 
 const GradientTopImage = styled.div`
   background-image: linear-gradient(transparent, var(--color-bg-primary)),
-    url('/photos/lander_top.jpg');
+    url('/photos/desktop_lander_T.jpg');
   height: 30vh;
   width: 100%;
   background-size: cover;
@@ -22,7 +23,7 @@ const GradientTopImage = styled.div`
 
 const GradientBottomImage = styled.div`
   background-image: linear-gradient(var(--color-bg-primary), transparent),
-    url('/photos/lander_bottom.jpg');
+    url('/photos/desktop_lander_B.jpg');
   height: 25vh;
   width: 100%;
   background-size: cover;
@@ -31,25 +32,40 @@ const GradientBottomImage = styled.div`
 
 const IntroParagraph = styled.div`
   font-size: 1.3rem;
-  font-style: italic;
   max-width: 40%;
-  margin: 1rem auto 3rem auto;
+  margin: 1rem auto 4.5rem auto;
   text-align: center;
+  animation: ${fadeIn} 5s;
   @media (max-width: 1024px) {
-    max-width: 90%;
-    font-size: 1.5rem;
+    max-width: 80%;
+    font-size: 1.2rem;
+  }
+`
+
+const IntroTitle = styled.h1`
+  font-size: 4rem;
+  font-style: italic;
+  animation: ${fadeIn} 5s;
+  @media (max-width: 1024px) {
+    font-size: 3.5rem;
+    margin: 0 auto;
   }
 `
 
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
     <GradientTopImage />
-    <IntroParagraph>
-      {METADATA.FIRST_NAME} is an avid hiker, web developer, mountaineer, and photo-taker
-      that spends her time hiking Colorado's high peaks and researching its terrain. Read
-      more about her <Link href="/about">here</Link>.
-    </IntroParagraph>
-    <h1 className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>Recent Posts</h1>
+    <div style={{ fontFamily: "'Playfair Display', serif" }}>
+      <IntroTitle className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>
+        {METADATA.FIRST_NAME}'s Photos
+      </IntroTitle>
+      <IntroParagraph>
+        {METADATA.FIRST_NAME} is an avid hiker, web developer, mountaineer, and
+        photo-taker that spends her time hiking Colorado's high peaks and researching its
+        terrain. Read more about her <Link href="/about">here</Link>.
+      </IntroParagraph>
+    </div>
+    <h2 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>Recent Posts</h2>
     <div className={styles.recentPosts}>
       {featuredPosts.map((post) => (
         <PostPreview postData={post} key={post.id} />
@@ -74,7 +90,7 @@ export async function getStaticProps() {
         description,
         baseName: 'home',
         previewImgUrl: PREVIEW_IMAGES.HOME_IMAGE,
-        bgColor: PREVIEW_CARD_COLORS.green,
+        bgColor: PREVIEW_CARD_COLORS.blue,
       })),
     },
   }

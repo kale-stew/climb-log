@@ -26,6 +26,15 @@ export const bounce = keyframes`
 }
 `
 
+export const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`
+
 export const shake = keyframes`
   0% {
     transform: translate(1px, 1px) rotate(0deg);
