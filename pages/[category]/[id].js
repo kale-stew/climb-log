@@ -2,8 +2,10 @@ import BlogMarkdown from '../../components/Markdown'
 import Category from '../../components/Category'
 import FormattedDate from '../../components/Date'
 import Layout from '../../components/Layout'
-import ShareButton from '../../components/ShareButton'
+import Link from 'next/link'
+// import ShareButton from '../../components/ShareButton'
 import SidebarNavigation from '../../components/SidebarNavigation'
+import styled from '@emotion/styled'
 import { METADATA, PREVIEW_CARD_COLORS } from '../../utils/constants'
 import { buildNavigation } from '../../components/BlogNavigation'
 import {
@@ -12,20 +14,40 @@ import {
   getPostData,
   getSortedPostsData,
 } from '../../utils/data/posts'
+import { shake } from '../../styles/animations'
 import { socialImage } from '../../utils/social-image'
 
-import styles from '../../styles/blog.module.css'
 import utilStyles from '../../styles/utils.module.css'
 
+const ArticleWrapper = styled.div`
+  width: 100vw;
+  display: flex;
+  justify-content: space-around;
+  @media (max-width: 1024px) {
+    padding: 0 2rem;
+  }
+`
+
+const BackToTop = styled.span`
+  margin: 2rem auto 2rem auto;
+  font-size: 1.2rem;
+  a {
+    color: var(--primary-text-color);
+    &:hover {
+      cursor: pointer;
+      animation: ${shake} 0.3s;
+      animation-iteration-count: 2;
+    }
+  }
+`
+
 const Post = ({ pageHeaders, postData, postIds }) => (
-  <Layout>
-    <SidebarNavigation
-      currentRoute={`${postData.category}/${postData.id}`}
-      links={pageHeaders}
-    />
-    <>
+  <Layout home>
+    <ArticleWrapper>
       <article>
-        <h1 className={utilStyles.headingXl}>{postData.title}</h1>
+        <h1 id="title" className={utilStyles.headingXl}>
+          {postData.title}
+        </h1>
         <div className={`${utilStyles.singleRow} ${utilStyles.centerTextForMobile}`}>
           <FormattedDate
             dateString={postData.date}
@@ -40,12 +62,19 @@ const Post = ({ pageHeaders, postData, postIds }) => (
         </div>
         <BlogMarkdown markdown={postData.content} />
       </article>
-      <div className={styles.socialButtons}>
-        <ShareButton type="twitter" data={postData} />
-        <ShareButton type="facebook" data={postData} />
-      </div>
-      {buildNavigation(postIds, postData)}
-    </>
+      <SidebarNavigation
+        currentRoute={`${postData.category}/${postData.id}`}
+        links={pageHeaders}
+      />
+    </ArticleWrapper>
+    <BackToTop className={utilStyles.shownForMobile}>
+      <Link href={`/${postData.category}/${postData.id}#title`}>Back to top ↑</Link>
+    </BackToTop>
+    {/* <div className={styles.socialButtons}>
+      <ShareButton type="twitter" data={postData} />
+      <ShareButton type="facebook" data={postData} />
+    </div> */}
+    {buildNavigation(postIds, postData)}
   </Layout>
 )
 

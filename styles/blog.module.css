@@ -7,18 +7,10 @@
   margin: 0 auto;
 }
 
-.blogPostHeading {
+.blogPage a {
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
-  color: var(--color-text-primary);
-  padding: 0;
-  box-shadow: none;
   font-weight: 400;
-}
-
-.blogPostHeading:hover {
-  text-decoration: underline;
-  box-shadow: none;
   color: var(--color-text-primary);
 }
 
