@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import styled from '@emotion/styled'
+import { makeKebabCase } from '../utils/helpers'
 
 const ImageWrapper = styled.div`
   display: flex;
@@ -26,7 +27,6 @@ export default function BlogMarkdown({ markdown }) {
   const MarkdownComponents = {
     p: (paragraph) => {
       const { node } = paragraph
-
       if (node.children[0].tagName === 'img') {
         const image = node.children[0]
         const alt = image.properties.alt?.replace(/ *\{[^)]*\} */g, '')
@@ -51,6 +51,10 @@ export default function BlogMarkdown({ markdown }) {
         )
       }
       return <p>{paragraph.children}</p>
+    },
+    h2: ({ node }) => {
+      const str = node.children[0].value
+      return <h2 id={makeKebabCase(str)}>{str}</h2>
     },
   }
 

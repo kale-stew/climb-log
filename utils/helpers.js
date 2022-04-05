@@ -3,9 +3,10 @@ import getMonth from 'date-fns/getMonth'
 import getYear from 'date-fns/getYear'
 import { ALL_MONTHS } from './constants'
 
-const addCommas = (num) => num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+export const addCommas = (num) =>
+  num && num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
-const capitalizeEachWord = (string) => {
+export const capitalizeEachWord = (string) => {
   let capitalize = string
     .split(' ')
     .map((s) => {
@@ -18,9 +19,10 @@ const capitalizeEachWord = (string) => {
   return capitalize
 }
 
-const filterByYear = (arr, year) => arr.filter(({ date }) => date.indexOf(year) >= 0)
+export const filterByYear = (arr, year) =>
+  arr.filter(({ date }) => date.indexOf(year) >= 0)
 
-const formatDate = (date, type) => {
+export const formatDate = (date, type) => {
   if (typeof date !== Date) {
     date = new Date(date)
   }
@@ -34,13 +36,19 @@ const formatDate = (date, type) => {
   return format(date, 'PP')
 }
 
-const getLocationData = (str) => {
+export const getLocationData = (str) => {
   const [area, state] = str.toLowerCase().split(',')
   return {
     area,
     state,
   }
 }
+
+export const makeKebabCase = (str) =>
+  str
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[\s_]+/g, '-')
+    .toLowerCase()
 
 /**
  * Checks if user-input month is the same month as a photo or post.
@@ -52,7 +60,7 @@ const getLocationData = (str) => {
  * @param {String} date formatted, ex: '2021-10-09'
  * @returns {Boolean}
  */
-const checkMonth = (queryMonth, date) => {
+export const checkMonth = (queryMonth, date) => {
   const dateNum = getMonth(new Date(date))
   const foundMonths = ALL_MONTHS.filter((month) => month.includes(queryMonth)).map(
     (month) => ALL_MONTHS.indexOf(month)
@@ -66,7 +74,7 @@ const checkMonth = (queryMonth, date) => {
  * @param {String} dateToCheck
  * @returns {Boolean}
  */
-const checkYear = (queryDate, dateToCheck) => {
+export const checkYear = (queryDate, dateToCheck) => {
   let dateSplit = dateToCheck !== null && dateToCheck.split('-')
   if (!isNaN(dateSplit[0])) {
     let queryYear = getYear(new Date(queryDate, 1, 1))
@@ -77,19 +85,6 @@ const checkYear = (queryDate, dateToCheck) => {
 }
 
 // Imperial to Metric conversions
-const milesToKilometers = (num) => roundDecimal(num * 1.609)
-const feetToMeters = (num) => roundDecimal(num / 3.281)
-const roundDecimal = (num) => num && Number(num.toFixed(1))
-
-export {
-  addCommas,
-  capitalizeEachWord,
-  checkMonth,
-  checkYear,
-  feetToMeters,
-  filterByYear,
-  formatDate,
-  getLocationData,
-  milesToKilometers,
-  roundDecimal,
-}
+export const milesToKilometers = (num) => roundDecimal(num * 1.609)
+export const feetToMeters = (num) => roundDecimal(num / 3.281)
+export const roundDecimal = (num) => num && Number(num.toFixed(1))

@@ -5,6 +5,8 @@ import { shakeLeft, shakeRight } from '../styles/animations'
 const BlogNavigation = styled.div`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
+  max-width: 70%;
+  margin: 1rem auto 2rem auto;
 `
 
 const NavigationRight = styled.span`

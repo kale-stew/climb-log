@@ -35,7 +35,7 @@ const IntroParagraph = styled.div`
   max-width: 40%;
   margin: 1rem auto 4.5rem auto;
   text-align: center;
-  animation: ${fadeIn} 5s;
+  animation: ${fadeIn} 3s;
   @media (max-width: 1024px) {
     max-width: 80%;
     font-size: 1.2rem;
@@ -45,7 +45,7 @@ const IntroParagraph = styled.div`
 const IntroTitle = styled.h1`
   font-size: 4rem;
   font-style: italic;
-  animation: ${fadeIn} 5s;
+  animation: ${fadeIn} 3s;
   @media (max-width: 1024px) {
     font-size: 3.5rem;
     margin: 0 auto;

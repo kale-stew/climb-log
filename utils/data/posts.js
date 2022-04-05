@@ -3,7 +3,7 @@ import matter from 'gray-matter'
 import path from 'path'
 import { buildAreaName } from '../builders'
 import { CATEGORY_TYPE, PREVIEW_IMAGES } from '../constants'
-import { addCommas, capitalizeEachWord } from '../helpers'
+import { addCommas, capitalizeEachWord, makeKebabCase } from '../helpers'
 import { fetchMostRecentClimbs } from './climbs'
 
 const ALL_DIRECTORIES = {
@@ -20,7 +20,6 @@ export function getAllPostIds() {
   const tripReportsFileNames = fs.readdirSync(ALL_DIRECTORIES.hikeDir)
 
   let categoryNames = []
-
   gearFileNames.forEach(function () {
     categoryNames.push(CATEGORY_TYPE.GEAR)
   })
@@ -136,6 +135,15 @@ export function getSortedPostsData() {
       return -1
     }
   })
+}
+
+// Create an array of h2 anchors for SidebarNavigation to render
+export async function getPageHeaders(data) {
+  const h2 = /^## (.*$)/gim
+  const parsed = [...data.content.matchAll(h2)]
+  return parsed.map((item) => {
+    return { href: `#${makeKebabCase(item[1].toString())}`, title: item[1] }
+  }, [])
 }
 
 // Create an array of five most recent objects to present

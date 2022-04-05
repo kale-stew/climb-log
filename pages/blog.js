@@ -37,15 +37,15 @@ const BlogCategoryFilterButton = styled.button`
 `
 
 const ReadMore = styled.span`
-  font-size: 0.8rem;
-  font-style: italic;
-  font-weight: 600;
   font-family: 'Playfair Display', serif;
+  a {
+    font-size: 0.8rem;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
   &:hover {
     text-decoration: underline;
-  }
-  a {
-    color: var(--color-text-primary);
   }
 `
 
@@ -111,7 +111,7 @@ export default function BlogLandingPage({ allPostsData }) {
                 }}
               >
                 <Link href="/[category]/[id]" as={`/${category}/${id}`}>
-                  <a className={styles.blogPostHeading}>{title}</a>
+                  {title}
                 </Link>
                 <small className={`${utilStyles.lightText} ${utilStyles.singleRow}`}>
                   <FormattedDate dateString={date} />{' '}
