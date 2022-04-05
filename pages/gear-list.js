@@ -1,6 +1,6 @@
 import Layout from '../components/Layout'
 import ToggleItem from '../components/ToggleItem'
-import { FilterButton } from '../components/FilterButton'
+import { FilterButton, FilterWrapper } from '../components/FilterButton'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllGear } from '../utils/data/gear'
@@ -9,8 +9,6 @@ import { useEffect, useState } from 'react'
 
 import styles from '../styles/gear.module.css'
 import utilStyles from '../styles/utils.module.css'
-
-// TODO: display total weight & no. of items for  of each pack list?
 
 const GearPage = ({ title, allGear }) => {
   const [gearCategories, setGearCategories] = useState()
@@ -44,8 +42,9 @@ const GearPage = ({ title, allGear }) => {
   }
 
   const resetData = () => {
-    setGearData(allGear)
     setPackList('')
+    setGearData(allGear)
+    buildCategories(allGear, true)
   }
 
   const buildPackListArr = () => {
@@ -68,16 +67,16 @@ const GearPage = ({ title, allGear }) => {
   }
 
   const buttonClick = (query) => {
-    setPackList(query)
-    setGearData(
-      allGear.filter(
-        ({ pack_list }) => pack_list && pack_list.map(({ name }) => name === query)
-      )
+    const filtered = allGear.filter(
+      ({ pack_list }) => pack_list && pack_list.some(({ name }) => name === query)
     )
+    setPackList(query)
+    setGearData(filtered)
+    buildCategories(filtered, true)
   }
 
   const buildButtons = () => (
-    <div style={{ display: 'inline', marginTop: '1.25rem' }}>
+    <>
       <FilterButton
         key="all-button"
         color="fallback"
@@ -97,7 +96,7 @@ const GearPage = ({ title, allGear }) => {
           {name}
         </FilterButton>
       ))}
-    </div>
+    </>
   )
 
   const userSearch = (query) => {
@@ -156,17 +155,19 @@ const GearPage = ({ title, allGear }) => {
         of each sub-section. Gear that has been retired is at the very bottom of this
         page.
       </div>
-      <div className={`${utilStyles.centerText} ${utilStyles.pageDescription}`}>
+      <div
+        className={`${utilStyles.centerText} ${utilStyles.pageDescription}`}
+        style={{ marginBottom: '1rem' }}
+      >
         Click on an item to view details like brand name, color, a preview image, or why
         it was retired.
       </div>
 
-      {/* Pack lists as Filters */}
-      {buildButtons()}
+      <FilterWrapper>{buildButtons()}</FilterWrapper>
 
       <div className={utilStyles.vertical}>
         {/* Search all Gear Items */}
-        <p className={styles.filterTitle}>Search all gear:</p>
+        <p style={{ margin: '0.5rem auto' }}>Search all gear:</p>
         <input
           className={utilStyles.searchInput}
           type={'search'}
