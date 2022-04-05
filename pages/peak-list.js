@@ -1,6 +1,6 @@
 import Layout from '../components/Layout'
-import { CompletedCount, PeakCard, RankNumber } from '../components/PeakList.components'
 import { FilterButton } from '../components/FilterButton'
+import { CompletedCount, PeakCard, RankNumber } from '../components/PeakList.components'
 import {
   FOURTEENERS,
   METADATA,
@@ -124,7 +124,7 @@ export default function PeakListPage({ allPeaks, title }) {
   }
 
   const buildButtons = () => (
-    <div style={{ display: 'inline', marginTop: '1.25rem' }}>
+    <div style={{ display: 'inline' }}>
       <FilterButton
         key="all-button"
         color="fallback"
@@ -197,7 +197,6 @@ export default function PeakListPage({ allPeaks, title }) {
           {buildButtons()}
 
           <div style={{ marginBottom: '2rem' }}>
-            {/* Search all Peaks */}
             <p>Search all peaks:</p>
             <input
               className={utilStyles.searchInput}

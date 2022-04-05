@@ -11,3 +11,12 @@ export const FilterButton = styled.button`
   }
   ${(p) => (p.isSelected ? 'border: 2px solid var(--color-text-tertiary);' : null)};
 `
+
+export const FilterWrapper = styled.div`
+  max-width: 70%;
+  margin: 0.5rem auto;
+  text-align: center;
+  @media (max-width: 1024px) {
+    max-width: 100%;
+  }
+`

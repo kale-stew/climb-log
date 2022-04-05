@@ -19,10 +19,6 @@
   margin: 0;
 }
 
-.filterTitle {
-  margin: 1rem 0 0.75em 0;
-}
-
 .searchFilter {
   flex-direction: column;
   justify-content: center;
@@ -36,10 +32,6 @@
 }
 
 @media (max-width: 1024px) {
-  .filterTitle {
-    margin: 1.5rem 0 0.75rem 0;
-  }
-
   .gearWrapper {
     display: flex;
     flex-direction: column;
