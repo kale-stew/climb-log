@@ -139,7 +139,7 @@ const ClimbLog = ({ allClimbs }) => {
     event(
       'gtm.click',
       filter,
-      `https://www.kylies.photos${router.asPath}`,
+      `https://www.${METADATA.SITE_NAME}${router.asPath}`,
       'AreaSelect',
       `${METADATA.SITE_NAME} | Climb Log`
     )

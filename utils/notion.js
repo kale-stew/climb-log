@@ -45,7 +45,7 @@ export const fmt = (field) => {
       case 'formula':
         return formatFormulaType(field)
       case 'multi_select':
-        return field?.multi_select
+        return field?.multi_select.length > 0 ? field.multi_select : null
       case 'number':
         return field?.number
       case 'relation':

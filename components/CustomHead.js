@@ -38,7 +38,7 @@ const CustomHead = (pageProps) => {
             window.dataLayer = window.dataLayer || [];
             dataLayer.push({
               'event': 'Pageview',
-              'pagePath': 'https://www.kylies.photos${router.asPath}',
+              'pagePath': 'https://www.${METADATA.SITE_NAME}${router.asPath}',
               'pageTitle': "${pageProps.title}",
               'visitorType': 'HARD CODED VISITOR'
             })
@@ -75,7 +75,7 @@ const CustomHead = (pageProps) => {
       />
 
       <meta property="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@kyliestew" />
+      <meta name="twitter:site" content={`@${METADATA.TWITTER_HANDLE}`} />
       <meta name="twitter:title" content={pageProps.title} />
       <meta name="twitter:description" content={pageProps.description} />
       <meta

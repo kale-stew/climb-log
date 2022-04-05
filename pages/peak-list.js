@@ -1,11 +1,6 @@
-import { useState } from 'react'
 import Layout from '../components/Layout'
-import {
-  CompletedCount,
-  FilterButton,
-  PeakCard,
-  RankNumber,
-} from '../components/PeakList.components'
+import { FilterButton } from '../components/FilterButton'
+import { CompletedCount, PeakCard, RankNumber } from '../components/PeakList.components'
 import {
   FOURTEENERS,
   METADATA,
@@ -13,9 +8,10 @@ import {
   PREVIEW_IMAGES,
   THIRTEENERS,
 } from '../utils/constants'
-import { fetchAllPeaks } from '../utils/data/peaks'
 import { addCommas, checkMonth, checkYear, formatDate } from '../utils/helpers'
+import { fetchAllPeaks } from '../utils/data/peaks'
 import { socialImage } from '../utils/social-image'
+import { useState } from 'react'
 
 import styles from '../styles/peak-list.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -128,7 +124,7 @@ export default function PeakListPage({ allPeaks, title }) {
   }
 
   const buildButtons = () => (
-    <div style={{ display: 'inline', marginTop: '1.25rem' }}>
+    <div style={{ display: 'inline' }}>
       <FilterButton
         key="all-button"
         color="fallback"
@@ -201,7 +197,6 @@ export default function PeakListPage({ allPeaks, title }) {
           {buildButtons()}
 
           <div style={{ marginBottom: '2rem' }}>
-            {/* Search all Peaks */}
             <p>Search all peaks:</p>
             <input
               className={utilStyles.searchInput}

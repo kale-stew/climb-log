@@ -1,3 +1,5 @@
+import { METADATA } from './constants'
+
 // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
 export const pageview = (url) => {
   window.gtag('config', 'G-W9WRKKHEN8', {
@@ -11,7 +13,7 @@ export const event = (action, value, path, label, pageTitle) => {
     window.dataLayer.push({
       event: action,
       value: value,
-      pagePath: `https://www.kylies.photos${path}`,
+      pagePath: `https://www.${METADATA.SITE_NAME}${path}`,
       pageTitle: pageTitle,
       visitorType: 'HARD CODED VISITOR',
       label: label,

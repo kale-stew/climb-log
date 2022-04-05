@@ -1,5 +1,6 @@
 import Layout from '../components/Layout'
 import ToggleItem from '../components/ToggleItem'
+import { FilterButton, FilterWrapper } from '../components/FilterButton'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllGear } from '../utils/data/gear'
@@ -11,10 +12,16 @@ import utilStyles from '../styles/utils.module.css'
 
 const GearPage = ({ title, allGear }) => {
   const [gearCategories, setGearCategories] = useState()
-  const [pureGear, setPure] = useState()
   const [gearData, setGearData] = useState()
+  const [packList, setPackList] = useState('')
 
-  const buildCategories = (gearList = pureGear, setState = false) => {
+  useEffect(() => {
+    setGearData(allGear)
+    buildCategories(allGear, true)
+  }, [])
+
+  const buildCategories = (gearList = gearData, setState = false) => {
+    // Create a loop to ensure 'Retired Items' are pushed to the end of the generated arr
     let hasRetiredItems = false
     const arr = gearList.map((gear) => {
       if (gear.category == '🪦 Retired Items') {
@@ -26,6 +33,7 @@ const GearPage = ({ title, allGear }) => {
     if (hasRetiredItems) {
       arr.push('🪦 Retired Items')
     }
+    // Remove duplicates with a new Set
     const returnArray = Array.from(new Set(arr))
     if (setState) {
       setGearCategories(returnArray)
@@ -33,14 +41,72 @@ const GearPage = ({ title, allGear }) => {
     return returnArray
   }
 
+  const resetData = () => {
+    setPackList('')
+    setGearData(allGear)
+    buildCategories(allGear, true)
+  }
+
+  const buildPackListArr = () => {
+    // Create an arr of all Pack Lists to then filter results by
+    const allLists = allGear.map((item) => item.pack_list)
+    let seen = new Set()
+    let arr = []
+    allLists.map(
+      (item) =>
+        item &&
+        item.flatMap((el) => {
+          const duplicate = seen.has(el.id)
+          seen.add(el.id)
+          !duplicate && arr.push(el)
+        })
+    )
+    // Remove duplicates with a new Set
+    const final = Array.from(new Set(arr))
+    return final
+  }
+
+  const buttonClick = (query) => {
+    const filtered = allGear.filter(
+      ({ pack_list }) => pack_list && pack_list.some(({ name }) => name === query)
+    )
+    setPackList(query)
+    setGearData(filtered)
+    buildCategories(filtered, true)
+  }
+
+  const buildButtons = () => (
+    <>
+      <FilterButton
+        key="all-button"
+        color="fallback"
+        onClick={() => resetData()}
+        isSelected={packList.length === 0}
+        style={{ color: 'var(--color-text-primary)' }}
+      >
+        All Items
+      </FilterButton>
+      {buildPackListArr().map(({ id, name, color }) => (
+        <FilterButton
+          key={id}
+          color={color}
+          onClick={() => buttonClick(name)}
+          isSelected={packList === name}
+        >
+          {name}
+        </FilterButton>
+      ))}
+    </>
+  )
+
   const userSearch = (query) => {
     const upperQuery = query.toUpperCase().trim()
     if (upperQuery == '') {
-      buildCategories(pureGear, true)
-      setGearData(pureGear)
+      buildCategories(gearData, true)
+      resetData()
       return
     }
-    let filteredGear = pureGear.filter((gear) => {
+    let filteredGear = gearData.filter((gear) => {
       let booleanVal =
         gear.title?.toUpperCase().includes(upperQuery) ||
         gear.brand?.toUpperCase().includes(upperQuery) ||
@@ -53,12 +119,6 @@ const GearPage = ({ title, allGear }) => {
     buildCategories(filteredGear, true)
     setGearData(filteredGear)
   }
-
-  useEffect(() => {
-    setPure(allGear)
-    setGearData(allGear)
-    buildCategories(allGear, true)
-  }, [])
 
   const filterByCategory = (arr, cat) => arr.filter(({ category }) => category === cat)
 
@@ -74,9 +134,7 @@ const GearPage = ({ title, allGear }) => {
 
     return gearDataCategories.map((cat) => (
       <>
-        <h3 key={`h3-${cat}`} className={utilStyles.centerTextForMobile}>
-          {cat}
-        </h3>
+        <h3 className={utilStyles.centerTextForMobile}>{cat}</h3>
         <ul key={`ul-${cat}`}>
           {filterByCategory(gearData, cat).map((item) => (
             <ToggleItem key={`${cat}-${item.id}`} item={item}>
@@ -97,12 +155,19 @@ const GearPage = ({ title, allGear }) => {
         of each sub-section. Gear that has been retired is at the very bottom of this
         page.
       </div>
-      <div className={`${utilStyles.centerText} ${utilStyles.pageDescription}`}>
+      <div
+        className={`${utilStyles.centerText} ${utilStyles.pageDescription}`}
+        style={{ marginBottom: '1rem' }}
+      >
         Click on an item to view details like brand name, color, a preview image, or why
         it was retired.
       </div>
+
+      <FilterWrapper>{buildButtons()}</FilterWrapper>
+
       <div className={utilStyles.vertical}>
-        <p className={styles.filterTitle}>Search all gear:</p>
+        {/* Search all Gear Items */}
+        <p style={{ margin: '0.5rem auto' }}>Search all gear:</p>
         <input
           className={utilStyles.searchInput}
           type={'search'}
@@ -112,6 +177,7 @@ const GearPage = ({ title, allGear }) => {
           }}
         />
       </div>
+
       <div className={styles.gearWrapper}>{buildGearList(gearCategories)} </div>
     </Layout>
   )
