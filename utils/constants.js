@@ -1,6 +1,8 @@
 export const METADATA = {
   FIRST_NAME: 'Kylie',
   FULL_NAME: 'Kylie Czajkowski',
+  INSTAGRAM_HANDLE: 'kalestewski',
+  PERSONAL_SITE: 'https://kylieis.online',
   SITE_NAME: 'kylies.photos',
   SOURCE_CODE: 'https://github.com/kale-stew/climb-log',
   TWITTER_HANDLE: 'kyliestew',
@@ -31,27 +33,6 @@ export const AREA_TYPE = {
   WA: 'Wilderness',
 }
 
-export const BRANDS = [
-  {
-    name: 'Goodr',
-    href: 'https://goodr.com',
-    description:
-      'Extremely functional and affordable nonslip sunglasses made to be worn everywhere, from high peaks to the dog park to the local brewery.',
-  },
-  {
-    name: 'Notion.so',
-    href: 'https://notion.so',
-    description:
-      'A productivity app used for everything from personal note-taking to professional project management work. Fun fact: the climb log on this website is built using it!',
-  },
-  {
-    name: 'Keep Nature Wild',
-    href: 'https://keepnaturewild.com',
-    description:
-      'An eco-minded outdoor brand that pledges to pick up 1lb of trash for every product sold.',
-  },
-]
-
 export const CATEGORY_TYPE = {
   ALL: 'all',
   GEAR: 'gear',
@@ -60,7 +41,7 @@ export const CATEGORY_TYPE = {
 }
 
 export const CONNECT = [
-  { title: 'Instagram', href: 'https://www.instagram.com/kalestewski/' },
+  { title: 'Instagram', href: `https://www.instagram.com/${METADATA.INSTAGRAM_HANDLE}/` },
   { title: 'AllTrails', href: 'https://www.alltrails.com/members/kylie-stewart-1' },
   { title: 'Strava', href: 'https://www.strava.com/athletes/46336787' },
   {

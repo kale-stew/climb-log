@@ -6,20 +6,20 @@
   font-size: 2.8rem;
   line-height: 1.2;
   letter-spacing: -0.05rem;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
 }
 
 .headingXl {
   font-size: 2.2rem;
   line-height: 1.3;
   letter-spacing: -0.05rem;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
 }
 
 .headingLg {
   font-size: 1.5rem;
   line-height: 1.4;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
 }
 
 .headingMd {
@@ -33,7 +33,7 @@
 
 .pageDescription {
   font-size: 0.9rem;
-  max-width: 60%;
+  max-width: 55%;
   margin: 0 auto 1em auto;
   line-height: 1.4;
 }

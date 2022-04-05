@@ -3,7 +3,6 @@ import styled from '@emotion/styled'
 export const CompletedCount = styled.span`
   margin: 0 auto 1rem auto;
   font-weight: 600;
-  font-size: 0.8rem;
   background-color: var(--color-bg-tertiary);
   color: var(--color-white);
   width: max-content;

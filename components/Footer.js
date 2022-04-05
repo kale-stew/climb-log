@@ -48,7 +48,10 @@ export default function Footer() {
         <div className={`${utilStyles.vertical} ${styles.footerLogo}`}>
           <Logo theme="dark" />
           <small>
-            © {new Date().getFullYear()} {METADATA.FULL_NAME}
+            © {new Date().getFullYear()}{' '}
+            <a href={METADATA.PERSONAL_SITE} target="_blank">
+              {METADATA.FULL_NAME}
+            </a>
           </small>
           <small style={{ fontSize: '10px', textAlign: 'center' }}>
             built with ♡{' '}
