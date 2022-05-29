@@ -19,6 +19,17 @@ const brands = [
   },
 ]
 
+const interviews = [
+  {
+    name: 'Atomic Jolt',
+    brandHref:
+      'https://atomicjoltmedia.com/episodes/episode-013-kylie-czajkowski-on-hiking',
+    embedHref: 'https://open.spotify.com/embed/episode/2ETzCeYr5s1vQGSn7z1lJB',
+    description:
+      'A podcast that explores small moments of lasting impact. In this episode, Kylie discusses finding balance in life through hiking, the importance of unplugging to avoid burnout, triumphs and lessons learned from hiking Fourteeners, mountain goats, and more.',
+  },
+]
+
 const photoPrefix =
   'https://raw.githubusercontent.com/kale-stew/kale-stew.github.io/5aab633946526c276c50619bc9408801259a0bbc/public/img/'
 
@@ -80,5 +91,5 @@ const photos = [
 ]
 
 export const fetchPersonalInformation = () => {
-  return { brands, photos }
+  return { brands, interviews, photos }
 }
