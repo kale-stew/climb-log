@@ -259,7 +259,7 @@ export default function PeakListPage({ allPeaks, title }) {
 }
 
 export async function getStaticProps() {
-  const title = 'Centennial Summit Checklist'
+  const title = 'My Centennial Summits'
   const description = `Peaks that ${METADATA.FIRST_NAME} has summitted.`
   const allPeaks = await fetchAllPeaks()
 

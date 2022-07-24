@@ -45,10 +45,10 @@ const AboutPage = ({ personalInfo, title }) => {
           </div>
         </>
         <p>
-          {METADATA.FULL_NAME} is a mountaineer, web developer, avid hiker, and
+          {METADATA.FULL_NAME} is a mountaineer, software engineer, avid hiker, and
           photo-taker. She spends her time hiking Colorado's high peaks and researching
-          its terrain when she's not working from home as web developer, or walking the
-          dog with her husband.
+          its terrain when she's not working from home as an engineering manager, or
+          walking the dog with her husband.
         </p>
         <p>
           Living in a small mountain town in the Colorado Rockies, {METADATA.FIRST_NAME}{' '}
@@ -56,9 +56,9 @@ const AboutPage = ({ personalInfo, title }) => {
           her Sony Alpha 6400.
         </p>
         <p>
-          Although she is taking the first few months of 2022 off of hiking to recover
-          from ankle surgery, she's eager to make the most of this time off by testing out
-          her camera's features from trailhead lots and 4WD roads across the state.
+          Although she had to take the first few months of 2022 off of hiking to recover
+          from ankle surgery, she has recently returned to climbing high peaks and is
+          attempting to stand on 57 of Colorado's summits above 14,000 feet.
         </p>
 
         <div

@@ -1,5 +1,11 @@
 const brands = [
   {
+    name: 'Alder Apparel',
+    href: 'https://glnk.io/jxww/kalestewski',
+    description:
+      'Alder offers inclusive sizing, community-informed design, sustainable and ethical production and a playful brand that starkly contrasts with the performance-driven, hard-core athletic brands that currently dominate the outdoor space. Use code KYLIE10 for 10% off your purchase!',
+  },
+  {
     name: 'Goodr',
     href: 'https://goodr.com',
     description:

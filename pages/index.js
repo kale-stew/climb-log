@@ -60,7 +60,7 @@ const HomePage = ({ featuredPosts }) => (
         {METADATA.FIRST_NAME}'s Photos
       </IntroTitle>
       <IntroParagraph>
-        {METADATA.FIRST_NAME} is an avid hiker, web developer, mountaineer, and
+        {METADATA.FIRST_NAME} is a mountaineer, software engineer, avid hiker, and
         photo-taker that spends her time hiking Colorado's high peaks and researching its
         terrain. Read more about her <Link href="/about">here</Link>.
       </IntroParagraph>
