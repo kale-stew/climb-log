@@ -39,7 +39,7 @@ const SidebarNavigation = ({ currentRoute, links }) => {
           Jump to...
         </span>
         {links.map((link) => (
-          <Link href={`/${currentRoute}${link.href}`}>
+          <Link href={`/${currentRoute}${link.href}`} key={link.href}>
             {router.asPath.includes(link.href) ? (
               <strong>{link.title}</strong>
             ) : (
