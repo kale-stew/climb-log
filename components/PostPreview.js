@@ -18,8 +18,6 @@ const PostPreview = ({ postData }) => {
                 ? postData.previewImgUrl
                 : PREVIEW_IMAGES.FALLBACK_IMAGE
             }
-            width={'100%'}
-            height={'100%'}
             layout="fill"
           />
         </div>
