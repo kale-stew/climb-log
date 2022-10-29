@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.6.0",
     "@notionhq/client": "^0.3.0",
     "@resoc/create-img": "^0.9.1",
+    "@vercel/analytics": "^0.1.3",
     "date-fns": "^2.27.0",
     "gray-matter": "^4.0.3",
     "next": "^12.3.1",
