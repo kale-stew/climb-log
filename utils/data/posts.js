@@ -164,7 +164,7 @@ export async function getRecentPosts() {
   const recentClimbs = await fetchMostRecentClimbs()
   const formClimbDescription = (climb) =>
     `A ${climb.distance} mile and ${addCommas(climb.gain)}' hike
-      in the ${buildAreaName(climb.area)} of ${capitalizeEachWord(climb.state)}.`
+      in ${buildAreaName(climb.area)}, ${capitalizeEachWord(climb.state)}.`
   const featuredClimbs = recentClimbs.map((climb) => {
     return {
       id: climb.id,
