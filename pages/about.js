@@ -2,7 +2,7 @@ import ContactForm from '../components/ContactForm'
 import Gallery from 'react-grid-gallery'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
-import Image from 'next/legacy/image'
+import Image from 'next/image'
 import Layout from '../components/Layout'
 import { AboutWrapper, FormCaption } from '../components/AboutPage.components'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
@@ -28,19 +28,25 @@ const AboutPage = ({ personalInfo, title }) => {
               src={HeadshotFull}
               width={240}
               height={330}
-              layout="intrinsic"
               altTxt={altText}
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+              }}
             />
           </div>
           <div className={utilStyles.shownForMobile}>
             <Image
               className={utilStyles.roundImage}
-              style={aboutImageStyles}
               src={HeadshotMobile}
               width={175}
               height={175}
-              layout="intrinsic"
               altTxt={altText}
+              style={{
+                ...aboutImageStyles,
+                maxWidth: '100%',
+                height: 'auto',
+              }}
             />
           </div>
         </>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/legacy/image'
+import Image from 'next/image'
 import FormattedDate from './Date'
 import { PREVIEW_IMAGES } from '../utils/constants'
 
@@ -18,7 +18,8 @@ const PostPreview = ({ postData }) => {
                 ? postData.previewImgUrl
                 : PREVIEW_IMAGES.FALLBACK_IMAGE
             }
-            layout="fill"
+            fill
+            sizes="100vw"
           />
         </div>
 

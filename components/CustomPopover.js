@@ -1,7 +1,7 @@
 import { BsArrowUpRight } from 'react-icons/bs'
 import { FiExternalLink } from 'react-icons/fi'
 import FormattedDate from './Date'
-import Image from 'next/legacy/image'
+import Image from 'next/image'
 import {
   addCommas,
   capitalizeEachWord,
@@ -43,8 +43,12 @@ const CustomPopover = ({ climb, metric }) => {
             src={climb.previewImgUrl}
             width="100%"
             height="100%"
-            layout="responsive"
-            objectFit="contain"
+            sizes="100vw"
+            style={{
+              width: '100%',
+              height: 'auto',
+              objectFit: 'contain',
+            }}
           />
         )}
         {buildTitle()}

@@ -1,4 +1,4 @@
-import Image from 'next/legacy/image'
+import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import styled from '@emotion/styled'
 import { makeKebabCase } from '../utils/helpers'
@@ -45,6 +45,10 @@ export default function BlogMarkdown({ markdown }) {
               className="postImg"
               alt={alt}
               priority={isPriority}
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+              }}
             />
             <ImageCaption>{alt}</ImageCaption>
           </ImageWrapper>

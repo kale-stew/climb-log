@@ -1,5 +1,5 @@
 import Layout from '../components/Layout'
-import Image from 'next/legacy/image'
+import Image from 'next/image'
 import ImageGoats from '../public/photos/404.jpeg'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { socialImage } from '../utils/social-image'
@@ -10,7 +10,13 @@ const NotFoundPage = () => {
   return (
     <Layout>
       <h1 className={utilStyles.headingXl}>Well this is awkward...</h1>
-      <Image src={ImageGoats} />
+      <Image
+        src={ImageGoats}
+        style={{
+          maxWidth: '100%',
+          height: 'auto',
+        }}
+      />
       <div className={utilStyles.vertical}>
         <h2>You've found a page that does not exist.</h2>
         <p>Click the home icon below ↓ to navigate back home</p>
