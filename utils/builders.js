@@ -11,7 +11,7 @@ const buildAreaName = (area) => {
     AREA_TYPE[str.toUpperCase()] ? AREA_TYPE[str.toUpperCase()] : str
   )
   const reformattedArea = arr.toString().replace(/,/g, ' ')
-  return capitalizeEachWord(`${reformattedArea.trim()}`)
+  return capitalizeEachWord(reformattedArea.trim())
 }
 
 /**

@@ -23,7 +23,10 @@ export const filterByYear = (arr, year) =>
   arr.filter(({ date }) => date.indexOf(year) >= 0)
 
 export const formatDate = (date, type) => {
-  if (typeof date !== Date) {
+  if (typeof date === 'string') {
+    const _date = date.includes('-') ? Array.from(date.split('-')) : date
+    date = new Date(_date)
+  } else if (typeof date !== Date) {
     date = new Date(date)
   }
 
