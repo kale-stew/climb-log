@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import ReactMarkdown from 'react-markdown'
 import styled from '@emotion/styled'
 import { makeKebabCase } from '../utils/helpers'

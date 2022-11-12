@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import FormattedDate from './Date'
 import { PREVIEW_IMAGES } from '../utils/constants'
 

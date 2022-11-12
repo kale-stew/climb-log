@@ -1,5 +1,5 @@
 import Layout from '../components/Layout'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import ImageGoats from '../public/photos/404.jpeg'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { socialImage } from '../utils/social-image'
