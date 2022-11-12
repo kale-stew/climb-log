@@ -1,5 +1,6 @@
 import { FacebookOpenGraph } from '@resoc/core'
 import Head from 'next/head'
+import Script from 'next/script'
 import { useRouter } from 'next/router'
 import { METADATA } from '../utils/constants'
 
@@ -29,10 +30,10 @@ const CustomHead = (pageProps) => {
     : `${METADATA.FULL_NAME}'s climbing log, hiking blog, and photography.`
 
   return (
-    <Head>
+    <>
       {/* Global Site Tag (gtag.js) - Google Analytics */}
-      <script async src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`} />
-      <script
+      <Script async src={`https://www.googletagmanager.com/gtag/js?id=G-W9WRKKHEN8`} />
+      <Script
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -45,7 +46,7 @@ const CustomHead = (pageProps) => {
           `,
         }}
       />
-      <script
+      <Script
         dangerouslySetInnerHTML={{
           __html: `
             <!-- Google Tag Manager -->
@@ -62,7 +63,7 @@ const CustomHead = (pageProps) => {
           `,
         }}
       />
-      <script
+      <Script
         dangerouslySetInnerHTML={{
           __html: `
             <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -73,27 +74,28 @@ const CustomHead = (pageProps) => {
           `,
         }}
       />
+      <Head>
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content={`@${METADATA.TWITTER_HANDLE}`} />
+        <meta name="twitter:title" content={pageProps.title} />
+        <meta name="twitter:description" content={pageProps.description} />
+        <meta
+          property="twitter:image"
+          content={`https://raw.githubusercontent.com/kale-stew/climb-log/main/public/open-graph/${pageProps.ogImage}`}
+        />
 
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content={`@${METADATA.TWITTER_HANDLE}`} />
-      <meta name="twitter:title" content={pageProps.title} />
-      <meta name="twitter:description" content={pageProps.description} />
-      <meta
-        property="twitter:image"
-        content={`https://raw.githubusercontent.com/kale-stew/climb-log/main/public/open-graph/${pageProps.ogImage}`}
-      />
+        <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
+        <meta property="og:image:width" content={FacebookOpenGraph.width} />
+        <meta property="og:image:height" content={FacebookOpenGraph.height} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={getPageUrl()} />
 
-      <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
-      <meta property="og:image:width" content={FacebookOpenGraph.width} />
-      <meta property="og:image:height" content={FacebookOpenGraph.height} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={getPageUrl()} />
-
-      <meta property="og:title" content={pageProps.title} />
-      <title>{getPageTitle()}</title>
-      <meta property="og:description" content={description} />
-      <meta name="description" content={description} />
-    </Head>
+        <meta property="og:title" content={pageProps.title} />
+        <title>{getPageTitle()}</title>
+        <meta property="og:description" content={description} />
+        <meta name="description" content={description} />
+      </Head>
+    </>
   )
 }
 

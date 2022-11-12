@@ -9,10 +9,11 @@ const PostPreview = ({ postData }) => {
   const isClimb = postData.href.indexOf('/climb-log?') === 0
 
   return (
-    <Link href={postData.href}>
+    <Link href={postData.href} legacyBehavior>
       <div className={styles.card}>
         <div className={styles.headerImg}>
           <Image
+            alt={postData.description}
             src={
               postData.previewImgUrl
                 ? postData.previewImgUrl
