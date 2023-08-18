@@ -1,4 +1,4 @@
-import Gallery from 'react-grid-gallery'
+import { Gallery } from 'react-grid-gallery'
 import Layout from '../components/Layout'
 import Link from 'next/link'
 import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
