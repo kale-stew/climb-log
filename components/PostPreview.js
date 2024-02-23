@@ -18,10 +18,10 @@ const PostPreview = ({ postData }) => {
                 ? postData.previewImgUrl
                 : PREVIEW_IMAGES.FALLBACK_IMAGE
             }
-            layout="fill"
+            fill
           />
         </div>
-
+        <hr class="solid" className={styles.cardDivider} />
         <div className={styles.cardText}>
           <div className={styles.cardTitle}>
             <Link href={postData.href}>

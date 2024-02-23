@@ -1,9 +1,7 @@
 .card {
   display: inline-block;
-  min-width: 330px;
+  width: 420px;
   background-color: var(--color-bg-primary);
-  border-radius: 35px 35px 20px 20px;
-  box-shadow: 5px 6px 10px var(--color-bg-secondary);
   transition: transform 0.5s;
 }
 
@@ -27,7 +25,7 @@
 }
 
 .cardTitle h2 {
-  margin-bottom: 0;
+  margin: 0 auto;
   color: var(--color-text-primary);
 }
 
@@ -38,21 +36,13 @@
 }
 
 .cardText {
-  padding: 1vw;
+  padding: 0;
   color: var(--color-text-secondary);
 }
 
 .headerImg {
-  min-height: 14rem;
-  max-height: 20rem;
+  height: 14rem;
   object-fit: cover;
   overflow: hidden;
   position: relative;
-  border-radius: 25px 25px 0 0;
-}
-
-@media (max-width: 1024px) {
-  .cardText {
-    padding: 1vw 3vw;
-  }
 }

@@ -6,26 +6,17 @@
 .recentPosts {
   display: grid;
   grid-gap: 2rem;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  padding: 0 10vw;
+  grid-template-columns: repeat(auto-fill, 420px);
+  padding: 0 3rem;
   margin: 2rem auto;
 }
 
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto;
-  max-width: 85vw;
-}
-
-@media (max-width: 712px) {
+@media (max-width: 975px) {
   .recentPosts {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 2.5rem auto;
-    max-width: 75%;
+    margin: 3rem auto;
+    width: 100%;
   }
 }

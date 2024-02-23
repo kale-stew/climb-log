@@ -10,17 +10,6 @@ import { socialImage } from '../utils/social-image'
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
 
-const GradientTopImage = styled.div`
-  background-image: linear-gradient(transparent, var(--color-bg-primary)),
-    url('/photos/desktop_lander_T.jpg');
-  height: 30vh;
-  width: 100%;
-  background-size: cover;
-  @media (max-width: 1024px) {
-    max-height: 25vh;
-  }
-`
-
 const GradientBottomImage = styled.div`
   background-image: linear-gradient(var(--color-bg-primary), transparent),
     url('/photos/desktop_lander_B.jpg');
@@ -30,33 +19,37 @@ const GradientBottomImage = styled.div`
   margin-top: 5vh;
 `
 
-const IntroParagraph = styled.div`
-  font-size: 1.3rem;
-  max-width: 40%;
-  margin: 1rem auto 4.5rem auto;
-  text-align: center;
-  animation: ${fadeIn} 3s;
-  @media (max-width: 1024px) {
-    max-width: 80%;
-    font-size: 1.2rem;
-  }
-`
-
 const IntroTitle = styled.h1`
   font-size: 4rem;
   font-style: italic;
+  margin: 2rem 4.5rem;
   animation: ${fadeIn} 3s;
+
   @media (max-width: 1024px) {
     font-size: 3.5rem;
-    margin: 0 auto;
+    margin: 1rem auto;
+    text-align: center;
+  }
+`
+
+const IntroParagraph = styled.div`
+  font-size: 1.3rem;
+  text-align: left;
+  margin: 1rem 4.5rem 3rem 4.5rem;
+  max-width: 60%;
+  animation: ${fadeIn} 3s;
+
+  @media (max-width: 1024px) {
+    max-width: 80%;
+    font-size: 1.2rem;
+    text-align: center;
   }
 `
 
 const HomePage = ({ featuredPosts }) => (
   <Layout home>
-    <GradientTopImage />
     <div style={{ fontFamily: "'Playfair Display', serif" }}>
-      <IntroTitle className={`${utilStyles.heading2Xl} ${utilStyles.centerText}`}>
+      <IntroTitle className={utilStyles.heading2Xl}>
         {METADATA.FIRST_NAME}'s Photos
       </IntroTitle>
       <IntroParagraph>
@@ -65,7 +58,7 @@ const HomePage = ({ featuredPosts }) => (
         terrain. Read more about her <Link href="/about">here</Link>.
       </IntroParagraph>
     </div>
-    <h2 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>Recent Posts</h2>
+    <h2 className={`${utilStyles.headingLg} ${utilStyles.centerText}`}>Recent Posts</h2>
     <div className={styles.recentPosts}>
       {featuredPosts.map((post) => (
         <PostPreview postData={post} key={post.id} />
