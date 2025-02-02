@@ -7,7 +7,7 @@ import Layout from '../components/Layout'
 import { AboutWrapper, FormCaption } from '../components/AboutPage.components'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { fetchPersonalInformation } from '../utils/data/about'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 
 import utilStyles from '../styles/utils.module.css'
 
@@ -152,13 +152,13 @@ export async function getStaticProps() {
       title,
       description,
       personalInfo,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
-        baseName: 'about',
-        bgColor: '#993e41',
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
+      //   baseName: 'about',
+      //   bgColor: '#993e41',
+      // })),
     },
   }
 }

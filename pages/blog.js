@@ -6,7 +6,7 @@ import styled from '@emotion/styled'
 import { CATEGORY_COLORS } from '../components/Category'
 import { CATEGORY_TYPE, PREVIEW_CARD_COLORS, METADATA } from '../utils/constants'
 import { getSortedPostsData } from '../utils/data/posts'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
@@ -151,13 +151,13 @@ export async function getStaticProps() {
       allPostsData,
       description,
       title,
-      ...(await socialImage({
-        title,
-        description,
-        baseName: 'blog',
-        bgColor: PREVIEW_CARD_COLORS.yellow,
-        textColor: PREVIEW_CARD_COLORS.navy,
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   baseName: 'blog',
+      //   bgColor: PREVIEW_CARD_COLORS.yellow,
+      //   textColor: PREVIEW_CARD_COLORS.navy,
+      // })),
     },
   }
 }

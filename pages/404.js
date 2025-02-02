@@ -2,7 +2,7 @@ import Layout from '../components/Layout'
 import Image from 'next/image'
 import ImageGoats from '../public/photos/404.jpeg'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 
 import utilStyles from '../styles/utils.module.css'
 
@@ -27,13 +27,13 @@ export async function getStaticProps() {
     props: {
       title,
       description,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.NOT_FOUND_IMAGE,
-        baseName: '404',
-        bgColor: '#3381cc',
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.NOT_FOUND_IMAGE,
+      //   baseName: '404',
+      //   bgColor: '#3381cc',
+      // })),
     },
   }
 }

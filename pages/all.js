@@ -1,11 +1,11 @@
 import Gallery from 'react-grid-gallery'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
+import { METADATA /*, PREVIEW_CARD_COLORS, PREVIEW_IMAGES */ } from '../utils/constants'
 import { checkMonth, checkYear, filterByYear } from '../utils/helpers'
 import { fetchAllImages } from '../utils/data/photos'
 import { lightFormat } from 'date-fns'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 import { useState } from 'react'
 
 import styles from '../styles/all-photos.module.css'
@@ -112,13 +112,13 @@ export async function getStaticProps() {
       title,
       description,
       allPhotos,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.ALL_PHOTOS_IMAGE,
-        baseName: 'photos',
-        bgColor: PREVIEW_CARD_COLORS.blue,
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.ALL_PHOTOS_IMAGE,
+      //   baseName: 'photos',
+      //   bgColor: PREVIEW_CARD_COLORS.blue,
+      // })),
     },
   }
 }

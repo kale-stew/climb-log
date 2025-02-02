@@ -15,7 +15,7 @@ import {
   getSortedPostsData,
 } from '../../utils/data/posts'
 import { shake } from '../../styles/animations'
-import { socialImage } from '../../utils/social-image'
+// import { socialImage } from '../../utils/social-image'
 
 import utilStyles from '../../styles/utils.module.css'
 
@@ -97,14 +97,14 @@ export async function getStaticProps({ params }) {
       postIds,
       title,
       description,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: postData.previewImgUrl,
-        baseName: `post-${params.id}`,
-        bgColor: postData.bgColor ? postData.bgColor : PREVIEW_CARD_COLORS.teal,
-        textColor: postData.textColor ? postData.textColor : PREVIEW_CARD_COLORS.white,
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: postData.previewImgUrl,
+      //   baseName: `post-${params.id}`,
+      //   bgColor: postData.bgColor ? postData.bgColor : PREVIEW_CARD_COLORS.teal,
+      //   textColor: postData.textColor ? postData.textColor : PREVIEW_CARD_COLORS.white,
+      // })),
     },
   }
 }

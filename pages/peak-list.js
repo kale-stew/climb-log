@@ -10,7 +10,7 @@ import {
 } from '../utils/constants'
 import { addCommas, checkMonth, checkYear, formatDate } from '../utils/helpers'
 import { fetchAllPeaks } from '../utils/data/peaks'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 import { useState } from 'react'
 
 import styles from '../styles/peak-list.module.css'
@@ -268,13 +268,13 @@ export async function getStaticProps() {
       allPeaks,
       title,
       description,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.PEAK_LIST_IMAGE,
-        baseName: 'peak-list',
-        bgColor: PREVIEW_CARD_COLORS.blue,
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.PEAK_LIST_IMAGE,
+      //   baseName: 'peak-list',
+      //   bgColor: PREVIEW_CARD_COLORS.blue,
+      // })),
     },
   }
 }

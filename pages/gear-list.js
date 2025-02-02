@@ -4,7 +4,7 @@ import { FilterButton, FilterWrapper } from '../components/FilterButton'
 import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllGear } from '../utils/data/gear'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 import { useEffect, useState } from 'react'
 
 import styles from '../styles/gear.module.css'
@@ -193,13 +193,13 @@ export async function getStaticProps() {
       allGear,
       title,
       description,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.GEAR_IMAGE,
-        baseName: 'gear-list',
-        bgColor: '#d3562c',
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.GEAR_IMAGE,
+      //   baseName: 'gear-list',
+      //   bgColor: '#d3562c',
+      // })),
     },
   }
 }

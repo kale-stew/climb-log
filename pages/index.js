@@ -5,7 +5,7 @@ import styled from '@emotion/styled'
 import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
 import { fadeIn } from '../styles/animations'
 import { getRecentPosts } from '../utils/data/posts'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 
 import styles from '../components/Layout.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -85,13 +85,13 @@ export async function getStaticProps() {
       title,
       description,
       featuredPosts,
-      ...(await socialImage({
-        title,
-        description,
-        baseName: 'home',
-        previewImgUrl: PREVIEW_IMAGES.HOME_IMAGE,
-        bgColor: PREVIEW_CARD_COLORS.blue,
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   baseName: 'home',
+      //   previewImgUrl: PREVIEW_IMAGES.HOME_IMAGE,
+      //   bgColor: PREVIEW_CARD_COLORS.blue,
+      // })),
     },
   }
 }
