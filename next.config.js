@@ -7,11 +7,22 @@ module.exports = {
     NOTION_PHOTO_DATABASE_ID: process.env.NOTION_PHOTO_DATABASE_ID,
   },
   images: {
-    domains: [
-      's3.us-west-2.amazonaws.com',
-      'live.staticflickr.com',
-      'raw.githubusercontent.com',
-    ],
+    remotePatterns: [{
+      protocol: 'https',
+      hostname: 's3.us-west-2.amazonaws.com',
+      port: '',
+      search: '',
+    }, {
+      protocol: 'https',
+      hostname: 'live.staticflickr.com',
+      port: '',
+      search: '',
+    }, {
+      protocol: 'https',
+      hostname: 'raw.githubusercontent.com',
+      port: '',
+      search: '',
+    }]
   },
   async redirects() {
     return [
