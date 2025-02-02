@@ -1,5 +1,5 @@
 import ContactForm from '../components/ContactForm'
-import Gallery from 'react-grid-gallery'
+import { Gallery } from 'react-grid-gallery'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Image from 'next/image'

@@ -1,4 +1,4 @@
-import Gallery from 'react-grid-gallery'
+import { Gallery } from 'react-grid-gallery'
 import Layout from '../components/Layout'
 import Link from 'next/link'
 import { METADATA /*, PREVIEW_CARD_COLORS, PREVIEW_IMAGES */ } from '../utils/constants'
@@ -12,7 +12,7 @@ import styles from '../styles/all-photos.module.css'
 import utilStyles from '../styles/utils.module.css'
 
 export default function AllPhotosPage({ title, allPhotos }) {
-  const [allPhotosPure, setAllPhotos] = useState(allPhotos)
+  const [allPhotosPure, _] = useState(allPhotos)
   const [allPhotosData, setAllPhotosData] = useState(allPhotos)
 
   /**
