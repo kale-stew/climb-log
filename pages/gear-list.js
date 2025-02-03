@@ -1,7 +1,7 @@
 import Layout from '../components/Layout'
 import ToggleItem from '../components/ToggleItem'
 import { FilterButton, FilterWrapper } from '../components/FilterButton'
-import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { METADATA /*, PREVIEW_IMAGES */ } from '../utils/constants'
 import { capitalizeEachWord } from '../utils/helpers'
 import { fetchAllGear } from '../utils/data/gear'
 // import { socialImage } from '../utils/social-image'
