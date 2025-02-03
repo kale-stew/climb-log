@@ -2,7 +2,7 @@ import Layout from '../components/Layout'
 import Link from 'next/link'
 import PostPreview from '../components/PostPreview'
 import styled from '@emotion/styled'
-import { METADATA, PREVIEW_CARD_COLORS, PREVIEW_IMAGES } from '../utils/constants'
+import { METADATA /*, PREVIEW_CARD_COLORS, PREVIEW_IMAGES */ } from '../utils/constants'
 import { fadeIn } from '../styles/animations'
 import { getRecentPosts } from '../utils/data/posts'
 // import { socialImage } from '../utils/social-image'
@@ -61,8 +61,8 @@ const HomePage = ({ featuredPosts }) => (
       </IntroTitle>
       <IntroParagraph>
         {METADATA.FIRST_NAME} is a mountaineer, software engineer, avid hiker, and
-        photo-taker that spends her time hiking Colorado's high peaks and researching its
-        terrain. Read more about her <Link href="/about">here</Link>.
+        photo-taker that spends her time hiking and researching high peaks across the
+        western United States. Read more about her <Link href="/about">here</Link>.
       </IntroParagraph>
     </div>
     <h2 className={`${utilStyles.headingXl} ${utilStyles.centerText}`}>Recent Posts</h2>
