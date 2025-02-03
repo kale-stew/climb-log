@@ -1,0 +1,10 @@
+.galleryWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 2rem auto;
+}
+
+.galleryWrapper>div>div {
+  justify-content: center;
+}
