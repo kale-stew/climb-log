@@ -1,13 +1,14 @@
 import ContactForm from '../components/ContactForm'
-import Gallery from 'react-grid-gallery'
+import { Gallery } from 'react-grid-gallery'
 import HeadshotFull from '../public/photos/headshot.jpg'
 import HeadshotMobile from '../public/photos/square_headshot.jpg'
 import Image from 'next/image'
 import Layout from '../components/Layout'
 import { AboutWrapper, FormCaption } from '../components/AboutPage.components'
-import { METADATA, PREVIEW_IMAGES } from '../utils/constants'
+import { METADATA /*, PREVIEW_IMAGES */ } from '../utils/constants'
 import { fetchPersonalInformation } from '../utils/data/about'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
+import styles from '../styles/about.module.css'
 
 import utilStyles from '../styles/utils.module.css'
 
@@ -26,8 +27,8 @@ const AboutPage = ({ personalInfo, title }) => {
           <div className={utilStyles.hiddenForMobile} style={aboutImageStyles}>
             <Image
               src={HeadshotFull}
-              width={240}
-              height={330}
+              width={180}
+              height={247}
               layout="intrinsic"
               altTxt={altText}
             />
@@ -46,28 +47,18 @@ const AboutPage = ({ personalInfo, title }) => {
         </>
         <p>
           {METADATA.FULL_NAME} is a mountaineer, software engineer, avid hiker, and
-          photo-taker. She spends her time hiking Colorado's high peaks and researching
-          its terrain when she's not working from home as an engineering manager, or
-          walking the dog with her husband.
+          photo-taker. When she's not at work, she spends her time hiking near her home
+          in California, researching the terrain of high peaks all over the country, and
+          walking her dog, Otis, with her husband.
         </p>
         <p>
-          Living in a small mountain town in the Colorado Rockies, {METADATA.FIRST_NAME}{' '}
-          spends a lot of her free time traveling to nearby peaks and taking photos with
+          Living just south of San Francisco, {METADATA.FIRST_NAME} spends much of her
+          free time traveling to destinations all over the state and taking photos with
           her Sony Alpha 6400.
-        </p>
-        <p>
-          Although she had to take the first few months of 2022 off of hiking to recover
-          from ankle surgery, she has recently returned to climbing high peaks and is
-          attempting to stand on 57 of Colorado's summits above 14,000 feet.
         </p>
 
         <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            margin: '2rem auto',
-          }}
+          className={styles.galleryWrapper}
         >
           <Gallery
             images={personalInfo.photos}
@@ -75,7 +66,6 @@ const AboutPage = ({ personalInfo, title }) => {
             enableImageSelection={false}
           />
         </div>
-
         <h2 className={utilStyles.centerTextForMobile}>Interviews</h2>
         <div>
           <p
@@ -152,13 +142,13 @@ export async function getStaticProps() {
       title,
       description,
       personalInfo,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
-        baseName: 'about',
-        bgColor: '#993e41',
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.ABOUT_IMAGE,
+      //   baseName: 'about',
+      //   bgColor: '#993e41',
+      // })),
     },
   }
 }

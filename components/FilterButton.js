@@ -13,9 +13,10 @@ export const FilterButton = styled.button`
 `
 
 export const FilterWrapper = styled.div`
-  max-width: 70%;
-  margin: 0.5rem auto;
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   @media (max-width: 1024px) {
     max-width: 100%;
   }

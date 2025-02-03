@@ -17,7 +17,7 @@ import {
 import { checkMonth, checkYear } from '../utils/helpers'
 import { event } from '../utils/gtag'
 import { fetchAllClimbs } from '../utils/data/climbs'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 
 import tableStyles from '../components/Table.module.css'
 import utilStyles from '../styles/utils.module.css'
@@ -260,13 +260,13 @@ export async function getStaticProps() {
       allClimbs,
       title,
       description,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
-        baseName: 'climb-log',
-        bgColor: PREVIEW_CARD_COLORS.navy,
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.CLIMB_LOG_IMAGE,
+      //   baseName: 'climb-log',
+      //   bgColor: PREVIEW_CARD_COLORS.navy,
+      // })),
     },
   }
 }

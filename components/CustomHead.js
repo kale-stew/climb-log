@@ -1,4 +1,4 @@
-import { FacebookOpenGraph } from '@resoc/core'
+// import { FacebookOpenGraph } from '@resoc/core'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { METADATA } from '../utils/constants'
@@ -84,8 +84,8 @@ const CustomHead = (pageProps) => {
       />
 
       <meta property="og:image" content={`/open-graph/${pageProps.ogImage}`} />
-      <meta property="og:image:width" content={FacebookOpenGraph.width} />
-      <meta property="og:image:height" content={FacebookOpenGraph.height} />
+      {/* <meta property="og:image:width" content={FacebookOpenGraph.width} />
+      <meta property="og:image:height" content={FacebookOpenGraph.height} /> */}
       <meta property="og:type" content="website" />
       <meta property="og:url" content={getPageUrl()} />
 

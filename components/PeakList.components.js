@@ -26,7 +26,7 @@ export const PeakCard = styled.div`
         background-image: linear-gradient(to bottom, var(--color-card-bg), var(--color-card-${
           p.color
         })),
-        url(${p.img ? p.img : '/photos/lander_top.jpg'});
+        url(${p.img ? p.img : '/photos/desktop_lander_T.jpg'});
         height: auto;
         color: var(--color-white);
         background-size: cover;

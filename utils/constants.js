@@ -104,7 +104,6 @@ export const PREVIEW_IMAGES = {
 }
 
 export const REFERRALS = [
-  { title: 'Alder Apparel', href: 'https://glnk.io/jxww/kalestewski' },
   { title: 'AllTrails Pro', href: 'https://www.alltrails.com/invite/N0NW0I' },
 ]
 

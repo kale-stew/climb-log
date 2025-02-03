@@ -1,6 +1,6 @@
 import path from 'path'
-import { compileLocalTemplate } from '@resoc/create-img'
-import { FacebookOpenGraph } from '@resoc/core'
+// import { compileLocalTemplate } from '@resoc/create-img'
+// import { FacebookOpenGraph } from '@resoc/core'
 import { PREVIEW_CARD_COLORS } from './constants'
 
 async function socialImage({

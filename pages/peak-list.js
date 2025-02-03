@@ -1,16 +1,16 @@
 import Layout from '../components/Layout'
-import { FilterButton } from '../components/FilterButton'
+import { FilterButton, FilterWrapper } from '../components/FilterButton'
 import { CompletedCount, PeakCard, RankNumber } from '../components/PeakList.components'
 import {
   FOURTEENERS,
   METADATA,
-  PREVIEW_CARD_COLORS,
-  PREVIEW_IMAGES,
   THIRTEENERS,
+  // PREVIEW_CARD_COLORS,
+  // PREVIEW_IMAGES,
 } from '../utils/constants'
 import { addCommas, checkMonth, checkYear, formatDate } from '../utils/helpers'
 import { fetchAllPeaks } from '../utils/data/peaks'
-import { socialImage } from '../utils/social-image'
+// import { socialImage } from '../utils/social-image'
 import { useState } from 'react'
 
 import styles from '../styles/peak-list.module.css'
@@ -55,8 +55,8 @@ export default function PeakListPage({ allPeaks, title }) {
       !elevationAlreadySelected && !mountainRangesSelected
         ? allPeaks
         : mountainRangesSelected
-        ? returnOnlyGivenMountainRange(allPeaks, rangeFilters)
-        : allPeaks
+          ? returnOnlyGivenMountainRange(allPeaks, rangeFilters)
+          : allPeaks
     if (str === elevationRange) {
       // If the current elevation filter is the same as what's being passed in,
       // reset the elevation filters
@@ -96,8 +96,8 @@ export default function PeakListPage({ allPeaks, title }) {
         elevationRange === THIRTEENERS
           ? returnOnlyThirteeners(filtered)
           : elevationRange === FOURTEENERS
-          ? returnOnlyFourteeners(filtered)
-          : filtered
+            ? returnOnlyFourteeners(filtered)
+            : filtered
       filtered = filteredByElevation
     }
     const toReset = maxedOut || filtersToSet.length === 0
@@ -124,7 +124,7 @@ export default function PeakListPage({ allPeaks, title }) {
   }
 
   const buildButtons = () => (
-    <div style={{ display: 'inline' }}>
+    <>
       <FilterButton
         key="all-button"
         color="fallback"
@@ -160,7 +160,7 @@ export default function PeakListPage({ allPeaks, title }) {
       >
         {THIRTEENERS}
       </FilterButton>
-    </div>
+    </>
   )
 
   return (
@@ -194,7 +194,8 @@ export default function PeakListPage({ allPeaks, title }) {
           </CompletedCount>
 
           {/* Preset queries as Filters */}
-          {buildButtons()}
+          <FilterWrapper>{buildButtons()}</FilterWrapper>
+          <br />
 
           <div style={{ marginBottom: '2rem' }}>
             <p>Search all peaks:</p>
@@ -268,13 +269,13 @@ export async function getStaticProps() {
       allPeaks,
       title,
       description,
-      ...(await socialImage({
-        title,
-        description,
-        previewImgUrl: PREVIEW_IMAGES.PEAK_LIST_IMAGE,
-        baseName: 'peak-list',
-        bgColor: PREVIEW_CARD_COLORS.blue,
-      })),
+      // ...(await socialImage({
+      //   title,
+      //   description,
+      //   previewImgUrl: PREVIEW_IMAGES.PEAK_LIST_IMAGE,
+      //   baseName: 'peak-list',
+      //   bgColor: PREVIEW_CARD_COLORS.blue,
+      // })),
     },
   }
 }
