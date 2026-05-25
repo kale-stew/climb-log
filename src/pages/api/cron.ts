@@ -319,45 +319,94 @@ async function syncPhotos(notion: Client, db: D1Database, dbId: string): Promise
   for (const page of pages) {
     try {
       const id = page.id.replace(/-/g, '')
-      const data = {
-        id,
-        url: getNotionProp(page, 'Image', 'files'),
-        caption: getNotionProp(page, 'Caption', 'title') || getNotionProp(page, 'Name', 'title'),
-        date: getNotionProp(page, 'Date', 'date'),
-        location: getNotionProp(page, 'Location', 'rich_text'),
-        camera: getNotionProp(page, 'Camera', 'select'),
-        width: getNotionProp(page, 'Width', 'number'),
-        height: getNotionProp(page, 'Height', 'number'),
+      
+      // Get raw Notion properties
+      const url = getNotionProp(page, 'href', 'url') || getNotionProp(page, 'Image', 'files')
+      const caption = getNotionProp(page, 'Caption', 'title') || getNotionProp(page, 'Name', 'title')
+      const dateRaw = getNotionProp(page, 'Date', 'date')
+      const areaFallback = getNotionProp(page, 'area_fallback', 'rich_text')
+      const tagsRaw = getNotionProp(page, 'tags', 'rich_text')
+      const width = getNotionProp(page, 'width', 'number')
+      const height = getNotionProp(page, 'height', 'number')
+      const exclude = getNotionProp(page, 'exclude', 'checkbox')
+
+      if (!url) continue // Skip photos without images
+
+      // Parse date: strip timezone if present (YYYY-MM-DDTHH:mm:ss... → YYYY-MM-DD)
+      const date = dateRaw ? dateRaw.split('T')[0] : null
+
+      // Parse area_fallback into area and state
+      // Formats: "Area Name, State" or "Area Name- State" or "Area Name - State"
+      let area: string | null = null
+      let state: string | null = null
+      
+      if (areaFallback) {
+        // Try comma separator first
+        if (areaFallback.includes(',')) {
+          const parts = areaFallback.split(',').map((s: string) => s.trim())
+          area = parts[0] || null
+          state = normalizeStateName(parts[1]) || null
+        }
+        // Try dash separator
+        else if (areaFallback.includes('-')) {
+          const parts = areaFallback.split('-').map((s: string) => s.trim())
+          area = parts[0] || null
+          state = normalizeStateName(parts[1]) || null
+        }
+        // No separator - just area
+        else {
+          area = areaFallback
+        }
+        
+        // Clean up area spacing (e.g., "Bridger- Teton" → "Bridger-Teton")
+        if (area) {
+          area = area.replace(/\s*-\s*/g, '-').trim()
+        }
       }
 
-      if (!data.url) continue // Skip photos without images
+      // Parse tags: lowercase, trim, dedupe, sort alphabetically
+      let searchTags: string | null = null
+      if (tagsRaw) {
+        const tags = tagsRaw
+          .split(',')
+          .map((t: string) => t.trim().toLowerCase())
+          .filter((t: string) => t.length > 0)
+        const uniqueTags = Array.from(new Set(tags)).sort()
+        searchTags = uniqueTags.join(', ')
+      }
 
       // Derive format from URL extension
-      const urlStr = data.url || ''
-      const ext = urlStr.split('.').pop()?.toLowerCase() || 'jpg'
+      const ext = url.split('.').pop()?.toLowerCase() || 'jpg'
       const format = ext === 'png' ? 'png' : ext === 'webp' ? 'webp' : 'jpeg'
-      const r2Key = `photos/${data.id}`
+      const r2Key = `photos/${id}`
 
       await db.prepare(`
-        INSERT INTO photos (id, notion_id, r2_key, src, caption, date, location, camera, width, height, format, site, source, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'climb-log', 'notion', datetime('now'))
+        INSERT INTO photos (
+          id, notion_id, r2_key, src, caption, date, 
+          area, state, width, height, search_tags, exclude,
+          format, site, source, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'climb-log', 'notion', datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
           notion_id = excluded.notion_id,
           r2_key = excluded.r2_key,
           src = excluded.src,
           caption = excluded.caption,
           date = excluded.date,
-          location = excluded.location,
-          camera = excluded.camera,
+          area = excluded.area,
+          state = excluded.state,
           width = excluded.width,
           height = excluded.height,
+          search_tags = excluded.search_tags,
+          exclude = excluded.exclude,
           format = excluded.format,
           site = excluded.site,
           source = excluded.source,
           updated_at = datetime('now')
       `).bind(
-        data.id, data.id, r2Key, data.url, data.caption, data.date,
-        data.location, data.camera, data.width, data.height, format
+        id, id, r2Key, url, caption, date,
+        area, state, width, height, searchTags, exclude ? 1 : 0,
+        format
       ).run()
 
       result.inserted++
@@ -367,4 +416,28 @@ async function syncPhotos(notion: Client, db: D1Database, dbId: string): Promise
   }
 
   return result
+}
+
+// Helper to normalize state names to full names
+function normalizeStateName(state: string | null | undefined): string | null {
+  if (!state) return null
+  
+  const stateMap: Record<string, string> = {
+    'AZ': 'Arizona',
+    'CA': 'California',
+    'CO': 'Colorado',
+    'ID': 'Idaho',
+    'MT': 'Montana',
+    'NM': 'New Mexico',
+    'NV': 'Nevada',
+    'OR': 'Oregon',
+    'UT': 'Utah',
+    'WA': 'Washington',
+    'WY': 'Wyoming',
+    'Alaska': 'Alaska',
+    'Washington State': 'Washington'
+  }
+  
+  const trimmed = state.trim()
+  return stateMap[trimmed] || trimmed
 }

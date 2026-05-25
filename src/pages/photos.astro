@@ -40,6 +40,6 @@ if (DB) {
       A gallery of my favorite shots from the trail. Click any photo to view full size.
     </p>
 
-    <PhotoGallery client:load photos={photos} />
+    <PhotoGallery client:only="react" photos={photos} />
   </div>
 </Layout>
