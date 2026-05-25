@@ -119,10 +119,15 @@ async function main() {
   ])
   sql += '\n\n'
 
-  // Photos
+  // Photos — include r2_key and short_id to match production schema
+  const photosWithKeys = photos.map(p => ({
+    ...p,
+    r2_key: `photos/${p.id}`,
+    short_id: Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
+  }))
   sql += '-- Photos\n'
-  sql += generateInsertSQL('photos', photos, [
-    'id', 'title', 'caption', 'src', 'thumbnail', 'area', 'state', 'date', 'width', 'height', 'search_tags', 'exclude'
+  sql += generateInsertSQL('photos', photosWithKeys, [
+    'id', 'title', 'caption', 'src', 'thumbnail', 'area', 'state', 'date', 'width', 'height', 'search_tags', 'exclude', 'r2_key', 'short_id'
   ])
 
   // Write SQL file
