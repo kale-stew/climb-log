@@ -1,0 +1,472 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+const DB = env.DB as D1Database | undefined
+
+let climbsWithoutPhotos: any[] = []
+let recentPhotos: any[] = []
+let recentAssignments: any[] = []
+let stats = { totalClimbs: 0, missingPhotos: 0 }
+
+if (DB) {
+  const climbsResult = await DB.prepare(
+    `SELECT id, date, title, area, state FROM climbs WHERE preview_img_url IS NULL OR preview_img_url = '' ORDER BY date DESC LIMIT 50`
+  ).all()
+  climbsWithoutPhotos = climbsResult.results || []
+
+  const photosResult = await DB.prepare(
+    `SELECT id, short_id, src, caption, area, state, date, accent_color FROM photos WHERE exclude = 0 AND src IS NOT NULL ORDER BY date DESC LIMIT 100`
+  ).all()
+  recentPhotos = photosResult.results || []
+
+  // Get recent assignments for undo functionality
+  const assignmentsResult = await DB.prepare(
+    `SELECT l.id, l.climb_id, l.new_url, l.assigned_at, c.title as climb_title
+     FROM photo_assignment_log l
+     LEFT JOIN climbs c ON l.climb_id = c.id
+     ORDER BY l.assigned_at DESC
+     LIMIT 20`
+  ).all()
+  recentAssignments = assignmentsResult.results || []
+
+  const totalResult = await DB.prepare('SELECT COUNT(*) as total FROM climbs').first()
+  const missingResult = await DB.prepare(`SELECT COUNT(*) as missing FROM climbs WHERE preview_img_url IS NULL OR preview_img_url = ''`).first()
+  stats = {
+    totalClimbs: totalResult?.total || 0,
+    missingPhotos: missingResult?.missing || 0,
+  }
+}
+
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return '-'
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+---
+
+<Layout title="Admin: Climb Photo Mapper" description="Map photos to climbs without preview images.">
+  <div class="container page">
+    <h1>Climb Photo Mapper</h1>
+    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">
+      {stats.missingPhotos} of {stats.totalClimbs} climbs missing preview images.
+      Click a photo to select it, then click a climb to assign.
+    </p>
+
+    <div class="admin-layout">
+      <div class="climbs-panel">
+        <h2>Climbs Without Photos ({climbsWithoutPhotos.length} shown)</h2>
+        <div class="climb-list">
+          {climbsWithoutPhotos.map((climb) => (
+            <div class="climb-item" data-climb-id={climb.id}>
+              <div class="climb-info">
+                <h3>{climb.title || 'Untitled'}</h3>
+                <p class="climb-meta">
+                  {formatDate(climb.date)}
+                  {climb.area && ` · ${climb.area}`}
+                  {climb.state && `, ${climb.state}`}
+                </p>
+              </div>
+              <span class="status-badge">needs photo</span>
+            </div>
+          ))}
+        </div>
+        {climbsWithoutPhotos.length === 0 && (
+          <p class="empty-state">All climbs have photos assigned!</p>
+        )}
+      </div>
+
+      <div class="photos-panel">
+        <h2>Available Photos ({recentPhotos.length} shown)</h2>
+        <div class="photo-grid">
+          {recentPhotos.map((photo) => (
+            <div 
+              class="photo-thumb" 
+              data-photo-url={photo.src}
+              data-photo-id={photo.short_id || photo.id}
+            >
+              <img src={photo.src} alt={photo.caption || 'Photo'} loading="lazy" />
+              <div class="photo-info">
+                <span class="photo-date">{formatDate(photo.date)}</span>
+                {photo.area && <span class="photo-area">{photo.area}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="audit-panel">
+        <h2>Recent Assignments</h2>
+        <p class="audit-hint">Click undo to revert an assignment</p>
+        <div class="audit-list" id="audit-list">
+          {recentAssignments.length === 0 && (
+            <p class="empty-state">No assignments yet</p>
+          )}
+          {recentAssignments.map((a) => (
+            <div class="audit-item" data-assignment-id={a.id} data-climb-id={a.climb_id}>
+              <img src={a.new_url} alt="" class="audit-thumb" loading="lazy" />
+              <div class="audit-info">
+                <span class="audit-title">{a.climb_title || 'Unknown climb'}</span>
+                <span class="audit-time">{formatDate(a.assigned_at)}</span>
+              </div>
+              <button class="undo-btn" title="Undo this assignment">Undo</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedPhotoUrl = null;
+    let selectedPhotoEl = null;
+
+    document.querySelectorAll('.photo-thumb').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.photo-thumb').forEach(p => p.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedPhotoUrl = el.dataset.photoUrl;
+        selectedPhotoEl = el;
+      });
+    });
+
+    document.querySelectorAll('.climb-item').forEach(el => {
+      el.addEventListener('click', async () => {
+        if (!selectedPhotoUrl) {
+          alert('Select a photo first, then click a climb to assign it.');
+          return;
+        }
+
+        const climbId = el.dataset.climbId;
+        const climbTitle = el.querySelector('h3')?.textContent || 'Unknown';
+        el.style.opacity = '0.5';
+
+        try {
+          const res = await fetch('/api/admin/map-photo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ climbId, photoUrl: selectedPhotoUrl })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            
+            // Add to audit log
+            addAuditItem(data.assignmentId, climbId, climbTitle, selectedPhotoUrl);
+            
+            // Remove from needs-photo list
+            el.style.transition = 'all 0.3s ease';
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(20px)';
+            setTimeout(() => el.remove(), 300);
+          } else {
+            el.style.opacity = '1';
+            alert('Failed to assign photo');
+          }
+        } catch (err) {
+          el.style.opacity = '1';
+          alert('Error: ' + err.message);
+        }
+      });
+    });
+
+    // Add a new item to the audit list
+    function addAuditItem(assignmentId, climbId, climbTitle, photoUrl) {
+      const auditList = document.getElementById('audit-list');
+      const emptyState = auditList.querySelector('.empty-state');
+      if (emptyState) emptyState.remove();
+
+      const item = document.createElement('div');
+      item.className = 'audit-item';
+      item.dataset.assignmentId = assignmentId;
+      item.dataset.climbId = climbId;
+      item.innerHTML = `
+        <img src="${photoUrl}" alt="" class="audit-thumb" loading="lazy" />
+        <div class="audit-info">
+          <span class="audit-title">${climbTitle}</span>
+          <span class="audit-time">Just now</span>
+        </div>
+        <button class="undo-btn" title="Undo this assignment">Undo</button>
+      `;
+      
+      // Add to top of list
+      auditList.insertBefore(item, auditList.firstChild);
+      
+      // Bind undo handler
+      item.querySelector('.undo-btn').addEventListener('click', handleUndo);
+    }
+
+    // Handle undo button clicks
+    async function handleUndo(e) {
+      const item = e.target.closest('.audit-item');
+      const assignmentId = item.dataset.assignmentId;
+      const climbId = item.dataset.climbId;
+      
+      item.style.opacity = '0.5';
+      e.target.disabled = true;
+      e.target.textContent = '...';
+
+      try {
+        const res = await fetch('/api/admin/undo-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ assignmentId })
+        });
+
+        if (res.ok) {
+          // Remove from audit list with animation
+          item.style.transition = 'all 0.3s ease';
+          item.style.opacity = '0';
+          item.style.transform = 'translateX(-20px)';
+          setTimeout(() => {
+            item.remove();
+            // Show empty state if no more items
+            const auditList = document.getElementById('audit-list');
+            if (!auditList.querySelector('.audit-item')) {
+              auditList.innerHTML = '<p class="empty-state">No assignments yet</p>';
+            }
+          }, 300);
+          
+          // Optionally refresh the page to show the climb back in the list
+          // For now, just show a brief notification
+          console.log('Assignment undone for climb:', climbId);
+        } else {
+          item.style.opacity = '1';
+          e.target.disabled = false;
+          e.target.textContent = 'Undo';
+          alert('Failed to undo assignment');
+        }
+      } catch (err) {
+        item.style.opacity = '1';
+        e.target.disabled = false;
+        e.target.textContent = 'Undo';
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Bind undo handlers to existing items
+    document.querySelectorAll('.undo-btn').forEach(btn => {
+      btn.addEventListener('click', handleUndo);
+    });
+  </script>
+
+  <style>
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr 300px;
+      gap: var(--space-lg);
+    }
+
+    .climbs-panel, .photos-panel, .audit-panel {
+      background: var(--color-bg-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid var(--color-border);
+    }
+
+    .climb-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .climb-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md);
+      background: var(--color-bg-primary);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .climb-item:hover {
+      border-color: var(--color-text-accent);
+      box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.1);
+    }
+
+    .climb-item h3 {
+      margin: 0 0 var(--space-xs);
+      font-size: var(--font-size-base);
+    }
+
+    .climb-meta {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      margin: 0;
+    }
+
+    .status-badge {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-tertiary);
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: var(--space-sm);
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .photo-thumb:hover {
+      transform: scale(1.05);
+    }
+
+    .photo-thumb.selected {
+      border-color: var(--color-text-accent);
+      box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.2);
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.5rem;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      color: white;
+      font-size: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--space-xl);
+      color: var(--color-text-tertiary);
+    }
+
+    /* Audit panel */
+    .audit-panel h2 {
+      font-size: var(--font-size-lg);
+    }
+
+    .audit-hint {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--space-md);
+    }
+
+    .audit-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .audit-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
+      background: var(--color-bg-primary);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--color-border);
+    }
+
+    .audit-thumb {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: var(--border-radius-sm);
+      flex-shrink: 0;
+    }
+
+    .audit-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .audit-title {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .audit-time {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .undo-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .undo-btn:hover {
+      background: var(--color-bg-tertiary);
+      border-color: var(--color-text-accent);
+      color: var(--color-text-accent);
+    }
+
+    .undo-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 1200px) {
+      .admin-layout {
+        grid-template-columns: 1fr 1fr;
+      }
+      .audit-panel {
+        grid-column: span 2;
+      }
+      .audit-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        max-height: 30vh;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+      .audit-panel {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</Layout>
