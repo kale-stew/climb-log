@@ -359,6 +359,7 @@ input:focus, select:focus, textarea:focus {
 /* Tables */
 .table-container {
   overflow-x: auto;
+  overflow: hidden;
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
 }
@@ -414,48 +415,6 @@ tr:hover {
 
 .gallery-item:hover img {
   transform: scale(1.05);
-}
-
-/* Lightbox */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.9);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-normal);
-}
-
-.lightbox.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.lightbox img {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
-}
-
-.lightbox-close {
-  position: absolute;
-  top: var(--space-lg);
-  right: var(--space-lg);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 50%;
-  color: white;
-  cursor: pointer;
-  font-size: 24px;
 }
 
 /* Blog / Article */

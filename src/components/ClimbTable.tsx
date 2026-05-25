@@ -227,7 +227,13 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                         className="climb-thumb"
                         loading="lazy"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none'
+                          const el = e.target as HTMLImageElement
+                          el.style.opacity = '0'
+                          el.parentElement!.style.background = 'var(--color-bg-tertiary)'
+                          el.parentElement!.style.display = 'flex'
+                          el.parentElement!.style.alignItems = 'center'
+                          el.parentElement!.style.justifyContent = 'center'
+                          el.parentElement!.innerHTML = '<span style="font-size: 10px; color: var(--color-text-tertiary)">📷</span>'
                         }}
                       />
                     </a>
