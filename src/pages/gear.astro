@@ -51,12 +51,15 @@ function getStatus(item: any) {
             {categoryGear.map((item) => (
               <div class={`gear-card ${getStatusClass(item)}`}>
                 {item.img && (
-                  <img 
-                    src={item.img} 
-                    alt={item.title}
-                    loading="lazy"
-                    class="gear-image"
-                  />
+                  <div class="gear-image-wrapper">
+                    <img 
+                      src={`/gear/${item.img}`}
+                      alt={item.title}
+                      loading="lazy"
+                      class="gear-image"
+                      onerror="this.style.display='none'"
+                    />
+                  </div>
                 )}
                 <div class="gear-content">
                   <h3>
@@ -84,8 +87,8 @@ function getStatus(item: any) {
   <style>
     .gear-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: var(--space-lg);
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-xl);
     }
 
     .gear-card {
@@ -100,10 +103,20 @@ function getStatus(item: any) {
       border-color: var(--color-border-hover);
     }
 
-    .gear-image {
+    .gear-image-wrapper {
       width: 100%;
-      height: 160px;
-      object-fit: cover;
+      height: 220px;
+      background: var(--color-bg-tertiary, #f5f5f5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+    }
+
+    .gear-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     .gear-content {

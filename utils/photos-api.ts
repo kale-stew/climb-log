@@ -11,6 +11,17 @@
 
 import { Hono } from "hono";
 
+// Generate a short URL-safe ID from any string (used for cleaner /img/{id} URLs)
+// Must match the Python: hashlib.sha256(input.encode()).hexdigest()[:8]
+async function generateShortId(input: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex.slice(0, 8);
+}
+
 // Supported widths for public image transforms
 const ALLOWED_WIDTHS = new Set([200, 400, 800, 1600]);
 const MAX_CUSTOM_WIDTH = 2048;
@@ -20,6 +31,7 @@ const inFlightTransforms = new Map<string, Promise<any>>();
 
 interface Photo {
   id: string;
+  short_id: string | null;
   notion_id: string | null;
   r2_key: string;
   title: string | null;
@@ -244,15 +256,31 @@ export function createPhotosApp(env: PhotosApiEnv) {
   app.get("/img/:photoId", async (c) => {
     const photoId = c.req.param("photoId");
     const requestedWidth = c.req.query("w");
-    const ctx = c.executionCtx;
+    let ctx: ExecutionContext | undefined;
+    try { ctx = c.executionCtx; } catch { /* local dev has no ExecutionContext */ }
 
     if (!photoId) return c.text("Missing photo ID", 400);
 
-    const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
+    let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
       .bind(photoId)
       .first<Photo>();
 
+    // Fallback: try looking up by short_id
+    if (!photo) {
+      photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+        .bind(photoId)
+        .first<Photo>();
+    }
+
     if (!photo) return c.text("Photo not found", 404);
+
+    // Fallback for photos not yet migrated to R2 (r2_key is null)
+    if (!photo.r2_key) {
+      if (photo.src) {
+        return c.redirect(photo.src, 302);
+      }
+      return c.text("Photo not available", 404);
+    }
 
     let r2Key: string;
     let width: number | null = null;
@@ -280,7 +308,14 @@ export function createPhotosApp(env: PhotosApiEnv) {
       const originalKey = `${photo.r2_key}/original.${photo.format}`;
       object = await env.R2_IMAGES.get(originalKey);
 
-      if (!object) return c.text("Photo file not found", 404);
+      if (!object) {
+        // Fallback: redirect to original src URL if R2 object missing
+        // (common in local dev before R2 sync, or if object was deleted)
+        if (photo.src) {
+          return c.redirect(photo.src, 302);
+        }
+        return c.text("Photo file not found", 404);
+      }
 
       return new Response(object.body, {
         headers: {
@@ -337,9 +372,15 @@ export function createPhotosApp(env: PhotosApiEnv) {
   // GET /api/photos/{id}
   app.get("/api/photos/:id", async (c) => {
     const id = c.req.param("id");
-    const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
+    let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
       .bind(id)
       .first<Photo>();
+
+    if (!photo) {
+      photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+        .bind(id)
+        .first<Photo>();
+    }
 
     if (!photo) return c.json({ error: "Photo not found" }, 404);
     return c.json(photo);
@@ -380,9 +421,10 @@ export function createPhotosApp(env: PhotosApiEnv) {
           photo.date || 'no date',
           photo.width && photo.height ? `${photo.width}x${photo.height}` : ''
         ].filter(Boolean).join(' · ');
+        const photoId = photo.short_id || photo.id;
         const tags = photo.site ? `<div class="photo-card-tags"><span class="tag">${escapeHtml(photo.site)}</span></div>` : '';
-        return `<a href="/admin/photos/${escapeHtml(photo.id)}" class="photo-card">
-          <img src="${origin}/img/${escapeHtml(photo.id)}?w=200" alt="${escapeHtml(photo.title || 'photo')}" loading="lazy">
+        return `<a href="/admin/photos/${escapeHtml(photoId)}" class="photo-card">
+          <img src="${origin}/img/${escapeHtml(photoId)}?w=200" alt="${escapeHtml(photo.title || 'photo')}" loading="lazy">
           <div class="photo-card-info">
             <div class="photo-card-title">${escapeHtml(photo.title || 'untitled')}</div>
             <div class="photo-card-meta">${escapeHtml(meta)}</div>
@@ -413,12 +455,19 @@ export function createPhotosApp(env: PhotosApiEnv) {
   // GET /admin/photos/{id} - Photo Detail
   app.get("/admin/photos/:id", async (c) => {
     const id = c.req.param("id");
-    const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
+    let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
       .bind(id)
       .first<Photo>();
 
+    if (!photo) {
+      photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+        .bind(id)
+        .first<Photo>();
+    }
+
     if (!photo) return c.text("Photo not found", 404);
 
+    const photoId = photo.short_id || photo.id;
     const origin = new URL(c.req.url).origin;
     const standardWidths = [200, 400, 800, 1600];
 
@@ -439,16 +488,16 @@ export function createPhotosApp(env: PhotosApiEnv) {
     ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
 
     const sizesGrid = standardWidths.map((w) => `<div class="size-item">
-      <img src="${origin}/img/${escapeHtml(photo.id)}?w=${w}" alt="${w}px" loading="lazy">
+      <img src="${origin}/img/${escapeHtml(photoId)}?w=${w}" alt="${w}px" loading="lazy">
       <code>${w}px</code>
-      <button type="button" onclick="navigator.clipboard.writeText('${origin}/img/${escapeHtml(photo.id)}?w=${w}'); this.textContent='copied!'; setTimeout(() => this.textContent='copy url', 1000);">copy url</button>
+      <button type="button" onclick="navigator.clipboard.writeText('${origin}/img/${escapeHtml(photoId)}?w=${w}'); this.textContent='copied!'; setTimeout(() => this.textContent='copy url', 1000);">copy url</button>
     </div>`).join('');
 
     const content = `<a href="/admin/photos" class="back-link">← back to grid</a>
     <div class="detail-layout">
       <div>
         <div class="detail-image">
-          <img src="${origin}/img/${escapeHtml(photo.id)}" alt="${escapeHtml(photo.title || 'photo')}">
+          <img src="${origin}/img/${escapeHtml(photoId)}" alt="${escapeHtml(photo.title || 'photo')}">
         </div>
       </div>
       <div class="detail-sidebar">
@@ -463,7 +512,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
         <div class="detail-panel">
           <h2>original</h2>
           <div class="size-item">
-            <button type="button" onclick="navigator.clipboard.writeText('${origin}/img/${escapeHtml(photo.id)}'); this.textContent='copied!'; setTimeout(() => this.textContent='copy original url', 1000);">copy original url</button>
+            <button type="button" onclick="navigator.clipboard.writeText('${origin}/img/${escapeHtml(photoId)}'); this.textContent='copied!'; setTimeout(() => this.textContent='copy original url', 1000);">copy original url</button>
           </div>
         </div>
       </div>
@@ -478,6 +527,13 @@ export function createPhotosApp(env: PhotosApiEnv) {
   app.patch("/api/admin/photos/:id", async (c) => {
     const id = c.req.param("id");
     const body = await c.req.json().catch(() => ({}));
+
+    // Resolve short_id to full id
+    let photoId = id;
+    const shortLookup = await env.DB.prepare("SELECT id FROM photos WHERE short_id = ?")
+      .bind(id)
+      .first<{ id: string }>();
+    if (shortLookup) photoId = shortLookup.id;
 
     const allowedFields = ["title", "location", "date", "tags", "site", "exclude", "caption"];
     const updates: string[] = [];
@@ -500,12 +556,12 @@ export function createPhotosApp(env: PhotosApiEnv) {
 
     updates.push("updated_at = datetime('now')");
 
-    const sql = `UPDATE photos SET ${updates.join(", ")} WHERE id = '${id.replace(/'/g, "''")}'`;
+    const sql = `UPDATE photos SET ${updates.join(", ")} WHERE id = '${photoId.replace(/'/g, "''")}'`;
 
     try {
       await env.DB.prepare(sql).run();
       const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
-        .bind(id)
+        .bind(photoId)
         .first<Photo>();
       return c.json(photo);
     } catch (error) {
@@ -516,18 +572,26 @@ export function createPhotosApp(env: PhotosApiEnv) {
   // DELETE /api/admin/photos/{id} - Delete photo
   app.delete("/api/admin/photos/:id", async (c) => {
     const id = c.req.param("id");
-    const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
+    let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
       .bind(id)
       .first<Photo>();
 
+    if (!photo) {
+      photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+        .bind(id)
+        .first<Photo>();
+    }
+
     if (!photo) return c.json({ error: "Photo not found" }, 404);
 
+    const photoId = photo.id;
+
     // Delete from D1
-    await env.DB.prepare("DELETE FROM photos WHERE id = ?").bind(id).run();
+    await env.DB.prepare("DELETE FROM photos WHERE id = ?").bind(photoId).run();
 
     // Delete from R2
     try {
-      const prefix = `photos/${id}/`;
+      const prefix = `${photo.r2_key}/`;
       const listed = await env.R2_IMAGES.list({ prefix });
       for (const obj of listed.objects) {
         await env.R2_IMAGES.delete(obj.key);
@@ -536,7 +600,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
       // R2 delete failures are non-critical
     }
 
-    return c.json({ success: true, deleted: id });
+    return c.json({ success: true, deleted: photoId });
   });
 
   // POST /api/admin/resize - Custom resize
@@ -553,9 +617,15 @@ export function createPhotosApp(env: PhotosApiEnv) {
       return c.json({ error: `width must be between 1 and ${MAX_CUSTOM_WIDTH}` }, 400);
     }
 
-    const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
+    let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
       .bind(photoId)
       .first<Photo>();
+
+    if (!photo) {
+      photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+        .bind(photoId)
+        .first<Photo>();
+    }
 
     if (!photo) return c.json({ error: "Photo not found" }, 404);
 
@@ -613,6 +683,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
     }
 
     const id = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+    const shortId = await generateShortId(id);
     const format = file.type === "image/png" ? "png" : "jpeg";
     const r2Key = `photos/${id}`;
 
@@ -637,10 +708,11 @@ export function createPhotosApp(env: PhotosApiEnv) {
     const esc = (s: string | null) => (s ? s.replace(/'/g, "''") : "");
     const sql = `
       INSERT INTO photos (
-        id, r2_key, title, location, date, width, height, format,
+        id, short_id, r2_key, title, location, date, width, height, format,
         site, source, tags, exclude, size_bytes, created_at, updated_at
       ) VALUES (
         '${id}',
+        '${shortId}',
         '${r2Key}',
         ${title ? `'${esc(title)}'` : "NULL"},
         ${location ? `'${esc(location)}'` : "NULL"},
@@ -681,7 +753,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
 
 async function getOrCreateTransform(
   env: PhotosApiEnv,
-  ctx: ExecutionContext,
+  _ctx: ExecutionContext | undefined,
   photo: Photo,
   width: number,
   targetKey: string
@@ -696,6 +768,11 @@ async function getOrCreateTransform(
       const originalKey = `${photo.r2_key}/original.${photo.format}`;
       const original = await env.R2_IMAGES.get(originalKey);
       if (!original) return null;
+
+      if (!env.IMAGES) {
+        console.warn("IMAGES binding not available, skipping transform");
+        return null;
+      }
 
       const transformed = await env.IMAGES.input(original.body)
         .transform({ width, fit: "scale-down" })

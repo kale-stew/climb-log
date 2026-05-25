@@ -79,34 +79,34 @@ function formatNumber(n: number): string {
       </div>
 
       {recentClimbs.length > 0 ? (
-        <div class="grid grid-3">
+        <div class="climb-card-grid">
           {recentClimbs.slice(0, 3).map((climb) => (
-            <div class="card">
-              {climb.preview_img_url && (
-                <img 
-                  src={climb.preview_img_url} 
-                  alt={climb.title || 'Climb photo'} 
-                  style="width: 100%; height: 180px; object-fit: cover; border-radius: var(--border-radius); margin-bottom: var(--space-md);"
-                  loading="lazy"
-                />
-              )}
-              <h3 style="font-size: var(--font-size-lg); margin-bottom: var(--space-sm);">
-                {climb.slug ? (
-                  <a href={`/blog/hike/${climb.slug}`}>{climb.title || 'Untitled'}</a>
+            <a href={climb.slug ? `/blog/hike/${climb.slug}` : '/climbs'} class="climb-card">
+              <div class="climb-card-image">
+                {climb.preview_img_url ? (
+                  <img 
+                    src={climb.preview_img_url} 
+                    alt={climb.title || 'Climb photo'} 
+                    loading="lazy"
+                    onerror="this.style.display='none'"
+                  />
                 ) : (
-                  climb.title || 'Untitled'
+                  <div class="climb-card-image-placeholder" />
                 )}
-              </h3>
-              <p style="font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0;">
-                {climb.date && new Date(climb.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                {climb.area && ` · ${climb.area}`}
-              </p>
-              {climb.distance && climb.gain && (
-                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: var(--space-xs);">
-                  {climb.distance} mi · {formatNumber(climb.gain)}' gain
+              </div>
+              <div class="climb-card-content">
+                <h3>{climb.title || 'Untitled'}</h3>
+                <p class="climb-card-meta">
+                  {climb.date && new Date(climb.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {climb.area && ` · ${climb.area}`}
                 </p>
-              )}
-            </div>
+                {climb.distance && climb.gain && (
+                  <p class="climb-card-stats">
+                    {climb.distance} mi · {formatNumber(climb.gain)}' gain
+                  </p>
+                )}
+              </div>
+            </a>
           ))}
         </div>
       ) : (
@@ -123,9 +123,71 @@ function formatNumber(n: number): string {
       font-size: 3.5rem;
       margin-bottom: var(--space-md);
     }
+    .climb-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-lg);
+    }
+    .climb-card {
+      display: block;
+      background: var(--color-bg-card);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .climb-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .climb-card-image {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      background: var(--color-bg-secondary);
+    }
+    .climb-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .climb-card:hover .climb-card-image img {
+      transform: scale(1.05);
+    }
+    .climb-card-image-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+    }
+    .climb-card-content {
+      padding: var(--space-md);
+    }
+    .climb-card-content h3 {
+      margin: 0 0 var(--space-sm);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .climb-card-meta {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      margin: 0 0 var(--space-xs);
+    }
+    .climb-card-stats {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
     @media (max-width: 768px) {
       .hero h1 {
         font-size: 2.5rem;
+      }
+      .climb-card-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>

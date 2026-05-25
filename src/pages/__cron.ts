@@ -339,13 +339,12 @@ async function syncPhotos(notion: Client, db: D1Database, dbId: string): Promise
       const r2Key = `photos/${data.id}`
 
       await db.prepare(`
-        INSERT INTO photos (id, notion_id, r2_key, src, url, caption, date, location, camera, width, height, format, site, source, updated_at)
+        INSERT INTO photos (id, notion_id, r2_key, src, caption, date, location, camera, width, height, format, site, source, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'climb-log', 'notion', datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
           notion_id = excluded.notion_id,
           r2_key = excluded.r2_key,
           src = excluded.src,
-          url = excluded.url,
           caption = excluded.caption,
           date = excluded.date,
           location = excluded.location,
@@ -357,7 +356,7 @@ async function syncPhotos(notion: Client, db: D1Database, dbId: string): Promise
           source = excluded.source,
           updated_at = datetime('now')
       `).bind(
-        data.id, data.id, r2Key, data.url, data.url, data.caption, data.date,
+        data.id, data.id, r2Key, data.url, data.caption, data.date,
         data.location, data.camera, data.width, data.height, format
       ).run()
 

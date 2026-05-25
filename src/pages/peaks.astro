@@ -61,33 +61,41 @@ function formatElevation(feet: number) {
       </div>
     </div>
 
-    <!-- Peak Table -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Peak</th>
-            <th>Range</th>
-            <th style="text-align: right;">Elevation</th>
-            <th style="text-align: center;">Rank</th>
-            <th>First Summit</th>
-          </tr>
-        </thead>
-        <tbody>
-          {peaks.map((peak) => (
-            <tr class={peak.first_completed ? '' : 'not-completed'}>
-              <td>
-                <strong>{peak.title}</strong>
-                {peak.elevation >= 14000 && <span class="badge">14er</span>}
-              </td>
-              <td>{peak.range || '-'}</td>
-              <td style="text-align: right;">{formatElevation(peak.elevation)}</td>
-              <td style="text-align: center;">{peak.rank || '-'}</td>
-              <td>{formatDate(peak.first_completed) || <span style="color: var(--color-text-tertiary);">-</span>}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <!-- Peak Grid with Photos -->
+    <div class="peak-grid">
+      {peaks.map((peak) => (
+        <div class={`peak-card ${peak.first_completed ? '' : 'not-completed'}`}>
+          {peak.img ? (
+            <div class="peak-image">
+              <img 
+                src={peak.img} 
+                alt={peak.title || 'Peak photo'}
+                loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.classList.add('no-image')"
+              />
+            </div>
+          ) : (
+            <div class="peak-image no-image">
+              <span class="peak-elevation-display">{formatElevation(peak.elevation)}</span>
+            </div>
+          )}
+          <div class="peak-info">
+            <div class="peak-header">
+              <h3>{peak.title}</h3>
+              {peak.elevation >= 14000 && <span class="badge">14er</span>}
+            </div>
+            <div class="peak-meta">
+              <span>{peak.range || 'Unknown range'}</span>
+              <span style="color: var(--color-text-tertiary);">{formatElevation(peak.elevation)}</span>
+            </div>
+            {peak.first_completed ? (
+              <div class="peak-date">First summit: {formatDate(peak.first_completed)}</div>
+            ) : (
+              <div class="peak-date pending">Not yet summited</div>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 
@@ -104,11 +112,84 @@ function formatElevation(feet: number) {
       margin-left: 0.5rem;
       vertical-align: middle;
     }
-    tr.not-completed {
-      opacity: 0.5;
+    .peak-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-lg);
     }
-    tr.not-completed:hover {
-      opacity: 0.8;
+    .peak-card {
+      background: var(--color-bg-card);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid var(--color-border);
+    }
+    .peak-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .peak-card.not-completed {
+      opacity: 0.6;
+    }
+    .peak-card.not-completed:hover {
+      opacity: 0.85;
+    }
+    .peak-image {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+      position: relative;
+    }
+    .peak-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .peak-card:hover .peak-image img {
+      transform: scale(1.05);
+    }
+    .peak-image.no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .peak-elevation-display {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-tertiary);
+      font-family: var(--font-serif);
+    }
+    .peak-info {
+      padding: var(--space-md);
+    }
+    .peak-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-sm);
+    }
+    .peak-header h3 {
+      margin: 0;
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+    }
+    .peak-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-sm);
+    }
+    .peak-date {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-accent);
+    }
+    .peak-date.pending {
+      color: var(--color-text-tertiary);
+      font-style: italic;
     }
   </style>
 </Layout>

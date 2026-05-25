@@ -196,6 +196,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
         <table>
           <thead>
             <tr>
+              <th style={{ width: '80px' }}>Photo</th>
               <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }}>
                 Date <SortIcon field="date" />
               </th>
@@ -217,6 +218,23 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           <tbody>
             {paginatedClimbs.map((climb) => (
               <tr key={climb.id}>
+                <td>
+                  {climb.preview_img_url ? (
+                    <a href={climb.slug ? `/blog/hike/${climb.slug}` : '#'} className="climb-thumb-link">
+                      <img 
+                        src={climb.preview_img_url} 
+                        alt={climb.title || ''}
+                        className="climb-thumb"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }}
+                      />
+                    </a>
+                  ) : (
+                    <div className="climb-thumb-placeholder" />
+                  )}
+                </td>
                 <td>{formatDate(climb.date)}</td>
                 <td>
                   {climb.slug ? (
@@ -322,6 +340,30 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
       )}
 
       <style>{`
+        .climb-thumb-link {
+          display: block;
+          width: 60px;
+          height: 45px;
+          border-radius: var(--border-radius);
+          overflow: hidden;
+          background: var(--color-bg-secondary);
+        }
+        .climb-thumb {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.2s ease;
+        }
+        .climb-thumb-link:hover .climb-thumb {
+          transform: scale(1.05);
+        }
+        .climb-thumb-placeholder {
+          width: 60px;
+          height: 45px;
+          border-radius: var(--border-radius);
+          background: var(--color-bg-secondary);
+          border: 1px dashed var(--color-border);
+        }
         .pagination-btn {
           padding: 0.5rem 0.75rem;
           border: 1px solid var(--color-border);

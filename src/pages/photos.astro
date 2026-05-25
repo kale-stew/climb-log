@@ -13,6 +13,7 @@ if (DB) {
   const result = await DB.prepare(`
     SELECT 
       id, 
+      short_id,
       src as url, 
       caption, 
       date, 
@@ -21,7 +22,9 @@ if (DB) {
       height, 
       title,
       state,
-      search_tags as tags
+      search_tags as tags,
+      r2_key,
+      accent_color
     FROM photos 
     WHERE exclude = 0
     ORDER BY date DESC

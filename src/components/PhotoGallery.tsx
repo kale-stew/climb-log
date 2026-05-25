@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 
 interface Photo {
   id: string
+  short_id?: string | null
   url: string
   caption: string | null
   date: string | null
@@ -13,6 +14,7 @@ interface Photo {
   blurhash?: string | null
   accent_color?: string | null
   tags?: string | null
+  r2_key?: string | null
 }
 
 interface PhotoGalleryProps {
@@ -46,7 +48,7 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           ? new Date(p.date).getMonth() === monthIndex
           : false
 
-        return captionMatch || locationMatch || areaMatch || stateMatch || tagsMatch || yearMatch || monthMatch
+        return captionMatch || areaMatch || stateMatch || tagsMatch || yearMatch || monthMatch
       })
     : photos
 
@@ -113,6 +115,28 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
     return photo.height / photo.width > 1.208
   }
 
+  // Get best available image URL: prefer photos-api endpoint if r2_key exists,
+  // otherwise fall back to the original source URL (Flickr/Notion)
+  const getImageUrl = (photo: Photo, size: 'thumb' | 'full' = 'thumb') => {
+    // Use short_id for cleaner URLs when available
+    const id = photo.short_id || photo.id
+    if (photo.r2_key) {
+      if (size === 'thumb') {
+        return `/img/${id}?w=800`
+      }
+      return `/img/${id}`
+    }
+    // Fallback to original URL (Flickr, etc.)
+    // For Flickr, swap _k.jpg or _b.jpg with appropriate size
+    let url = photo.url || ''
+    if (size === 'thumb' && url.includes('live.staticflickr.com')) {
+      // Use Flickr's native sizing: _k (2048) → _c (800)
+      url = url.replace(/_k\.jpg$/, '_c.jpg')
+      url = url.replace(/_b\.jpg$/, '_c.jpg')
+    }
+    return url
+  }
+
   return (
     <>
       {/* Search */}
@@ -142,9 +166,13 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
             style={photo.accent_color ? { backgroundColor: photo.accent_color } : undefined}
           >
             <img
-              src={`/img/${photo.id}?w=800`}
+              src={getImageUrl(photo, 'thumb')}
               alt={photo.caption || 'Photo'}
               loading="lazy"
+              onError={(e) => {
+                // If image fails to load, hide it to show the background/accent color
+                (e.target as HTMLImageElement).style.display = 'none'
+              }}
             />
             {photo.caption && (
               <div className="photo-overlay">
@@ -176,7 +204,7 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
 
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <img
-              src={`/img/${currentPhoto.id}`}
+              src={getImageUrl(currentPhoto, 'full')}
               alt={currentPhoto.caption || 'Photo'}
             />
             <div className="lightbox-info">
