@@ -42,24 +42,24 @@ function formatElevation(feet: number) {
     </p>
 
     <!-- Stats -->
-    <div class="stats-grid mb-xl">
-      <div class="stat-card">
-        <div class="stat-value">{stats.completed}</div>
-        <div class="stat-label">Peaks Summited</div>
+    <section class="stats-row mb-xl">
+      <div class="stat-item">
+        <div class="stat-number">{stats.completed}</div>
+        <div class="stat-name">Peaks Summited</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value">{stats.fourteeners}</div>
-        <div class="stat-label">14ers</div>
+      <div class="stat-item">
+        <div class="stat-number">{stats.fourteeners}</div>
+        <div class="stat-name">14ers</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value">{stats.thirteeners}</div>
-        <div class="stat-label">13ers</div>
+      <div class="stat-item">
+        <div class="stat-number">{stats.thirteeners}</div>
+        <div class="stat-name">13ers</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value">{stats.total}</div>
-        <div class="stat-label">On List</div>
+      <div class="stat-item">
+        <div class="stat-number">{stats.total}</div>
+        <div class="stat-name">On List</div>
       </div>
-    </div>
+    </section>
 
     <!-- Peak Grid with Photos -->
     <div class="peak-grid">
@@ -100,6 +100,42 @@ function formatElevation(feet: number) {
   </div>
 
   <style>
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-xl);
+      padding: var(--space-2xl) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--color-text-accent);
+      line-height: 1.1;
+    }
+    .stat-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-xs);
+    }
+
+    @media (max-width: 768px) {
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-lg);
+      }
+      .stat-number {
+        font-size: 2rem;
+      }
+    }
+
     .badge {
       display: inline-block;
       font-size: 0.625rem;
