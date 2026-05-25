@@ -1,6 +1,6 @@
 /* kylies.photos — Global Styles */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap');
 
 /* Reset */
 *,
@@ -13,17 +13,17 @@
 
 /* CSS Custom Properties */
 :root {
-  /* Colors - base palette */
-  --color-black: #1a1a1a;
-  --color-dark-grey: #2e2e2e;
-  --color-medium-grey: #6b6b6b;
-  --color-light-grey: #a7a7a7;
-  --color-offwhite: #e6e6e6;
-  --color-white: #fafafa;
-  
-  --color-accent-blue: #0071ce;
-  --color-accent-green: #60aa00;
-  --color-accent-orange: #e49604;
+  /* Colors - base palette (Trail Dust) */
+  --color-black: #2C2926;
+  --color-dark-grey: #3E3A36;
+  --color-medium-grey: #6B6560;
+  --color-light-grey: #A39E98;
+  --color-offwhite: #F0EDE8;
+  --color-white: #FAF8F5;
+
+  --color-accent: #8B7355;
+  --color-accent-green: #6B8E5E;
+  --color-accent-orange: #D4845A;
   
   /* Card colors (semi-transparent) */
   --color-card-blue: #277da1d7;
@@ -45,7 +45,7 @@
   
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Crimson Pro', Georgia, serif;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
@@ -75,30 +75,32 @@
 [data-theme='light'] {
   --color-bg-primary: var(--color-white);
   --color-bg-secondary: var(--color-offwhite);
-  --color-bg-tertiary: #d1d1d1;
+  --color-bg-tertiary: #E8E4DE;
   --color-bg-card: rgba(255, 255, 255, 0.9);
-  
+
   --color-text-primary: var(--color-black);
   --color-text-secondary: var(--color-dark-grey);
   --color-text-tertiary: var(--color-medium-grey);
-  --color-text-accent: var(--color-accent-blue);
-  
-  --color-border: var(--color-light-grey);
+  --color-text-accent: var(--color-accent);
+
+  --color-border: #E0DCD6;
+  --color-border-hover: #C9C4BC;
 }
 
 /* Dark theme */
 [data-theme='dark'] {
-  --color-bg-primary: var(--color-black);
-  --color-bg-secondary: #242424;
-  --color-bg-tertiary: #3a3a3a;
-  --color-bg-card: rgba(30, 30, 30, 0.9);
-  
+  --color-bg-primary: #1C1A18;
+  --color-bg-secondary: #252320;
+  --color-bg-tertiary: #3A3632;
+  --color-bg-card: rgba(40, 38, 35, 0.9);
+
   --color-text-primary: var(--color-offwhite);
   --color-text-secondary: var(--color-light-grey);
-  --color-text-tertiary: var(--color-medium-grey);
-  --color-text-accent: var(--color-accent-green);
-  
-  --color-border: var(--color-dark-grey);
+  --color-text-tertiary: #8A8580;
+  --color-text-accent: #A6906E;
+
+  --color-border: #3A3632;
+  --color-border-hover: #504B46;
 }
 
 /* Base styles */
@@ -217,7 +219,8 @@ input:focus, select:focus, textarea:focus {
   z-index: 100;
   height: var(--header-height);
   background-color: var(--color-bg-primary);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   backdrop-filter: blur(10px);
 }
 
@@ -291,9 +294,10 @@ input:focus, select:focus, textarea:focus {
 
 /* Footer */
 .footer {
-  background-color: var(--color-dark-grey);
-  color: var(--color-offwhite);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
   padding: var(--space-2xl) var(--space-lg);
+  border-top: 1px solid var(--color-border);
 }
 
 .footer-inner {
@@ -305,7 +309,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .footer h4 {
-  color: var(--color-white);
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -313,14 +317,14 @@ input:focus, select:focus, textarea:focus {
 }
 
 .footer a {
-  color: var(--color-light-grey);
+  color: var(--color-text-tertiary);
   font-size: var(--font-size-sm);
   display: block;
   padding: var(--space-xs) 0;
 }
 
 .footer a:hover {
-  color: var(--color-white);
+  color: var(--color-text-accent);
 }
 
 /* Cards */
