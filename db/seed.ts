@@ -98,9 +98,13 @@ async function main() {
   let sql = '-- Auto-generated seed SQL\n'
   sql += `-- Generated at: ${new Date().toISOString()}\n\n`
 
-  // Climbs
+  // Climbs — clear expired Notion URLs from preview_img_url so fallback works
+  const climbsWithCleanImages = climbs.map(c => ({
+    ...c,
+    preview_img_url: c.preview_img_url?.includes('amazonaws.com') ? null : c.preview_img_url
+  }))
   sql += '-- Climbs\n'
-  sql += generateInsertSQL('climbs', climbs, [
+  sql += generateInsertSQL('climbs', climbsWithCleanImages, [
     'id', 'date', 'title', 'slug', 'preview_img_url', 'distance', 'gain', 'area', 'state', 'strava'
   ])
   sql += '\n\n'
@@ -119,7 +123,9 @@ async function main() {
   ])
   sql += '\n\n'
 
-  // Photos — include r2_key, short_id, and accent_color to match production schema
+  // Photos — include short_id and accent_color.
+  // Note: we intentionally leave r2_key NULL for seed data so images fall back to src (Flickr URLs).
+  // Photos uploaded via photos-api will have r2_key set by the upload endpoint.
   const pleasingAccents = [
     '#8B7355', '#6B8E5E', '#D4845A', '#A0522D', '#5F9EA0',
     '#7B6B8D', '#9E8B6B', '#6B7B8D', '#8D7B6B', '#5E8B6E',
@@ -127,7 +133,8 @@ async function main() {
   ]
   const photosWithKeys = photos.map((p, i) => ({
     ...p,
-    r2_key: `photos/${p.id}`,
+    // r2_key is intentionally NULL for seed photos — they use src (Flickr) fallback
+    r2_key: null,
     short_id: Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
     accent_color: pleasingAccents[i % pleasingAccents.length]
   }))

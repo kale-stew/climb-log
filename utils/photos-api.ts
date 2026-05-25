@@ -368,7 +368,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
 
     // Fallback for photos not yet migrated to R2 (r2_key is null)
     if (!photo.r2_key) {
-      if (photo.src) {
+      if (photo.src && !photo.src.includes('amazonaws.com')) {
         return c.redirect(photo.src, 302);
       }
       return c.text("Photo not available", 404);

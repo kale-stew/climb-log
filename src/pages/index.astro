@@ -19,9 +19,41 @@ if (DB) {
     ).all()
     recentClimbs = climbsResult.results || []
 
-    // Fetch hero photos (last 5 from photos table, served via R2)
+    // Fill missing preview images from photos table
+    const missingImage = recentClimbs.some(c => !c.preview_img_url)
+    if (missingImage) {
+      const photoResult = await DB.prepare(
+        'SELECT date, area, state, short_id, src FROM photos WHERE exclude = 0 ORDER BY date DESC'
+      ).all()
+      const photos = (photoResult.results || []) as any[]
+
+      const byDate = new Map<string, string>()
+      const byAreaState = new Map<string, string>()
+      const byState = new Map<string, string>()
+
+      for (const p of photos) {
+        if (p.date && !byDate.has(p.date)) byDate.set(p.date, p.short_id)
+        if (p.area && p.state) {
+          const key = `${p.area}||${p.state}`
+          if (!byAreaState.has(key)) byAreaState.set(key, p.short_id)
+        }
+        if (p.state && !byState.has(p.state)) byState.set(p.state, p.short_id)
+      }
+
+      for (const climb of recentClimbs) {
+        if (!climb.preview_img_url) {
+          let sid: string | undefined
+          if (climb.date && byDate.has(climb.date)) sid = byDate.get(climb.date)
+          else if (climb.area && climb.state) sid = byAreaState.get(`${climb.area}||${climb.state}`)
+          else if (climb.state) sid = byState.get(climb.state)
+          if (sid) climb.preview_img_url = `/img/${sid}?w=800`
+        }
+      }
+    }
+
+    // Fetch hero photos (last 5 from photos table)
     const photosResult = await DB.prepare(
-      'SELECT short_id, accent_color FROM photos WHERE exclude = 0 AND r2_key IS NOT NULL ORDER BY date DESC LIMIT 5'
+      'SELECT short_id, accent_color, src FROM photos WHERE exclude = 0 ORDER BY date DESC LIMIT 5'
     ).all()
     heroPhotos = (photosResult.results || [])
       .filter((p: any) => p.short_id)

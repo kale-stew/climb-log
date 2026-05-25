@@ -40,17 +40,18 @@ export const POST: APIRoute = async () => {
 
 async function runSync(): Promise<Response> {
   const DB = env.DB as D1Database | undefined
+  const R2_IMAGES = env.R2_IMAGES as R2Bucket | undefined
   const notionToken = import.meta.env.NOTION_TOKEN
 
   if (!DB) {
-    return new Response(JSON.stringify({ error: 'D1 not configured' }), { 
+    return new Response(JSON.stringify({ error: 'D1 not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
   }
 
   if (!notionToken) {
-    return new Response(JSON.stringify({ error: 'Notion token not configured' }), { 
+    return new Response(JSON.stringify({ error: 'Notion token not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
@@ -72,7 +73,7 @@ async function runSync(): Promise<Response> {
       results.push(await syncGear(notion, DB, NOTION_DB_IDS.gear))
     }
     if (NOTION_DB_IDS.photos) {
-      results.push(await syncPhotos(notion, DB, NOTION_DB_IDS.photos))
+      results.push(await syncPhotos(notion, DB, R2_IMAGES, NOTION_DB_IDS.photos))
     }
 
     // Log sync result
@@ -312,7 +313,7 @@ async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<S
   return result
 }
 
-async function syncPhotos(notion: Client, db: D1Database, dbId: string): Promise<SyncResult> {
+async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefined, dbId: string): Promise<SyncResult> {
   const result: SyncResult = { table: 'photos', inserted: 0, updated: 0, errors: [] }
   const pages = await getAllPages(notion, dbId)
 
@@ -380,16 +381,20 @@ async function syncPhotos(notion: Client, db: D1Database, dbId: string): Promise
       const format = ext === 'png' ? 'png' : ext === 'webp' ? 'webp' : 'jpeg'
       const r2Key = `photos/${id}`
 
+      // Generate short_id for clean URLs
+      const shortId = Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
+
       await db.prepare(`
         INSERT INTO photos (
-          id, notion_id, r2_key, src, caption, date, 
+          id, notion_id, r2_key, short_id, src, caption, date,
           area, state, width, height, search_tags, exclude,
           format, site, source, updated_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'climb-log', 'notion', datetime('now'))
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'climb-log', 'notion', datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
           notion_id = excluded.notion_id,
           r2_key = excluded.r2_key,
+          short_id = COALESCE(excluded.short_id, photos.short_id),
           src = excluded.src,
           caption = excluded.caption,
           date = excluded.date,
@@ -404,10 +409,32 @@ async function syncPhotos(notion: Client, db: D1Database, dbId: string): Promise
           source = excluded.source,
           updated_at = datetime('now')
       `).bind(
-        id, id, r2Key, url, caption, date,
+        id, id, r2Key, shortId, url, caption, date,
         area, state, width, height, searchTags, exclude ? 1 : 0,
         format
       ).run()
+
+      // Sync image to R2 so we can serve from our own storage
+      if (r2) {
+        try {
+          const r2ObjectKey = `${r2Key}/original.${format}`
+          const existing = await r2.head(r2ObjectKey)
+
+          if (!existing) {
+            const imgRes = await fetch(url)
+            if (imgRes.ok) {
+              const buffer = await imgRes.arrayBuffer()
+              const contentType = imgRes.headers.get('content-type') || `image/${format}`
+              await r2.put(r2ObjectKey, buffer, {
+                httpMetadata: { contentType },
+              })
+            }
+          }
+        } catch (r2Error) {
+          // Don't fail the whole sync if one image upload fails
+          console.error(`Failed to sync image ${id} to R2:`, r2Error)
+        }
+      }
 
       result.inserted++
     } catch (error) {
