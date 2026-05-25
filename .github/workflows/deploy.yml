@@ -63,18 +63,37 @@ jobs:
             return deployment.data.id;
           result-encoding: string
 
+      - name: generate preview name from pr title
+        if: github.event_name == 'pull_request'
+        id: slug
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          WORD=$(echo "$TITLE" | sed -E 's/^(fix|feat|chore|docs|refactor|test|ci|style|perf|build|revert|rewrite|add|update|remove|delete)(\([^)]*\))?[\:!]?\s*//i' | awk '{print $1}' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g' | cut -c1-12)
+          [ -z "$WORD" ] && WORD="pr${{ github.event.pull_request.number }}"
+          echo "name=climb-log-${WORD}-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+
+      - name: generate preview config
+        if: github.event_name == 'pull_request'
+        run: |
+          jq --arg name "${{ steps.slug.outputs.name }}" '
+            .name = $name
+            | .d1_databases[0].database_id = "c0e56b31-fbfd-46f9-992e-af369d9c2cb9"
+            | .d1_databases[0].database_name = "climb-log-db-preview"
+            | del(.env)
+          ' wrangler.jsonc > wrangler-preview.jsonc
+          cat wrangler-preview.jsonc
+
       - name: Deploy to Preview
         if: github.event_name == 'pull_request'
         id: deploy-preview
         run: |
-          OUTPUT=$(npx wrangler deploy --env preview 2>&1) || true
+          START_TIME=$(date +%s)
+          OUTPUT=$(npx wrangler deploy --config wrangler-preview.jsonc 2>&1)
           echo "$OUTPUT"
-          # Extract the preview URL from wrangler output
-          PREVIEW_URL=$(echo "$OUTPUT" | grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' | head -1)
-          if [ -z "$PREVIEW_URL" ]; then
-            PREVIEW_URL="https://climb-log-preview.kylieski.workers.dev"
-          fi
-          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+          END_TIME=$(date +%s)
+          DEPLOY_TIME=$((END_TIME - START_TIME))
+          echo "deploy_time=${DEPLOY_TIME}s" >> $GITHUB_OUTPUT
+          echo "preview_url=https://${{ steps.slug.outputs.name }}.kylieski.workers.dev" >> $GITHUB_OUTPUT
 
       - name: Update Preview Deployment Status
         if: github.event_name == 'pull_request'
@@ -82,7 +101,7 @@ jobs:
         with:
           script: |
             const deploymentId = ${{ steps.preview-deployment.outputs.result }};
-            const previewUrl = '${{ steps.deploy-preview.outputs.preview_url }}' || 'https://climb-log-preview.kylieski.workers.dev';
+            const previewUrl = '${{ steps.deploy-preview.outputs.preview_url }}';
             
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
@@ -93,47 +112,43 @@ jobs:
               description: 'Preview deployment successful'
             });
 
-      - name: Comment Preview URL on PR
-        if: github.event_name == 'pull_request'
+      - name: comment preview url
+        if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'blog/') && !startsWith(github.head_ref, 'post/')
         uses: actions/github-script@v7
         with:
           script: |
-            const previewUrl = '${{ steps.deploy-preview.outputs.preview_url }}' || 'https://climb-log-preview.kylieski.workers.dev';
+            const marker = '<!-- climb-log-preview-bot -->';
+            const isNew = context.payload.action === 'opened';
+            const verb = isNew ? 'deployed' : 'updated';
+            const emoji = isNew ? '🚀' : '⛰️';
+            const dbUrl = 'https://dash.cloudflare.com/bb52c0e5f3a93fc72779915d7dc6982b/workers/d1/databases/c0e56b31-fbfd-46f9-992e-af369d9c2cb9';
+            const previewUrl = '${{ steps.deploy-preview.outputs.preview_url }}';
+            const deployTime = '${{ steps.deploy-preview.outputs.deploy_time }}';
+            const commitSha = '${{ github.event.pull_request.head.sha }}'.substring(0, 7);
             
-            // Check for existing comment
+            const body = `${marker}\n${emoji} Preview ${verb}!\n\n| | |\n|------|------|\n| 🔗 Preview | ${previewUrl} |\n| 📊 Database | [climb-log-db-preview](${dbUrl}) |\n| ⏱️ Deploy Time | ${deployTime} |\n| 📝 Commit | \`${commitSha}\` |\n\n_This preview updates automatically with each push._`;
+            
             const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number
+              repo: context.repo.repo
             });
             
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
-              comment.body.includes('Preview deployment')
-            );
+            const existing = comments.find(c => c.body && c.body.includes(marker));
             
-            const body = `### Preview deployment ready!
-            
-            | Name | Link |
-            |------|------|
-            | Preview | ${previewUrl} |
-            | Commit | \`${context.payload.pull_request.head.sha.substring(0, 7)}\` |
-            
-            _This preview will be updated on each push to this PR._`;
-            
-            if (botComment) {
+            if (existing) {
               await github.rest.issues.updateComment({
+                comment_id: existing.id,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                comment_id: botComment.id,
-                body
+                body: body
               });
             } else {
               await github.rest.issues.createComment({
+                issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number,
-                body
+                body: body
               });
             }
 
