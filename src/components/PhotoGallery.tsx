@@ -210,13 +210,32 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
             <div className="lightbox-info">
               {currentPhoto.caption && <h3>{currentPhoto.caption}</h3>}
               <div className="lightbox-meta">
-                {currentPhoto.area && <span>{currentPhoto.area}</span>}
-                {currentPhoto.state && <span>{currentPhoto.state}</span>}
-                {currentPhoto.date && <span>{formatDate(currentPhoto.date)}</span>}
-                {currentPhoto.camera && <span>{currentPhoto.camera}</span>}
+                {currentPhoto.area && (
+                  <span>
+                    <span style={{ opacity: 0.6 }}>📍</span> {currentPhoto.area}
+                  </span>
+                )}
+                {currentPhoto.state && currentPhoto.area && <span className="meta-sep">·</span>}
+                {currentPhoto.state && (
+                  <span>
+                    <span style={{ opacity: 0.6 }}>🗺️</span> {currentPhoto.state}
+                  </span>
+                )}
+                {currentPhoto.date && (currentPhoto.area || currentPhoto.state) && <span className="meta-sep">·</span>}
+                {currentPhoto.date && (
+                  <span>
+                    <span style={{ opacity: 0.6 }}>📅</span> {formatDate(currentPhoto.date)}
+                  </span>
+                )}
+                {currentPhoto.camera && currentPhoto.date && <span className="meta-sep">·</span>}
+                {currentPhoto.camera && (
+                  <span>
+                    <span style={{ opacity: 0.6 }}>📷</span> {currentPhoto.camera}
+                  </span>
+                )}
               </div>
               <div className="lightbox-counter">
-                {lightboxIndex! + 1} / {filteredPhotos.length}
+                {String(lightboxIndex! + 1).padStart(2, '0')} / {String(filteredPhotos.length).padStart(2, '0')}
               </div>
             </div>
           </div>
@@ -362,21 +381,41 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
         .lightbox-info h3 {
           margin: 0 0 0.5rem;
           font-size: 1.25rem;
+          color: #ffffff;
+          font-weight: 500;
+          text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
         .lightbox-meta {
           display: flex;
-          gap: 1.5rem;
+          gap: 0.75rem;
           justify-content: center;
-          font-size: 0.875rem;
-          color: rgba(255,255,255,0.7);
+          align-items: center;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 0.8rem;
+          color: rgba(255,255,255,0.9);
           flex-wrap: wrap;
+          margin-top: 0.5rem;
+        }
+
+        .lightbox-meta span {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .lightbox-meta .meta-sep {
+          color: rgba(255,255,255,0.4);
+          font-weight: 300;
         }
 
         .lightbox-counter {
           margin-top: 0.75rem;
-          font-size: 0.875rem;
+          font-size: 0.75rem;
           color: rgba(255,255,255,0.5);
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          letter-spacing: 0.05em;
         }
 
         @media (max-width: 768px) {
