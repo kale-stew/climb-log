@@ -43,7 +43,7 @@ const slug = post.id.replace(/\.md$/, '')
 <Layout 
   title={post.data.title} 
   description={`${categoryLabels[category]} - ${post.data.title}`}
-  ogImage={post.data.previewImgUrl}
+  ogImage={`https://kylies.photos/api/og/${slug}`}
   ogImageAlt={post.data.title}
 >
   <article class="container blog-post">
