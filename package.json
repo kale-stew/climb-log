@@ -17,7 +17,6 @@
     "seed": "tsx db/seed.ts",
     "seed:remote": "tsx db/seed.ts --remote",
     "export": "node scripts/export-data.mjs",
-    "migrate-images": "node scripts/migrate-images.mjs",
     "migrate:schema": "node scripts/migrate/merge-photos-schema.mjs",
     "migrate:schema:remote": "node scripts/migrate/merge-photos-schema.mjs --remote",
     "migrate:r2": "node scripts/migrate/r2-sync.mjs",

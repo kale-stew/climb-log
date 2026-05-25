@@ -1,4 +1,0 @@
-.categoryLink:hover {
-  cursor: pointer;
-  box-shadow: 0 10px 20px var(--color-bg-tertiary), 0 6px 6px var(--color-bg-tertiary);
-}
