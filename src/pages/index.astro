@@ -1,0 +1,194 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+// Get D1 binding from Cloudflare environment
+const DB = env.DB as D1Database | undefined
+
+let recentClimbs: any[] = []
+let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
+
+if (DB) {
+  // Fetch recent climbs
+  const climbsResult = await DB.prepare(
+    'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'
+  ).all()
+  recentClimbs = climbsResult.results || []
+
+  // Fetch stats
+  const statsResult = await DB.prepare(`
+    SELECT 
+      (SELECT COUNT(*) FROM climbs) as totalClimbs,
+      (SELECT COUNT(*) FROM peaks WHERE first_completed IS NOT NULL) as totalPeaks,
+      (SELECT COALESCE(SUM(distance), 0) FROM climbs) as totalMiles,
+      (SELECT COALESCE(SUM(gain), 0) FROM climbs) as totalGain
+  `).first()
+  
+  if (statsResult) {
+    stats = {
+      totalClimbs: statsResult.totalClimbs || 0,
+      totalPeaks: statsResult.totalPeaks || 0,
+      totalMiles: Math.round(statsResult.totalMiles || 0),
+      totalGain: Math.round(statsResult.totalGain || 0),
+    }
+  }
+}
+
+function formatNumber(n: number): string {
+  return n.toLocaleString()
+}
+---
+
+<Layout title="Home" description="Kylie's climbing and hiking adventures in Colorado and beyond.">
+  <div class="container page">
+    <!-- Hero -->
+    <section class="hero text-center mb-xl">
+      <h1>kylies.photos</h1>
+      <p style="font-size: 1.25rem; color: var(--color-text-secondary); max-width: 600px; margin: 0 auto;">
+        Climbing, hiking, and exploring the mountains of Colorado and beyond.
+      </p>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats-grid mb-xl">
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalClimbs)}</div>
+        <div class="stat-label">Climbs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalPeaks)}</div>
+        <div class="stat-label">Peaks Summited</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalMiles)}</div>
+        <div class="stat-label">Miles Hiked</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalGain)}'</div>
+        <div class="stat-label">Elevation Gained</div>
+      </div>
+    </section>
+
+    <!-- Recent Climbs -->
+    <section>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+        <h2 style="margin: 0;">Recent Climbs</h2>
+        <a href="/climbs" class="btn">View All →</a>
+      </div>
+
+      {recentClimbs.length > 0 ? (
+        <div class="climb-card-grid">
+          {recentClimbs.slice(0, 3).map((climb) => (
+            <a href={climb.slug ? `/blog/hike/${climb.slug}` : '/climbs'} class="climb-card">
+              <div class="climb-card-image">
+                {climb.preview_img_url ? (
+                  <img 
+                    src={climb.preview_img_url} 
+                    alt={climb.title || 'Climb photo'} 
+                    loading="lazy"
+                    onerror="this.style.display='none'"
+                  />
+                ) : (
+                  <div class="climb-card-image-placeholder" />
+                )}
+              </div>
+              <div class="climb-card-content">
+                <h3>{climb.title || 'Untitled'}</h3>
+                <p class="climb-card-meta">
+                  {climb.date && new Date(climb.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {climb.area && ` · ${climb.area}`}
+                </p>
+                {climb.distance && climb.gain && (
+                  <p class="climb-card-stats">
+                    {climb.distance} mi · {formatNumber(climb.gain)}' gain
+                  </p>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p>No climbs found. <a href="/climbs">View climb log</a></p>
+      )}
+    </section>
+  </div>
+
+  <style>
+    .hero {
+      padding: var(--space-3xl) 0;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: var(--space-md);
+    }
+    .climb-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-lg);
+    }
+    .climb-card {
+      display: block;
+      background: var(--color-bg-card);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .climb-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .climb-card-image {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      background: var(--color-bg-secondary);
+    }
+    .climb-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .climb-card:hover .climb-card-image img {
+      transform: scale(1.05);
+    }
+    .climb-card-image-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+    }
+    .climb-card-content {
+      padding: var(--space-md);
+    }
+    .climb-card-content h3 {
+      margin: 0 0 var(--space-sm);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .climb-card-meta {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      margin: 0 0 var(--space-xs);
+    }
+    .climb-card-stats {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      .climb-card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</Layout>

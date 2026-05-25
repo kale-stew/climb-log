@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro'
+import ClimbTable from '../components/ClimbTable'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+const DB = env.DB as D1Database | undefined
+
+let climbs: any[] = []
+
+if (DB) {
+  const result = await DB.prepare(
+    'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state, strava FROM climbs ORDER BY date DESC'
+  ).all()
+  climbs = result.results || []
+}
+---
+
+<Layout title="Climb Log" description="A log of all my hikes and climbs.">
+  <div class="container page">
+    <h1>Climb Log</h1>
+    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      A complete log of my hikes and climbs. Click on column headers to sort, use filters to narrow down.
+    </p>
+
+    <ClimbTable client:load climbs={climbs} />
+  </div>
+</Layout>

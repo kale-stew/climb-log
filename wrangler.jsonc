@@ -1,0 +1,70 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "climb-log",
+  "account_id": "bb52c0e5f3a93fc72779915d7dc6982b",
+  "compatibility_date": "2025-05-23",
+  "compatibility_flags": ["nodejs_compat_v2"],
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/", "/climbs", "/peaks", "/gear", "/photos", "/api/*", "/images/*", "/img/*", "/admin/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "climb-log-db",
+      "database_id": "95cf00b1-027f-4ae9-a9f1-4351aafa056d"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_IMAGES",
+      "bucket_name": "climb-log-images"
+    }
+  ],
+  "images": {
+    "binding": "IMAGES"
+  },
+  "vars": {
+    "ALLOWED_WIDTHS": "200,400,800,1600"
+  },
+  "triggers": {
+    "crons": ["0 0 * * *"]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "env": {
+    "preview": {
+      "name": "climb-log-preview",
+      "workers_dev": true,
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "climb-log-db-preview",
+          "database_id": "c0e56b31-fbfd-46f9-992e-af369d9c2cb9"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "R2_IMAGES",
+          "bucket_name": "climb-log-images-preview"
+        }
+      ],
+      "images": {
+        "binding": "IMAGES"
+      },
+      "vars": {
+        "ALLOWED_WIDTHS": "200,400,800,1600"
+      }
+    },
+    "production": {
+      "name": "climb-log",
+      "routes": [
+        { "pattern": "kylies.photos", "custom_domain": true }
+      ]
+    }
+  }
+}

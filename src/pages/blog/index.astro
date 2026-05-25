@@ -1,0 +1,230 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { getCollection } from 'astro:content'
+
+// Static page with all posts
+export const prerender = true
+
+const posts = await getCollection('blog')
+
+// Sort by date descending
+const sortedPosts = posts.sort((a, b) => {
+  return new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+})
+
+// Group by category (extracted from file path)
+function getCategory(id: string): string {
+  const parts = id.split('/')
+  return parts.length > 1 ? parts[0] : 'thoughts'
+}
+
+const categories = ['all', 'hike', 'gear', 'thoughts'] as const
+const categoryLabels: Record<string, string> = {
+  all: 'all',
+  hike: 'trip reports',
+  gear: 'gear',
+  thoughts: 'thoughts',
+}
+
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+}
+---
+
+<Layout title="Blog" description="Trip reports, gear reviews, and thoughts on hiking and climbing.">
+  <div class="container page">
+    <h1>Blog</h1>
+    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      Trip reports, gear reviews, and other thoughts from the trail.
+    </p>
+
+    <!-- Category Filter (client-side) -->
+    <div class="category-filter" id="category-filter">
+      {categories.map((cat) => (
+        <button 
+          class={`category-btn ${cat === 'all' ? 'active' : ''}`}
+          data-category={cat}
+        >
+          {categoryLabels[cat]}
+        </button>
+      ))}
+    </div>
+
+    <!-- Posts Grid -->
+    <div class="posts-grid" id="posts-grid">
+      {sortedPosts.map((post) => {
+        const category = getCategory(post.id)
+        const slug = post.id.replace(/\.md$/, '')
+        return (
+          <article class="post-card" data-category={category}>
+            {post.data.previewImgUrl && (
+              <a href={`/blog/${slug}`} class="post-image">
+                <img 
+                  src={post.data.previewImgUrl} 
+                  alt={post.data.title}
+                  loading="lazy"
+                />
+              </a>
+            )}
+            <div class="post-content">
+              <span class={`post-category cat-${category}`}>{categoryLabels[category]}</span>
+              <h2>
+                <a href={`/blog/${slug}`}>{post.data.title}</a>
+              </h2>
+              <time datetime={post.data.date}>{formatDate(post.data.date)}</time>
+            </div>
+          </article>
+        )
+      })}
+    </div>
+  </div>
+
+  <style>
+    .category-filter {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+
+    .category-btn {
+      padding: var(--space-xs) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: 9999px;
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .category-btn:hover {
+      border-color: var(--color-border-hover);
+      color: var(--color-text);
+    }
+
+    .category-btn.active {
+      background: var(--color-text);
+      color: var(--color-bg);
+      border-color: var(--color-text);
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-xl);
+    }
+
+    .post-card {
+      background: var(--color-bg-secondary);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .post-card:hover {
+      border-color: var(--color-border-hover);
+      transform: translateY(-2px);
+    }
+
+    .post-card.hidden {
+      display: none;
+    }
+
+    .post-image {
+      display: block;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    .post-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .post-card:hover .post-image img {
+      transform: scale(1.05);
+    }
+
+    .post-content {
+      padding: var(--space-lg);
+    }
+
+    .post-category {
+      display: inline-block;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .post-category.cat-hike {
+      color: var(--color-purple, #8b5cf6);
+    }
+
+    .post-category.cat-gear {
+      color: var(--color-orange, #f97316);
+    }
+
+    .post-category.cat-thoughts {
+      color: var(--color-pink, #ec4899);
+    }
+
+    .post-content h2 {
+      font-size: var(--font-size-lg);
+      margin: 0 0 var(--space-sm);
+      line-height: 1.3;
+    }
+
+    .post-content h2 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .post-content h2 a:hover {
+      color: var(--color-accent);
+    }
+
+    .post-content time {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+    }
+
+    @media (max-width: 640px) {
+      .posts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <script>
+    // Client-side category filtering
+    const filterBtns = document.querySelectorAll('.category-btn')
+    const posts = document.querySelectorAll('.post-card')
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const category = btn.getAttribute('data-category')
+        
+        // Update active button
+        filterBtns.forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        
+        // Filter posts
+        posts.forEach(post => {
+          const postCategory = post.getAttribute('data-category')
+          if (category === 'all' || postCategory === category) {
+            post.classList.remove('hidden')
+          } else {
+            post.classList.add('hidden')
+          }
+        })
+      })
+    })
+  </script>
+</Layout>

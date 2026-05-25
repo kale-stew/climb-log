@@ -5,7 +5,7 @@ import { Client, LogLevel } from '@notionhq/client'
  * Initialize Notion client & configure a default db query
  */
 export const notion = new Client({
-  auth: process.env.NOTION_ACCESS_TOKEN,
+  auth: process.env.NOTION_TOKEN,
   logLevel: LogLevel.DEBUG,
 })
 
@@ -82,7 +82,7 @@ export const findMatchingSlug = (str) => {
 export const getDatabaseQueryConfig = (
   cursor = null,
   pageSize = null,
-  database_id = process.env.NOTION_CLIMB_DATABASE_ID
+  database_id = process.env.NOTION_CLIMBS_DB_ID
 ) => {
   const config = {
     database_id,

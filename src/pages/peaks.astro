@@ -1,0 +1,195 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+const DB = env.DB as D1Database | undefined
+
+let peaks: any[] = []
+let stats = { total: 0, completed: 0, fourteeners: 0, thirteeners: 0 }
+
+if (DB) {
+  const result = await DB.prepare(`
+    SELECT id, title, elevation, range, first_completed, rank, img
+    FROM peaks 
+    ORDER BY elevation DESC
+  `).all()
+  peaks = result.results || []
+
+  stats.total = peaks.length
+  stats.completed = peaks.filter(p => p.first_completed).length
+  stats.fourteeners = peaks.filter(p => p.elevation >= 14000 && p.first_completed).length
+  stats.thirteeners = peaks.filter(p => p.elevation >= 13000 && p.elevation < 14000 && p.first_completed).length
+}
+
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function formatElevation(feet: number) {
+  return feet.toLocaleString() + "'"
+}
+---
+
+<Layout title="Peak List" description="Peaks I've summited in Colorado and beyond.">
+  <div class="container page">
+    <h1>Peak List</h1>
+    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      Tracking my progress on Colorado's highest peaks.
+    </p>
+
+    <!-- Stats -->
+    <div class="stats-grid mb-xl">
+      <div class="stat-card">
+        <div class="stat-value">{stats.completed}</div>
+        <div class="stat-label">Peaks Summited</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{stats.fourteeners}</div>
+        <div class="stat-label">14ers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{stats.thirteeners}</div>
+        <div class="stat-label">13ers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{stats.total}</div>
+        <div class="stat-label">On List</div>
+      </div>
+    </div>
+
+    <!-- Peak Grid with Photos -->
+    <div class="peak-grid">
+      {peaks.map((peak) => (
+        <div class={`peak-card ${peak.first_completed ? '' : 'not-completed'}`}>
+          {peak.img ? (
+            <div class="peak-image">
+              <img 
+                src={peak.img} 
+                alt={peak.title || 'Peak photo'}
+                loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.classList.add('no-image')"
+              />
+            </div>
+          ) : (
+            <div class="peak-image no-image">
+              <span class="peak-elevation-display">{formatElevation(peak.elevation)}</span>
+            </div>
+          )}
+          <div class="peak-info">
+            <div class="peak-header">
+              <h3>{peak.title}</h3>
+              {peak.elevation >= 14000 && <span class="badge">14er</span>}
+            </div>
+            <div class="peak-meta">
+              <span>{peak.range || 'Unknown range'}</span>
+              <span style="color: var(--color-text-tertiary);">{formatElevation(peak.elevation)}</span>
+            </div>
+            {peak.first_completed ? (
+              <div class="peak-date">First summit: {formatDate(peak.first_completed)}</div>
+            ) : (
+              <div class="peak-date pending">Not yet summited</div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <style>
+    .badge {
+      display: inline-block;
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      background: var(--color-accent);
+      color: white;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    .peak-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+    .peak-card {
+      background: var(--color-bg-card);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid var(--color-border);
+    }
+    .peak-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .peak-card.not-completed {
+      opacity: 0.6;
+    }
+    .peak-card.not-completed:hover {
+      opacity: 0.85;
+    }
+    .peak-image {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+      position: relative;
+    }
+    .peak-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .peak-card:hover .peak-image img {
+      transform: scale(1.05);
+    }
+    .peak-image.no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .peak-elevation-display {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-tertiary);
+      font-family: var(--font-serif);
+    }
+    .peak-info {
+      padding: var(--space-md);
+    }
+    .peak-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-sm);
+    }
+    .peak-header h3 {
+      margin: 0;
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+    }
+    .peak-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-sm);
+    }
+    .peak-date {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-accent);
+    }
+    .peak-date.pending {
+      color: var(--color-text-tertiary);
+      font-style: italic;
+    }
+  </style>
+</Layout>

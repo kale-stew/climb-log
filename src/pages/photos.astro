@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro'
+import PhotoGallery from '../components/PhotoGallery'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+const DB = env.DB as D1Database | undefined
+
+let photos: any[] = []
+
+if (DB) {
+  const result = await DB.prepare(`
+    SELECT 
+      id, 
+      short_id,
+      src as url, 
+      caption, 
+      date, 
+      area, 
+      width, 
+      height, 
+      title,
+      state,
+      search_tags as tags,
+      r2_key,
+      accent_color
+    FROM photos 
+    WHERE exclude = 0
+    ORDER BY date DESC
+  `).all()
+  photos = result.results || []
+}
+---
+
+<Layout title="Photos" description="A gallery of my favorite hiking and climbing photos.">
+  <div class="container page">
+    <h1>Photos</h1>
+    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      A gallery of my favorite shots from the trail. Click any photo to view full size.
+    </p>
+
+    <PhotoGallery client:only="react" photos={photos} />
+  </div>
+</Layout>

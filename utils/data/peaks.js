@@ -1,7 +1,7 @@
 import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
 const getPeakConfig = (nextCursor = null) =>
-  getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_PEAK_DATABASE_ID)
+  getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_PEAKS_DB_ID)
 const peakSorts = [{ property: 'elevation', direction: 'descending' }]
 
 const formatPeaks = (peakList) =>

@@ -1,47 +1,50 @@
 {
   "name": "climb-log",
   "author": "Kylie Czajkowski <hello@kylieis.online>",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "format": "prettier --write ."
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:preview": "npm run build && wrangler deploy --env preview",
+    "seed": "tsx db/seed.ts",
+    "seed:remote": "tsx db/seed.ts --remote",
+    "export": "node scripts/export-data.mjs",
+    "migrate-images": "node scripts/migrate-images.mjs",
+    "migrate:schema": "node scripts/migrate/merge-photos-schema.mjs",
+    "migrate:schema:remote": "node scripts/migrate/merge-photos-schema.mjs --remote",
+    "migrate:r2": "node scripts/migrate/r2-sync.mjs",
+    "format": "prettier --write .",
+    "typecheck": "astro check && tsc --noEmit"
   },
   "dependencies": {
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
-    "@notionhq/client": "^0.3.0",
-    "@resoc/create-img": "^0.7.1",
-    "@vercel/analytics": "^1.4.1",
-    "date-fns": "^2.27.0",
+    "@astrojs/cloudflare": "^13.2.0",
+    "@astrojs/react": "^4.3.0",
+    "@notionhq/client": "^2.3.0",
+    "astro": "^6.3.7",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.4.2",
     "gray-matter": "^4.0.3",
-    "next": "^15.1.6",
-    "path": "^0.12.7",
+    "hono": "^4.12.22",
+    "marked": "^15.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-grid-gallery": "^1.0.1",
-    "react-icons": "^4.3.1",
-    "react-markdown": "^7.1.1",
-    "react-table": "^7.8.0",
-    "react-tiny-popover": "^8.1.4",
-    "styled-components": "^6.1.14"
+    "recharts": "^2.15.3"
   },
   "devDependencies": {
-    "@resoc/core": "^0.9.1",
-    "prettier": "^2.3.2"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "@cloudflare/workers-types": "^4.20250515.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "prettier": "^3.5.3",
+    "tsx": "^4.22.3",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.94.0"
   }
 }
