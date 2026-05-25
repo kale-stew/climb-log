@@ -4,10 +4,11 @@ import { env } from 'cloudflare:workers'
 
 export const prerender = false
 
-// Get D1 binding from Cloudflare environment
 const DB = env.DB as D1Database | undefined
 
 let recentClimbs: any[] = []
+let heroPhotos: { short_id: string; accent_color: string | null }[] = []
+let heroAccentColor: string | null = null
 let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
 
 if (DB) {
@@ -16,6 +17,55 @@ if (DB) {
     'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'
   ).all()
   recentClimbs = climbsResult.results || []
+
+  // Fill missing preview images from photos table (Option B fallback)
+  for (const climb of recentClimbs) {
+    if (!climb.preview_img_url) {
+      // Try exact date first (most specific)
+      const dateMatch = await DB.prepare(`
+        SELECT short_id FROM photos 
+        WHERE exclude = 0 AND r2_key IS NOT NULL AND date = ?
+        ORDER BY date DESC LIMIT 1
+      `).bind(climb.date).first()
+      
+      if (dateMatch?.short_id) {
+        climb.preview_img_url = `/img/${dateMatch.short_id}?w=800`
+        continue
+      }
+      
+      // Then try area + state combo
+      const areaStateMatch = await DB.prepare(`
+        SELECT short_id FROM photos 
+        WHERE exclude = 0 AND r2_key IS NOT NULL 
+          AND area = ? AND state = ?
+        ORDER BY date DESC LIMIT 1
+      `).bind(climb.area, climb.state).first()
+      
+      if (areaStateMatch?.short_id) {
+        climb.preview_img_url = `/img/${areaStateMatch.short_id}?w=800`
+        continue
+      }
+      
+      // Last resort: state only
+      const stateMatch = await DB.prepare(`
+        SELECT short_id FROM photos 
+        WHERE exclude = 0 AND r2_key IS NOT NULL AND state = ?
+        ORDER BY date DESC LIMIT 1
+      `).bind(climb.state).first()
+      
+      if (stateMatch?.short_id) {
+        climb.preview_img_url = `/img/${stateMatch.short_id}?w=800`
+      }
+    }
+  }
+
+  // Fetch hero photos (last 5 from photos table, served via R2)
+  const photosResult = await DB.prepare(
+    'SELECT short_id, accent_color FROM photos WHERE exclude = 0 AND r2_key IS NOT NULL ORDER BY date DESC LIMIT 5'
+  ).all()
+  heroPhotos = (photosResult.results || [])
+    .filter((p: any) => p.short_id)
+    .map((p: any) => ({ short_id: p.short_id, accent_color: p.accent_color }))
 
   // Fetch stats
   const statsResult = await DB.prepare(`
@@ -41,40 +91,42 @@ function formatNumber(n: number): string {
 }
 ---
 
-<Layout title="Home" description="Kylie's climbing and hiking adventures in Colorado and beyond.">
-  <div class="container page">
-    <!-- Hero -->
-    <section class="hero text-center mb-xl">
+<Layout title="Home" description="Kylie's climbing and hiking adventures in Colorado and beyond." ogImage="https://kylies.photos/open-graph/home.jpg">
+  <!-- Hero -->
+  <section class="hero" data-photos={JSON.stringify(heroPhotos.map(p => p.short_id))} data-accents={JSON.stringify(Object.fromEntries(heroPhotos.map(p => [p.short_id, p.accent_color])))}>
+    <div class="hero-image" id="hero-image"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
       <h1>kylies.photos</h1>
-      <p style="font-size: 1.25rem; color: var(--color-text-secondary); max-width: 600px; margin: 0 auto;">
-        Climbing, hiking, and exploring the mountains of Colorado and beyond.
-      </p>
-    </section>
+      <p>Climbing, hiking, and exploring the mountains of Colorado and beyond.</p>
+    </div>
+  </section>
 
+  <div class="container page">
     <!-- Stats -->
-    <section class="stats-grid mb-xl">
-      <div class="stat-card">
-        <div class="stat-value">{formatNumber(stats.totalClimbs)}</div>
-        <div class="stat-label">Climbs</div>
+    <section class="stats-row mb-xl">
+      <div class="stat-item">
+        <div class="stat-number">{formatNumber(stats.totalClimbs)}</div>
+        <div class="stat-name">Climbs</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value">{formatNumber(stats.totalPeaks)}</div>
-        <div class="stat-label">Peaks Summited</div>
+      <div class="stat-item">
+        <div class="stat-number">{formatNumber(stats.totalPeaks)}</div>
+        <div class="stat-name">Peaks Summited</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value">{formatNumber(stats.totalMiles)}</div>
-        <div class="stat-label">Miles Hiked</div>
+      <div class="stat-item">
+        <div class="stat-number">{formatNumber(stats.totalMiles)}</div>
+        <div class="stat-name">Miles Hiked</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value">{formatNumber(stats.totalGain)}'</div>
-        <div class="stat-label">Elevation Gained</div>
+      <div class="stat-item">
+        <div class="stat-number">{formatNumber(stats.totalGain)}'</div>
+        <div class="stat-name">Elevation Gained</div>
       </div>
     </section>
 
     <!-- Recent Climbs -->
     <section>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
-        <h2 style="margin: 0;">Recent Climbs</h2>
+        <h2 style="margin: 0; font-family: var(--font-serif);">Recent Climbs</h2>
         <a href="/climbs" class="btn">View All →</a>
       </div>
 
@@ -88,7 +140,7 @@ function formatNumber(n: number): string {
                     src={climb.preview_img_url} 
                     alt={climb.title || 'Climb photo'} 
                     loading="lazy"
-                    onerror="this.style.display='none'"
+                    onerror="this.style.opacity='0'; this.parentElement.style.background='var(--color-bg-tertiary)'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; this.parentElement.innerHTML='<span style=font-size:14px>🏔️</span>'"
                   />
                 ) : (
                   <div class="climb-card-image-placeholder" />
@@ -115,14 +167,103 @@ function formatNumber(n: number): string {
     </section>
   </div>
 
+  <script>
+    // Cycle hero image through last 5 photos
+    const heroSection = document.querySelector('.hero');
+    const heroImage = document.getElementById('hero-image');
+    if (heroSection && heroImage) {
+      const photos = JSON.parse(heroSection.dataset.photos || '[]');
+      const accents = JSON.parse(heroSection.dataset.accents || '{}');
+      if (photos.length > 0) {
+        const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
+        heroImage.style.backgroundImage = `url(/img/${randomPhoto}?w=1600)`;
+        // Apply accent color of the SELECTED photo to stat numbers
+        const accentColor = accents[randomPhoto];
+        if (accentColor) {
+          document.querySelectorAll('.stat-number').forEach(el => {
+            (el as HTMLElement).style.color = accentColor;
+          });
+        }
+      }
+    }
+  </script>
+
   <style>
     .hero {
-      padding: var(--space-3xl) 0;
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      min-height: 400px;
+      max-height: 700px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .hero h1 {
-      font-size: 3.5rem;
+    .hero-image {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 0.5s ease;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.5) 70%, var(--color-bg-primary) 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+      padding: var(--space-lg);
+    }
+    .hero-content h1 {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 4rem;
+      font-weight: 400;
       margin-bottom: var(--space-md);
+      color: #ffffff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
     }
+    .hero-content p {
+      font-size: 1.25rem;
+      max-width: 500px;
+      margin: 0 auto;
+      color: #ffffff;
+      opacity: 0.95;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-xl);
+      padding: var(--space-2xl) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--color-text-accent);
+      line-height: 1.1;
+      transition: color 0.3s ease;
+    }
+    .stat-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-xs);
+    }
+
     .climb-card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -130,18 +271,18 @@ function formatNumber(n: number): string {
     }
     .climb-card {
       display: block;
-      background: var(--color-bg-card);
+      background: var(--color-bg-primary);
       border-radius: var(--border-radius-lg);
       overflow: hidden;
-      box-shadow: var(--shadow-sm);
       border: 1px solid var(--color-border);
       text-decoration: none;
       color: inherit;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
     .climb-card:hover {
       transform: translateY(-3px);
       box-shadow: var(--shadow-md);
+      border-color: var(--color-border-hover);
     }
     .climb-card-image {
       width: 100%;
@@ -162,6 +303,9 @@ function formatNumber(n: number): string {
       width: 100%;
       height: 100%;
       background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .climb-card-content {
       padding: var(--space-md);
@@ -182,9 +326,21 @@ function formatNumber(n: number): string {
       color: var(--color-text-secondary);
       margin: 0;
     }
+
     @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 2.5rem;
+      .hero {
+        height: 50vh;
+        min-height: 300px;
+      }
+      .hero-content h1 {
+        font-size: 2.75rem;
+      }
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-lg);
+      }
+      .stat-number {
+        font-size: 2rem;
       }
       .climb-card-grid {
         grid-template-columns: 1fr;

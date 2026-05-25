@@ -198,18 +198,51 @@ button:hover, .btn:hover {
 /* Forms */
 input, select, textarea {
   font-family: var(--font-sans);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   padding: var(--space-sm) var(--space-md);
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   outline: none;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  height: 40px;
+  line-height: 1.4;
+}
+
+input::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.8;
 }
 
 input:focus, select:focus, textarea:focus {
   border-color: var(--color-text-accent);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+select {
+  appearance: auto;
+  padding-right: var(--space-xl);
+  cursor: pointer;
+}
+
+select option {
+  padding: var(--space-sm);
+}
+
+/* Filter bar alignment */
+.filter-bar input,
+.filter-bar select {
+  min-width: 160px;
+  max-width: 100%;
+}
+
+.filter-bar input[type="text"] {
+  min-width: 220px;
+}
+
+.filter-bar {
+  align-items: center;
 }
 
 /* Header */
