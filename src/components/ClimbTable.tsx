@@ -191,82 +191,124 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
         </div>
       </div>
 
-      {/* Table */}
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th style={{ width: '80px' }}>Photo</th>
-              <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }}>
-                Date <SortIcon field="date" />
-              </th>
-              <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                Hike <SortIcon field="title" />
-              </th>
-              <th onClick={() => handleSort('area')} style={{ cursor: 'pointer' }}>
-                Area <SortIcon field="area" />
-              </th>
-              <th onClick={() => handleSort('distance')} style={{ cursor: 'pointer', textAlign: 'right' }}>
-                Distance <SortIcon field="distance" />
-              </th>
-              <th onClick={() => handleSort('gain')} style={{ cursor: 'pointer', textAlign: 'right' }}>
-                Gain <SortIcon field="gain" />
-              </th>
-              <th style={{ textAlign: 'center' }}>Links</th>
-            </tr>
-          </thead>
-          <tbody>
+      {/* Empty state */}
+      {filteredClimbs.length === 0 && (
+        <div className="empty-state">
+          <p>No climbs match your filters.</p>
+          <button onClick={() => { setSearchQuery(''); setAreaFilter(''); setStateFilter(''); setCurrentPage(1) }} className="btn">
+            Clear filters
+          </button>
+        </div>
+      )}
+
+      {/* Desktop Table */}
+      {filteredClimbs.length > 0 && (
+        <>
+          <div className="table-container desktop-only">
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: '80px' }}>Photo</th>
+                  <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }} aria-label={`Sort by date, currently ${sortField === 'date' ? sortOrder : 'unsorted'}`}>
+                    Date <SortIcon field="date" />
+                  </th>
+                  <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }} aria-label={`Sort by title, currently ${sortField === 'title' ? sortOrder : 'unsorted'}`}>
+                    Hike <SortIcon field="title" />
+                  </th>
+                  <th onClick={() => handleSort('area')} style={{ cursor: 'pointer' }} aria-label={`Sort by area, currently ${sortField === 'area' ? sortOrder : 'unsorted'}`}>
+                    Area <SortIcon field="area" />
+                  </th>
+                  <th onClick={() => handleSort('distance')} style={{ cursor: 'pointer', textAlign: 'right' }} aria-label={`Sort by distance, currently ${sortField === 'distance' ? sortOrder : 'unsorted'}`}>
+                    Distance <SortIcon field="distance" />
+                  </th>
+                  <th onClick={() => handleSort('gain')} style={{ cursor: 'pointer', textAlign: 'right' }} aria-label={`Sort by gain, currently ${sortField === 'gain' ? sortOrder : 'unsorted'}`}>
+                    Gain <SortIcon field="gain" />
+                  </th>
+                  <th style={{ textAlign: 'center' }}>Links</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedClimbs.map((climb) => (
+                  <tr key={climb.id}>
+                    <td>
+                      {climb.preview_img_url ? (
+                        <a href={climb.slug ? `/blog/hike/${climb.slug}` : '#'} className="climb-thumb-link">
+                          <img 
+                            src={climb.preview_img_url} 
+                            alt={climb.title || ''}
+                            className="climb-thumb"
+                            loading="lazy"
+                            onError={(e) => {
+                              const el = e.target as HTMLImageElement
+                              el.style.opacity = '0'
+                              el.parentElement!.style.background = 'var(--color-bg-tertiary)'
+                              el.parentElement!.style.display = 'flex'
+                              el.parentElement!.style.alignItems = 'center'
+                              el.parentElement!.style.justifyContent = 'center'
+                              el.parentElement!.innerHTML = '<span style="font-size: 10px; color: var(--color-text-tertiary)">📷</span>'
+                            }}
+                          />
+                        </a>
+                      ) : (
+                        <div className="climb-thumb-placeholder" />
+                      )}
+                    </td>
+                    <td>{formatDate(climb.date)}</td>
+                    <td>
+                      {climb.slug ? (
+                        <a href={`/blog/hike/${climb.slug}`}>{climb.title || 'Untitled'}</a>
+                      ) : (
+                        climb.title || 'Untitled'
+                      )}
+                    </td>
+                    <td>
+                      {climb.area}
+                      {climb.state && <span style={{ color: 'var(--color-text-tertiary)' }}>, {climb.state}</span>}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>{formatDistance(climb.distance)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatGain(climb.gain)}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      {climb.strava && (
+                        <a href={climb.strava} target="_blank" rel="noopener noreferrer" title="View on Strava">
+                          🏃
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="mobile-only">
             {paginatedClimbs.map((climb) => (
-              <tr key={climb.id}>
-                <td>
-                  {climb.preview_img_url ? (
-                    <a href={climb.slug ? `/blog/hike/${climb.slug}` : '#'} className="climb-thumb-link">
-                      <img 
-                        src={climb.preview_img_url} 
-                        alt={climb.title || ''}
-                        className="climb-thumb"
-                        loading="lazy"
-                        onError={(e) => {
-                          const el = e.target as HTMLImageElement
-                          el.style.opacity = '0'
-                          el.parentElement!.style.background = 'var(--color-bg-tertiary)'
-                          el.parentElement!.style.display = 'flex'
-                          el.parentElement!.style.alignItems = 'center'
-                          el.parentElement!.style.justifyContent = 'center'
-                          el.parentElement!.innerHTML = '<span style="font-size: 10px; color: var(--color-text-tertiary)">📷</span>'
-                        }}
-                      />
-                    </a>
-                  ) : (
-                    <div className="climb-thumb-placeholder" />
+              <div className="climb-mobile-card" key={climb.id}>
+                <div className="climb-mobile-header">
+                  <span className="climb-mobile-date">{formatDate(climb.date)}</span>
+                  {climb.strava && (
+                    <a href={climb.strava} target="_blank" rel="noopener noreferrer" title="View on Strava">🏃</a>
                   )}
-                </td>
-                <td>{formatDate(climb.date)}</td>
-                <td>
+                </div>
+                <h3 className="climb-mobile-title">
                   {climb.slug ? (
                     <a href={`/blog/hike/${climb.slug}`}>{climb.title || 'Untitled'}</a>
                   ) : (
                     climb.title || 'Untitled'
                   )}
-                </td>
-                <td>
-                  {climb.area}
-                  {climb.state && <span style={{ color: 'var(--color-text-tertiary)' }}>, {climb.state}</span>}
-                </td>
-                <td style={{ textAlign: 'right' }}>{formatDistance(climb.distance)}</td>
-                <td style={{ textAlign: 'right' }}>{formatGain(climb.gain)}</td>
-                <td style={{ textAlign: 'center' }}>
-                  {climb.strava && (
-                    <a href={climb.strava} target="_blank" rel="noopener noreferrer" title="View on Strava">
-                      🏃
-                    </a>
-                  )}
-                </td>
-              </tr>
+                </h3>
+                <div className="climb-mobile-meta">
+                  {climb.area && <span>{climb.area}{climb.state && `, ${climb.state}`}</span>}
+                </div>
+                <div className="climb-mobile-stats">
+                  <span>{formatDistance(climb.distance)}</span>
+                  <span>{formatGain(climb.gain)}</span>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -346,6 +388,63 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
       )}
 
       <style>{`
+        .empty-state {
+          text-align: center;
+          padding: var(--space-2xl) var(--space-lg);
+          color: var(--color-text-tertiary);
+        }
+        .empty-state p {
+          margin-bottom: var(--space-md);
+        }
+
+        .desktop-only {
+          display: block;
+        }
+        .mobile-only {
+          display: none;
+        }
+
+        .climb-mobile-card {
+          background: var(--color-bg-primary);
+          border: 1px solid var(--color-border);
+          border-radius: var(--border-radius-lg);
+          padding: var(--space-md);
+          margin-bottom: var(--space-md);
+        }
+        .climb-mobile-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: var(--space-sm);
+        }
+        .climb-mobile-date {
+          font-size: var(--font-size-sm);
+          color: var(--color-text-tertiary);
+        }
+        .climb-mobile-title {
+          font-size: var(--font-size-lg);
+          font-weight: 600;
+          margin: 0 0 var(--space-sm);
+        }
+        .climb-mobile-title a {
+          color: inherit;
+          text-decoration: none;
+        }
+        .climb-mobile-title a:hover {
+          color: var(--color-text-accent);
+        }
+        .climb-mobile-meta {
+          font-size: var(--font-size-sm);
+          color: var(--color-text-secondary);
+          margin-bottom: var(--space-sm);
+        }
+        .climb-mobile-stats {
+          display: flex;
+          gap: var(--space-lg);
+          font-size: var(--font-size-sm);
+          color: var(--color-text-tertiary);
+        }
+
         .climb-thumb-link {
           display: block;
           width: 60px;
@@ -392,6 +491,15 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           background: var(--color-text);
           color: var(--color-bg);
           border-color: var(--color-text);
+        }
+
+        @media (max-width: 768px) {
+          .desktop-only {
+            display: none;
+          }
+          .mobile-only {
+            display: block;
+          }
         }
       `}</style>
     </div>
