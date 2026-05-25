@@ -2,7 +2,6 @@
 title: 'My Car Camping Setup'
 date: '2022-02-01'
 previewImgUrl: 'https://live.staticflickr.com/65535/51851829565_d5f9104edc_b.jpg'
-bgColor: '#768021'
 ---
 
 When I was 15 and just beginning to drive on a learner's permit, I remember thinking an SUV would be the coolest. So much room! For whatever you want! And that height off of the road? They just looked awesome. Of course, when I mentioned this to my dad as reasoning for why I wanted an SUV as my first vehicle, he let me know that a bigger car meant bigger costs, bigger replacement pieces, and a bigger and more expensive to fill gas tank. My request wasn't reasonable as a teenager driving around a crowded metropolitan area, and I didn't even realize it.

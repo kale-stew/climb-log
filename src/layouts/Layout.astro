@@ -3,9 +3,13 @@ export interface Props {
   title: string
   description?: string
   ogImage?: string
+  ogImageAlt?: string
 }
 
-const { title, description, ogImage } = Astro.props
+const { title, description, ogImage, ogImageAlt } = Astro.props
+
+const canonicalUrl = `https://kylies.photos${Astro.url.pathname}`
+const defaultOgImage = 'https://kylies.photos/og/default.jpg'
 
 const navLinks = [
   { name: 'Blog', href: '/blog' },
@@ -44,22 +48,37 @@ const footerLinks = {
     <title>{title} — kylies.photos</title>
     <meta name="description" content={description ?? 'Kylie\'s climbing and hiking adventures in Colorado and beyond.'} />
     
+    <link rel="canonical" href={canonicalUrl} />
+
     <!-- Open Graph -->
     <meta property="og:title" content={`${title} — kylies.photos`} />
     <meta property="og:description" content={description ?? ''} />
-    <meta property="og:image" content={ogImage ?? 'https://kylies.photos/og/default.jpg'} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage ?? defaultOgImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt ?? `${title} — kylies.photos`} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="kylies.photos" />
-    
-    <!-- Twitter -->
+
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@kyliestew" />
+    <meta name="twitter:creator" content="@kyliestew" />
     <meta name="twitter:title" content={`${title} — kylies.photos`} />
     <meta name="twitter:description" content={description ?? ''} />
-    <meta name="twitter:image" content={ogImage ?? 'https://kylies.photos/og/default.jpg'} />
-    
-    <!-- Favicon -->
+    <meta name="twitter:image" content={ogImage ?? defaultOgImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt ?? `${title} — kylies.photos`} />
+
+    <!-- Theme color for mobile browsers -->
+    <meta name="theme-color" content="#FAF8F5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1C1A18" media="(prefers-color-scheme: dark)" />
+
+    <!-- Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/web.manifest" />
     
     <!-- Styles -->
     <link rel="stylesheet" href="/styles/globals.css" />

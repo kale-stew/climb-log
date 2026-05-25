@@ -1,0 +1,67 @@
+name: Cleanup Preview
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+env:
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install wrangler
+        run: npm install -g wrangler
+
+      - name: Generate preview name from PR title
+        id: slug
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          WORD=$(echo "$TITLE" | sed -E 's/^(fix|feat|chore|docs|refactor|test|ci|style|perf|build|revert|rewrite|add|update|remove|delete)(\([^)]*\))?[:!]?\s*//i' | awk '{print $1}' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g' | cut -c1-12)
+          [ -z "$WORD" ] && WORD="pr${{ github.event.pull_request.number }}"
+          echo "name=climb-log-${WORD}-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+
+      - name: Delete preview worker
+        run: |
+          npx wrangler delete --name "${{ steps.slug.outputs.name }}" --force
+        continue-on-error: true
+
+      - name: Update bot comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- climb-log-preview-bot -->';
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            
+            if (existing) {
+              const verb = context.payload.pull_request.merged ? 'merged' : 'closed';
+              const body = `${marker}\n🧹 Preview cleaned up — PR ${verb}!\n\n_The preview worker has been deleted._`;
+              
+              await github.rest.issues.updateComment({
+                comment_id: existing.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }

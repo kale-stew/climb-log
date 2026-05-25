@@ -14,10 +14,48 @@ if (DB) {
     'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state, strava FROM climbs ORDER BY date DESC'
   ).all()
   climbs = result.results || []
+
+  // Option B: Fill missing preview images from photos table
+  for (const climb of climbs) {
+    if (!climb.preview_img_url) {
+      const dateMatch = await DB.prepare(`
+        SELECT short_id FROM photos 
+        WHERE exclude = 0 AND r2_key IS NOT NULL AND date = ?
+        ORDER BY date DESC LIMIT 1
+      `).bind(climb.date).first()
+      
+      if (dateMatch?.short_id) {
+        climb.preview_img_url = `/img/${dateMatch.short_id}?w=200`
+        continue
+      }
+      
+      const areaStateMatch = await DB.prepare(`
+        SELECT short_id FROM photos 
+        WHERE exclude = 0 AND r2_key IS NOT NULL 
+          AND area = ? AND state = ?
+        ORDER BY date DESC LIMIT 1
+      `).bind(climb.area, climb.state).first()
+      
+      if (areaStateMatch?.short_id) {
+        climb.preview_img_url = `/img/${areaStateMatch.short_id}?w=200`
+        continue
+      }
+      
+      const stateMatch = await DB.prepare(`
+        SELECT short_id FROM photos 
+        WHERE exclude = 0 AND r2_key IS NOT NULL AND state = ?
+        ORDER BY date DESC LIMIT 1
+      `).bind(climb.state).first()
+      
+      if (stateMatch?.short_id) {
+        climb.preview_img_url = `/img/${stateMatch.short_id}?w=200`
+      }
+    }
+  }
 }
 ---
 
-<Layout title="Climb Log" description="A log of all my hikes and climbs.">
+<Layout title="Climb Log" description="A log of all my hikes and climbs." ogImage="https://kylies.photos/open-graph/climb-log.jpg">
   <div class="container page">
     <h1>Climb Log</h1>
     <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">

@@ -29,6 +29,98 @@ const MAX_CUSTOM_WIDTH = 2048;
 // In-flight transform tracking to prevent duplicate work
 const inFlightTransforms = new Map<string, Promise<any>>();
 
+/**
+ * Extract the dominant color from a PNG image buffer.
+ * Uses a simple k-means-like approach: sample pixels, find most common color cluster.
+ * Returns hex color string like "#8B7355"
+ */
+function extractDominantColor(pngBuffer: Uint8Array): string | null {
+  try {
+    // PNG files start with signature, then chunks
+    // We need to find the IDAT chunk and decompress it
+    // For simplicity, we'll use a rough heuristic on raw pixel data
+    
+    // Find IHDR to get dimensions (should be right after signature)
+    // PNG signature is 8 bytes, then IHDR chunk
+    if (pngBuffer.length < 33) return null;
+    
+    // Skip PNG signature (8 bytes) and IHDR length (4 bytes) and type (4 bytes)
+    const width = (pngBuffer[16] << 24) | (pngBuffer[17] << 16) | (pngBuffer[18] << 8) | pngBuffer[19];
+    const height = (pngBuffer[20] << 24) | (pngBuffer[21] << 16) | (pngBuffer[22] << 8) | pngBuffer[23];
+    
+    if (width <= 0 || height <= 0 || width > 100 || height > 100) {
+      // Fallback: sample from raw buffer bytes (rough approximation)
+      return extractColorFromRawBytes(pngBuffer);
+    }
+    
+    return extractColorFromRawBytes(pngBuffer);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Sample colors from raw image bytes (works as fallback for any format)
+ * Looks for byte patterns that could be RGB values
+ */
+function extractColorFromRawBytes(buffer: Uint8Array): string | null {
+  // Skip headers (first ~100 bytes likely contain PNG/image headers)
+  const startOffset = Math.min(100, Math.floor(buffer.length * 0.1));
+  const endOffset = Math.floor(buffer.length * 0.9);
+  
+  if (endOffset - startOffset < 100) return null;
+  
+  // Sample RGB triplets and collect color frequencies
+  const colorCounts = new Map<string, number>();
+  const sampleStep = Math.max(3, Math.floor((endOffset - startOffset) / 500));
+  
+  for (let i = startOffset; i < endOffset - 3; i += sampleStep) {
+    const r = buffer[i];
+    const g = buffer[i + 1];
+    const b = buffer[i + 2];
+    
+    // Skip values that are likely not real colors (too dark, too bright, or grayscale)
+    if (r < 20 && g < 20 && b < 20) continue; // too dark
+    if (r > 245 && g > 245 && b > 245) continue; // too bright
+    
+    // Quantize to reduce noise (round to nearest 16)
+    const qr = Math.round(r / 16) * 16;
+    const qg = Math.round(g / 16) * 16;
+    const qb = Math.round(b / 16) * 16;
+    
+    const key = `${qr},${qg},${qb}`;
+    colorCounts.set(key, (colorCounts.get(key) || 0) + 1);
+  }
+  
+  if (colorCounts.size === 0) return null;
+  
+  // Find the most common color with decent saturation
+  let bestColor = "";
+  let bestScore = 0;
+  
+  for (const [key, count] of colorCounts) {
+    const [r, g, b] = key.split(",").map(Number);
+    
+    // Calculate saturation (prefer colorful over gray)
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const saturation = max > 0 ? (max - min) / max : 0;
+    
+    // Score combines frequency and saturation preference
+    const score = count * (0.5 + saturation * 0.5);
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestColor = key;
+    }
+  }
+  
+  if (!bestColor) return null;
+  
+  const [r, g, b] = bestColor.split(",").map(Number);
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`.toUpperCase();
+}
+
 interface Photo {
   id: string;
   short_id: string | null;
@@ -656,6 +748,96 @@ export function createPhotosApp(env: PhotosApiEnv) {
     } catch (error) {
       return c.json({ error: "Transform failed" }, 500);
     }
+  });
+
+  // POST /api/admin/photos/extract-colors - Extract accent colors for photos missing them
+  // Can be called via MCP or admin UI to batch-process photos
+  app.post("/api/admin/photos/extract-colors", async (c) => {
+    const body = await c.req.json().catch(() => ({}));
+    const limit = Math.min(body.limit || 50, 100); // Max 100 per batch
+    const photoId = body.photoId; // Optional: process single photo
+
+    let photos: Photo[];
+    
+    if (photoId) {
+      // Single photo mode
+      let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
+        .bind(photoId)
+        .first<Photo>();
+      if (!photo) {
+        photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+          .bind(photoId)
+          .first<Photo>();
+      }
+      if (!photo) return c.json({ error: "Photo not found" }, 404);
+      photos = [photo];
+    } else {
+      // Batch mode: get photos missing accent_color
+      const result = await env.DB.prepare(
+        `SELECT * FROM photos 
+         WHERE r2_key IS NOT NULL 
+           AND (accent_color IS NULL OR accent_color = '')
+         ORDER BY date DESC 
+         LIMIT ?`
+      ).bind(limit).all<Photo>();
+      photos = result.results || [];
+    }
+
+    if (photos.length === 0) {
+      return c.json({ message: "No photos need color extraction", processed: 0 });
+    }
+
+    const results: { id: string; accent_color: string | null; error?: string }[] = [];
+
+    for (const photo of photos) {
+      try {
+        // Get a small version of the image for color sampling
+        const originalKey = `${photo.r2_key}/original.${photo.format}`;
+        const original = await env.R2_IMAGES.get(originalKey);
+        
+        if (!original) {
+          results.push({ id: photo.id, accent_color: null, error: "Original not found" });
+          continue;
+        }
+
+        // Transform to a tiny image (32x32) for fast color extraction
+        const transformed = await env.IMAGES.input(original.body)
+          .transform({ width: 32, height: 32, fit: "cover" })
+          .output({ format: "image/png" });
+        
+        const buffer = await transformed.response().arrayBuffer();
+        const accentColor = extractDominantColor(new Uint8Array(buffer));
+
+        if (accentColor) {
+          // Update database
+          await env.DB.prepare(
+            "UPDATE photos SET accent_color = ?, updated_at = datetime('now') WHERE id = ?"
+          ).bind(accentColor, photo.id).run();
+          
+          results.push({ id: photo.id, accent_color: accentColor });
+        } else {
+          results.push({ id: photo.id, accent_color: null, error: "Could not extract color" });
+        }
+      } catch (error) {
+        results.push({ 
+          id: photo.id, 
+          accent_color: null, 
+          error: error instanceof Error ? error.message : "Unknown error" 
+        });
+      }
+    }
+
+    const successful = results.filter(r => r.accent_color && !r.error).length;
+    const remaining = await env.DB.prepare(
+      "SELECT COUNT(*) as count FROM photos WHERE r2_key IS NOT NULL AND (accent_color IS NULL OR accent_color = '')"
+    ).first<{ count: number }>();
+
+    return c.json({
+      processed: photos.length,
+      successful,
+      remaining: remaining?.count || 0,
+      results,
+    });
   });
 
   // POST /api/admin/upload - Upload new photo
