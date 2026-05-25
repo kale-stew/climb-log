@@ -1,0 +1,132 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+// Get D1 binding from Cloudflare environment
+const DB = env.DB as D1Database | undefined
+
+let recentClimbs: any[] = []
+let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
+
+if (DB) {
+  // Fetch recent climbs
+  const climbsResult = await DB.prepare(
+    'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'
+  ).all()
+  recentClimbs = climbsResult.results || []
+
+  // Fetch stats
+  const statsResult = await DB.prepare(`
+    SELECT 
+      (SELECT COUNT(*) FROM climbs) as totalClimbs,
+      (SELECT COUNT(*) FROM peaks WHERE first_completed IS NOT NULL) as totalPeaks,
+      (SELECT COALESCE(SUM(distance), 0) FROM climbs) as totalMiles,
+      (SELECT COALESCE(SUM(gain), 0) FROM climbs) as totalGain
+  `).first()
+  
+  if (statsResult) {
+    stats = {
+      totalClimbs: statsResult.totalClimbs || 0,
+      totalPeaks: statsResult.totalPeaks || 0,
+      totalMiles: Math.round(statsResult.totalMiles || 0),
+      totalGain: Math.round(statsResult.totalGain || 0),
+    }
+  }
+}
+
+function formatNumber(n: number): string {
+  return n.toLocaleString()
+}
+---
+
+<Layout title="Home" description="Kylie's climbing and hiking adventures in Colorado and beyond.">
+  <div class="container page">
+    <!-- Hero -->
+    <section class="hero text-center mb-xl">
+      <h1>kylies.photos</h1>
+      <p style="font-size: 1.25rem; color: var(--color-text-secondary); max-width: 600px; margin: 0 auto;">
+        Climbing, hiking, and exploring the mountains of Colorado and beyond.
+      </p>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats-grid mb-xl">
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalClimbs)}</div>
+        <div class="stat-label">Climbs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalPeaks)}</div>
+        <div class="stat-label">Peaks Summited</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalMiles)}</div>
+        <div class="stat-label">Miles Hiked</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{formatNumber(stats.totalGain)}'</div>
+        <div class="stat-label">Elevation Gained</div>
+      </div>
+    </section>
+
+    <!-- Recent Climbs -->
+    <section>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+        <h2 style="margin: 0;">Recent Climbs</h2>
+        <a href="/climbs" class="btn">View All →</a>
+      </div>
+
+      {recentClimbs.length > 0 ? (
+        <div class="grid grid-3">
+          {recentClimbs.slice(0, 3).map((climb) => (
+            <div class="card">
+              {climb.preview_img_url && (
+                <img 
+                  src={climb.preview_img_url} 
+                  alt={climb.title || 'Climb photo'} 
+                  style="width: 100%; height: 180px; object-fit: cover; border-radius: var(--border-radius); margin-bottom: var(--space-md);"
+                  loading="lazy"
+                />
+              )}
+              <h3 style="font-size: var(--font-size-lg); margin-bottom: var(--space-sm);">
+                {climb.slug ? (
+                  <a href={`/blog/hike/${climb.slug}`}>{climb.title || 'Untitled'}</a>
+                ) : (
+                  climb.title || 'Untitled'
+                )}
+              </h3>
+              <p style="font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0;">
+                {climb.date && new Date(climb.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {climb.area && ` · ${climb.area}`}
+              </p>
+              {climb.distance && climb.gain && (
+                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: var(--space-xs);">
+                  {climb.distance} mi · {formatNumber(climb.gain)}' gain
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No climbs found. <a href="/climbs">View climb log</a></p>
+      )}
+    </section>
+  </div>
+
+  <style>
+    .hero {
+      padding: var(--space-3xl) 0;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: var(--space-md);
+    }
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</Layout>

@@ -1,0 +1,162 @@
+---
+export interface Props {
+  title: string
+  description?: string
+  ogImage?: string
+}
+
+const { title, description, ogImage } = Astro.props
+
+const navLinks = [
+  { name: 'Blog', href: '/blog' },
+  { name: 'Climbs', href: '/climbs' },
+  { name: 'Peaks', href: '/peaks' },
+  { name: 'Gear', href: '/gear' },
+  { name: 'Photos', href: '/photos' },
+  { name: 'About', href: '/about' },
+]
+
+const currentPath = Astro.url.pathname
+
+const footerLinks = {
+  explore: [
+    { title: 'Blog', href: '/blog' },
+    { title: 'Climb Log', href: '/climbs' },
+    { title: 'Peak List', href: '/peaks' },
+    { title: 'Gear List', href: '/gear' },
+    { title: 'Photos', href: '/photos' },
+    { title: 'About', href: '/about' },
+  ],
+  connect: [
+    { title: 'Instagram', href: 'https://www.instagram.com/kalestewski/' },
+    { title: 'Strava', href: 'https://www.strava.com/athletes/46336787' },
+    { title: 'AllTrails', href: 'https://www.alltrails.com/members/kylie-stewart-1' },
+    { title: 'Flickr', href: 'https://flickr.com/photos/189863825@N02/' },
+  ],
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — kylies.photos</title>
+    <meta name="description" content={description ?? 'Kylie\'s climbing and hiking adventures in Colorado and beyond.'} />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content={`${title} — kylies.photos`} />
+    <meta property="og:description" content={description ?? ''} />
+    <meta property="og:image" content={ogImage ?? 'https://kylies.photos/og/default.jpg'} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="kylies.photos" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} — kylies.photos`} />
+    <meta name="twitter:description" content={description ?? ''} />
+    <meta name="twitter:image" content={ogImage ?? 'https://kylies.photos/og/default.jpg'} />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/styles/globals.css" />
+    
+    <!-- Theme init (prevent flash) -->
+    <script is:inline>
+      const theme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    </script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="logo">kylies.photos</a>
+        
+        <button class="mobile-nav-toggle" aria-label="Toggle navigation" id="nav-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        
+        <nav class="nav" id="nav">
+          {navLinks.map(link => (
+            <a 
+              href={link.href} 
+              class:list={['nav-link', { active: currentPath.startsWith(link.href) }]}
+            >
+              {link.name}
+            </a>
+          ))}
+          
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div>
+          <h4>Explore</h4>
+          {footerLinks.explore.map(link => (
+            <a href={link.href}>{link.title}</a>
+          ))}
+        </div>
+        <div>
+          <h4>Connect</h4>
+          {footerLinks.connect.map(link => (
+            <a href={link.href} target="_blank" rel="noopener noreferrer">{link.title}</a>
+          ))}
+        </div>
+        <div>
+          <h4>About</h4>
+          <p style="font-size: 0.875rem; color: var(--color-light-grey); line-height: 1.6;">
+            Photos and stories from Kylie's adventures in the mountains.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Theme toggle
+      const themeToggle = document.getElementById('theme-toggle');
+      themeToggle?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      });
+
+      // Mobile nav toggle
+      const navToggle = document.getElementById('nav-toggle');
+      const nav = document.getElementById('nav');
+      navToggle?.addEventListener('click', () => {
+        nav?.classList.toggle('open');
+      });
+    </script>
+  </body>
+</html>

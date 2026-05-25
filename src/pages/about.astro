@@ -1,0 +1,73 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+// Static page - no SSR needed
+export const prerender = true
+---
+
+<Layout title="About" description="About Kylie and this site.">
+  <div class="container page">
+    <h1>About</h1>
+    
+    <div class="about-content">
+      <section>
+        <h2>Hey, I'm Kylie</h2>
+        <p>
+          I'm a software engineer based in Colorado who spends most of my free time in the mountains. 
+          This site is where I document my hikes, climbs, and adventures.
+        </p>
+        <p>
+          I started hiking Colorado's peaks in 2019 and quickly became obsessed with bagging summits. 
+          What started as casual day hikes has evolved into longer backpacking trips, winter climbs, 
+          and the occasional scramble up something probably a bit too sketchy.
+        </p>
+      </section>
+
+      <section>
+        <h2>About This Site</h2>
+        <p>
+          This site is built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> 
+          and runs on <a href="https://workers.cloudflare.com" target="_blank" rel="noopener">Cloudflare Workers</a>. 
+          Data is stored in <a href="https://developers.cloudflare.com/d1" target="_blank" rel="noopener">D1</a> 
+          (Cloudflare's SQLite database) and synced daily from my Notion databases.
+        </p>
+        <p>
+          The source code is available on <a href="https://github.com/kyliepace/climb-log" target="_blank" rel="noopener">GitHub</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2>Get in Touch</h2>
+        <p>
+          Find me on <a href="https://github.com/kyliepace" target="_blank" rel="noopener">GitHub</a>, 
+          <a href="https://www.strava.com/athletes/kyliepace" target="_blank" rel="noopener">Strava</a>, 
+          or shoot me an email at <a href="mailto:hi@kylies.photos">hi@kylies.photos</a>.
+        </p>
+      </section>
+    </div>
+  </div>
+
+  <style>
+    .about-content {
+      max-width: 700px;
+    }
+
+    .about-content section {
+      margin-bottom: var(--space-2xl);
+    }
+
+    .about-content h2 {
+      margin-bottom: var(--space-md);
+    }
+
+    .about-content p {
+      line-height: 1.75;
+      margin-bottom: var(--space-md);
+    }
+
+    .about-content a {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  </style>
+</Layout>

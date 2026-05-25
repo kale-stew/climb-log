@@ -1,0 +1,114 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+const DB = env.DB as D1Database | undefined
+
+let peaks: any[] = []
+let stats = { total: 0, completed: 0, fourteeners: 0, thirteeners: 0 }
+
+if (DB) {
+  const result = await DB.prepare(`
+    SELECT id, title, elevation, range, first_completed, rank, img
+    FROM peaks 
+    ORDER BY elevation DESC
+  `).all()
+  peaks = result.results || []
+
+  stats.total = peaks.length
+  stats.completed = peaks.filter(p => p.first_completed).length
+  stats.fourteeners = peaks.filter(p => p.elevation >= 14000 && p.first_completed).length
+  stats.thirteeners = peaks.filter(p => p.elevation >= 13000 && p.elevation < 14000 && p.first_completed).length
+}
+
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function formatElevation(feet: number) {
+  return feet.toLocaleString() + "'"
+}
+---
+
+<Layout title="Peak List" description="Peaks I've summited in Colorado and beyond.">
+  <div class="container page">
+    <h1>Peak List</h1>
+    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      Tracking my progress on Colorado's highest peaks.
+    </p>
+
+    <!-- Stats -->
+    <div class="stats-grid mb-xl">
+      <div class="stat-card">
+        <div class="stat-value">{stats.completed}</div>
+        <div class="stat-label">Peaks Summited</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{stats.fourteeners}</div>
+        <div class="stat-label">14ers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{stats.thirteeners}</div>
+        <div class="stat-label">13ers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{stats.total}</div>
+        <div class="stat-label">On List</div>
+      </div>
+    </div>
+
+    <!-- Peak Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Peak</th>
+            <th>Range</th>
+            <th style="text-align: right;">Elevation</th>
+            <th style="text-align: center;">Rank</th>
+            <th>First Summit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {peaks.map((peak) => (
+            <tr class={peak.first_completed ? '' : 'not-completed'}>
+              <td>
+                <strong>{peak.title}</strong>
+                {peak.elevation >= 14000 && <span class="badge">14er</span>}
+              </td>
+              <td>{peak.range || '-'}</td>
+              <td style="text-align: right;">{formatElevation(peak.elevation)}</td>
+              <td style="text-align: center;">{peak.rank || '-'}</td>
+              <td>{formatDate(peak.first_completed) || <span style="color: var(--color-text-tertiary);">-</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <style>
+    .badge {
+      display: inline-block;
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      background: var(--color-accent);
+      color: white;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    tr.not-completed {
+      opacity: 0.5;
+    }
+    tr.not-completed:hover {
+      opacity: 0.8;
+    }
+  </style>
+</Layout>

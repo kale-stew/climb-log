@@ -2,7 +2,7 @@ import { buildAreaName } from '../builders'
 import { fmt, getDatabaseQueryConfig, notion } from '../notion'
 
 const getPhotosConfig = (nextCursor = null) =>
-  getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_PHOTO_DATABASE_ID)
+  getDatabaseQueryConfig(nextCursor, null, process.env.NOTION_PHOTOS_DB_ID)
 const photosSort = [{ property: 'taken_on', direction: 'descending' }]
 
 const formatPhotos = (response) => {

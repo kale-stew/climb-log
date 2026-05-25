@@ -1,0 +1,180 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+
+export const prerender = false
+
+const DB = env.DB as D1Database | undefined
+
+let gear: any[] = []
+let categories: string[] = []
+
+if (DB) {
+  const result = await DB.prepare(`
+    SELECT id, title, brand, category, img, url, acquired_on, retired_on
+    FROM gear 
+    ORDER BY category, title
+  `).all()
+  gear = result.results || []
+
+  // Get unique categories
+  const catSet = new Set(gear.map(g => g.category).filter(Boolean))
+  categories = Array.from(catSet).sort()
+}
+
+function getStatusClass(item: any) {
+  if (item.retired_on) return 'status-retired'
+  if (item.acquired_on) return 'status-own'
+  return ''
+}
+
+function getStatus(item: any) {
+  if (item.retired_on) return 'Retired'
+  if (item.acquired_on) return 'Own'
+  return null
+}
+---
+
+<Layout title="Gear" description="My hiking and climbing gear list.">
+  <div class="container page">
+    <h1>Gear</h1>
+    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      My current hiking and climbing gear, plus items I've used in the past.
+    </p>
+
+    {categories.map((category) => {
+      const categoryGear = gear.filter(g => g.category === category)
+      return (
+        <section class="mb-xl">
+          <h2>{category}</h2>
+          <div class="gear-grid">
+            {categoryGear.map((item) => (
+              <div class={`gear-card ${getStatusClass(item)}`}>
+                {item.img && (
+                  <img 
+                    src={item.img} 
+                    alt={item.title}
+                    loading="lazy"
+                    class="gear-image"
+                  />
+                )}
+                <div class="gear-content">
+                  <h3>
+                    {item.url ? (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a>
+                    ) : (
+                      item.title
+                    )}
+                  </h3>
+                  {item.brand && <p class="gear-brand">{item.brand}</p>}
+                  {getStatus(item) && <span class={`gear-status ${getStatusClass(item)}`}>{getStatus(item)}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    })}
+
+    {gear.length === 0 && (
+      <p>No gear found.</p>
+    )}
+  </div>
+
+  <style>
+    .gear-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .gear-card {
+      background: var(--color-bg-secondary);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      transition: border-color 0.2s;
+    }
+
+    .gear-card:hover {
+      border-color: var(--color-border-hover);
+    }
+
+    .gear-image {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .gear-content {
+      padding: var(--space-md);
+    }
+
+    .gear-content h3 {
+      font-size: var(--font-size-base);
+      margin: 0 0 var(--space-xs);
+    }
+
+    .gear-brand {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      margin: 0 0 var(--space-sm);
+    }
+
+    .gear-meta {
+      display: flex;
+      gap: var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .gear-rating {
+      color: var(--color-accent);
+      letter-spacing: 2px;
+      margin-bottom: var(--space-sm);
+    }
+
+    .gear-status {
+      display: inline-block;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      background: var(--color-bg-tertiary);
+    }
+
+    .gear-status.status-own {
+      background: #22c55e20;
+      color: #22c55e;
+    }
+
+    .gear-status.status-sold {
+      background: #ef444420;
+      color: #ef4444;
+    }
+
+    .gear-status.status-wishlist {
+      background: #3b82f620;
+      color: #3b82f6;
+    }
+
+    .gear-status.status-retired {
+      background: #6b728020;
+      color: #6b7280;
+    }
+
+    .gear-notes {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-sm);
+      margin-bottom: 0;
+    }
+
+    .gear-card.status-sold,
+    .gear-card.status-retired {
+      opacity: 0.6;
+    }
+  </style>
+</Layout>
