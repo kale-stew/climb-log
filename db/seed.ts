@@ -119,15 +119,21 @@ async function main() {
   ])
   sql += '\n\n'
 
-  // Photos — include r2_key and short_id to match production schema
-  const photosWithKeys = photos.map(p => ({
+  // Photos — include r2_key, short_id, and accent_color to match production schema
+  const pleasingAccents = [
+    '#8B7355', '#6B8E5E', '#D4845A', '#A0522D', '#5F9EA0',
+    '#7B6B8D', '#9E8B6B', '#6B7B8D', '#8D7B6B', '#5E8B6E',
+    '#8E7B5E', '#7B8D6B', '#9B6B5E', '#6B5E8B', '#7D6B5E'
+  ]
+  const photosWithKeys = photos.map((p, i) => ({
     ...p,
     r2_key: `photos/${p.id}`,
-    short_id: Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
+    short_id: Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+    accent_color: pleasingAccents[i % pleasingAccents.length]
   }))
   sql += '-- Photos\n'
   sql += generateInsertSQL('photos', photosWithKeys, [
-    'id', 'title', 'caption', 'src', 'thumbnail', 'area', 'state', 'date', 'width', 'height', 'search_tags', 'exclude', 'r2_key', 'short_id'
+    'id', 'title', 'caption', 'src', 'thumbnail', 'area', 'state', 'date', 'width', 'height', 'search_tags', 'exclude', 'r2_key', 'short_id', 'accent_color'
   ])
 
   // Write SQL file

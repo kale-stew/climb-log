@@ -93,7 +93,14 @@ const footerLinks = {
   <body>
     <header class="header">
       <div class="header-inner">
-        <a href="/" class="logo">kylies.photos</a>
+        <a href="/" class="logo" aria-label="Home">
+          <svg class="logo-icon" viewBox="0 0 48 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Sun behind mountains -->
+            <circle cx="32" cy="12" r="8" stroke="var(--color-accent-orange)" stroke-width="2.5" fill="none" />
+            <!-- Mountains outline -->
+            <path d="M2 38 L14 18 L20 26 L30 10 L46 38" stroke="var(--color-text-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          </svg>
+        </a>
         
         <button class="mobile-nav-toggle" aria-label="Toggle navigation" id="nav-toggle">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
