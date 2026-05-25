@@ -7,6 +7,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import crypto from 'crypto'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = path.join(__dirname, '..', 'data')
@@ -94,15 +95,35 @@ async function main() {
   const peaks: Peak[] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'peaks.json'), 'utf8'))
   const gear: Gear[] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'gear.json'), 'utf8'))
   const photos: Photo[] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'photos.json'), 'utf8'))
+  const blogPhotos: Photo[] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'blog-photos.json'), 'utf8'))
+  const allPhotos = [...photos, ...blogPhotos]
 
   let sql = '-- Auto-generated seed SQL\n'
   sql += `-- Generated at: ${new Date().toISOString()}\n\n`
 
-  // Climbs — clear expired Notion URLs from preview_img_url so fallback works
-  const climbsWithCleanImages = climbs.map(c => ({
-    ...c,
-    preview_img_url: c.preview_img_url?.includes('amazonaws.com') ? null : c.preview_img_url
-  }))
+  // Build a map of Flickr URL → short_id for converting climb preview images
+  const urlToShortId = new Map<string, string>()
+  for (const p of allPhotos) {
+    const sid = crypto.createHash('sha256').update(p.id).digest('hex').slice(0, 8)
+    urlToShortId.set(p.src, sid)
+    if (p.thumbnail) urlToShortId.set(p.thumbnail, sid)
+  }
+
+  // Climbs — clear expired Notion URLs and convert Flickr URLs to /img/{short_id}
+  const climbsWithCleanImages = climbs.map(c => {
+    let preview = c.preview_img_url
+    if (preview?.includes('amazonaws.com')) {
+      preview = null
+    } else if (preview) {
+      // Some climbs have comma-separated image URLs — take the first one
+      const firstUrl = preview.split(',')[0]
+      const sid = urlToShortId.get(firstUrl)
+      if (sid) {
+        preview = `/img/${sid}`
+      }
+    }
+    return { ...c, preview_img_url: preview }
+  })
   sql += '-- Climbs\n'
   sql += generateInsertSQL('climbs', climbsWithCleanImages, [
     'id', 'date', 'title', 'slug', 'preview_img_url', 'distance', 'gain', 'area', 'state', 'strava'
@@ -131,11 +152,11 @@ async function main() {
     '#7B6B8D', '#9E8B6B', '#6B7B8D', '#8D7B6B', '#5E8B6E',
     '#8E7B5E', '#7B8D6B', '#9B6B5E', '#6B5E8B', '#7D6B5E'
   ]
-  const photosWithKeys = photos.map((p, i) => ({
+  const photosWithKeys = allPhotos.map((p, i) => ({
     ...p,
     // r2_key is intentionally NULL for seed photos — they use src (Flickr) fallback
     r2_key: null,
-    short_id: Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+    short_id: crypto.createHash('sha256').update(p.id).digest('hex').slice(0, 8),
     accent_color: pleasingAccents[i % pleasingAccents.length]
   }))
   sql += '-- Photos\n'
@@ -150,7 +171,7 @@ async function main() {
   console.log(`  ${climbs.length} climbs`)
   console.log(`  ${peaks.length} peaks`)
   console.log(`  ${gear.length} gear items`)
-  console.log(`  ${photos.length} photos`)
+  console.log(`  ${allPhotos.length} photos`)
 }
 
 main().catch(console.error)

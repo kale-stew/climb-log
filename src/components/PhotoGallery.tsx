@@ -115,26 +115,13 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
     return photo.height / photo.width > 1.208
   }
 
-  // Get best available image URL: prefer photos-api endpoint if r2_key exists,
-  // otherwise fall back to the original source URL (Flickr/Notion)
+  // Get best available image URL via photos-api
   const getImageUrl = (photo: Photo, size: 'thumb' | 'full' = 'thumb') => {
-    // Use short_id for cleaner URLs when available
     const id = photo.short_id || photo.id
-    if (photo.r2_key) {
-      if (size === 'thumb') {
-        return `/img/${id}?w=800`
-      }
-      return `/img/${id}`
+    if (size === 'thumb') {
+      return `/img/${id}?w=800`
     }
-    // Fallback to original URL (Flickr, etc.)
-    // For Flickr, swap _k.jpg or _b.jpg with appropriate size
-    let url = photo.url || ''
-    if (size === 'thumb' && url.includes('live.staticflickr.com')) {
-      // Use Flickr's native sizing: _k (2048) → _c (800)
-      url = url.replace(/_k\.jpg$/, '_c.jpg')
-      url = url.replace(/_b\.jpg$/, '_c.jpg')
-    }
-    return url
+    return `/img/${id}`
   }
 
   return (

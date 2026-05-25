@@ -8,8 +8,8 @@ export const prerender = false
 // Default accent color (Trail Dust brown)
 const DEFAULT_ACCENT = '#8B7355'
 
-// Fallback hero image when post doesn't have one (direct Flickr URL, not /img/ which returns webp)
-const FALLBACK_HERO = 'https://live.staticflickr.com/65535/51852079537_fe544bb243_b.jpg'
+// Fallback hero image when post doesn't have one
+const FALLBACK_HERO = '/img/9943163a'
 
 // Cache the font fetch
 let interFontData: ArrayBuffer | null = null
@@ -49,7 +49,7 @@ async function getMonoFont(): Promise<ArrayBuffer> {
   return monoFontData
 }
 
-// Look up accent color from photos DB by matching src URL
+// Look up accent color from photos DB by matching short_id or src URL
 async function getAccentColorFromDb(previewImgUrl: string | undefined): Promise<string | null> {
   if (!previewImgUrl) return null
   
@@ -57,23 +57,22 @@ async function getAccentColorFromDb(previewImgUrl: string | undefined): Promise<
   if (!DB) return null
 
   try {
-    // Try exact match first
+    // If it's a photos-api URL like /img/abc123, extract short_id
+    const shortIdMatch = previewImgUrl.match(/\/img\/(\w+)/)
+    if (shortIdMatch) {
+      const photo = await DB.prepare(
+        'SELECT accent_color FROM photos WHERE short_id = ? LIMIT 1'
+      ).bind(shortIdMatch[1]).first<{ accent_color: string | null }>()
+      
+      if (photo?.accent_color) return photo.accent_color
+    }
+
+    // Fallback: try exact src match (for legacy URLs)
     const photo = await DB.prepare(
       'SELECT accent_color FROM photos WHERE src = ? LIMIT 1'
     ).bind(previewImgUrl).first<{ accent_color: string | null }>()
     
     if (photo?.accent_color) return photo.accent_color
-
-    // Try matching by Flickr photo ID (extract from URL like 51848131036)
-    const flickrMatch = previewImgUrl.match(/\/(\d{11,})_/)
-    if (flickrMatch) {
-      const flickrId = flickrMatch[1]
-      const byFlickr = await DB.prepare(
-        'SELECT accent_color FROM photos WHERE src LIKE ? LIMIT 1'
-      ).bind(`%${flickrId}%`).first<{ accent_color: string | null }>()
-      
-      if (byFlickr?.accent_color) return byFlickr.accent_color
-    }
   } catch {
     // DB query failed, fall through to default
   }

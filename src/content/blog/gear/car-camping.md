@@ -1,7 +1,7 @@
 ---
 title: 'My Car Camping Setup'
 date: '2022-02-01'
-previewImgUrl: 'https://live.staticflickr.com/65535/51851829565_d5f9104edc_b.jpg'
+previewImgUrl: '/img/8b50672e'
 ---
 
 When I was 15 and just beginning to drive on a learner's permit, I remember thinking an SUV would be the coolest. So much room! For whatever you want! And that height off of the road? They just looked awesome. Of course, when I mentioned this to my dad as reasoning for why I wanted an SUV as my first vehicle, he let me know that a bigger car meant bigger costs, bigger replacement pieces, and a bigger and more expensive to fill gas tank. My request wasn't reasonable as a teenager driving around a crowded metropolitan area, and I didn't even realize it.
@@ -16,7 +16,7 @@ Opting to sleep in the car instead of a tent is also a nice choice when temperat
 
 There are plenty of benefits to car camping, but there are downsides to consider as well.
 
-![Watching the sun set over Gunnison Reservoir in Curecanti Recreation Area. {768x498}](https://live.staticflickr.com/65535/51851872120_6b865c6c04_b.jpg)
+![Watching the sun set over Gunnison Reservoir in Curecanti Recreation Area. {768x498}](/img/4ea122ed)
 
 ## Benefits to Car Camping
 
@@ -37,7 +37,7 @@ As I mentioned, Leave No Trace is important to consider when recreating in the b
 
 One of the most difficult roads I drove after we put the kit on near the end of summer 2021 was Saxon Mountain, a 7 mile 4x4 road boasting 23 switchbacks that takes you up to an old gold and silver mine at the 11,400' summit. I was grateful for the additional clearance when we took each of those 23 hairpin turns, some of the obstacles were daunting at first site but the Expo handled them with ease.
 
-![Gaining the switchbacks above Georgetown, I-70 visible on the lower right. {768x462}](https://live.staticflickr.com/65535/51851872200_79d285d5dc_b.jpg)
+![Gaining the switchbacks above Georgetown, I-70 visible on the lower right. {768x462}](/img/8d4f59ca)
 
 The most harrowing point along this route came near the top of the switchbacks, before Georgetown leaves your view with 2.2 miles remaining to the summit: a sharp rock marks the wall to your right, and a small boulder marks the edge of the road to your left before a steep, 1800' drop-off just beyond it. This road leading up to this narrow crossing is steep and quickly drops off on the other side, making it a more threatening challenge than something without this additional hindrance might be.
 
@@ -51,7 +51,7 @@ I don't necessarily seek out OHV roads as much as I need to travel on them to ge
 
 As for finding car camping sites, the same website I linked above is a great resource for determining what kind of camping I might be able to do at or near a trailhead. When I'm not evaluating a site for a climb, I like to look at [this free campsite finder](https://freecampsites.net) as a starting point. If I can't find any sites that suit my needs there, I'll look up my intended area on Google Maps and check the satellite view for viable sites within a certain perimeter. The official sites for State and National Parks typically have helpful information for figuring out where you might be able to stay nearby, and whether you should use a tent or car.
 
-![Offroading around Argentine Pass. {576x768}](https://live.staticflickr.com/65535/51851277603_0f3ded6060_c.jpg)
+![Offroading around Argentine Pass. {576x768}](/img/eca68696)
 
 ## Gear
 
@@ -88,7 +88,7 @@ We take these items with us if we plan to car camp. I've taken a selection of th
 - 240kWh Portable [Jackery](https://www.jackery.com/pages/portable-power-stations) (with the solar charging panel that recharges it if we're traveling over multiple days in the summer)
 - weBoost Range extender (registered with Verizon, purchased from [Amazon](https://smile.amazon.com/gp/product/B07PDVTMM6))
 
-![Parked at Stephen's Gulch, Mount Edwards visible in the background. {768x524}](https://live.staticflickr.com/65535/51857592640_e0e93ee4d8_b.jpg)
+![Parked at Stephen's Gulch, Mount Edwards visible in the background. {768x524}](/img/8a5ac97c)
 
 ## Learn More
 

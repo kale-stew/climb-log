@@ -1,14 +1,14 @@
 ---
 title: 'Summiting My Winter White Whale'
 date: '2021-12-03'
-previewImgUrl: 'https://live.staticflickr.com/65535/51790214482_31c994dd38_b.jpg'
+previewImgUrl: '/img/2e989d6f'
 ---
 
 In the fall of 2020, The Year of the Pandemic, I was let go from my role as a software engineer. With a sudden onslaught of free time and raging burnout, I made the choice to start pursuing high peaks in the winter. December was rough as I got familiar with my snowshoes and the brutal conditions that winter summits demanded. I bought my first pair of ski goggles and my second pair of microspikes. I started to research routes and reach out to folks I knew were down for the sufferfest (I primarily found myself partnered up with experienced backcountry skiers or hikers with at least one season of seeking out snowflake peaks under their belt). And thus began my winter mountaineering career.
 
 Humboldt was my third "snowflake" 14er attempt. When I say "snowflake", I'm referring to a peak obtained within calendar winter (this window typically begins late December and ends mid-March). The qualifications being set to such a limited period of time, during which conditions are usually the worst a hiker can experience, snowflake summits are something to be proud of. A bragging point for some experienced mountaineers. I had successfully ascended Pikes Peak and Mount Democrat (two class two routes, one of which I had climbed in the summer prior) that calendar winter and I was eager to bag a few more. Humboldt seemed like a reasonable next goal, and being in the Sangres it had a special appeal.
 
-![A photo from my snowflake ascent of Mount Democrat, January 2021. {768x490}](https://live.staticflickr.com/65535/51854602186_8954f86292_b.jpg)
+![A photo from my snowflake ascent of Mount Democrat, January 2021. {768x490}](/img/0b10e0ef)
 
 ## The First Attempt
 
@@ -20,17 +20,17 @@ The next morning, everyone was quick to wake and we set out for the 2WD parking 
 
 The first couple of miles snowshoeing the road before the Rainbow Trail turn were uneventful. I think we were all eager for the first sign of alpenglow and hoping to position ourselves for a killer view before it happened. As we gained the Rainbow Trail ridge and began our bushwhack up the east ridge, light hit our backs and warmed the scene around us. Navigating through the trees, the snow glistened like it had been coated with glitter, while the fresh powder made it seem like no one had broken trail in several months.
 
-![First light seen along Humboldt's east ridge approach.](https://live.staticflickr.com/65535/51732591448_cbc12127da_k.jpg)
+![First light seen along Humboldt's east ridge approach.](/img/a80d55da)
 
 About 3.5 miles in, we realized we were all working especially hard but not seeming to gain quite as much elevation as is to be expected at this point along the trail. It seemed like we were moving straight, not up. Our group had begun to drift, with two leading and two holding up the rear, just barely out of audible communication distance. We later learned that the leading group had unintentional followed some SAR tracks off route, but we were all determined to get up this thing so we continued to trudge even after we realized we had made a mistake.
 
-![The moon was still out just after first light.](https://live.staticflickr.com/65535/51732583708_ed244b2cf5_k.jpg)
+![The moon was still out just after first light.](/img/13768de3)
 
 Reaching treeline, we were all burnt. The group splintered even further. Some of us couldn't keep food down and straggled behind while we suppressed the dry-heaves, one member blazed ahead up the false summit to gain Humboldt's final ridge, others fell somewhere between the two. The day was dragging on past our intended time and the pressure started to feel real. When a member of our party started puking, we made the choice to split up even further, which was definitely ill-advised.
 
 While one member of our group did manage to summit Humboldt Peak that day, three of us had to turn around as close as 200' below the summit proper. "It's right there," some strangers descending past us pointed out. "That's not a false summit, you're probably only 10 minutes away." I don't think I even replied to them, just wearily nodded. We knew we were close, but we also knew how bad we felt. It just wasn't going to be worth it. Altitude sickness is a force to be reckoned with.
 
-![So close, yet so far. This is where we first turned around. {768x498}](https://live.staticflickr.com/65535/51732590893_8120f419b4_b.jpg)
+![So close, yet so far. This is where we first turned around. {768x498}](/img/ba884daa)
 
 ## The Second Attempt
 
@@ -44,11 +44,11 @@ One more month went by before I tried for Humboldt again... Well, I admit, one m
 
 I passed all of the checkpoints where we had turned around on trips prior. Passed the vomit-break tree, passed the false summit, passed the section 200' below the summit where we first made the call, and finally found myself on top of Humboldt Peak.
 
-![Photo of my summit sign on top of Humboldt Peak. Crestone Peak & Needle are visible in the background. {576x768}](https://live.staticflickr.com/65535/51732592028_0bc574b2d5_k.jpg)
+![Photo of my summit sign on top of Humboldt Peak. Crestone Peak & Needle are visible in the background. {576x768}](/img/5a9b5c35)
 
 The east ridge route up to Humboldt Peak is funny because you don't see the Crestones until you're on the summit proper. You do, however, get beautiful views once you start to gain the slopes around treeline, see all kinds of wildlife, and the neighboring Centennials show off for you most of the way up. But when you're standing on the summit block, the Crestones are the sight that make this whole day worth it. And you can only see those two from the 14,064' summit.
 
-![A broader view of the Crestones from the summit of Humboldt Peak. {768x502}](https://live.staticflickr.com/65535/51790214482_31c994dd38_b.jpg)
+![A broader view of the Crestones from the summit of Humboldt Peak. {768x502}](/img/2e989d6f)
 
 ---
 
