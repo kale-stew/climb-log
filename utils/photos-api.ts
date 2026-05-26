@@ -126,6 +126,7 @@ interface Photo {
   short_id: string | null;
   notion_id: string | null;
   r2_key: string;
+  src: string | null;
   title: string | null;
   caption: string | null;
   location: string | null;
@@ -628,30 +629,30 @@ export function createPhotosApp(env: PhotosApiEnv) {
     if (shortLookup) photoId = shortLookup.id;
 
     const allowedFields = ["title", "location", "date", "tags", "site", "exclude", "caption"];
-    const updates: string[] = [];
+    const updateFields: string[] = [];
+    const updateValues: (string | number | null)[] = [];
 
     for (const field of allowedFields) {
       if (field in body) {
         const value = body[field];
+        updateFields.push(field);
         if (field === "exclude") {
-          updates.push(`${field} = ${value ? 1 : 0}`);
+          updateValues.push(value ? 1 : 0);
         } else {
-          const escaped = String(value).replace(/'/g, "''");
-          updates.push(`${field} = '${escaped}'`);
+          updateValues.push(value === null ? null : String(value));
         }
       }
     }
 
-    if (updates.length === 0) {
+    if (updateFields.length === 0) {
       return c.json({ error: "No valid fields to update" }, 400);
     }
 
-    updates.push("updated_at = datetime('now')");
-
-    const sql = `UPDATE photos SET ${updates.join(", ")} WHERE id = '${photoId.replace(/'/g, "''")}'`;
+    const setClause = updateFields.map(f => `${f} = ?`).join(", ") + ", updated_at = datetime('now')";
+    updateValues.push(photoId); // for WHERE clause
 
     try {
-      await env.DB.prepare(sql).run();
+      await env.DB.prepare(`UPDATE photos SET ${setClause} WHERE id = ?`).bind(...updateValues).run();
       const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
         .bind(photoId)
         .first<Photo>();
@@ -887,33 +888,26 @@ export function createPhotosApp(env: PhotosApiEnv) {
       // Dimensions extraction failed
     }
 
-    const esc = (s: string | null) => (s ? s.replace(/'/g, "''") : "");
-    const sql = `
-      INSERT INTO photos (
-        id, short_id, r2_key, title, location, date, width, height, format,
-        site, source, tags, exclude, size_bytes, created_at, updated_at
-      ) VALUES (
-        '${id}',
-        '${shortId}',
-        '${r2Key}',
-        ${title ? `'${esc(title)}'` : "NULL"},
-        ${location ? `'${esc(location)}'` : "NULL"},
-        ${date ? `'${esc(date)}'` : "NULL"},
-        ${width || "NULL"},
-        ${height || "NULL"},
-        '${format}',
-        '${esc(site)}',
-        'upload',
-        ${tags ? `'${esc(tags)}'` : "'[]'"},
-        0,
-        ${file.size},
-        datetime('now'),
-        datetime('now')
-      )
-    `;
-
     try {
-      await env.DB.prepare(sql).run();
+      await env.DB.prepare(`
+        INSERT INTO photos (
+          id, short_id, r2_key, title, location, date, width, height, format,
+          site, source, tags, exclude, size_bytes, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'upload', ?, 0, ?, datetime('now'), datetime('now'))
+      `).bind(
+        id,
+        shortId,
+        r2Key,
+        title || null,
+        location || null,
+        date || null,
+        width,
+        height,
+        format,
+        site,
+        tags || '[]',
+        file.size
+      ).run();
     } catch (error) {
       await env.R2_IMAGES.delete(`${r2Key}/original.${format}`);
       return c.json({ error: "Database insert failed" }, 500);

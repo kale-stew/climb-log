@@ -19,6 +19,20 @@ interface SyncResult {
   errors: string[]
 }
 
+/**
+ * Generate a deterministic short URL-safe ID from any string.
+ * Uses SHA-256 hash truncated to 8 hex chars.
+ * Must match utils/photos-api.ts:generateShortId
+ */
+async function generateShortId(input: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(input)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return hashHex.slice(0, 8)
+}
+
 // Manual trigger via GET request with secret
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url)
@@ -77,14 +91,11 @@ async function runSync(): Promise<Response> {
     }
 
     // Log sync result
-    const duration = Date.now() - startTime
+    const recordsSynced = results.reduce((sum, r) => sum + r.inserted + r.updated, 0)
     await DB.prepare(`
-      INSERT INTO sync_log (synced_at, duration_ms, records_synced, status, error_message)
-      VALUES (datetime('now'), ?, ?, 'success', NULL)
-    `).bind(
-      duration,
-      results.reduce((sum, r) => sum + r.inserted + r.updated, 0)
-    ).run()
+      INSERT INTO sync_log (sync_type, status, records_synced, error_message, completed_at)
+      VALUES ('notion_sync', 'success', ?, NULL, datetime('now'))
+    `).bind(recordsSynced).run()
 
     return new Response(JSON.stringify({
       success: true,
@@ -99,9 +110,9 @@ async function runSync(): Promise<Response> {
     
     // Log failed sync
     await DB.prepare(`
-      INSERT INTO sync_log (synced_at, duration_ms, records_synced, status, error_message)
-      VALUES (datetime('now'), ?, 0, 'failed', ?)
-    `).bind(Date.now() - startTime, errorMessage).run()
+      INSERT INTO sync_log (sync_type, status, records_synced, error_message, completed_at)
+      VALUES ('notion_sync', 'failed', 0, ?, datetime('now'))
+    `).bind(errorMessage).run()
 
     return new Response(JSON.stringify({
       success: false,
@@ -381,8 +392,9 @@ async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefin
       const format = ext === 'png' ? 'png' : ext === 'webp' ? 'webp' : 'jpeg'
       const r2Key = `photos/${id}`
 
-      // Generate short_id for clean URLs
-      const shortId = Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
+      // Generate deterministic short_id from Notion page ID for clean URLs
+      // This ensures the same photo always gets the same short_id, preventing URL breakage
+      const shortId = await generateShortId(page.id)
 
       await db.prepare(`
         INSERT INTO photos (

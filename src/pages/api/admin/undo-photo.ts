@@ -14,11 +14,12 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    const body = await request.json()
-    const { assignmentId } = body
+    const body = await request.json() as Record<string, unknown>
+    const assignmentId = typeof body.assignmentId === 'number' ? body.assignmentId : 
+                         typeof body.assignmentId === 'string' ? parseInt(body.assignmentId, 10) : null
 
-    if (!assignmentId) {
-      return new Response(JSON.stringify({ error: 'Missing assignmentId' }), {
+    if (!assignmentId || isNaN(assignmentId)) {
+      return new Response(JSON.stringify({ error: 'Missing or invalid assignmentId' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       })

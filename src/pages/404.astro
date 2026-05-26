@@ -1,0 +1,71 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+export const prerender = true
+---
+
+<Layout title="Page Not Found" description="This page does not exist.">
+  <div class="container page not-found">
+    <h1>Well this is awkward...</h1>
+    <img 
+      src="/img/991d0662" 
+      alt="A curious mountain goat" 
+      class="not-found-image"
+      loading="eager"
+    />
+    <div class="not-found-message">
+      <h2>You've found a page that does not exist.</h2>
+      <p>Click the home icon below ↓ to navigate back home</p>
+      <a href="/" class="home-link">← Back to home</a>
+    </div>
+  </div>
+
+  <style>
+    .not-found {
+      text-align: center;
+      padding-top: var(--space-2xl);
+      padding-bottom: var(--space-3xl);
+    }
+
+    .not-found h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: var(--space-xl);
+    }
+
+    .not-found-image {
+      width: 100%;
+      max-width: 700px;
+      height: auto;
+      border-radius: var(--border-radius-lg);
+      margin: 0 auto var(--space-xl);
+      display: block;
+      box-shadow: var(--shadow-md);
+    }
+
+    .not-found-message h2 {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+    }
+
+    .not-found-message p {
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--space-lg);
+    }
+
+    .home-link {
+      display: inline-block;
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--color-accent);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+    }
+
+    .home-link:hover {
+      opacity: 0.9;
+    }
+  </style>
+</Layout>

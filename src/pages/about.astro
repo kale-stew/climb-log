@@ -3,6 +3,16 @@ import Layout from '../layouts/Layout.astro'
 
 // Static page - no SSR needed
 export const prerender = true
+
+const interviews = [
+  {
+    name: 'Atomic Jolt',
+    brandHref: 'https://atomicjoltmedia.com/episodes/episode-013-kylie-czajkowski-on-hiking',
+    embedHref: 'https://open.spotify.com/embed/episode/2ETzCeYr5s1vQGSn7z1lJB',
+    description:
+      'A podcast that explores small moments of lasting impact. In this episode, Kylie discusses finding balance in life through hiking, the importance of unplugging to avoid burnout, triumphs and lessons learned from hiking Fourteeners, mountain goats, and more.',
+  },
+]
 ---
 
 <Layout title="About" description="About Kylie and this site." ogImage="https://kylies.photos/open-graph/about.jpg">
@@ -37,6 +47,29 @@ export const prerender = true
       </section>
 
       <section>
+        <h2>Interviews</h2>
+        <p class="section-subtitle">Kylie has appeared as a guest on...</p>
+        <ul class="interviews-list">
+          {interviews.map((interview) => (
+            <li>
+              <a href={interview.brandHref} target="_blank" rel="noopener">
+                <strong>{interview.name}</strong>
+              </a>
+              {interview.description && `: ${interview.description}`}
+              <iframe
+                src={`${interview.embedHref}?utm_source=generator&theme=0`}
+                width="100%"
+                height="80"
+                frameborder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                style="border-radius: 12px; margin-top: 1rem;"
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section>
         <h2>Get in Touch</h2>
         <p>
           Find me on <a href="https://github.com/kale-stew" target="_blank" rel="noopener">GitHub</a>,
@@ -68,6 +101,30 @@ export const prerender = true
     .about-content a {
       text-decoration: underline;
       text-underline-offset: 2px;
+    }
+
+    .section-subtitle {
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+    }
+
+    .interviews-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .interviews-list li {
+      margin-bottom: var(--space-xl);
+    }
+
+    .interviews-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .interviews-list iframe {
+      display: block;
     }
   </style>
 </Layout>

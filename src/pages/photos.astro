@@ -10,6 +10,8 @@ const DB = env.DB as D1Database | undefined
 let photos: any[] = []
 
 if (DB) {
+  // Limit to most recent 500 photos for initial load performance
+  // Client-side filtering handles search within this set
   const result = await DB.prepare(`
     SELECT 
       id, 
@@ -28,6 +30,7 @@ if (DB) {
     FROM photos 
     WHERE exclude = 0
     ORDER BY date DESC
+    LIMIT 500
   `).all()
   photos = result.results || []
 }

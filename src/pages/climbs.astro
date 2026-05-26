@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import ClimbTable from '../components/ClimbTable'
+import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
 import { env } from 'cloudflare:workers'
 
 export const prerender = false
@@ -17,39 +18,8 @@ if (DB) {
     ).all()
     climbs = result.results || []
 
-    // Fetch all photos once for fallback matching
-    const missingImage = climbs.some(c => !c.preview_img_url)
-    if (missingImage) {
-      const photoResult = await DB.prepare(
-        'SELECT date, area, state, short_id FROM photos WHERE exclude = 0 ORDER BY date DESC'
-      ).all()
-      const photos = (photoResult.results || []) as any[]
-
-      // Build lookup maps
-      const byDate = new Map<string, string>()
-      const byAreaState = new Map<string, string>()
-      const byState = new Map<string, string>()
-
-      for (const p of photos) {
-        if (p.date && !byDate.has(p.date)) byDate.set(p.date, p.short_id)
-        if (p.area && p.state) {
-          const key = `${p.area}||${p.state}`
-          if (!byAreaState.has(key)) byAreaState.set(key, p.short_id)
-        }
-        if (p.state && !byState.has(p.state)) byState.set(p.state, p.short_id)
-      }
-
-      // Assign fallback images
-      for (const climb of climbs) {
-        if (!climb.preview_img_url) {
-          let sid: string | undefined
-          if (climb.date && byDate.has(climb.date)) sid = byDate.get(climb.date)
-          else if (climb.area && climb.state) sid = byAreaState.get(`${climb.area}||${climb.state}`)
-          else if (climb.state) sid = byState.get(climb.state)
-          if (sid) climb.preview_img_url = `/img/${sid}?w=200`
-        }
-      }
-    }
+    // Fill missing preview images from photos table (200px thumbnails for table)
+    await fillMissingPreviewImages(DB, climbs, 200)
   } catch (e) {
     console.error('Failed to fetch climbs:', e)
   }

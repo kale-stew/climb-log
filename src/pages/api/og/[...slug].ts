@@ -150,7 +150,7 @@ export const GET: APIRoute = async ({ params }) => {
     </div>
   `
 
-  return new ImageResponse(html, {
+  const response = new ImageResponse(html, {
     width: 1200,
     height: 630,
     fonts: [
@@ -174,4 +174,10 @@ export const GET: APIRoute = async ({ params }) => {
       },
     ],
   })
+  
+  // Add cache headers to reduce load from social crawlers
+  // Browser cache: 1 day, CDN cache: 1 week
+  response.headers.set('Cache-Control', 'public, max-age=86400, s-maxage=604800')
+  
+  return response
 }

@@ -14,11 +14,12 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    const body = await request.json()
-    const { climbId, photoUrl } = body
+    const body = await request.json() as Record<string, unknown>
+    const climbId = typeof body.climbId === 'string' ? body.climbId : null
+    const photoUrl = typeof body.photoUrl === 'string' ? body.photoUrl : null
 
     if (!climbId || !photoUrl) {
-      return new Response(JSON.stringify({ error: 'Missing climbId or photoUrl' }), {
+      return new Response(JSON.stringify({ error: 'Missing or invalid climbId or photoUrl' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       })

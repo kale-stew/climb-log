@@ -61,10 +61,18 @@ function formatElevation(feet: number) {
       </div>
     </section>
 
+    <!-- Filter Controls -->
+    <div class="filter-controls">
+      <button class="filter-btn active" data-filter="all">All Peaks</button>
+      <button class="filter-btn" data-filter="14er">14ers Only</button>
+      <button class="filter-btn" data-filter="13er">13ers Only</button>
+    </div>
+    <p class="filter-count">Showing <span id="visible-count">{peaks.length}</span> of {peaks.length} peaks</p>
+
     <!-- Peak Grid with Photos -->
-    <div class="peak-grid">
+    <div class="peak-grid" id="peak-grid">
       {peaks.map((peak) => (
-        <div class={`peak-card ${peak.first_completed ? '' : 'not-completed'}`}>
+        <div class={`peak-card ${peak.first_completed ? '' : 'not-completed'}`} data-elevation={peak.elevation}>
           {peak.img ? (
             <div class="peak-image">
               <img 
@@ -227,5 +235,87 @@ function formatElevation(feet: number) {
       color: var(--color-text-tertiary);
       font-style: italic;
     }
+
+    .filter-controls {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      margin-bottom: var(--space-md);
+      padding-top: var(--space-xl);
+    }
+
+    .filter-btn {
+      padding: var(--space-sm) var(--space-lg);
+      border: 2px solid var(--color-border);
+      background: var(--color-bg-card);
+      color: var(--color-text);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 500;
+      font-family: inherit;
+      font-size: var(--font-size-sm);
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--color-accent);
+    }
+
+    .filter-btn.active {
+      background: var(--color-accent);
+      color: white;
+      border-color: var(--color-accent);
+    }
+
+    .filter-count {
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--space-xl);
+    }
+
+    @media (max-width: 768px) {
+      .filter-controls {
+        flex-wrap: wrap;
+      }
+    }
   </style>
+
+  <script>
+    const buttons = document.querySelectorAll('.filter-btn')
+    const cards = document.querySelectorAll('.peak-card')
+    const countEl = document.getElementById('visible-count')
+    const totalCards = cards.length
+
+    function updateCount() {
+      const visible = Array.from(cards).filter(c => c.style.display !== 'none').length
+      if (countEl) countEl.textContent = visible
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter
+
+        // Update active button
+        buttons.forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+
+        // Filter cards
+        cards.forEach(card => {
+          const elevation = parseInt(card.dataset.elevation || '0')
+          let show = true
+
+          if (filter === '14er') {
+            show = elevation >= 14000
+          } else if (filter === '13er') {
+            show = elevation >= 13000 && elevation < 14000
+          }
+
+          card.style.display = show ? '' : 'none'
+        })
+
+        updateCount()
+      })
+    })
+  </script>
 </Layout>

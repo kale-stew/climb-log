@@ -76,18 +76,17 @@ jobs:
         run: |
           # Astro builds worker output to dist/server/ with static assets in dist/client/
           # We need main pointing to the worker entry and assets to the client directory
+          # NOTE: Secrets are set via `wrangler secret put`, NOT in vars (which are plaintext)
           jq --arg name "${{ steps.slug.outputs.name }}" '
             .name = $name
             | .main = "./dist/server/entry.mjs"
             | .assets.directory = "./dist/client"
             | .d1_databases[0].database_id = "c0e56b31-fbfd-46f9-992e-af369d9c2cb9"
             | .d1_databases[0].database_name = "climb-log-db-preview"
-            | .vars.NOTION_TOKEN = "${{ secrets.NOTION_TOKEN }}"
             | .vars.NOTION_CLIMBS_DB_ID = "${{ secrets.NOTION_CLIMBS_DB_ID }}"
             | .vars.NOTION_PEAKS_DB_ID = "${{ secrets.NOTION_PEAKS_DB_ID }}"
             | .vars.NOTION_GEAR_DB_ID = "${{ secrets.NOTION_GEAR_DB_ID }}"
             | .vars.NOTION_PHOTOS_DB_ID = "${{ secrets.NOTION_PHOTOS_DB_ID }}"
-            | .vars.CRON_SECRET = "${{ secrets.CRON_SECRET }}"
             | del(.env)
           ' wrangler.jsonc > wrangler-preview.jsonc
 
@@ -105,6 +104,13 @@ jobs:
           echo "deploy_time=${DEPLOY_TIME}s" >> $GITHUB_OUTPUT
           echo "preview_url=https://${{ steps.slug.outputs.name }}.kylieski.workers.dev" >> $GITHUB_OUTPUT
           exit $EXIT_CODE
+
+      - name: Set preview secrets
+        if: github.event_name == 'pull_request'
+        run: |
+          # Set secrets via wrangler secret put (not plaintext vars)
+          echo "${{ secrets.NOTION_TOKEN }}" | npx wrangler secret put NOTION_TOKEN --config wrangler-preview.jsonc
+          echo "${{ secrets.CRON_SECRET }}" | npx wrangler secret put CRON_SECRET --config wrangler-preview.jsonc
 
       - name: apply migrations to preview db
         if: github.event_name == 'pull_request'

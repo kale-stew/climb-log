@@ -46,6 +46,7 @@
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Crimson Pro', Georgia, serif;
+  --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
@@ -57,6 +58,7 @@
   /* Layout */
   --max-width: 1200px;
   --header-height: 64px;
+  --border-radius-sm: 0.25rem;
   --border-radius: 0.5rem;
   --border-radius-lg: 1rem;
   
@@ -77,11 +79,17 @@
   --color-bg-secondary: var(--color-offwhite);
   --color-bg-tertiary: #E8E4DE;
   --color-bg-card: rgba(255, 255, 255, 0.9);
+  
+  /* Semantic aliases for components */
+  --color-bg: var(--color-bg-primary);
+  --color-text: var(--color-text-primary);
 
   --color-text-primary: var(--color-black);
   --color-text-secondary: var(--color-dark-grey);
   --color-text-tertiary: var(--color-medium-grey);
   --color-text-accent: var(--color-accent);
+  
+  --color-accent-hover: #7a6248;
 
   --color-border: #E0DCD6;
   --color-border-hover: #C9C4BC;
@@ -93,11 +101,17 @@
   --color-bg-secondary: #252320;
   --color-bg-tertiary: #3A3632;
   --color-bg-card: rgba(40, 38, 35, 0.9);
+  
+  /* Semantic aliases for components */
+  --color-bg: var(--color-bg-primary);
+  --color-text: var(--color-text-primary);
 
   --color-text-primary: var(--color-offwhite);
   --color-text-secondary: var(--color-light-grey);
   --color-text-tertiary: #8A8580;
   --color-text-accent: #A6906E;
+  
+  --color-accent-hover: #b8a080;
 
   --color-border: #3A3632;
   --color-border-hover: #504B46;
@@ -108,7 +122,13 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+}
+
+/* Respect user motion preferences for smooth scroll */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {

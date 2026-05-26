@@ -183,6 +183,21 @@ const footerLinks = {
       navToggle?.addEventListener('click', () => {
         nav?.classList.toggle('open');
       });
+      
+      // Close mobile nav on link click
+      nav?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => nav?.classList.remove('open'));
+      });
+      
+      // Close mobile nav on outside click
+      document.addEventListener('click', (e) => {
+        const target = e.target as Node;
+        if (nav?.classList.contains('open') && 
+            !nav.contains(target) && 
+            !navToggle?.contains(target)) {
+          nav.classList.remove('open');
+        }
+      });
     </script>
   </body>
 </html>
