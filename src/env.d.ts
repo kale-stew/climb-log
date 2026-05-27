@@ -6,7 +6,7 @@
  * Cloudflare Workers environment bindings.
  * These match the bindings defined in wrangler.jsonc.
  */
-interface CloudflareEnv {
+export interface CloudflareEnv {
   DB: D1Database
   R2_IMAGES: R2Bucket
   IMAGES: ImagesBinding
@@ -15,8 +15,7 @@ interface CloudflareEnv {
 
 // Type the `env` export from `cloudflare:workers`
 declare module 'cloudflare:workers' {
-  const env: CloudflareEnv
-  export { env }
+  export const env: CloudflareEnv
 }
 
 declare namespace App {

@@ -10,6 +10,23 @@
  */
 
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import {
+  updatePhotoSchema,
+  resizePhotoSchema,
+  extractColorsSchema,
+} from "../src/lib/schemas";
+
+/**
+ * Format Zod validation errors into a user-friendly message.
+ * Inline to avoid Zod v4 type compatibility issues with exported function.
+ */
+function formatValidationError(error: { issues: { path: PropertyKey[]; message: string }[] }): string {
+  return error.issues.map(issue => {
+    const path = issue.path.length > 0 ? `${issue.path.map(String).join('.')}: ` : ''
+    return `${path}${issue.message}`
+  }).join('; ')
+}
 
 // Generate a short URL-safe ID from any string (used for cleaner /img/{id} URLs)
 // Must match the Python: hashlib.sha256(input.encode()).hexdigest()[:8]
@@ -617,50 +634,83 @@ export function createPhotosApp(env: PhotosApiEnv) {
   // ============ ADMIN API ROUTES ============
 
   // PATCH /api/admin/photos/{id} - Edit metadata
-  app.patch("/api/admin/photos/:id", async (c) => {
-    const id = c.req.param("id");
-    const body = await c.req.json().catch(() => ({}));
+  app.patch(
+    "/api/admin/photos/:id",
+    zValidator("json", updatePhotoSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: formatValidationError(result.error) }, 400);
+      }
+    }),
+    async (c) => {
+      const id = c.req.param("id");
+      const body = c.req.valid("json");
 
-    // Resolve short_id to full id
-    let photoId = id;
-    const shortLookup = await env.DB.prepare("SELECT id FROM photos WHERE short_id = ?")
-      .bind(id)
-      .first<{ id: string }>();
-    if (shortLookup) photoId = shortLookup.id;
+      // Resolve short_id to full id
+      let photoId = id;
+      const shortLookup = await env.DB.prepare("SELECT id FROM photos WHERE short_id = ?")
+        .bind(id)
+        .first<{ id: string }>();
+      if (shortLookup) photoId = shortLookup.id;
 
-    const allowedFields = ["title", "location", "date", "tags", "site", "exclude", "caption"];
-    const updateFields: string[] = [];
-    const updateValues: (string | number | null)[] = [];
+      // Check photo exists
+      const existingPhoto = await env.DB.prepare("SELECT id FROM photos WHERE id = ?")
+        .bind(photoId)
+        .first<{ id: string }>();
+      if (!existingPhoto) {
+        return c.json({ error: "Photo not found" }, 404);
+      }
 
-    for (const field of allowedFields) {
-      if (field in body) {
-        const value = body[field];
-        updateFields.push(field);
-        if (field === "exclude") {
-          updateValues.push(value ? 1 : 0);
-        } else {
-          updateValues.push(value === null ? null : String(value));
-        }
+      const updateFields: string[] = [];
+      const updateValues: (string | number | null)[] = [];
+
+      // Type-safe field extraction from validated body
+      if (body.title !== undefined) {
+        updateFields.push("title");
+        updateValues.push(body.title);
+      }
+      if (body.location !== undefined) {
+        updateFields.push("location");
+        updateValues.push(body.location);
+      }
+      if (body.date !== undefined) {
+        updateFields.push("date");
+        updateValues.push(body.date);
+      }
+      if (body.tags !== undefined) {
+        updateFields.push("tags");
+        updateValues.push(body.tags);
+      }
+      if (body.site !== undefined) {
+        updateFields.push("site");
+        updateValues.push(body.site);
+      }
+      if (body.exclude !== undefined) {
+        updateFields.push("exclude");
+        updateValues.push(body.exclude ? 1 : 0);
+      }
+      if (body.caption !== undefined) {
+        updateFields.push("caption");
+        updateValues.push(body.caption);
+      }
+
+      if (updateFields.length === 0) {
+        return c.json({ error: "No valid fields to update" }, 400);
+      }
+
+      const setClause = updateFields.map(f => `${f} = ?`).join(", ") + ", updated_at = datetime('now')";
+      updateValues.push(photoId); // for WHERE clause
+
+      try {
+        await env.DB.prepare(`UPDATE photos SET ${setClause} WHERE id = ?`).bind(...updateValues).run();
+        const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
+          .bind(photoId)
+          .first<Photo>();
+        return c.json(photo);
+      } catch (error) {
+        return c.json({ error: "Update failed" }, 500);
       }
     }
-
-    if (updateFields.length === 0) {
-      return c.json({ error: "No valid fields to update" }, 400);
-    }
-
-    const setClause = updateFields.map(f => `${f} = ?`).join(", ") + ", updated_at = datetime('now')";
-    updateValues.push(photoId); // for WHERE clause
-
-    try {
-      await env.DB.prepare(`UPDATE photos SET ${setClause} WHERE id = ?`).bind(...updateValues).run();
-      const photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
-        .bind(photoId)
-        .first<Photo>();
-      return c.json(photo);
-    } catch (error) {
-      return c.json({ error: "Update failed" }, 500);
-    }
-  });
+  );
 
   // DELETE /api/admin/photos/{id} - Delete photo
   app.delete("/api/admin/photos/:id", async (c) => {
@@ -697,68 +747,71 @@ export function createPhotosApp(env: PhotosApiEnv) {
   });
 
   // POST /api/admin/resize - Custom resize
-  app.post("/api/admin/photos/resize", async (c) => {
-    const body = await c.req.json().catch(() => ({}));
-    const { photoId, width } = body;
+  app.post(
+    "/api/admin/photos/resize",
+    zValidator("json", resizePhotoSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: formatValidationError(result.error) }, 400);
+      }
+    }),
+    async (c) => {
+      const { photoId, width } = c.req.valid("json");
 
-    if (!photoId || !width) {
-      return c.json({ error: "photoId and width required" }, 400);
-    }
-
-    const w = parseInt(width, 10);
-    if (Number.isNaN(w) || w < 1 || w > MAX_CUSTOM_WIDTH) {
-      return c.json({ error: `width must be between 1 and ${MAX_CUSTOM_WIDTH}` }, 400);
-    }
-
-    let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
-      .bind(photoId)
-      .first<Photo>();
-
-    if (!photo) {
-      photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+      let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
         .bind(photoId)
         .first<Photo>();
+
+      if (!photo) {
+        photo = await env.DB.prepare("SELECT * FROM photos WHERE short_id = ?")
+          .bind(photoId)
+          .first<Photo>();
+      }
+
+      if (!photo) return c.json({ error: "Photo not found" }, 404);
+
+      const r2Key = `${photo.r2_key}/w${width}.webp`;
+
+      const existing = await env.R2_IMAGES.get(r2Key);
+      if (existing) {
+        const origin = new URL(c.req.url).origin;
+        return c.json({ url: `${origin}/img/${photoId}?w=${width}`, cached: true, width });
+      }
+
+      const originalKey = `${photo.r2_key}/original.${photo.format}`;
+      const original = await env.R2_IMAGES.get(originalKey);
+      if (!original) return c.json({ error: "Original not found" }, 404);
+
+      try {
+        const transformed = await env.IMAGES.input(original.body)
+          .transform({ width, fit: "scale-down" })
+          .output({ format: "image/webp", quality: 85 });
+
+        const buffer = await transformed.response().arrayBuffer();
+        await env.R2_IMAGES.put(r2Key, buffer, {
+          httpMetadata: { contentType: "image/webp" },
+        });
+
+        const origin = new URL(c.req.url).origin;
+        return c.json({ url: `${origin}/img/${photoId}?w=${width}`, cached: false, width });
+      } catch (error) {
+        return c.json({ error: "Transform failed" }, 500);
+      }
     }
-
-    if (!photo) return c.json({ error: "Photo not found" }, 404);
-
-    const r2Key = `${photo.r2_key}/w${w}.webp`;
-
-    const existing = await env.R2_IMAGES.get(r2Key);
-    if (existing) {
-      const origin = new URL(c.req.url).origin;
-      return c.json({ url: `${origin}/img/${photoId}?w=${w}`, cached: true, width: w });
-    }
-
-    const originalKey = `${photo.r2_key}/original.${photo.format}`;
-    const original = await env.R2_IMAGES.get(originalKey);
-    if (!original) return c.json({ error: "Original not found" }, 404);
-
-    try {
-      const transformed = await env.IMAGES.input(original.body)
-        .transform({ width: w, fit: "scale-down" })
-        .output({ format: "image/webp", quality: 85 });
-
-      const buffer = await transformed.response().arrayBuffer();
-      await env.R2_IMAGES.put(r2Key, buffer, {
-        httpMetadata: { contentType: "image/webp" },
-      });
-
-      const origin = new URL(c.req.url).origin;
-      return c.json({ url: `${origin}/img/${photoId}?w=${w}`, cached: false, width: w });
-    } catch (error) {
-      return c.json({ error: "Transform failed" }, 500);
-    }
-  });
+  );
 
   // POST /api/admin/photos/extract-colors - Extract accent colors for photos missing them
   // Can be called via MCP or admin UI to batch-process photos
-  app.post("/api/admin/photos/extract-colors", async (c) => {
-    const body = await c.req.json().catch(() => ({}));
-    const limit = Math.min(body.limit || 50, 100); // Max 100 per batch
-    const photoId = body.photoId; // Optional: process single photo
+  app.post(
+    "/api/admin/photos/extract-colors",
+    zValidator("json", extractColorsSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: formatValidationError(result.error) }, 400);
+      }
+    }),
+    async (c) => {
+      const { limit, photoId } = c.req.valid("json");
 
-    let photos: Photo[];
+      let photos: Photo[];
     
     if (photoId) {
       // Single photo mode
@@ -839,7 +892,8 @@ export function createPhotosApp(env: PhotosApiEnv) {
       remaining: remaining?.count || 0,
       results,
     });
-  });
+    }
+  );
 
   // POST /api/admin/upload - Upload new photo
   app.post("/api/admin/photos/upload", async (c) => {

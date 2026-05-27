@@ -3,19 +3,20 @@ import Layout from '../layouts/Layout.astro'
 import ClimbTable from '../components/ClimbTable'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
 import { env } from 'cloudflare:workers'
+import type { ClimbListItem } from '../lib/types'
 
 export const prerender = false
 
-const DB = env.DB as D1Database | undefined
+const DB = env.DB
 
-let climbs: any[] = []
+let climbs: ClimbListItem[] = []
 
 if (DB) {
   try {
-    // Fetch climbs
+    // Fetch climbs with only the fields needed for the list view
     const result = await DB.prepare(
       'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state, strava FROM climbs ORDER BY date DESC'
-    ).all()
+    ).all<ClimbListItem>()
     climbs = result.results || []
 
     // Fill missing preview images from photos table (200px thumbnails for table)

@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro'
-import { Client } from '@notionhq/client'
+import { Client, isNotionClientError, APIErrorCode } from '@notionhq/client'
 import { env } from 'cloudflare:workers'
+import { fetchImage, IMAGE_TIMEOUT_MS, FetchTimeoutError } from '../../lib/fetch-with-timeout'
+import type { SyncResult } from '../../lib/types'
 
 export const prerender = false
 
@@ -12,12 +14,8 @@ const NOTION_DB_IDS = {
   photos: import.meta.env.NOTION_PHOTOS_DB_ID,
 }
 
-interface SyncResult {
-  table: string
-  inserted: number
-  updated: number
-  errors: string[]
-}
+/** Timeout for Notion API operations (15 seconds) */
+const NOTION_TIMEOUT_MS = 15_000
 
 /**
  * Generate a deterministic short URL-safe ID from any string.
@@ -33,6 +31,26 @@ async function generateShortId(input: string): Promise<string> {
   return hashHex.slice(0, 8)
 }
 
+/**
+ * Structured log helper for sync operations.
+ * In production, these logs appear in Workers Logs.
+ */
+function logSync(level: 'info' | 'warn' | 'error', message: string, context?: Record<string, unknown>): void {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    ...context,
+  }
+  if (level === 'error') {
+    console.error(JSON.stringify(entry))
+  } else if (level === 'warn') {
+    console.warn(JSON.stringify(entry))
+  } else {
+    console.log(JSON.stringify(entry))
+  }
+}
+
 // Manual trigger via GET request with secret
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url)
@@ -41,7 +59,10 @@ export const GET: APIRoute = async ({ request }) => {
   // Verify secret for manual triggers
   const expectedSecret = import.meta.env.CRON_SECRET
   if (!expectedSecret || secret !== expectedSecret) {
-    return new Response('Unauthorized', { status: 401 })
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { 
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 
   return runSync()
@@ -53,11 +74,12 @@ export const POST: APIRoute = async () => {
 }
 
 async function runSync(): Promise<Response> {
-  const DB = env.DB as D1Database | undefined
-  const R2_IMAGES = env.R2_IMAGES as R2Bucket | undefined
+  const DB = env.DB
+  const R2_IMAGES = env.R2_IMAGES
   const notionToken = import.meta.env.NOTION_TOKEN
 
   if (!DB) {
+    logSync('error', 'D1 not configured')
     return new Response(JSON.stringify({ error: 'D1 not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -65,15 +87,25 @@ async function runSync(): Promise<Response> {
   }
 
   if (!notionToken) {
+    logSync('error', 'Notion token not configured')
     return new Response(JSON.stringify({ error: 'Notion token not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
   }
 
-  const notion = new Client({ auth: notionToken })
+  // Configure Notion client with timeout
+  const notion = new Client({ 
+    auth: notionToken,
+    timeoutMs: NOTION_TIMEOUT_MS,
+  })
+  
   const results: SyncResult[] = []
   const startTime = Date.now()
+
+  logSync('info', 'Starting Notion sync', { 
+    databases: Object.entries(NOTION_DB_IDS).filter(([, v]) => v).map(([k]) => k) 
+  })
 
   try {
     // Sync each table
@@ -90,33 +122,52 @@ async function runSync(): Promise<Response> {
       results.push(await syncPhotos(notion, DB, R2_IMAGES, NOTION_DB_IDS.photos))
     }
 
-    // Log sync result
+    // Calculate totals
+    const duration = Date.now() - startTime
     const recordsSynced = results.reduce((sum, r) => sum + r.inserted + r.updated, 0)
+    const totalErrors = results.reduce((sum, r) => sum + r.errors.length, 0)
+
+    // Log sync result
     await DB.prepare(`
       INSERT INTO sync_log (sync_type, status, records_synced, error_message, completed_at)
-      VALUES ('notion_sync', 'success', ?, NULL, datetime('now'))
-    `).bind(recordsSynced).run()
+      VALUES ('notion_sync', ?, ?, ?, datetime('now'))
+    `).bind(
+      totalErrors > 0 ? 'partial' : 'success',
+      recordsSynced,
+      totalErrors > 0 ? `${totalErrors} record errors` : null
+    ).run()
+
+    logSync('info', 'Notion sync completed', { duration_ms: duration, recordsSynced, totalErrors })
 
     return new Response(JSON.stringify({
       success: true,
       duration_ms: duration,
+      records_synced: recordsSynced,
       results
     }), {
       headers: { 'Content-Type': 'application/json' }
     })
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const duration = Date.now() - startTime
+    const errorMessage = formatError(error)
     
+    logSync('error', 'Notion sync failed', { duration_ms: duration, error: errorMessage })
+
     // Log failed sync
-    await DB.prepare(`
-      INSERT INTO sync_log (sync_type, status, records_synced, error_message, completed_at)
-      VALUES ('notion_sync', 'failed', 0, ?, datetime('now'))
-    `).bind(errorMessage).run()
+    try {
+      await DB.prepare(`
+        INSERT INTO sync_log (sync_type, status, records_synced, error_message, completed_at)
+        VALUES ('notion_sync', 'failed', 0, ?, datetime('now'))
+      `).bind(errorMessage).run()
+    } catch (dbError) {
+      logSync('error', 'Failed to log sync error to D1', { error: formatError(dbError) })
+    }
 
     return new Response(JSON.stringify({
       success: false,
       error: errorMessage,
+      duration_ms: duration,
       results
     }), {
       status: 500,
@@ -125,9 +176,26 @@ async function runSync(): Promise<Response> {
   }
 }
 
+/**
+ * Format an error into a string message.
+ * Handles Notion API errors, fetch timeout errors, and generic errors.
+ */
+function formatError(error: unknown): string {
+  if (isNotionClientError(error)) {
+    return `Notion API error: ${error.code} - ${error.message}`
+  }
+  if (error instanceof FetchTimeoutError) {
+    return error.message
+  }
+  if (error instanceof Error) {
+    return error.message
+  }
+  return 'Unknown error'
+}
+
 // Helper to get all pages from a Notion database (handles pagination)
-async function getAllPages(notion: Client, databaseId: string) {
-  const pages: any[] = []
+async function getAllPages(notion: Client, databaseId: string): Promise<Array<Record<string, unknown>>> {
+  const pages: Array<Record<string, unknown>> = []
   let cursor: string | undefined
 
   do {
@@ -136,7 +204,7 @@ async function getAllPages(notion: Client, databaseId: string) {
       start_cursor: cursor,
       page_size: 100,
     })
-    pages.push(...response.results)
+    pages.push(...(response.results as Array<Record<string, unknown>>))
     cursor = response.has_more ? response.next_cursor ?? undefined : undefined
   } while (cursor)
 
@@ -144,29 +212,44 @@ async function getAllPages(notion: Client, databaseId: string) {
 }
 
 // Helper to extract property values from Notion
-function getNotionProp(page: any, name: string, type: string): any {
-  const prop = page.properties[name]
+function getNotionProp(page: Record<string, unknown>, name: string, type: string): unknown {
+  const properties = page.properties as Record<string, Record<string, unknown>> | undefined
+  if (!properties) return null
+  
+  const prop = properties[name]
   if (!prop) return null
 
   switch (type) {
-    case 'title':
-      return prop.title?.[0]?.plain_text || null
-    case 'rich_text':
-      return prop.rich_text?.[0]?.plain_text || null
+    case 'title': {
+      const titleArray = prop.title as Array<{ plain_text?: string }> | undefined
+      return titleArray?.[0]?.plain_text || null
+    }
+    case 'rich_text': {
+      const textArray = prop.rich_text as Array<{ plain_text?: string }> | undefined
+      return textArray?.[0]?.plain_text || null
+    }
     case 'number':
       return prop.number ?? null
-    case 'date':
-      return prop.date?.start || null
-    case 'select':
-      return prop.select?.name || null
-    case 'multi_select':
-      return prop.multi_select?.map((s: any) => s.name) || []
+    case 'date': {
+      const dateObj = prop.date as { start?: string } | null
+      return dateObj?.start || null
+    }
+    case 'select': {
+      const selectObj = prop.select as { name?: string } | null
+      return selectObj?.name || null
+    }
+    case 'multi_select': {
+      const multiSelect = prop.multi_select as Array<{ name?: string }> | undefined
+      return multiSelect?.map(s => s.name).filter(Boolean) || []
+    }
     case 'url':
       return prop.url || null
     case 'checkbox':
       return prop.checkbox ?? false
-    case 'files':
-      return prop.files?.[0]?.file?.url || prop.files?.[0]?.external?.url || null
+    case 'files': {
+      const files = prop.files as Array<{ file?: { url?: string }; external?: { url?: string } }> | undefined
+      return files?.[0]?.file?.url || files?.[0]?.external?.url || null
+    }
     default:
       return null
   }
@@ -174,26 +257,36 @@ function getNotionProp(page: any, name: string, type: string): any {
 
 async function syncClimbs(notion: Client, db: D1Database, dbId: string): Promise<SyncResult> {
   const result: SyncResult = { table: 'climbs', inserted: 0, updated: 0, errors: [] }
-  const pages = await getAllPages(notion, dbId)
+  
+  let pages: Array<Record<string, unknown>>
+  try {
+    pages = await getAllPages(notion, dbId)
+  } catch (error) {
+    result.errors.push(`Failed to fetch climbs: ${formatError(error)}`)
+    return result
+  }
+
+  logSync('info', 'Syncing climbs', { count: pages.length })
 
   for (const page of pages) {
     try {
-      const id = page.id.replace(/-/g, '')
+      const pageId = page.id as string
+      const id = pageId.replace(/-/g, '')
       const data = {
         id,
-        date: getNotionProp(page, 'Date', 'date'),
-        title: getNotionProp(page, 'Name', 'title'),
-        slug: getNotionProp(page, 'Slug', 'rich_text'),
-        preview_img_url: getNotionProp(page, 'Preview Image', 'files'),
-        distance: getNotionProp(page, 'Distance', 'number'),
-        gain: getNotionProp(page, 'Gain', 'number'),
-        max_elevation: getNotionProp(page, 'Max Elevation', 'number'),
-        moving_time: getNotionProp(page, 'Moving Time', 'number'),
-        area: getNotionProp(page, 'Area', 'select'),
-        state: getNotionProp(page, 'State', 'select'),
-        strava: getNotionProp(page, 'Strava', 'url'),
-        alltrails: getNotionProp(page, 'AllTrails', 'url'),
-        published: getNotionProp(page, 'Published', 'checkbox'),
+        date: getNotionProp(page, 'Date', 'date') as string | null,
+        title: getNotionProp(page, 'Name', 'title') as string | null,
+        slug: getNotionProp(page, 'Slug', 'rich_text') as string | null,
+        preview_img_url: getNotionProp(page, 'Preview Image', 'files') as string | null,
+        distance: getNotionProp(page, 'Distance', 'number') as number | null,
+        gain: getNotionProp(page, 'Gain', 'number') as number | null,
+        max_elevation: getNotionProp(page, 'Max Elevation', 'number') as number | null,
+        moving_time: getNotionProp(page, 'Moving Time', 'number') as number | null,
+        area: getNotionProp(page, 'Area', 'select') as string | null,
+        state: getNotionProp(page, 'State', 'select') as string | null,
+        strava: getNotionProp(page, 'Strava', 'url') as string | null,
+        alltrails: getNotionProp(page, 'AllTrails', 'url') as string | null,
+        published: getNotionProp(page, 'Published', 'checkbox') as boolean,
       }
 
       await db.prepare(`
@@ -222,7 +315,8 @@ async function syncClimbs(notion: Client, db: D1Database, dbId: string): Promise
 
       result.inserted++
     } catch (error) {
-      result.errors.push(`Climb ${page.id}: ${error}`)
+      const pageId = page.id as string
+      result.errors.push(`Climb ${pageId}: ${formatError(error)}`)
     }
   }
 
@@ -231,20 +325,30 @@ async function syncClimbs(notion: Client, db: D1Database, dbId: string): Promise
 
 async function syncPeaks(notion: Client, db: D1Database, dbId: string): Promise<SyncResult> {
   const result: SyncResult = { table: 'peaks', inserted: 0, updated: 0, errors: [] }
-  const pages = await getAllPages(notion, dbId)
+  
+  let pages: Array<Record<string, unknown>>
+  try {
+    pages = await getAllPages(notion, dbId)
+  } catch (error) {
+    result.errors.push(`Failed to fetch peaks: ${formatError(error)}`)
+    return result
+  }
+
+  logSync('info', 'Syncing peaks', { count: pages.length })
 
   for (const page of pages) {
     try {
-      const id = page.id.replace(/-/g, '')
+      const pageId = page.id as string
+      const id = pageId.replace(/-/g, '')
       const data = {
         id,
-        name: getNotionProp(page, 'Name', 'title'),
-        elevation: getNotionProp(page, 'Elevation', 'number'),
-        prominence: getNotionProp(page, 'Prominence', 'number'),
-        range: getNotionProp(page, 'Range', 'select'),
-        first_completed: getNotionProp(page, 'First Completed', 'date'),
-        attempts: getNotionProp(page, 'Attempts', 'number'),
-        list_class: getNotionProp(page, 'Class', 'select'),
+        name: getNotionProp(page, 'Name', 'title') as string | null,
+        elevation: getNotionProp(page, 'Elevation', 'number') as number | null,
+        prominence: getNotionProp(page, 'Prominence', 'number') as number | null,
+        range: getNotionProp(page, 'Range', 'select') as string | null,
+        first_completed: getNotionProp(page, 'First Completed', 'date') as string | null,
+        attempts: getNotionProp(page, 'Attempts', 'number') as number | null,
+        list_class: getNotionProp(page, 'Class', 'select') as string | null,
       }
 
       await db.prepare(`
@@ -266,7 +370,8 @@ async function syncPeaks(notion: Client, db: D1Database, dbId: string): Promise<
 
       result.inserted++
     } catch (error) {
-      result.errors.push(`Peak ${page.id}: ${error}`)
+      const pageId = page.id as string
+      result.errors.push(`Peak ${pageId}: ${formatError(error)}`)
     }
   }
 
@@ -275,23 +380,33 @@ async function syncPeaks(notion: Client, db: D1Database, dbId: string): Promise<
 
 async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<SyncResult> {
   const result: SyncResult = { table: 'gear', inserted: 0, updated: 0, errors: [] }
-  const pages = await getAllPages(notion, dbId)
+  
+  let pages: Array<Record<string, unknown>>
+  try {
+    pages = await getAllPages(notion, dbId)
+  } catch (error) {
+    result.errors.push(`Failed to fetch gear: ${formatError(error)}`)
+    return result
+  }
+
+  logSync('info', 'Syncing gear', { count: pages.length })
 
   for (const page of pages) {
     try {
-      const id = page.id.replace(/-/g, '')
+      const pageId = page.id as string
+      const id = pageId.replace(/-/g, '')
       const data = {
         id,
-        name: getNotionProp(page, 'Name', 'title'),
-        brand: getNotionProp(page, 'Brand', 'select'),
-        category: getNotionProp(page, 'Category', 'select'),
-        weight_oz: getNotionProp(page, 'Weight (oz)', 'number'),
-        price: getNotionProp(page, 'Price', 'number'),
-        rating: getNotionProp(page, 'Rating', 'number'),
-        status: getNotionProp(page, 'Status', 'select'),
-        notes: getNotionProp(page, 'Notes', 'rich_text'),
-        url: getNotionProp(page, 'URL', 'url'),
-        image_url: getNotionProp(page, 'Image', 'files'),
+        name: getNotionProp(page, 'Name', 'title') as string | null,
+        brand: getNotionProp(page, 'Brand', 'select') as string | null,
+        category: getNotionProp(page, 'Category', 'select') as string | null,
+        weight_oz: getNotionProp(page, 'Weight (oz)', 'number') as number | null,
+        price: getNotionProp(page, 'Price', 'number') as number | null,
+        rating: getNotionProp(page, 'Rating', 'number') as number | null,
+        status: getNotionProp(page, 'Status', 'select') as string | null,
+        notes: getNotionProp(page, 'Notes', 'rich_text') as string | null,
+        url: getNotionProp(page, 'URL', 'url') as string | null,
+        image_url: getNotionProp(page, 'Image', 'files') as string | null,
       }
 
       await db.prepare(`
@@ -317,7 +432,8 @@ async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<S
 
       result.inserted++
     } catch (error) {
-      result.errors.push(`Gear ${page.id}: ${error}`)
+      const pageId = page.id as string
+      result.errors.push(`Gear ${pageId}: ${formatError(error)}`)
     }
   }
 
@@ -326,21 +442,31 @@ async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<S
 
 async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefined, dbId: string): Promise<SyncResult> {
   const result: SyncResult = { table: 'photos', inserted: 0, updated: 0, errors: [] }
-  const pages = await getAllPages(notion, dbId)
+  
+  let pages: Array<Record<string, unknown>>
+  try {
+    pages = await getAllPages(notion, dbId)
+  } catch (error) {
+    result.errors.push(`Failed to fetch photos: ${formatError(error)}`)
+    return result
+  }
+
+  logSync('info', 'Syncing photos', { count: pages.length })
 
   for (const page of pages) {
     try {
-      const id = page.id.replace(/-/g, '')
+      const pageId = page.id as string
+      const id = pageId.replace(/-/g, '')
       
       // Get raw Notion properties
-      const url = getNotionProp(page, 'href', 'url') || getNotionProp(page, 'Image', 'files')
-      const caption = getNotionProp(page, 'Caption', 'title') || getNotionProp(page, 'Name', 'title')
-      const dateRaw = getNotionProp(page, 'Date', 'date')
-      const areaFallback = getNotionProp(page, 'area_fallback', 'rich_text')
-      const tagsRaw = getNotionProp(page, 'tags', 'rich_text')
-      const width = getNotionProp(page, 'width', 'number')
-      const height = getNotionProp(page, 'height', 'number')
-      const exclude = getNotionProp(page, 'exclude', 'checkbox')
+      const url = (getNotionProp(page, 'href', 'url') || getNotionProp(page, 'Image', 'files')) as string | null
+      const caption = (getNotionProp(page, 'Caption', 'title') || getNotionProp(page, 'Name', 'title')) as string | null
+      const dateRaw = getNotionProp(page, 'Date', 'date') as string | null
+      const areaFallback = getNotionProp(page, 'area_fallback', 'rich_text') as string | null
+      const tagsRaw = getNotionProp(page, 'tags', 'rich_text') as string | null
+      const width = getNotionProp(page, 'width', 'number') as number | null
+      const height = getNotionProp(page, 'height', 'number') as number | null
+      const exclude = getNotionProp(page, 'exclude', 'checkbox') as boolean
 
       if (!url) continue // Skip photos without images
 
@@ -348,44 +474,10 @@ async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefin
       const date = dateRaw ? dateRaw.split('T')[0] : null
 
       // Parse area_fallback into area and state
-      // Formats: "Area Name, State" or "Area Name- State" or "Area Name - State"
-      let area: string | null = null
-      let state: string | null = null
-      
-      if (areaFallback) {
-        // Try comma separator first
-        if (areaFallback.includes(',')) {
-          const parts = areaFallback.split(',').map((s: string) => s.trim())
-          area = parts[0] || null
-          state = normalizeStateName(parts[1]) || null
-        }
-        // Try dash separator
-        else if (areaFallback.includes('-')) {
-          const parts = areaFallback.split('-').map((s: string) => s.trim())
-          area = parts[0] || null
-          state = normalizeStateName(parts[1]) || null
-        }
-        // No separator - just area
-        else {
-          area = areaFallback
-        }
-        
-        // Clean up area spacing (e.g., "Bridger- Teton" → "Bridger-Teton")
-        if (area) {
-          area = area.replace(/\s*-\s*/g, '-').trim()
-        }
-      }
+      const { area, state } = parseAreaFallback(areaFallback)
 
       // Parse tags: lowercase, trim, dedupe, sort alphabetically
-      let searchTags: string | null = null
-      if (tagsRaw) {
-        const tags = tagsRaw
-          .split(',')
-          .map((t: string) => t.trim().toLowerCase())
-          .filter((t: string) => t.length > 0)
-        const uniqueTags = Array.from(new Set(tags)).sort()
-        searchTags = uniqueTags.join(', ')
-      }
+      const searchTags = parseTags(tagsRaw)
 
       // Derive format from URL extension
       const ext = url.split('.').pop()?.toLowerCase() || 'jpg'
@@ -393,8 +485,7 @@ async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefin
       const r2Key = `photos/${id}`
 
       // Generate deterministic short_id from Notion page ID for clean URLs
-      // This ensures the same photo always gets the same short_id, preventing URL breakage
-      const shortId = await generateShortId(page.id)
+      const shortId = await generateShortId(pageId)
 
       await db.prepare(`
         INSERT INTO photos (
@@ -428,36 +519,114 @@ async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefin
 
       // Sync image to R2 so we can serve from our own storage
       if (r2) {
-        try {
-          const r2ObjectKey = `${r2Key}/original.${format}`
-          const existing = await r2.head(r2ObjectKey)
-
-          if (!existing) {
-            const imgRes = await fetch(url)
-            if (imgRes.ok) {
-              const buffer = await imgRes.arrayBuffer()
-              const contentType = imgRes.headers.get('content-type') || `image/${format}`
-              await r2.put(r2ObjectKey, buffer, {
-                httpMetadata: { contentType },
-              })
-            }
-          }
-        } catch (r2Error) {
-          // Don't fail the whole sync if one image upload fails
-          console.error(`Failed to sync image ${id} to R2:`, r2Error)
-        }
+        await syncImageToR2(r2, r2Key, format, url, id)
       }
 
       result.inserted++
     } catch (error) {
-      result.errors.push(`Photo ${page.id}: ${error}`)
+      const pageId = page.id as string
+      result.errors.push(`Photo ${pageId}: ${formatError(error)}`)
     }
   }
 
   return result
 }
 
-// Helper to normalize state names to full names
+/**
+ * Sync an image from a URL to R2 storage.
+ * Uses fetch with timeout to prevent hanging on slow/unresponsive servers.
+ */
+async function syncImageToR2(
+  r2: R2Bucket,
+  r2Key: string,
+  format: string,
+  url: string,
+  photoId: string
+): Promise<void> {
+  try {
+    const r2ObjectKey = `${r2Key}/original.${format}`
+    const existing = await r2.head(r2ObjectKey)
+
+    if (!existing) {
+      const imgRes = await fetchImage(url, IMAGE_TIMEOUT_MS)
+      if (imgRes.ok) {
+        const buffer = await imgRes.arrayBuffer()
+        const contentType = imgRes.headers.get('content-type') || `image/${format}`
+        await r2.put(r2ObjectKey, buffer, {
+          httpMetadata: { contentType },
+        })
+      } else {
+        logSync('warn', 'Failed to fetch image', { 
+          photoId, 
+          url, 
+          status: imgRes.status 
+        })
+      }
+    }
+  } catch (error) {
+    // Don't fail the whole sync if one image upload fails
+    logSync('warn', 'Failed to sync image to R2', { 
+      photoId, 
+      url, 
+      error: formatError(error) 
+    })
+  }
+}
+
+/**
+ * Parse area_fallback into area and state.
+ * Formats: "Area Name, State" or "Area Name- State" or "Area Name - State"
+ */
+function parseAreaFallback(areaFallback: string | null): { area: string | null; state: string | null } {
+  if (!areaFallback) {
+    return { area: null, state: null }
+  }
+
+  let area: string | null = null
+  let state: string | null = null
+
+  // Try comma separator first
+  if (areaFallback.includes(',')) {
+    const parts = areaFallback.split(',').map(s => s.trim())
+    area = parts[0] || null
+    state = normalizeStateName(parts[1]) || null
+  }
+  // Try dash separator
+  else if (areaFallback.includes('-')) {
+    const parts = areaFallback.split('-').map(s => s.trim())
+    area = parts[0] || null
+    state = normalizeStateName(parts[1]) || null
+  }
+  // No separator - just area
+  else {
+    area = areaFallback
+  }
+
+  // Clean up area spacing (e.g., "Bridger- Teton" → "Bridger-Teton")
+  if (area) {
+    area = area.replace(/\s*-\s*/g, '-').trim()
+  }
+
+  return { area, state }
+}
+
+/**
+ * Parse tags string into normalized, deduplicated, sorted format.
+ */
+function parseTags(tagsRaw: string | null): string | null {
+  if (!tagsRaw) return null
+  
+  const tags = tagsRaw
+    .split(',')
+    .map(t => t.trim().toLowerCase())
+    .filter(t => t.length > 0)
+  const uniqueTags = Array.from(new Set(tags)).sort()
+  return uniqueTags.length > 0 ? uniqueTags.join(', ') : null
+}
+
+/**
+ * Normalize state names to full names.
+ */
 function normalizeStateName(state: string | null | undefined): string | null {
   if (!state) return null
   
