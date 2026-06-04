@@ -21,6 +21,8 @@
     "migrate:schema:remote": "node scripts/migrate/merge-photos-schema.mjs --remote",
     "migrate:r2": "node scripts/migrate/r2-sync.mjs",
     "format": "prettier --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "typecheck": "astro check && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -44,6 +46,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.16",
     "@cloudflare/workers-types": "^4.20250515.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
