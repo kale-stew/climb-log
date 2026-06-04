@@ -13,11 +13,17 @@ export interface CloudflareEnv {
   ALLOWED_WIDTHS: string
 }
 
-// Type the `env` export from `cloudflare:workers`
-declare module 'cloudflare:workers' {
-  export const env: CloudflareEnv
-}
+declare global {
+  /**
+   * Populate the `Cloudflare.Env` interface that `cloudflare:workers` uses to
+   * type its `env` export. Declaration merging adds our bindings, so
+   * `import { env } from 'cloudflare:workers'` is fully typed.
+   */
+  namespace Cloudflare {
+    interface Env extends CloudflareEnv {}
+  }
 
-declare namespace App {
-  interface Locals extends import('@astrojs/cloudflare').Runtime<CloudflareEnv> {}
+  namespace App {
+    interface Locals extends import('@astrojs/cloudflare').Runtime<CloudflareEnv> {}
+  }
 }
