@@ -3,6 +3,7 @@ import { Client, isNotionClientError, APIErrorCode } from '@notionhq/client'
 import { env } from 'cloudflare:workers'
 import { fetchImage, IMAGE_TIMEOUT_MS, FetchTimeoutError } from '../../lib/fetch-with-timeout'
 import type { SyncResult } from '../../lib/types'
+import { getNotionProp, parseAreaFallback, parseTags } from '../../lib/notion-helpers'
 
 export const prerender = false
 
@@ -211,48 +212,14 @@ async function getAllPages(notion: Client, databaseId: string): Promise<Array<Re
   return pages
 }
 
-// Helper to extract property values from Notion
-function getNotionProp(page: Record<string, unknown>, name: string, type: string): unknown {
-  const properties = page.properties as Record<string, Record<string, unknown>> | undefined
-  if (!properties) return null
-  
-  const prop = properties[name]
-  if (!prop) return null
-
-  switch (type) {
-    case 'title': {
-      const titleArray = prop.title as Array<{ plain_text?: string }> | undefined
-      return titleArray?.[0]?.plain_text || null
-    }
-    case 'rich_text': {
-      const textArray = prop.rich_text as Array<{ plain_text?: string }> | undefined
-      return textArray?.[0]?.plain_text || null
-    }
-    case 'number':
-      return prop.number ?? null
-    case 'date': {
-      const dateObj = prop.date as { start?: string } | null
-      return dateObj?.start || null
-    }
-    case 'select': {
-      const selectObj = prop.select as { name?: string } | null
-      return selectObj?.name || null
-    }
-    case 'multi_select': {
-      const multiSelect = prop.multi_select as Array<{ name?: string }> | undefined
-      return multiSelect?.map(s => s.name).filter(Boolean) || []
-    }
-    case 'url':
-      return prop.url || null
-    case 'checkbox':
-      return prop.checkbox ?? false
-    case 'files': {
-      const files = prop.files as Array<{ file?: { url?: string }; external?: { url?: string } }> | undefined
-      return files?.[0]?.file?.url || files?.[0]?.external?.url || null
-    }
-    default:
-      return null
-  }
+/**
+ * Check whether a row with the given id already exists in a table.
+ * Used to distinguish inserts from updates when reporting sync counts.
+ * `table` is always a hardcoded literal (never user input), so interpolation is safe.
+ */
+async function rowExists(db: D1Database, table: string, id: string): Promise<boolean> {
+  const row = await db.prepare(`SELECT 1 FROM ${table} WHERE id = ? LIMIT 1`).bind(id).first()
+  return row !== null
 }
 
 async function syncClimbs(notion: Client, db: D1Database, dbId: string): Promise<SyncResult> {
@@ -274,6 +241,7 @@ async function syncClimbs(notion: Client, db: D1Database, dbId: string): Promise
       const id = pageId.replace(/-/g, '')
       const data = {
         id,
+        notion_id: pageId,
         date: getNotionProp(page, 'Date', 'date') as string | null,
         title: getNotionProp(page, 'Name', 'title') as string | null,
         slug: getNotionProp(page, 'Slug', 'rich_text') as string | null,
@@ -289,10 +257,13 @@ async function syncClimbs(notion: Client, db: D1Database, dbId: string): Promise
         published: getNotionProp(page, 'Published', 'checkbox') as boolean,
       }
 
+      const existed = await rowExists(db, 'climbs', id)
+
       await db.prepare(`
-        INSERT INTO climbs (id, date, title, slug, preview_img_url, distance, gain, max_elevation, moving_time, area, state, strava, alltrails, published, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        INSERT INTO climbs (id, notion_id, date, title, slug, preview_img_url, distance, gain, max_elevation, moving_time, area, state, strava, alltrails, published, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
+          notion_id = excluded.notion_id,
           date = excluded.date,
           title = excluded.title,
           slug = excluded.slug,
@@ -308,12 +279,13 @@ async function syncClimbs(notion: Client, db: D1Database, dbId: string): Promise
           published = excluded.published,
           updated_at = datetime('now')
       `).bind(
-        data.id, data.date, data.title, data.slug, data.preview_img_url,
+        data.id, data.notion_id, data.date, data.title, data.slug, data.preview_img_url,
         data.distance, data.gain, data.max_elevation, data.moving_time,
         data.area, data.state, data.strava, data.alltrails, data.published ? 1 : 0
       ).run()
 
-      result.inserted++
+      if (existed) result.updated++
+      else result.inserted++
     } catch (error) {
       const pageId = page.id as string
       result.errors.push(`Climb ${pageId}: ${formatError(error)}`)
@@ -342,6 +314,7 @@ async function syncPeaks(notion: Client, db: D1Database, dbId: string): Promise<
       const id = pageId.replace(/-/g, '')
       const data = {
         id,
+        notion_id: pageId,
         name: getNotionProp(page, 'Name', 'title') as string | null,
         elevation: getNotionProp(page, 'Elevation', 'number') as number | null,
         prominence: getNotionProp(page, 'Prominence', 'number') as number | null,
@@ -351,10 +324,13 @@ async function syncPeaks(notion: Client, db: D1Database, dbId: string): Promise<
         list_class: getNotionProp(page, 'Class', 'select') as string | null,
       }
 
+      const existed = await rowExists(db, 'peaks', id)
+
       await db.prepare(`
-        INSERT INTO peaks (id, name, elevation, prominence, range, first_completed, attempts, list_class, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        INSERT INTO peaks (id, notion_id, name, elevation, prominence, range, first_completed, attempts, list_class, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
+          notion_id = excluded.notion_id,
           name = excluded.name,
           elevation = excluded.elevation,
           prominence = excluded.prominence,
@@ -364,11 +340,12 @@ async function syncPeaks(notion: Client, db: D1Database, dbId: string): Promise<
           list_class = excluded.list_class,
           updated_at = datetime('now')
       `).bind(
-        data.id, data.name, data.elevation, data.prominence,
+        data.id, data.notion_id, data.name, data.elevation, data.prominence,
         data.range, data.first_completed, data.attempts, data.list_class
       ).run()
 
-      result.inserted++
+      if (existed) result.updated++
+      else result.inserted++
     } catch (error) {
       const pageId = page.id as string
       result.errors.push(`Peak ${pageId}: ${formatError(error)}`)
@@ -397,6 +374,7 @@ async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<S
       const id = pageId.replace(/-/g, '')
       const data = {
         id,
+        notion_id: pageId,
         name: getNotionProp(page, 'Name', 'title') as string | null,
         brand: getNotionProp(page, 'Brand', 'select') as string | null,
         category: getNotionProp(page, 'Category', 'select') as string | null,
@@ -409,10 +387,13 @@ async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<S
         image_url: getNotionProp(page, 'Image', 'files') as string | null,
       }
 
+      const existed = await rowExists(db, 'gear', id)
+
       await db.prepare(`
-        INSERT INTO gear (id, name, brand, category, weight_oz, price, rating, status, notes, url, image_url, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        INSERT INTO gear (id, notion_id, name, brand, category, weight_oz, price, rating, status, notes, url, image_url, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
+          notion_id = excluded.notion_id,
           name = excluded.name,
           brand = excluded.brand,
           category = excluded.category,
@@ -425,12 +406,13 @@ async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<S
           image_url = excluded.image_url,
           updated_at = datetime('now')
       `).bind(
-        data.id, data.name, data.brand, data.category,
+        data.id, data.notion_id, data.name, data.brand, data.category,
         data.weight_oz, data.price, data.rating, data.status,
         data.notes, data.url, data.image_url
       ).run()
 
-      result.inserted++
+      if (existed) result.updated++
+      else result.inserted++
     } catch (error) {
       const pageId = page.id as string
       result.errors.push(`Gear ${pageId}: ${formatError(error)}`)
@@ -487,6 +469,8 @@ async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefin
       // Generate deterministic short_id from Notion page ID for clean URLs
       const shortId = await generateShortId(pageId)
 
+      const existed = await rowExists(db, 'photos', id)
+
       await db.prepare(`
         INSERT INTO photos (
           id, notion_id, r2_key, short_id, src, caption, date,
@@ -517,12 +501,15 @@ async function syncPhotos(notion: Client, db: D1Database, r2: R2Bucket | undefin
         format
       ).run()
 
-      // Sync image to R2 so we can serve from our own storage
+      // Sync image to R2 so we can serve from our own storage.
+      // Note: "inserted"/"updated" reflect the D1 row upsert; R2 image sync
+      // failures are logged but do not change these counts.
       if (r2) {
         await syncImageToR2(r2, r2Key, format, url, id)
       }
 
-      result.inserted++
+      if (existed) result.updated++
+      else result.inserted++
     } catch (error) {
       const pageId = page.id as string
       result.errors.push(`Photo ${pageId}: ${formatError(error)}`)
@@ -571,81 +558,4 @@ async function syncImageToR2(
       error: formatError(error) 
     })
   }
-}
-
-/**
- * Parse area_fallback into area and state.
- * Formats: "Area Name, State" or "Area Name- State" or "Area Name - State"
- */
-function parseAreaFallback(areaFallback: string | null): { area: string | null; state: string | null } {
-  if (!areaFallback) {
-    return { area: null, state: null }
-  }
-
-  let area: string | null = null
-  let state: string | null = null
-
-  // Try comma separator first
-  if (areaFallback.includes(',')) {
-    const parts = areaFallback.split(',').map(s => s.trim())
-    area = parts[0] || null
-    state = normalizeStateName(parts[1]) || null
-  }
-  // Try dash separator
-  else if (areaFallback.includes('-')) {
-    const parts = areaFallback.split('-').map(s => s.trim())
-    area = parts[0] || null
-    state = normalizeStateName(parts[1]) || null
-  }
-  // No separator - just area
-  else {
-    area = areaFallback
-  }
-
-  // Clean up area spacing (e.g., "Bridger- Teton" → "Bridger-Teton")
-  if (area) {
-    area = area.replace(/\s*-\s*/g, '-').trim()
-  }
-
-  return { area, state }
-}
-
-/**
- * Parse tags string into normalized, deduplicated, sorted format.
- */
-function parseTags(tagsRaw: string | null): string | null {
-  if (!tagsRaw) return null
-  
-  const tags = tagsRaw
-    .split(',')
-    .map(t => t.trim().toLowerCase())
-    .filter(t => t.length > 0)
-  const uniqueTags = Array.from(new Set(tags)).sort()
-  return uniqueTags.length > 0 ? uniqueTags.join(', ') : null
-}
-
-/**
- * Normalize state names to full names.
- */
-function normalizeStateName(state: string | null | undefined): string | null {
-  if (!state) return null
-  
-  const stateMap: Record<string, string> = {
-    'AZ': 'Arizona',
-    'CA': 'California',
-    'CO': 'Colorado',
-    'ID': 'Idaho',
-    'MT': 'Montana',
-    'NM': 'New Mexico',
-    'NV': 'Nevada',
-    'OR': 'Oregon',
-    'UT': 'Utah',
-    'WA': 'Washington',
-    'WY': 'Wyoming',
-    'Alaska': 'Alaska',
-    'Washington State': 'Washington'
-  }
-  
-  const trimmed = state.trim()
-  return stateMap[trimmed] || trimmed
 }

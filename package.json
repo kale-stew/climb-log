@@ -21,9 +21,12 @@
     "migrate:schema:remote": "node scripts/migrate/merge-photos-schema.mjs --remote",
     "migrate:r2": "node scripts/migrate/r2-sync.mjs",
     "format": "prettier --write .",
-    "typecheck": "astro check && tsc --noEmit"
+    "typecheck": "astro check && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.9",
     "@astrojs/cloudflare": "^13.2.0",
     "@astrojs/react": "^4.3.0",
     "@hono/zod-validator": "^0.8.0",
@@ -47,6 +50,7 @@
     "prettier": "^3.5.3",
     "tsx": "^4.22.3",
     "typescript": "^5.9.3",
+    "vitest": "^3.2.6",
     "wrangler": "^4.94.0"
   }
 }
