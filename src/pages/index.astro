@@ -9,7 +9,6 @@ const DB = env.DB as D1Database | undefined
 
 let recentClimbs: any[] = []
 let heroPhotos: { short_id: string; accent_color: string | null }[] = []
-let heroAccentColor: string | null = null
 let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
 
 if (DB) {
@@ -38,7 +37,7 @@ if (DB) {
         (SELECT COUNT(*) FROM peaks WHERE first_completed IS NOT NULL) as totalPeaks,
         (SELECT COALESCE(SUM(distance), 0) FROM climbs) as totalMiles,
         (SELECT COALESCE(SUM(gain), 0) FROM climbs) as totalGain
-    `).first()
+    `).first<{ totalClimbs: number; totalPeaks: number; totalMiles: number; totalGain: number }>()
     
     if (statsResult) {
       stats = {
@@ -136,7 +135,7 @@ function formatNumber(n: number): string {
 
   <script>
     // Cycle hero image through last 5 photos
-    const heroSection = document.querySelector('.hero');
+    const heroSection = document.querySelector<HTMLElement>('.hero');
     const heroImage = document.getElementById('hero-image');
     if (heroSection && heroImage) {
       const photos = JSON.parse(heroSection.dataset.photos || '[]');

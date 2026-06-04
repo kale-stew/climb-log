@@ -72,7 +72,7 @@ function escapeSQL(value: unknown): string {
   return `'${String(value).replace(/'/g, "''")}'`
 }
 
-function generateInsertSQL<T extends Record<string, unknown>>(
+function generateInsertSQL<T extends object>(
   table: string,
   data: T[],
   columns: (keyof T)[]

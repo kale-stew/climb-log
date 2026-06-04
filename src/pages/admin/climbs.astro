@@ -32,8 +32,8 @@ if (DB) {
   ).all()
   recentAssignments = assignmentsResult.results || []
 
-  const totalResult = await DB.prepare('SELECT COUNT(*) as total FROM climbs').first()
-  const missingResult = await DB.prepare(`SELECT COUNT(*) as missing FROM climbs WHERE preview_img_url IS NULL OR preview_img_url = ''`).first()
+  const totalResult = await DB.prepare('SELECT COUNT(*) as total FROM climbs').first<{ total: number }>()
+  const missingResult = await DB.prepare(`SELECT COUNT(*) as missing FROM climbs WHERE preview_img_url IS NULL OR preview_img_url = ''`).first<{ missing: number }>()
   stats = {
     totalClimbs: totalResult?.total || 0,
     missingPhotos: missingResult?.missing || 0,
@@ -119,26 +119,24 @@ function formatDate(dateStr: string | null) {
   </div>
 
   <script>
-    let selectedPhotoUrl = null;
-    let selectedPhotoEl = null;
+    let selectedPhotoUrl: string | null = null;
 
-    document.querySelectorAll('.photo-thumb').forEach(el => {
+    document.querySelectorAll<HTMLElement>('.photo-thumb').forEach(el => {
       el.addEventListener('click', () => {
         document.querySelectorAll('.photo-thumb').forEach(p => p.classList.remove('selected'));
         el.classList.add('selected');
-        selectedPhotoUrl = el.dataset.photoUrl;
-        selectedPhotoEl = el;
+        selectedPhotoUrl = el.dataset.photoUrl ?? null;
       });
     });
 
-    document.querySelectorAll('.climb-item').forEach(el => {
+    document.querySelectorAll<HTMLElement>('.climb-item').forEach(el => {
       el.addEventListener('click', async () => {
         if (!selectedPhotoUrl) {
           alert('Select a photo first, then click a climb to assign it.');
           return;
         }
 
-        const climbId = el.dataset.climbId;
+        const climbId = el.dataset.climbId ?? '';
         const climbTitle = el.querySelector('h3')?.textContent || 'Unknown';
         el.style.opacity = '0.5';
 
@@ -150,11 +148,11 @@ function formatDate(dateStr: string | null) {
           });
 
           if (res.ok) {
-            const data = await res.json();
-            
+            const data = await res.json() as { assignmentId: string };
+
             // Add to audit log
             addAuditItem(data.assignmentId, climbId, climbTitle, selectedPhotoUrl);
-            
+
             // Remove from needs-photo list
             el.style.transition = 'all 0.3s ease';
             el.style.opacity = '0';
@@ -166,14 +164,15 @@ function formatDate(dateStr: string | null) {
           }
         } catch (err) {
           el.style.opacity = '1';
-          alert('Error: ' + err.message);
+          alert('Error: ' + (err instanceof Error ? err.message : String(err)));
         }
       });
     });
 
     // Add a new item to the audit list
-    function addAuditItem(assignmentId, climbId, climbTitle, photoUrl) {
+    function addAuditItem(assignmentId: string, climbId: string, climbTitle: string, photoUrl: string) {
       const auditList = document.getElementById('audit-list');
+      if (!auditList) return;
       const emptyState = auditList.querySelector('.empty-state');
       if (emptyState) emptyState.remove();
 
@@ -189,23 +188,24 @@ function formatDate(dateStr: string | null) {
         </div>
         <button class="undo-btn" title="Undo this assignment">Undo</button>
       `;
-      
+
       // Add to top of list
       auditList.insertBefore(item, auditList.firstChild);
-      
+
       // Bind undo handler
-      item.querySelector('.undo-btn').addEventListener('click', handleUndo);
+      item.querySelector('.undo-btn')?.addEventListener('click', handleUndo);
     }
 
     // Handle undo button clicks
-    async function handleUndo(e) {
-      const item = e.target.closest('.audit-item');
+    async function handleUndo(e: Event) {
+      const button = e.currentTarget as HTMLButtonElement;
+      const item = button.closest<HTMLElement>('.audit-item');
+      if (!item) return;
       const assignmentId = item.dataset.assignmentId;
-      const climbId = item.dataset.climbId;
-      
+
       item.style.opacity = '0.5';
-      e.target.disabled = true;
-      e.target.textContent = '...';
+      button.disabled = true;
+      button.textContent = '...';
 
       try {
         const res = await fetch('/api/admin/undo-photo', {
@@ -223,25 +223,25 @@ function formatDate(dateStr: string | null) {
             item.remove();
             // Show empty state if no more items
             const auditList = document.getElementById('audit-list');
-            if (!auditList.querySelector('.audit-item')) {
+            if (auditList && !auditList.querySelector('.audit-item')) {
               auditList.innerHTML = '<p class="empty-state">No assignments yet</p>';
             }
           }, 300);
-          
+
           // Optionally refresh the page to show the climb back in the list
           // For now, just show a brief notification
-          console.log('Assignment undone for climb:', climbId);
+          console.log('Assignment undone for climb:', item.dataset.climbId);
         } else {
           item.style.opacity = '1';
-          e.target.disabled = false;
-          e.target.textContent = 'Undo';
+          button.disabled = false;
+          button.textContent = 'Undo';
           alert('Failed to undo assignment');
         }
       } catch (err) {
         item.style.opacity = '1';
-        e.target.disabled = false;
-        e.target.textContent = 'Undo';
-        alert('Error: ' + err.message);
+        button.disabled = false;
+        button.textContent = 'Undo';
+        alert('Error: ' + (err instanceof Error ? err.message : String(err)));
       }
     }
 

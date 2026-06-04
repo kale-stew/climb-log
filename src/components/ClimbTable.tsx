@@ -35,12 +35,12 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
 
   // Get unique areas and states for filters
   const areas = useMemo(() => {
-    const set = new Set(climbs.map(c => c.area).filter(Boolean))
+    const set = new Set(climbs.map(c => c.area).filter((a): a is string => Boolean(a)))
     return Array.from(set).sort()
   }, [climbs])
 
   const states = useMemo(() => {
-    const set = new Set(climbs.map(c => c.state).filter(Boolean))
+    const set = new Set(climbs.map(c => c.state).filter((s): s is string => Boolean(s)))
     return Array.from(set).sort()
   }, [climbs])
 
@@ -94,12 +94,6 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
     const start = (currentPage - 1) * pageSize
     return filteredClimbs.slice(start, start + pageSize)
   }, [filteredClimbs, currentPage, pageSize])
-
-  // Reset to page 1 when filters change
-  const handleFilterChange = (setter: (val: string) => void) => (val: string) => {
-    setter(val)
-    setCurrentPage(1)
-  }
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

@@ -67,7 +67,7 @@ export const mockPhotoPage = {
 export function createMockNotion(pages: any[] = []) {
   return {
     databases: {
-      query: async ({ database_id, start_cursor, page_size }: any) => ({
+      query: async () => ({
         results: pages,
         has_more: false,
         next_cursor: null,
@@ -75,7 +75,7 @@ export function createMockNotion(pages: any[] = []) {
     },
     blocks: {
       children: {
-        list: async ({ block_id }: any) => ({
+        list: async () => ({
           results: [
             {
               type: 'paragraph',

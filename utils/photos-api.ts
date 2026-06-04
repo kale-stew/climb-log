@@ -32,7 +32,6 @@ async function generateShortId(input: string): Promise<string> {
 
 // Supported widths for public image transforms
 const ALLOWED_WIDTHS = new Set([200, 400, 800, 1600]);
-const MAX_CUSTOM_WIDTH = 2048;
 
 // In-flight transform tracking to prevent duplicate work
 const inFlightTransforms = new Map<string, Promise<any>>();

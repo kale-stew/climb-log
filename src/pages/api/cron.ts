@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { Client, isNotionClientError, APIErrorCode } from '@notionhq/client'
+import { Client, isNotionClientError } from '@notionhq/client'
 import { env } from 'cloudflare:workers'
 import { fetchImage, IMAGE_TIMEOUT_MS, FetchTimeoutError } from '../../lib/fetch-with-timeout'
 import type { SyncResult } from '../../lib/types'

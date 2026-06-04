@@ -471,7 +471,7 @@ const slug = post.id.replace(/\.md$/, '')
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               const id = entry.target.id
-              document.querySelectorAll('.toc-link').forEach((link) => {
+              document.querySelectorAll<HTMLElement>('.toc-link').forEach((link) => {
                 link.classList.remove('active')
                 if (link.dataset.target === id) {
                   link.classList.add('active')
@@ -489,10 +489,10 @@ const slug = post.id.replace(/\.md$/, '')
       headings.forEach((heading) => observer.observe(heading))
 
       // Smooth scroll on TOC link click
-      document.querySelectorAll('.toc-link').forEach((link) => {
+      document.querySelectorAll<HTMLElement>('.toc-link').forEach((link) => {
         link.addEventListener('click', (e) => {
           e.preventDefault()
-          const target = document.getElementById(link.dataset.target)
+          const target = document.getElementById(link.dataset.target ?? '')
           if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' })
             history.pushState(null, '', '#' + link.dataset.target)

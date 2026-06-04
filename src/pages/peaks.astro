@@ -282,14 +282,13 @@ function formatElevation(feet: number) {
   </style>
 
   <script>
-    const buttons = document.querySelectorAll('.filter-btn')
-    const cards = document.querySelectorAll('.peak-card')
+    const buttons = document.querySelectorAll<HTMLElement>('.filter-btn')
+    const cards = document.querySelectorAll<HTMLElement>('.peak-card')
     const countEl = document.getElementById('visible-count')
-    const totalCards = cards.length
 
     function updateCount() {
       const visible = Array.from(cards).filter(c => c.style.display !== 'none').length
-      if (countEl) countEl.textContent = visible
+      if (countEl) countEl.textContent = String(visible)
     }
 
     buttons.forEach(btn => {
