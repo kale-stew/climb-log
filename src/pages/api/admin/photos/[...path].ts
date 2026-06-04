@@ -5,15 +5,19 @@ import { createPhotosApp } from '../../../../../utils/photos-api'
 export const prerender = false
 
 /**
- * Create the photos Hono app with bindings from the Cloudflare environment.
- * Factored out to avoid duplication across HTTP methods.
+ * Build the photos Hono app once per isolate and reuse it across requests.
+ * Lazily initialized so the Cloudflare `env` binding is available on first use.
  */
+let photosApp: ReturnType<typeof createPhotosApp> | undefined
 function getPhotosApp() {
-  return createPhotosApp({
-    DB: env.DB,
-    R2_IMAGES: env.R2_IMAGES,
-    IMAGES: env.IMAGES,
-  })
+  if (!photosApp) {
+    photosApp = createPhotosApp({
+      DB: env.DB,
+      R2_IMAGES: env.R2_IMAGES,
+      IMAGES: env.IMAGES,
+    })
+  }
+  return photosApp
 }
 
 // Handles all /api/admin/photos/* routes

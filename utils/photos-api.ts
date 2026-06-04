@@ -15,18 +15,9 @@ import {
   updatePhotoSchema,
   resizePhotoSchema,
   extractColorsSchema,
+  photoListQuerySchema,
+  formatZodError,
 } from "../src/lib/schemas";
-
-/**
- * Format Zod validation errors into a user-friendly message.
- * Inline to avoid Zod v4 type compatibility issues with exported function.
- */
-function formatValidationError(error: { issues: { path: PropertyKey[]; message: string }[] }): string {
-  return error.issues.map(issue => {
-    const path = issue.path.length > 0 ? `${issue.path.map(String).join('.')}: ` : ''
-    return `${path}${issue.message}`
-  }).join('; ')
-}
 
 // Generate a short URL-safe ID from any string (used for cleaner /img/{id} URLs)
 // Must match the Python: hashlib.sha256(input.encode()).hexdigest()[:8]
@@ -451,14 +442,11 @@ export function createPhotosApp(env: PhotosApiEnv) {
 
   // GET /api/photos
   app.get("/api/photos", async (c) => {
-    const url = new URL(c.req.url);
-    const site = url.searchParams.get("site");
-
-    const limitParam = parseInt(url.searchParams.get("limit") || "50", 10);
-    const limit = Number.isNaN(limitParam) ? 50 : Math.min(Math.max(1, limitParam), 100);
-
-    const offsetParam = parseInt(url.searchParams.get("offset") || "0", 10);
-    const offset = Number.isNaN(offsetParam) ? 0 : Math.max(0, offsetParam);
+    const parsed = photoListQuerySchema.safeParse(c.req.query());
+    if (!parsed.success) {
+      return c.json({ error: formatZodError(parsed.error) }, 400);
+    }
+    const { site, limit, offset } = parsed.data;
 
     let query = "SELECT * FROM photos WHERE exclude = 0";
     const params: (string | number)[] = [];
@@ -638,7 +626,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
     "/api/admin/photos/:id",
     zValidator("json", updatePhotoSchema, (result, c) => {
       if (!result.success) {
-        return c.json({ error: formatValidationError(result.error) }, 400);
+        return c.json({ error: formatZodError(result.error) }, 400);
       }
     }),
     async (c) => {
@@ -751,7 +739,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
     "/api/admin/photos/resize",
     zValidator("json", resizePhotoSchema, (result, c) => {
       if (!result.success) {
-        return c.json({ error: formatValidationError(result.error) }, 400);
+        return c.json({ error: formatZodError(result.error) }, 400);
       }
     }),
     async (c) => {
@@ -805,7 +793,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
     "/api/admin/photos/extract-colors",
     zValidator("json", extractColorsSchema, (result, c) => {
       if (!result.success) {
-        return c.json({ error: formatValidationError(result.error) }, 400);
+        return c.json({ error: formatZodError(result.error) }, 400);
       }
     }),
     async (c) => {
@@ -921,7 +909,14 @@ export function createPhotosApp(env: PhotosApiEnv) {
 
     const id = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
     const shortId = await generateShortId(id);
-    const format = file.type === "image/png" ? "png" : "jpeg";
+    
+    // Map MIME type to format (fixes WebP being stored as "jpeg")
+    const formatMap: Record<string, string> = {
+      "image/jpeg": "jpeg",
+      "image/png": "png",
+      "image/webp": "webp",
+    };
+    const format = formatMap[file.type] ?? "jpeg";
     const r2Key = `photos/${id}`;
 
     const arrayBuffer = await file.arrayBuffer();
