@@ -22,13 +22,13 @@ Build a CMD+K-invokable conversational agent for kylies.photos that helps users 
 
 ### Cost Estimate
 
-| Service | Monthly Cost |
-|---------|--------------|
-| Workers Paid Plan (minimum) | $5.00 |
-| Workers AI (Llama 3.1 8B - free tier) | $0.00 |
-| BGE embeddings | ~$0.01 |
-| Vectorize (free tier) | $0.00 |
-| **Total** | **~$5.01/month** |
+| Service                               | Monthly Cost     |
+| ------------------------------------- | ---------------- |
+| Workers Paid Plan (minimum)           | $5.00            |
+| Workers AI (Llama 3.1 8B - free tier) | $0.00            |
+| BGE embeddings                        | ~$0.01           |
+| Vectorize (free tier)                 | $0.00            |
+| **Total**                             | **~$5.01/month** |
 
 ### Timeline
 
@@ -74,12 +74,17 @@ UI Rendering (markdown + rich cards)
 ### Model Selection
 
 **Primary:** `@cf/meta/llama-3.1-8b-instruct-fast`
+
 - 128K context window
-- Function calling support (confirmed)
+- Function calling support — **re-verify the "Function calling" badge on the model page**;
+  required for AI SDK `tool()` calls via `workers-ai-provider`
 - Likely free tier
 - Sufficient for RAG-based Q&A
+- Newer alternatives if quality/tool-calling is lacking: `@cf/zai-org/glm-4.7-flash`
+  (docs' default chat example), `@cf/google/gemma-4-26b-a4b-it`, `@cf/meta/llama-4-scout-17b-16e-instruct`
 
 **Fallback options (if needed):**
+
 - `@cf/meta/llama-3.3-70b-instruct-fp8-fast` - Better quality, $15/1K queries
 - `@cf/openrouter/moonshotai/kimi-k2.6` - 262K context, higher cost
 
@@ -92,7 +97,7 @@ export const AGENT_CONFIG = {
   contextWindow: 128000,
   maxTokens: 4096,
   temperature: 0.7,
-} as const;
+} as const
 ```
 
 Environment variable override: `AGENT_MODEL`
@@ -120,12 +125,17 @@ Stored in localStorage, passed to agent via API request.
 - **Challenge:** Cloudflare Turnstile when limit hit
 - **On success:** Reset counter for 1 hour
 - **Implementation:** Atomic SQL in Durable Object (no race conditions)
+- **Server-side verification required:** the widget token must be validated server-side via
+  `POST https://challenges.cloudflare.com/turnstile/v0/siteverify` with the secret key
+  (stored as a `wrangler secret`, e.g. `TURNSTILE_SECRET`) before resetting the counter.
+  The client widget alone is not sufficient.
 
 ### Photo Detail Pages
 
 **Route:** `/photos/[id]` (NOT query params)
 
 **Benefits:**
+
 - SEO-friendly URLs
 - Shareable photo links
 - Consistent with climb/peak/gear pages
@@ -270,6 +280,35 @@ END;
 
 ## Agent Implementation
 
+> ### ⚠️ SDK Currency Notes (reviewed June 2026)
+>
+> The Agents SDK changed materially after this spec was first drafted (notably the
+> **AI SDK v6 breaking change on 2025-12-22**). Verify against
+> https://developers.cloudflare.com/agents/ before implementing Phase 2. Key deltas:
+>
+> 1. **`AIChatAgent` ships in `@cloudflare/ai-chat`, not `agents`.** Install:
+>    `npm install @cloudflare/ai-chat agents ai workers-ai-provider zod`
+> 2. **Tools are AI SDK `tool()` definitions, not hand-rolled dispatch.** Define each tool
+>    on the server with `tool({ description, inputSchema: z.object({...}), execute })`,
+>    pass them to `streamText({ model, messages, tools, stopWhen: stepCountIs(n) })`, and
+>    return `result.toUIMessageStreamResponse()`. The model drives the agentic loop.
+>    The `ToolResponse<T>`/`Source` "callable methods" framing below is superseded — keep
+>    `Source` only as the shape a tool's `execute` returns for citation rendering.
+> 3. **Deprecated APIs to avoid:** `convertToModelMessages()` is now **async** (`await` it);
+>    `CoreMessage` → `ModelMessage`; `addToolResult()` → `addToolOutput()`; the `tools`
+>    option in `useAgentChat` → `onToolCall`.
+> 4. **Client hooks split:** `useAgent` from `agents/react`, but `useAgentChat` from
+>    `@cloudflare/ai-chat/react`. Prefer `routeAgentRequest()` + WebSocket transport over a
+>    custom `/api/agent/[id].ts` POST endpoint. **Open question:** how to mount
+>    `routeAgentRequest` alongside Astro's handler on Workers — see
+>    https://developers.cloudflare.com/agents/getting-started/add-to-existing-project/
+> 5. **Model must carry the "Function calling" capability badge** to work with `tool()`.
+>    `@cf/meta/llama-3.1-8b-instruct-fast` still exists; confirm its badge, or consider
+>    newer fast options (`@cf/zai-org/glm-4.7-flash` is the docs' default chat example).
+> 6. **Do NOT enable `experimentalDecorators`** in tsconfig — it breaks `@callable`.
+>    (Current `tsconfig.json` extends `astro/tsconfigs/strict`, which is fine.)
+> 7. **Turnstile needs server-side `siteverify`**, not just the widget — see Rate Limiting.
+
 ### Rate Limiter (Atomic SQL)
 
 ```typescript
@@ -280,13 +319,13 @@ async checkRateLimit(ip: string): Promise<boolean> {
 
   // Atomic cleanup + count in one transaction
   this.sql`DELETE FROM rate_limits WHERE ip = ${ip} AND ts < ${cutoff}`;
-  
+
   const result = this.sql<{ count: number }>`
     SELECT COUNT(*) as count FROM rate_limits WHERE ip = ${ip}
   `;
-  
+
   if (result[0].count >= 10) return false;
-  
+
   this.sql`INSERT INTO rate_limits (ip, ts) VALUES (${ip}, ${now})`;
   return true;
 }
@@ -294,24 +333,29 @@ async checkRateLimit(ip: string): Promise<boolean> {
 
 ### Tool Response Format
 
+> **Superseded by SDK Currency Note #2.** With AI SDK `tool()`, the framework handles the
+> request/response envelope — a tool's `execute` just returns its data. Keep `Source` below
+> as the shape `execute` returns (and the agent embeds in markdown) for citation rendering;
+> drop the `ToolResponse<T>` wrapper.
+
 ```typescript
 interface ToolResponse<T> {
-  success: boolean;
-  data: T;
-  sources: Source[];
-  metadata?: Record<string, any>;
+  success: boolean
+  data: T
+  sources: Source[]
+  metadata?: Record<string, any>
 }
 
 interface Source {
-  type: 'climb' | 'photo' | 'peak' | 'gear' | 'blog_post';
-  id: string;
-  title: string;
-  url: string;
+  type: 'climb' | 'photo' | 'peak' | 'gear' | 'blog_post'
+  id: string
+  title: string
+  url: string
   preview?: {
-    image?: string;
-    description?: string;
-  };
-  metadata?: Record<string, any>;
+    image?: string
+    description?: string
+  }
+  metadata?: Record<string, any>
 }
 ```
 
@@ -327,13 +371,17 @@ interface Source {
 
 ### Message History Trimming
 
+> **Verify against current persistence API.** `AIChatAgent` now persists messages itself;
+> reassigning `this.messages` may not be the supported mutation path. Prefer trimming the
+> array you pass into `convertToModelMessages()` (keep the persisted history intact), e.g.
+> `await convertToModelMessages(this.messages.slice(-40))`.
+
 ```typescript
 async onChatMessage() {
-  // Keep last 40 messages (20 turns)
-  if (this.messages.length > 40) {
-    this.messages = this.messages.slice(-40);
-  }
-  // ... rest of handler
+  // Trim what we send to the model, not the persisted history.
+  const recent = this.messages.slice(-40); // last ~20 turns
+  const modelMessages = await convertToModelMessages(recent);
+  // ... streamText({ model, messages: modelMessages, tools, stopWhen: stepCountIs(n) })
 }
 ```
 
@@ -344,48 +392,51 @@ async onChatMessage() {
 ### Implementation (with error isolation + pagination)
 
 ```typescript
-const CONCURRENCY = 3; // Respect Notion rate limits
-const VALID_TABLES = ['climbs', 'peaks', 'gear'];
+const CONCURRENCY = 3 // Respect Notion rate limits
+const VALID_TABLES = ['climbs', 'peaks', 'gear']
 
 async function syncNotionBodies(notion, DB, table, dbId) {
   if (!VALID_TABLES.includes(table)) {
-    throw new Error(`Invalid table: ${table}`);
+    throw new Error(`Invalid table: ${table}`)
   }
-  
+
   const records = await DB.prepare(
     `SELECT notion_id FROM ${table} WHERE notion_id IS NOT NULL`
-  ).all();
-  
+  ).all()
+
   // Batch with concurrency limit
-  const chunks = chunk(records.results, CONCURRENCY);
-  
+  const chunks = chunk(records.results, CONCURRENCY)
+
   for (const batch of chunks) {
-    await Promise.all(batch.map(async (record) => {
-      try {
-        let allBlocks = [];
-        let cursor;
-        
-        // Handle pagination
-        do {
-          const response = await notion.blocks.children.list({ 
-            block_id: record.notion_id,
-            start_cursor: cursor,
-            page_size: 100
-          });
-          
-          allBlocks.push(...response.results);
-          cursor = response.has_more ? response.next_cursor : null;
-        } while (cursor);
-        
-        await DB.prepare(
-          `UPDATE ${table} SET notion_body = ?, notion_body_synced_at = ? WHERE notion_id = ?`
-        ).bind(JSON.stringify(allBlocks), new Date().toISOString(), record.notion_id).run();
-        
-      } catch (error) {
-        console.error(`Failed to sync ${table} ${record.notion_id}:`, error);
-        // Continue with other records
-      }
-    }));
+    await Promise.all(
+      batch.map(async (record) => {
+        try {
+          let allBlocks = []
+          let cursor
+
+          // Handle pagination
+          do {
+            const response = await notion.blocks.children.list({
+              block_id: record.notion_id,
+              start_cursor: cursor,
+              page_size: 100,
+            })
+
+            allBlocks.push(...response.results)
+            cursor = response.has_more ? response.next_cursor : null
+          } while (cursor)
+
+          await DB.prepare(
+            `UPDATE ${table} SET notion_body = ?, notion_body_synced_at = ? WHERE notion_id = ?`
+          )
+            .bind(JSON.stringify(allBlocks), new Date().toISOString(), record.notion_id)
+            .run()
+        } catch (error) {
+          console.error(`Failed to sync ${table} ${record.notion_id}:`, error)
+          // Continue with other records
+        }
+      })
+    )
   }
 }
 ```
@@ -414,26 +465,26 @@ wrangler vectorize create-metadata-index photos-index --property-name=photo_id -
 ### Batched Backfill Script
 
 ```typescript
-const BATCH_SIZE = 100;
-const photos = await db.prepare('SELECT * FROM photos').all();
+const BATCH_SIZE = 100
+const photos = await db.prepare('SELECT * FROM photos').all()
 
 for (let i = 0; i < photos.results.length; i += BATCH_SIZE) {
-  const batch = photos.results.slice(i, i + BATCH_SIZE);
-  const texts = batch.map(p => 
+  const batch = photos.results.slice(i, i + BATCH_SIZE)
+  const texts = batch.map((p) =>
     [p.title, p.caption, p.search_tags, p.ai_caption].filter(Boolean).join(' ')
-  );
-  
-  const { data } = await ai.run('@cf/baai/bge-base-en-v1.5', { text: texts });
-  
+  )
+
+  const { data } = await ai.run('@cf/baai/bge-base-en-v1.5', { text: texts })
+
   const vectors = batch.map((photo, j) => ({
     id: photo.id,
     values: data[j],
-    metadata: { photo_id: photo.id }
-  }));
+    metadata: { photo_id: photo.id },
+  }))
 
-  await vectorize.upsert(vectors);
-  
-  console.log(`Processed ${i + batch.length}/${photos.results.length} photos`);
+  await vectorize.upsert(vectors)
+
+  console.log(`Processed ${i + batch.length}/${photos.results.length} photos`)
 }
 ```
 
@@ -444,17 +495,18 @@ for (let i = 0; i < photos.results.length; i += BATCH_SIZE) {
 ### Blog Voice (Default)
 
 ```markdown
-You are Kylie's climbing assistant, writing in her personal, reflective, 
-educational voice from kylieis.online. 
+You are Kylie's climbing assistant, writing in her personal, reflective,
+educational voice from kylieis.online.
 
 Key traits:
+
 - Share knowledge warmly with personal anecdotes
 - Admit learning experiences openly ("I used to think...")
 - Use specific examples from climbs (reference locations, gear, dates)
 - Educational but approachable tone
 - Reference personal growth and lessons learned
 
-When describing Kylie's experiences, use "I" (e.g., "I found the Garmin 
+When describing Kylie's experiences, use "I" (e.g., "I found the Garmin
 InReach invaluable during my Uncompahgre climb in October 2021").
 
 When making recommendations, cite specific blog posts or trip reports as sources.
@@ -463,9 +515,10 @@ When making recommendations, cite specific blog posts or trip reports as sources
 ### Casual/Friendly
 
 ```markdown
-You're a hiking buddy helping someone plan their next adventure in Colorado. 
+You're a hiking buddy helping someone plan their next adventure in Colorado.
 
 Key traits:
+
 - Enthusiastic and encouraging ("That's an awesome choice!")
 - Conversational language with contractions
 - Focus on excitement and fun aspects
@@ -480,6 +533,7 @@ Keep responses warm and supportive, especially for beginners.
 You're a professional mountain guide providing precise technical information.
 
 Key traits:
+
 - Concise and data-focused
 - Lead with metrics (elevation, distance, gain, difficulty class)
 - Emphasize safety considerations and conditions
@@ -495,11 +549,13 @@ Format responses with clear sections and bullet points for scannability.
 ## Gear Purchase Intelligence
 
 Kylie primarily purchases outdoor gear from:
+
 - **REI**: Most frequent retailer, trusted for quality and returns
 - **Direct from manufacturers**: Arc'teryx, Patagonia, Black Diamond, etc.
 - **Specialty shops**: Local Colorado outdoor stores
 
 When recommending where to buy gear:
+
 - Mention REI as the primary recommendation
 - Suggest manufacturer direct sales for brand-specific items
 - DO NOT link to Amazon
@@ -602,36 +658,37 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
   'backcountry.com': { name: 'Backcountry', type: 'retail', trust: 'medium' },
   'moosejaw.com': { name: 'Moosejaw', type: 'retail', trust: 'medium' },
   'amazon.com': { name: 'Amazon', type: 'retail', trust: 'exclude' }, // never recommend
-};
+}
 ```
 
 ---
 
 ## wrangler.jsonc Updates
 
+> Notes: the project already sets `"compatibility_flags": ["nodejs_compat_v2"]` (a superset of
+> the docs' `nodejs_compat` — fine to keep) and already has an `"images"` binding. Workers AI
+> needs an explicit `"ai": { "binding": "AI" }` binding (add it). Never edit an existing
+> migration tag — add a new one.
+
 ```jsonc
 {
   // ... existing config
-  
+
+  "ai": { "binding": "AI" },
+
   "durable_objects": {
-    "bindings": [
-      { "name": "ClimbLogAgent", "class_name": "ClimbLogAgent" }
-    ]
+    "bindings": [{ "name": "ClimbLogAgent", "class_name": "ClimbLogAgent" }],
   },
-  
-  "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["ClimbLogAgent"] }
-  ],
-  
+
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ClimbLogAgent"] }],
+
   "vectorize": {
-    "bindings": [
-      { "binding": "VECTORIZE", "index_name": "photos-index" }
-    ]
+    "bindings": [{ "binding": "VECTORIZE", "index_name": "photos-index" }],
   },
-  
+
   "vars": {
-    "AGENT_MODEL": "@cf/meta/llama-3.1-8b-instruct-fast"
-  }
+    "AGENT_MODEL": "@cf/meta/llama-3.1-8b-instruct-fast",
+  },
 }
 ```
 
@@ -642,18 +699,21 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 ### Phase 1: Detail Pages + Notion Sync (Week 1)
 
 #### Slug Generation
+
 - [ ] Create `scripts/backfill-slugs.ts`
 - [ ] Generate slugs for peaks
 - [ ] Generate slugs for gear
 - [ ] Run locally and remotely
 
 #### Retailer Intelligence
+
 - [ ] Create `scripts/parse-gear-retailers.ts`
 - [ ] Define `KNOWN_RETAILERS` mapping
 - [ ] Parse `gear.url` to extract retailer
 - [ ] Run backfill script
 
 #### Climb Detail Pages
+
 - [ ] Create `src/pages/climbs/[slug].astro`
 - [ ] Implement `getStaticPaths()` for all climbs
 - [ ] Fetch climb from D1 by slug
@@ -665,6 +725,7 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] Add Strava/AllTrails links
 
 #### Peak Detail Pages
+
 - [ ] Create `src/pages/peaks/[slug].astro`
 - [ ] Implement `getStaticPaths()`
 - [ ] Render Notion body if exists
@@ -672,6 +733,7 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] Query photos tagged with peak name
 
 #### Gear Detail Pages
+
 - [ ] Create `src/pages/gear/[id].astro`
 - [ ] Display all gear metadata
 - [ ] Display "Purchased from: {retailer}"
@@ -681,12 +743,14 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] NO purchase links
 
 #### Notion Content Renderer
+
 - [ ] Create `src/components/NotionContent.tsx`
 - [ ] Handle paragraph, headings, lists
 - [ ] Handle bold/italic/links
 - [ ] Add CSS styling
 
 #### Notion Body Sync
+
 - [ ] Create `syncNotionBodies()` helper
 - [ ] Error isolation per record
 - [ ] Pagination handling
@@ -694,6 +758,7 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] Add to daily cron
 
 #### Admin Panel
+
 - [ ] Create/enhance `src/pages/admin/sync.astro`
 - [ ] Add refresh buttons
 - [ ] Create API endpoints
@@ -701,13 +766,15 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 ### Phase 2: Agent Core + Semantic Search (Week 2)
 
 #### Agent Setup
-- [ ] Install `agents` SDK
-- [ ] Create `ClimbLogAgent.ts`
-- [ ] Define types in `src/agents/types.ts`
-- [ ] Create API routes
-- [ ] Update wrangler.jsonc bindings
 
-#### Agent Tools
+- [ ] Install SDK: `npm install @cloudflare/ai-chat agents ai workers-ai-provider zod`
+- [ ] Create `ClimbLogAgent.ts` extending `AIChatAgent` (from `@cloudflare/ai-chat`)
+- [ ] Define `Source` type in `src/agents/types.ts` (drop `ToolResponse<T>` wrapper)
+- [ ] Wire `routeAgentRequest()` (resolve Astro-on-Workers mounting; see add-to-existing-project)
+- [ ] Update wrangler.jsonc bindings (DO + migration; `"ai": { "binding": "AI" }` already present)
+
+#### Agent Tools (define as AI SDK `tool()` with zod `inputSchema` + `execute`)
+
 - [ ] `search_climbs()`
 - [ ] `search_photos()` (FTS5)
 - [ ] `search_photos_semantic()` (Vectorize)
@@ -717,16 +784,19 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] `get_random_photo()`
 
 #### Rate Limiting
+
 - [ ] Implement atomic SQL rate limiter
 - [ ] Add Turnstile challenge component
 - [ ] Integrate into agent flow
 
 #### Voice System
+
 - [ ] Create `src/lib/agent-voices.ts`
 - [ ] Create `VoiceSelector.tsx` component
 - [ ] Store in localStorage
 
 #### Agent Modal
+
 - [ ] Create `AgentModal.tsx`
 - [ ] CMD+K keyboard listener
 - [ ] Message history display
@@ -734,12 +804,14 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] Source card rendering
 
 #### Vectorize Setup
+
 - [ ] Create index
 - [ ] Create metadata index
 - [ ] Build batched backfill script
 - [ ] Run backfill
 
 #### Blog Post Indexing
+
 - [ ] Create migration with FTS5 triggers
 - [ ] Create indexing script
 - [ ] Run indexer
@@ -747,6 +819,7 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 ### Phase 3: Photo Pages + Auth (Week 3)
 
 #### Photo Detail Pages
+
 - [ ] Create `src/pages/photos/[id].astro`
 - [ ] Full resolution image display
 - [ ] Metadata sidebar
@@ -756,27 +829,32 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] Keyboard shortcuts
 
 #### Agent Photo URLs
+
 - [ ] Update tools to return `/photos/{id}` URLs
 - [ ] Include both thumbnail and page URLs
 
 #### Cloudflare Access
+
 - [ ] Create Access application
 - [ ] Configure auth providers
 - [ ] Set policies for admin routes
 - [ ] Add optional policy for saved conversations
 
 #### JWT Validation
+
 - [ ] Create middleware
 - [ ] Extract and verify JWT
 - [ ] Extract user ID from claims
 
 #### Conversation Saver
+
 - [ ] Create `ConversationSaver.tsx`
 - [ ] Show after first response
 - [ ] Sign-in flow
 - [ ] Store in DO state
 
 #### Saved Conversations
+
 - [ ] Create `/api/agent/conversations.ts`
 - [ ] List user's saved chats
 - [ ] Resume functionality
@@ -784,30 +862,35 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 ### Phase 4: Polish + Deploy (Week 4)
 
 #### Error Handling
+
 - [ ] Add try/catch to all tools
 - [ ] Graceful degradation
 - [ ] Retry logic for rate limits
 - [ ] Error logging
 
 #### Prompt Refinement
+
 - [ ] Test diverse queries
 - [ ] Tune system prompts
 - [ ] Add examples
 - [ ] Test edge cases
 
 #### Citations & Sources
+
 - [ ] Parse markdown links
 - [ ] Render source cards
 - [ ] Deduplicate sources
 - [ ] Group by type
 
 #### Analytics
+
 - [ ] Track query count
 - [ ] Track tool usage
 - [ ] Track voice preference
 - [ ] Create dashboard
 
 #### Production Deployment
+
 - [ ] Run all migrations
 - [ ] Backfill embeddings
 - [ ] Backfill blog posts
@@ -817,6 +900,7 @@ const KNOWN_RETAILERS: Record<string, { name: string; type: string; trust: strin
 - [ ] Monitor costs
 
 #### Documentation
+
 - [ ] Update README
 - [ ] Document tool schemas
 - [ ] Document voice options
