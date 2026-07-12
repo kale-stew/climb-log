@@ -21,7 +21,8 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 ## Photo References
 
 - Preserve relative `/img/{id}` URLs. Published Markdown, climb previews, homepage heroes, OG generation, fallbacks, and the 404 page use them.
-- Legacy identifiers include Notion UUIDs, canonical photo IDs, and eight-character `short_id` values derived from SHA-256. Do not rewrite or remove them without a complete reference audit.
+- Legacy identifiers include Notion UUIDs, canonical photo IDs, and eight-character `short_id` values. A published `short_id` is `sha256(dashed-notion-page-id).slice(0,8)`; note `climb-log` `photos.id` is the *dashed* Notion id while `photos-api` `photos.id` is the undashed 12-char id and its `notion_id` is dashed. The canonical service resolves these via `photo_aliases`. Do not rewrite or remove identifiers without a complete reference audit.
+- Two `short_id` values are hard-coded and must keep resolving: `991d0662` (`src/pages/404.astro` hero) and `9943163a` (`src/pages/api/og/[...slug].ts` OG default).
 - Treat `exclude` as hidden from the gallery, not unused. Excluded photos can still be embedded in published posts.
 - Prefer canonical `photos-api` IDs for new content. Keep the local `/img/:id` route as a compatibility redirect while legacy URLs exist.
 - Do not add new direct reads from the local `photos` table. New photo features consume the canonical API.
