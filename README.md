@@ -55,7 +55,7 @@ migrations/             # SQL schema definitions
 - **gear**: Equipment reviews and ratings
 - **sync_log**: Notion sync history
 
-See [AGENTS.md](.opencode/AGENTS.md) for full schema details.
+See [AGENTS.md](AGENTS.md) for agent-focused architecture and safety guidance.
 
 ## Environment Setup
 
