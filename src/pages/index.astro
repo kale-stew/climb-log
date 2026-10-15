@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
 import { formatCalendarDate } from '../lib/dates'
-import { getCanonicalPhotos, getPhotosFetch } from '../lib/photos-client'
+import { getCanonicalPhotos } from '../lib/photos-client'
 import { env } from 'cloudflare:workers'
 
 export const prerender = false
@@ -15,10 +15,7 @@ let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
 
 if (DB) {
   try {
-    const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, {
-      limit: 100,
-      fetchFn: getPhotosFetch(env.PHOTOS_API),
-    })
+    const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 100 })
     // Fetch recent climbs
     const climbsResult = await DB.prepare(
       'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'

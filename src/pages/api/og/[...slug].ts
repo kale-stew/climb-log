@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro'
 import { ImageResponse } from 'workers-og'
 import { getCollection } from 'astro:content'
 import { env } from 'cloudflare:workers'
-import { getCanonicalPhoto, getPhotosFetch } from '../../../lib/photos-client'
+import { getCanonicalPhoto } from '../../../lib/photos-client'
 import { formatCalendarDate } from '../../../lib/dates'
 
 export const prerender = false
@@ -56,9 +56,7 @@ async function getAccentColor(previewImgUrl: string | undefined): Promise<string
 
   const identifier = previewImgUrl.match(/\/img\/([^/?#]+)/)?.[1]
   if (!identifier) return null
-  return (await getCanonicalPhoto(env.PHOTOS_API_ORIGIN, identifier, {
-    fetchFn: getPhotosFetch(env.PHOTOS_API),
-  }))?.accent_color ?? null
+  return (await getCanonicalPhoto(env.PHOTOS_API_ORIGIN, identifier))?.accent_color ?? null
 }
 
 export const GET: APIRoute = async ({ params }) => {

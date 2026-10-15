@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { adaptCanonicalPhoto, clearPhotosCache, getCanonicalPhoto, getCanonicalPhotos, getPhotosFetch } from '../../src/lib/photos-client'
+import { adaptCanonicalPhoto, clearPhotosCache, getCanonicalPhoto, getCanonicalPhotos } from '../../src/lib/photos-client'
 
 const photo = {
   id: 'canonical-1',
@@ -67,13 +67,4 @@ describe('photos client', () => {
     )
   })
 
-  it('uses a service binding fetcher when available', async () => {
-    const service = { fetch: vi.fn(async () => Response.json(photo)) } as unknown as Fetcher
-    const fetchFn = getPhotosFetch(service)
-
-    const result = await fetchFn('https://photos.example/api/photos/canonical-1')
-
-    expect(result.ok).toBe(true)
-    expect(service.fetch).toHaveBeenCalledOnce()
-  })
 })

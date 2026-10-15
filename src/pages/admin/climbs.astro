@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import { env } from 'cloudflare:workers'
-import { getCanonicalPhotos, getPhotosFetch } from '../../lib/photos-client'
+import { getCanonicalPhotos } from '../../lib/photos-client'
 import { formatCalendarDate } from '../../lib/dates'
 
 export const prerender = false
@@ -19,10 +19,7 @@ if (DB) {
   ).all()
   climbsWithoutPhotos = climbsResult.results || []
 
-  recentPhotos = (await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, {
-    limit: 100,
-    fetchFn: getPhotosFetch(env.PHOTOS_API),
-  })).map(photo => ({
+  recentPhotos = (await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 100 })).map(photo => ({
     ...photo,
     src: `/img/${photo.id}?w=200`,
   }))

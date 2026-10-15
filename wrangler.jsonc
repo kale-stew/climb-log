@@ -3,7 +3,7 @@
   "name": "climb-log",
   "account_id": "bb52c0e5f3a93fc72779915d7dc6982b",
   "compatibility_date": "2025-05-23",
-  "compatibility_flags": ["nodejs_compat_v2"],
+  "compatibility_flags": ["nodejs_compat_v2", "global_fetch_strictly_public"],
   "workers_dev": true,
   "assets": {
     "directory": "./dist",

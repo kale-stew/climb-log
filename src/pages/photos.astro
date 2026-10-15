@@ -2,15 +2,12 @@
 import Layout from '../layouts/Layout.astro'
 import PhotoGallery from '../components/PhotoGallery'
 import { env } from 'cloudflare:workers'
-import { getCanonicalPhotos, getPhotosFetch } from '../lib/photos-client'
+import { getCanonicalPhotos } from '../lib/photos-client'
 
 export const prerender = false
 
 // Keep the existing initial cap until the gallery gains server-side pagination.
-const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, {
-  limit: 500,
-  fetchFn: getPhotosFetch(env.PHOTOS_API),
-})
+const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
 ---
 
 <Layout title="Photos" description="A gallery of my favorite hiking and climbing photos." ogImage="https://kylies.photos/open-graph/photos.jpg">

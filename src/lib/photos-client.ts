@@ -132,8 +132,3 @@ export async function getCanonicalPhoto(
 export function clearPhotosCache(): void {
   cache.clear()
 }
-
-export function getPhotosFetch(service?: Fetcher): typeof fetch {
-  if (!service) return fetch
-  return ((input: RequestInfo | URL, init?: RequestInit) => service.fetch(input, init)) as typeof fetch
-}
