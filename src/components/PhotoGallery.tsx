@@ -388,8 +388,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
         }
 
         @keyframes gallery-reflow {
-          from { opacity: 0.55; transform: scale(0.985); }
-          to { opacity: 1; transform: scale(1); }
+          from { transform: scale(0.985, 0.94); transform-origin: top center; }
+          to { transform: scale(1, 1); transform-origin: top center; }
         }
 
         @media (prefers-reduced-motion: reduce) {
