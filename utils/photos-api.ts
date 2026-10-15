@@ -356,9 +356,6 @@ export function createPhotosApp(env: PhotosApiEnv) {
   app.get("/img/:photoId", async (c) => {
     const photoId = c.req.param("photoId");
     const requestedWidth = c.req.query("w");
-    let ctx: ExecutionContext | undefined;
-    try { ctx = c.executionCtx; } catch { /* local dev has no ExecutionContext */ }
-
     if (!photoId) return c.text("Missing photo ID", 400);
 
     let photo = await env.DB.prepare("SELECT * FROM photos WHERE id = ?")
@@ -401,7 +398,7 @@ export function createPhotosApp(env: PhotosApiEnv) {
     let object = await env.R2_IMAGES.get(r2Key);
 
     if (!object && width) {
-      object = await getOrCreateTransform(env, ctx, photo, width, r2Key);
+      object = await getOrCreateTransform(env, photo, width, r2Key);
     }
 
     if (!object) {
@@ -977,7 +974,6 @@ export function createPhotosApp(env: PhotosApiEnv) {
 
 async function getOrCreateTransform(
   env: PhotosApiEnv,
-  _ctx: ExecutionContext | undefined,
   photo: Photo,
   width: number,
   targetKey: string

@@ -11,7 +11,14 @@ export default defineConfig({
       conditions: ['web', 'worker'],
     },
     optimizeDeps: {
-      exclude: ['workers-og', '@resvg/resvg-wasm', 'yoga-wasm-web'],
+      exclude: [
+        'workers-og',
+        '@resvg/resvg-wasm',
+        'yoga-wasm-web',
+        'hono',
+        '@hono/zod-validator',
+        'zod',
+      ],
     },
     ssr: {
       external: ['workers-og'],

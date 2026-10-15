@@ -30,7 +30,7 @@
   "dependencies": {
     "@astrojs/check": "^0.9.9",
     "@astrojs/cloudflare": "^13.2.0",
-    "@astrojs/react": "^4.3.0",
+    "@astrojs/react": "^5.0.7",
     "@hono/zod-validator": "^0.8.0",
     "@notionhq/client": "^2.3.0",
     "astro": "^6.3.7",
@@ -47,13 +47,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
-    "@cloudflare/workers-types": "^4.20250515.0",
+    "@cloudflare/workers-types": "^5.20261015.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "prettier": "^3.5.3",
     "tsx": "^4.22.3",
     "typescript": "^5.9.3",
     "vitest": "^3.2.6",
-    "wrangler": "^4.94.0"
+    "wrangler": "^4.151.0"
   }
 }
