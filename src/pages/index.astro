@@ -31,7 +31,7 @@ if (DB) {
       .filter(photo => (photo.width ?? 0) >= 1200)
     const heroCandidates = landscapePhotos.length > 0 ? landscapePhotos : canonicalPhotos
     heroPhoto = heroCandidates[Math.floor(Math.random() * heroCandidates.length)] ?? null
-    recentPhotos = canonicalPhotos.filter(photo => photo.id !== heroPhoto?.id).slice(0, 7)
+    recentPhotos = canonicalPhotos.filter(photo => photo.id !== heroPhoto?.id).slice(0, 8)
 
     // Fetch stats
     const statsResult = await DB.prepare(`
@@ -234,6 +234,7 @@ function getPhotoAlt(photo: DisplayPhoto): string {
     .photo-strip {
       columns: 4 180px;
       column-gap: 0.75rem;
+      column-fill: balance;
     }
     .photo-strip-item {
       display: block;
