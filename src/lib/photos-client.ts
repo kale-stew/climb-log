@@ -36,9 +36,22 @@ interface PhotoOptions {
   fetchFn?: typeof fetch
 }
 
+interface ClimbAssignmentsResponse {
+  assignments: Array<{ climb_id: string; photo_id: string; is_primary: number; photo_date: string | null }>
+}
+
+export interface ClimbPhotoAssignment {
+  photoId: string
+  photoDate: string | null
+  primary: boolean
+}
+
+export type ClimbPhotoAssignments = Map<string, ClimbPhotoAssignment[]>
+
 const PAGE_SIZE = 100
 const DEFAULT_TTL_MS = 60_000
 const cache = new Map<string, { expiresAt: number; photos: Promise<DisplayPhoto[]> }>()
+const assignmentCache = new Map<string, { expiresAt: number; assignments: Promise<ClimbPhotoAssignments> }>()
 
 function normalizeOrigin(origin: string): string {
   const url = new URL(origin)
@@ -171,6 +184,45 @@ export async function getCanonicalPhoto(
   }
 }
 
+export async function getClimbPhotoAssignments(
+  origin: string | undefined,
+  options: PhotoOptions & { ttlMs?: number } = {},
+): Promise<ClimbPhotoAssignments> {
+  if (!origin) return new Map()
+  const ttlMs = options.ttlMs ?? DEFAULT_TTL_MS
+  try {
+    const normalizedOrigin = normalizeOrigin(origin)
+    const cached = assignmentCache.get(normalizedOrigin)
+    if (cached && cached.expiresAt > Date.now()) return await cached.assignments
+
+    const assignments = (async () => {
+      const response = await (options.fetchFn ?? fetch)(new URL('/api/climb-photos', normalizedOrigin), {
+        headers: { Accept: 'application/json' },
+      })
+      if (!response.ok) throw new Error(`photos-api returned ${response.status}`)
+      const body = (await response.json()) as ClimbAssignmentsResponse
+      const result: ClimbPhotoAssignments = new Map()
+      for (const assignment of body.assignments) {
+        const entries = result.get(assignment.climb_id) || []
+        entries.push({
+          photoId: assignment.photo_id,
+          photoDate: assignment.photo_date,
+          primary: assignment.is_primary === 1,
+        })
+        result.set(assignment.climb_id, entries)
+      }
+      return result
+    })()
+    assignmentCache.set(normalizedOrigin, { expiresAt: Date.now() + ttlMs, assignments })
+    return await assignments
+  }
+  catch (error) {
+    console.error('Failed to fetch climb photo assignments:', error)
+    return new Map()
+  }
+}
+
 export function clearPhotosCache(): void {
   cache.clear()
+  assignmentCache.clear()
 }

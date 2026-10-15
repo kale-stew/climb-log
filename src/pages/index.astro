@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
 import { formatCalendarDate, formatRecentDate } from '../lib/dates'
-import { getCanonicalPhotos, type DisplayPhoto } from '../lib/photos-client'
+import { getCanonicalPhotos, getClimbPhotoAssignments, type DisplayPhoto } from '../lib/photos-client'
 import { env } from 'cloudflare:workers'
 
 export const prerender = false
@@ -16,7 +16,10 @@ let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
 
 if (DB) {
   try {
-    const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 100 })
+    const [canonicalPhotos, assignments] = await Promise.all([
+      getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 1500 }),
+      getClimbPhotoAssignments(env.PHOTOS_API_ORIGIN),
+    ])
     // Fetch recent climbs
     const climbsResult = await DB.prepare(
       'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'
@@ -24,7 +27,7 @@ if (DB) {
     recentClimbs = climbsResult.results || []
 
     // Fill missing preview images from canonical photos.
-    await fillMissingPreviewImages(recentClimbs, canonicalPhotos, 800)
+    fillMissingPreviewImages(recentClimbs, canonicalPhotos, 800, assignments)
 
     const landscapePhotos = canonicalPhotos
       .filter(photo => (photo.width ?? 0) > (photo.height ?? 0) * 1.25)

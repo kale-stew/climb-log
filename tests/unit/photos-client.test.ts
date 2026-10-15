@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   adaptCanonicalPhoto,
   clearPhotosCache,
+  getClimbPhotoAssignments,
   getCanonicalPhoto,
   getCanonicalPhotos,
   normalizePhotoLocation,
@@ -90,5 +91,23 @@ describe('photos client', () => {
       new URL('https://photos.example/api/photos/legacy-alias'),
       expect.any(Object),
     )
+  })
+
+  it('prefers a primary formal climb assignment', async () => {
+    const fetchFn = vi.fn(async () => Response.json({
+      assignments: [
+        { climb_id: 'climb-1', photo_id: 'secondary', is_primary: 0 },
+        { climb_id: 'climb-1', photo_id: 'primary', is_primary: 1 },
+      ],
+    })) as typeof fetch
+
+    const assignments = await getClimbPhotoAssignments('https://photos.example', {
+      fetchFn,
+      ttlMs: 0,
+    })
+    expect(assignments.get('climb-1')).toEqual([
+      { photoId: 'secondary', photoDate: undefined, primary: false },
+      { photoId: 'primary', photoDate: undefined, primary: true },
+    ])
   })
 })

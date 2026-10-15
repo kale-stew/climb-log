@@ -4,7 +4,7 @@ import ClimbTable from '../components/ClimbTable'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
 import { env } from 'cloudflare:workers'
 import type { ClimbListItem } from '../lib/types'
-import { getCanonicalPhotos } from '../lib/photos-client'
+import { getCanonicalPhotos, getClimbPhotoAssignments } from '../lib/photos-client'
 
 export const prerender = false
 
@@ -20,8 +20,11 @@ if (DB) {
     ).all<ClimbListItem>()
     climbs = result.results || []
 
-    const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
-    await fillMissingPreviewImages(climbs, canonicalPhotos, 200)
+    const [canonicalPhotos, assignments] = await Promise.all([
+      getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 1500 }),
+      getClimbPhotoAssignments(env.PHOTOS_API_ORIGIN),
+    ])
+    fillMissingPreviewImages(climbs, canonicalPhotos, 200, assignments)
   } catch (e) {
     console.error('Failed to fetch climbs:', e)
   }

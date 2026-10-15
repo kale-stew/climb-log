@@ -1,100 +1,61 @@
-/**
- * Shared utility for building photo fallback lookup maps.
- * Used to assign preview images to climbs when they don't have one set.
- */
-
-interface PhotoLookupMaps {
-  byDate: Map<string, string>
-  byMonthState: Map<string, string>
-  byAreaState: Map<string, string>
-}
+import type { ClimbPhotoAssignments } from './photos-client'
 
 interface PhotoRow {
   date: string | null
-  area: string | null
-  state: string | null
   id: string
 }
 
-/**
- * Build lookup maps for finding fallback photos by date, area+state, or state.
- * Limited to 500 most recent photos for performance.
- */
-export function buildPhotoFallbackMaps(photos: PhotoRow[]): PhotoLookupMaps {
-  const byDate = new Map<string, string>()
-  const byMonthState = new Map<string, string>()
-  const byAreaState = new Map<string, string>()
-
-  for (const p of photos) {
-    if (p.id) {
-      if (p.date && !byDate.has(p.date)) {
-        byDate.set(p.date, p.id)
-      }
-      if (p.date && p.state) {
-        const key = `${p.date.slice(0, 7)}||${p.state}`
-        if (!byMonthState.has(key)) byMonthState.set(key, p.id)
-      }
-      if (p.area && p.state) {
-        const key = `${p.area}||${p.state}`
-        if (!byAreaState.has(key)) {
-          byAreaState.set(key, p.id)
-        }
-      }
-    }
-  }
-
-  return { byDate, byMonthState, byAreaState }
-}
-
 interface ClimbLike {
+  id?: string | null
   date?: string | null
-  area?: string | null
-  state?: string | null
   preview_img_url?: string | null
 }
 
-/**
- * Find a fallback photo short_id for a climb without a preview image.
- * Tries to match by date, then exact area and state. A state-only match is too
- * broad and can attach an unrelated photo to many climbs.
- */
-export function findFallbackPhotoId(climb: ClimbLike, maps: PhotoLookupMaps): string | undefined {
-  if (climb.date && maps.byDate.has(climb.date)) {
-    return maps.byDate.get(climb.date)
-  }
-  if (climb.date && climb.state) {
-    const key = `${climb.date.slice(0, 7)}||${climb.state}`
-    if (maps.byMonthState.has(key)) return maps.byMonthState.get(key)
-  }
-  if (climb.area && climb.state) {
-    const key = `${climb.area}||${climb.state}`
-    if (maps.byAreaState.has(key)) {
-      return maps.byAreaState.get(key)
-    }
-  }
-  return undefined
+function calendarDate(value: string): string {
+  return value.slice(0, 10)
 }
 
 /**
- * Fill in missing preview_img_url on climbs using fallback photos.
- * Mutates the climbs array in place.
+ * Apply one unique preview per climb. Canonical formal assignments win;
+ * otherwise, consume an unused photo captured on the same calendar date.
+ * Existing preview URLs remain only when neither canonical source can help.
  */
-export async function fillMissingPreviewImages(
+export function fillMissingPreviewImages(
   climbs: ClimbLike[],
   photos: PhotoRow[],
-  width: number = 800,
-): Promise<void> {
-  const missingImage = climbs.some(c => !c.preview_img_url)
-  if (!missingImage) return
+  width = 800,
+  formalAssignments: ClimbPhotoAssignments = new Map(),
+): void {
+  const byDate = new Map<string, string[]>()
+  for (const photo of photos) {
+    if (!photo.date) continue
+    const date = calendarDate(photo.date)
+    const entries = byDate.get(date) || []
+    entries.push(photo.id)
+    byDate.set(date, entries)
+  }
 
-  const maps = buildPhotoFallbackMaps(photos)
+  const usedPhotoIds = new Set(
+    [...formalAssignments.values()].flatMap(assignments => assignments.map(({ photoId }) => photoId)),
+  )
 
   for (const climb of climbs) {
-    if (!climb.preview_img_url) {
-      const shortId = findFallbackPhotoId(climb, maps)
-      if (shortId) {
-        climb.preview_img_url = `/img/${shortId}/?w=${width}`
-      }
+    const formalOptions = climb.id ? formalAssignments.get(climb.id) || [] : []
+    const formal = formalOptions.find(({ primary }) => primary)
+      || formalOptions.find(({ photoDate }) => climb.date && photoDate?.slice(0, 10) === calendarDate(climb.date))
+      || formalOptions[0]
+    if (formal) {
+      climb.preview_img_url = `/img/${formal.photoId}/?w=${width}`
+      continue
     }
+
+    if (!climb.date) continue
+    const fallbackPhotoId = byDate
+      .get(calendarDate(climb.date))
+      ?.find(photoId => !usedPhotoIds.has(photoId))
+    if (!fallbackPhotoId) continue
+
+    usedPhotoIds.add(fallbackPhotoId)
+    climb.preview_img_url = `/img/${fallbackPhotoId}/?w=${width}`
   }
 }
