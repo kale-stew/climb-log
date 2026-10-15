@@ -1,5 +1,10 @@
 # photos-api Consumer Contract (climb-log / kylies.photos)
 
+> **Status: canonical read cutover is live; compatibility retirement remains.**
+> The photo client, same-origin image proxy, formal hike-photo assignments, and
+> exact-date unique fallback are active. Treat the sequence below as rollout
+> history and use the remaining-work list for new changes.
+
 ## Summary
 
 `kylies.photos` (this repository) is a **consumer** of the canonical
@@ -142,6 +147,18 @@ that page's image origin to canonical first.
 5. Retire duplicate storage (local table, bucket, cron photo writes, and the
    photos-api bidirectional `predeploy`/reverse-sync) in a **separate** change.
    Never restore bidirectional synchronization.
+
+## Remaining Work
+
+- [ ] Switch the public gallery from the compatibility listing to the curated
+  `portfolio` collection and add server-side pagination.
+- [ ] Redirect `/admin/photos/*` and `/api/admin/photos/*` to the canonical
+  `photos-api` admin; keep only the canonical hike selector.
+- [ ] Remove photo writes from the Notion cron while preserving climb, gear,
+  peak, and blog synchronization.
+- [ ] Audit literal and generated image references against canonical aliases.
+- [ ] After the audit, remove the local photo table and `climb-log-images` R2
+  bucket in a separate rollback-safe change.
 
 ## Verification
 
