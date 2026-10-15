@@ -31,6 +31,7 @@ function getImageUrl(photo: Photo, size: 'thumb' | 'full' = 'thumb') {
 }
 
 const GRID_MIN_WIDTHS = [140, 190, 260, 360, 520]
+const GRID_GAPS = ['0.2rem', '0.35rem', '0.6rem', '0.9rem', '1.25rem']
 
 export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
   const [photos, setPhotos] = useState(initialPhotos)
@@ -161,6 +162,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const currentPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null
   const visiblePhotos = filteredPhotos.slice(0, visibleCount)
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
+  const gridGap = GRID_GAPS[gridZoom]
 
   const changeGridZoom = (direction: -1 | 1) => {
     setGridZoom(level => Math.max(0, Math.min(GRID_MIN_WIDTHS.length - 1, level + direction)))
@@ -231,7 +233,9 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
       <div
         key={gridZoom}
         className="photo-grid"
-        style={{ '--photo-min-width': `${gridMinWidth}px` } as CSSProperties}
+        style={
+          { '--photo-min-width': `${gridMinWidth}px`, '--photo-gap': gridGap } as CSSProperties
+        }
         onTouchStart={event => {
           if (event.touches.length === 2)
             pinchStartDistance.current = getTouchDistance(event.touches)
@@ -383,7 +387,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
         .photo-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(var(--photo-min-width), 1fr));
-          gap: 1.25rem;
+          gap: var(--photo-gap);
           animation: gallery-reflow 240ms ease both;
         }
 
@@ -660,7 +664,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
             right: 0.5rem;
           }
 
-          .photo-grid { gap: 0.75rem; }
+          .photo-grid { gap: var(--photo-gap); }
           .photo-item,
           .photo-item:first-child { grid-column: span 1; grid-row: span 1; }
           .photo-item-tall { grid-row: span 2; }
