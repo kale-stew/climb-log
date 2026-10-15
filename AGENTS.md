@@ -42,6 +42,8 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 - `main` is the production branch. Use the preview environment for production-like validation before deploying production.
 - Inspect D1 and R2 bindings before running remote migrations or deployment commands.
 - Never remove the local photo table, R2 binding, or compatibility routes in the same change that first switches consumers to the canonical service.
+- Before diagnosing a preview deploy failure, verify authentication in the active profile. Profile-scoped XDG paths can hide Wrangler credentials. Use the authenticated profile or Cloudflare MCP rather than changing project auth.
+- If a local build cannot resolve a `remote: true` service binding, use a temporary build-only override and restore the real config before deployment. Never commit the override.
 
 ## Authentication And Secrets
 
@@ -64,6 +66,9 @@ Run production deployment only when explicitly requested.
 - Derive the image-reference inventory from source and generated data; do not rely on a hard-coded count.
 - Verify every literal and generated `/img/{id}` against the canonical resolver before retiring local storage.
 - Exercise the gallery, homepage hero, climb previews, blog body images, OG generation, 404 page, and admin flows after photo-routing changes.
+- Validate deployed previews at desktop and mobile widths using real interactions, not only screenshots or a successful build. Exercise navigation, menus, gallery density, lightboxes, and transition states.
+- Use a browser-capable design reviewer for visual changes. Avoid `transition: all`, all-tile FLIP animation, and View Transitions over large photo grids; animate bounded visible elements and targeted properties.
+- Keep temporary screenshots, HTML captures, and review artifacts under `docs/review/` untracked. Check `git status` before committing.
 - Keep compatibility and deletion as separate changes so rollback does not require restoring deleted objects.
 
 ## Anti-patterns
