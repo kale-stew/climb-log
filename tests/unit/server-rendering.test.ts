@@ -32,7 +32,7 @@ describe('server-rendered collection pages', () => {
   it('includes the first 24 photos in HTML', () => {
     const photos = Array.from({ length: 25 }, (_, index) => ({
       id: `photo-${index}`,
-      url: `/img/photo-${index}`,
+      url: `/img/photo-${index}/`,
       caption: `Mountain photo ${index}`,
       date: '2026-02-15',
       area: 'The mountains',

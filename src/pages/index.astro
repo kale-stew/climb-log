@@ -26,8 +26,12 @@ if (DB) {
     // Fill missing preview images from canonical photos.
     await fillMissingPreviewImages(recentClimbs, canonicalPhotos, 800)
 
-    heroPhoto = canonicalPhotos[0] ?? null
-    recentPhotos = canonicalPhotos.slice(1, 8)
+    const landscapePhotos = canonicalPhotos
+      .filter(photo => (photo.width ?? 0) > (photo.height ?? 0) * 1.25)
+      .filter(photo => (photo.width ?? 0) >= 1200)
+    const heroCandidates = landscapePhotos.length > 0 ? landscapePhotos : canonicalPhotos
+    heroPhoto = heroCandidates[Math.floor(Math.random() * heroCandidates.length)] ?? null
+    recentPhotos = canonicalPhotos.filter(photo => photo.id !== heroPhoto?.id).slice(0, 7)
 
     // Fetch stats
     const statsResult = await DB.prepare(`
@@ -78,8 +82,11 @@ function getPhotoAlt(photo: DisplayPhoto): string {
 >
   <figure class="hero-photo">
     <img
-      src={heroPhoto ? `/img/${heroPhoto.id}?w=1600` : '/open-graph/home.jpg'}
+      src={heroPhoto ? `/img/${heroPhoto.id}/?w=1600` : '/open-graph/home.jpg'}
       alt={heroPhoto ? getPhotoAlt(heroPhoto) : 'Snow-covered mountains above a forested trail in Colorado'}
+      width={heroPhoto?.width ?? 1200}
+      height={heroPhoto?.height ?? 630}
+      fetchpriority="high"
     />
     {heroPhoto && (
       <figcaption>
@@ -103,11 +110,11 @@ function getPhotoAlt(photo: DisplayPhoto): string {
           <span>the camera has been getting out more than the log</span>
         </div>
         <div class="photo-strip">
-          {recentPhotos.map((photo, index) => (
-            <a href="/photos/" class:list={['photo-strip-item', { wide: index === 0 || index === 5, tall: index === 2 }]}>
-              <img src={`/img/${photo.id}?w=800`} alt={getPhotoAlt(photo)} loading="lazy" />
+          {recentPhotos.map(photo => (
+            <a href="/photos/" class="photo-strip-item" aria-label={`View ${getPhotoAlt(photo)}`}>
+              <img src={`/img/${photo.id}/?w=800`} alt="" loading="lazy" width={photo.width ?? 800} height={photo.height ?? 600} />
               {(photo.title || photo.area) && (
-                <span>{photo.title || photo.area}</span>
+                <span aria-hidden="true">{photo.title || photo.area}</span>
               )}
             </a>
           ))}
@@ -225,23 +232,22 @@ function getPhotoAlt(photo: DisplayPhoto): string {
     .section-heading > a { color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
     .section-heading > a:hover { color: var(--color-text-accent); }
     .photo-strip {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-auto-rows: 160px;
-      gap: 0.75rem;
+      columns: 4 180px;
+      column-gap: 0.75rem;
     }
     .photo-strip-item {
+      display: block;
       position: relative;
+      break-inside: avoid;
       overflow: hidden;
       border-radius: 0.35rem;
       background: var(--color-bg-secondary);
+      margin-bottom: 0.75rem;
     }
-    .photo-strip-item.wide { grid-column: span 2; }
-    .photo-strip-item.tall { grid-row: span 2; }
     .photo-strip-item img {
+      display: block;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       transition: transform 0.5s ease;
     }
     .photo-strip-item:hover img { transform: scale(1.025); }
@@ -310,8 +316,7 @@ function getPhotoAlt(photo: DisplayPhoto): string {
       .hero-photo figcaption { align-items: flex-start; flex-direction: column; gap: 0; }
       .home-intro { padding: 4rem 0; }
       .section-heading { align-items: flex-start; flex-direction: column; }
-      .photo-strip { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 140px; }
-      .photo-strip-item.wide { grid-column: span 2; }
+      .photo-strip { columns: 2 140px; }
       .outing-entry { grid-template-columns: 100px 1fr; gap: var(--space-lg); }
       .outing-thumb { width: 100px; }
     }

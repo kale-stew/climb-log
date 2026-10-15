@@ -28,7 +28,7 @@ describe('photos client', () => {
   it('adapts canonical location and image fields', () => {
     expect(adaptCanonicalPhoto(photo)).toMatchObject({
       id: 'canonical-1',
-      url: '/img/canonical-1',
+      url: '/img/canonical-1/',
       area: 'Bridger-Teton',
       state: 'Wyoming',
     })

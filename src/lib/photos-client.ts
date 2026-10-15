@@ -90,7 +90,7 @@ export function adaptCanonicalPhoto(photo: CanonicalPhoto): DisplayPhoto {
     title: normalizePhotoText(photo.title),
     caption: normalizePhotoText(photo.caption),
     location,
-    url: `/img/${encodeURIComponent(photo.id)}`,
+    url: `/img/${encodeURIComponent(photo.id)}/`,
     area,
     state,
   }

@@ -11,7 +11,7 @@ export const prerender = false
 const DEFAULT_ACCENT = '#8B7355'
 
 // Fallback hero image when post doesn't have one
-const FALLBACK_HERO = '/img/9943163a'
+const FALLBACK_HERO = '/img/9943163a/'
 
 // Cache the font fetch
 let interFontData: ArrayBuffer | null = null

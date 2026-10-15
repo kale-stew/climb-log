@@ -119,7 +119,7 @@ async function main() {
       const firstUrl = preview.split(',')[0]
       const sid = urlToShortId.get(firstUrl)
       if (sid) {
-        preview = `/img/${sid}`
+        preview = `/img/${sid}/`
       }
     }
     return { ...c, preview_img_url: preview }

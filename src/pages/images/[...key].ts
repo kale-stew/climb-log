@@ -44,8 +44,8 @@ export const GET: APIRoute = async ({ params, request }) => {
       const widthMap: Record<string, string> = { '200': '200', '800': '800', '1600': '1600', 'original': 'original' }
       const widthParam = widthMap[size]
       const redirectUrl = widthParam && widthParam !== 'original'
-        ? `/img/${photoId}?w=${widthParam}`
-        : `/img/${photoId}`
+        ? `/img/${photoId}/?w=${widthParam}`
+        : `/img/${photoId}/`
       return new Response(null, {
         status: 301,
         headers: {

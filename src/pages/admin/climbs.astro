@@ -21,7 +21,7 @@ if (DB) {
 
   recentPhotos = (await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 100 })).map(photo => ({
     ...photo,
-    src: `/img/${photo.id}?w=200`,
+    src: `/img/${photo.id}/?w=200`,
   }))
 
   // Get recent assignments for undo functionality

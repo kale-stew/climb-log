@@ -5,6 +5,7 @@
 
 interface PhotoLookupMaps {
   byDate: Map<string, string>
+  byMonthState: Map<string, string>
   byAreaState: Map<string, string>
 }
 
@@ -21,12 +22,17 @@ interface PhotoRow {
  */
 export function buildPhotoFallbackMaps(photos: PhotoRow[]): PhotoLookupMaps {
   const byDate = new Map<string, string>()
+  const byMonthState = new Map<string, string>()
   const byAreaState = new Map<string, string>()
 
   for (const p of photos) {
     if (p.id) {
       if (p.date && !byDate.has(p.date)) {
         byDate.set(p.date, p.id)
+      }
+      if (p.date && p.state) {
+        const key = `${p.date.slice(0, 7)}||${p.state}`
+        if (!byMonthState.has(key)) byMonthState.set(key, p.id)
       }
       if (p.area && p.state) {
         const key = `${p.area}||${p.state}`
@@ -37,7 +43,7 @@ export function buildPhotoFallbackMaps(photos: PhotoRow[]): PhotoLookupMaps {
     }
   }
 
-  return { byDate, byAreaState }
+  return { byDate, byMonthState, byAreaState }
 }
 
 interface ClimbLike {
@@ -52,12 +58,13 @@ interface ClimbLike {
  * Tries to match by date, then exact area and state. A state-only match is too
  * broad and can attach an unrelated photo to many climbs.
  */
-export function findFallbackPhotoId(
-  climb: ClimbLike,
-  maps: PhotoLookupMaps
-): string | undefined {
+export function findFallbackPhotoId(climb: ClimbLike, maps: PhotoLookupMaps): string | undefined {
   if (climb.date && maps.byDate.has(climb.date)) {
     return maps.byDate.get(climb.date)
+  }
+  if (climb.date && climb.state) {
+    const key = `${climb.date.slice(0, 7)}||${climb.state}`
+    if (maps.byMonthState.has(key)) return maps.byMonthState.get(key)
   }
   if (climb.area && climb.state) {
     const key = `${climb.area}||${climb.state}`
@@ -75,18 +82,18 @@ export function findFallbackPhotoId(
 export async function fillMissingPreviewImages(
   climbs: ClimbLike[],
   photos: PhotoRow[],
-  width: number = 800
+  width: number = 800,
 ): Promise<void> {
   const missingImage = climbs.some(c => !c.preview_img_url)
   if (!missingImage) return
 
   const maps = buildPhotoFallbackMaps(photos)
-  
+
   for (const climb of climbs) {
     if (!climb.preview_img_url) {
       const shortId = findFallbackPhotoId(climb, maps)
       if (shortId) {
-        climb.preview_img_url = `/img/${shortId}?w=${width}`
+        climb.preview_img_url = `/img/${shortId}/?w=${width}`
       }
     }
   }

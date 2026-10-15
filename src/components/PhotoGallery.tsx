@@ -27,7 +27,7 @@ interface PhotoGalleryProps {
 
 function getImageUrl(photo: Photo, size: 'thumb' | 'full' = 'thumb') {
   const id = photo.short_id || photo.id
-  return size === 'thumb' ? `/img/${id}?w=800` : `/img/${id}`
+  return size === 'thumb' ? `/img/${id}/?w=800` : `/img/${id}/`
 }
 
 export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
@@ -201,7 +201,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           >
             <img
               src={getImageUrl(photo, 'thumb')}
-              alt={photo.caption || photo.title || 'Photo'}
+              alt=""
               loading="lazy"
               onError={e => {
                 // If image fails to load, hide it to show the background/accent color
