@@ -1,5 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  "main": "./src/worker.ts",
   "name": "climb-log",
   "account_id": "bb52c0e5f3a93fc72779915d7dc6982b",
   "compatibility_date": "2025-05-23",

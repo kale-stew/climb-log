@@ -53,6 +53,8 @@ foundation).
 
 Limits cap at 100; consumers paginate for larger sets.
 
+The `portfolio` collection includes canonical records imported from desktop files as well as Notion-backed records. Imported rows can have `notion_id = NULL`; do not treat Notion as the universal photo source.
+
 ## Consumer-side responsibilities
 
 The canonical service returns canonical shape. **Adaptation is the consumer's
@@ -72,6 +74,13 @@ job** — do not ask the service to emit climb-log-specific fields.
 5. **Fallbacks / hero / OG accent.** Read from a fetched canonical list
    (portfolio collection or compatibility list), not from the local `photos`
    table.
+6. **Recent vs. curated photos.** Use the date-ordered compatibility list for a
+   "recent photos" surface. Use the `portfolio` collection endpoint for curated
+   gallery surfaces. Do not assume collection order means capture date.
+7. **Display cleanup.** `adaptCanonicalPhoto` applies a small defensive text and
+   location normalizer. Permanent metadata corrections belong in photos-api D1
+   or the import manifest that created the row, then should be verified through
+   the public API.
 
 ## Consumers to cut over
 

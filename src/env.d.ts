@@ -13,6 +13,11 @@ export interface CloudflareEnv {
   ALLOWED_WIDTHS: string
   PHOTOS_API_ORIGIN: string
   PHOTOS_API?: Fetcher
+  CRON_SECRET?: string
+  NOTION_TOKEN?: string
+  NOTION_CLIMBS_DB_ID?: string
+  NOTION_PEAKS_DB_ID?: string
+  NOTION_GEAR_DB_ID?: string
 }
 
 declare global {

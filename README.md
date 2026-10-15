@@ -116,21 +116,29 @@ npx wrangler deploy
 
 ## Data Sync
 
-Photos, climbs, peaks, and gear are synced from Notion via a scheduled cron job:
+Climbs, peaks, and gear are synced from Notion via a scheduled Worker event. Photos are owned by the separate canonical `photos-api` service and are never sourced from this cron.
 
 ```bash
 # Runs automatically daily at midnight UTC
 # Cloudflare Cron Triggers: 0 0 * * *
 
 # Manual trigger (for testing)
-curl "https://climb-log.kylieski.workers.dev/api/cron?secret=YOUR_CRON_SECRET"
+curl -X POST "https://climb-log.kylieski.workers.dev/api/cron" \
+  -H "Authorization: Bearer $CRON_SECRET"
 ```
 
 The cron:
 - Fetches updates from Notion databases
-- Normalizes metadata (dates, tags, locations)
-- Updates D1 database
+- Updates the local climb, peak, and gear tables in D1
 - Logs sync results to `sync_log` table
+
+The deployed Worker must bind `CRON_SECRET`, `NOTION_TOKEN`, and the applicable `NOTION_*_DB_ID` values. A configured Cron Trigger without those bindings cannot sync. The custom Worker entrypoint in `src/worker.ts` forwards scheduled events to the authenticated `/api/cron` route.
+
+## Canonical Photos
+
+All new photo reads use `src/lib/photos-client.ts` and the public `photos-api` contract. Canonical photos can originate from Notion, desktop imports, or published blog assets, so `notion_id` may be null. Metadata corrections for imported photos belong in photos-api D1 or its import manifest, not the legacy Notion Photo Directory.
+
+The homepage requests the date-ordered compatibility list for recent frames. Curated portfolio experiences use `GET /api/collections/portfolio/photos`. See `docs/specs/photos-api-consumer.md` for the complete consumer contract.
 
 ## Photo Processing
 

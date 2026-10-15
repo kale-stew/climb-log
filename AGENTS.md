@@ -27,11 +27,13 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 - Prefer canonical `photos-api` IDs for new content. Keep the local `/img/:id` route as a compatibility redirect while legacy URLs exist.
 - Do not add new direct reads from the local `photos` table. New photo features consume the canonical API.
 - Do not copy canonical originals or transforms into `climb-log-images`.
+- Canonical rows can come from Notion, desktop imports, or blog assets. Never assume `notion_id` is present or that the legacy Notion Photo Directory is the source of an imported row.
+- Use the date-ordered compatibility list for recent-photo surfaces and the `portfolio` collection endpoint for curated galleries. Collection order is not capture-date order.
 
 ## Generated And Synced Data
 
 - Do not hand-edit generated seed output. Change its source or generator and regenerate it.
-- The Notion cron currently updates multiple domains, including legacy photo rows and objects. When changing photo ownership, preserve climb, gear, and peak synchronization while removing only photo writes.
+- The Notion cron owns climb, gear, and peak synchronization. Photo metadata and originals are owned by photos-api; do not add photo writes back to the climb-log cron.
 - Preview image values can be external URLs, canonical API URLs, or generated `/img/{id}` fallbacks. Audit all forms before changing resolution behavior.
 
 ## Deployment
