@@ -48,9 +48,11 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const [filter, setFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(50)
   const [gridZoom, setGridZoom] = useState(2)
+  const gridZoomRef = useRef(gridZoom)
   const pinchStartDistance = useRef<number | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const previousRects = useRef(new Map<string, DOMRect>())
+  const activeAnimations = useRef(new Set<Animation>())
 
   useEffect(() => {
     if (initialPhotos.length > 0 || !apiOrigin) return
@@ -185,50 +187,68 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
 
-  const captureGridLayout = () => {
+  const captureVisibleTiles = () => {
     const tiles = gridRef.current?.querySelectorAll<HTMLElement>('[data-photo-id]')
     if (!tiles) return
-    previousRects.current = new Map(
-      Array.from(tiles, tile => [tile.dataset.photoId ?? '', tile.getBoundingClientRect()]),
-    )
+
+    const visible = new Map<string, DOMRect>()
+    for (const tile of tiles) {
+      if (visible.size >= 12) break
+      for (const animation of tile.getAnimations()) animation.cancel()
+      const rect = tile.getBoundingClientRect()
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        visible.set(tile.dataset.photoId ?? '', rect)
+      }
+    }
+    previousRects.current = visible
   }
 
   const changeGridZoom = (direction: -1 | 1) => {
-    setGridZoom(level => {
-      const next = Math.max(0, Math.min(GRID_MIN_WIDTHS.length - 1, level + direction))
-      if (next !== level) captureGridLayout()
-      return next
-    })
+    const next = Math.max(0, Math.min(GRID_MIN_WIDTHS.length - 1, gridZoomRef.current + direction))
+    if (next === gridZoomRef.current) return
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) captureVisibleTiles()
+    gridZoomRef.current = next
+    setGridZoom(next)
   }
 
   useIsomorphicLayoutEffect(() => {
     if (previousRects.current.size === 0) return
     const tiles = gridRef.current?.querySelectorAll<HTMLElement>('[data-photo-id]')
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!tiles) return
 
-    if (!reduceMotion && tiles) {
-      for (const tile of tiles) {
-        const previous = previousRects.current.get(tile.dataset.photoId ?? '')
-        if (!previous) continue
-        const current = tile.getBoundingClientRect()
-        tile.getAnimations().forEach(animation => {
-          animation.cancel()
-        })
-        tile.animate(
-          [
-            {
-              transform: `translate(${previous.left - current.left}px, ${previous.top - current.top}px) scale(${previous.width / current.width}, ${previous.height / current.height})`,
-              transformOrigin: 'top left',
-            },
-            { transform: 'none', transformOrigin: 'top left' },
-          ],
-          { duration: 220, easing: 'cubic-bezier(.22, 1, .36, 1)' },
-        )
-      }
+    for (const tile of tiles) {
+      const previous = previousRects.current.get(tile.dataset.photoId ?? '')
+      if (!previous) continue
+      for (const animation of tile.getAnimations()) animation.cancel()
+      const current = tile.getBoundingClientRect()
+      if (current.bottom <= 0 || current.top >= window.innerHeight) continue
+
+      const animation = tile.animate(
+        [
+          {
+            transform: `translate(${previous.left - current.left}px, ${previous.top - current.top}px) scale(${previous.width / current.width}, ${previous.height / current.height})`,
+            transformOrigin: 'top left',
+          },
+          { transform: 'none', transformOrigin: 'top left' },
+        ],
+        { duration: 180, easing: 'cubic-bezier(.2, .8, .2, 1)' },
+      )
+      activeAnimations.current.add(animation)
+      animation.finished.then(
+        () => activeAnimations.current.delete(animation),
+        () => activeAnimations.current.delete(animation),
+      )
     }
-
     previousRects.current.clear()
-  })
+  }, [gridZoom])
+
+  useEffect(
+    () => () => {
+      for (const animation of activeAnimations.current) animation.cancel()
+      activeAnimations.current.clear()
+    },
+    [],
+  )
 
   const getTouchDistance = (touches: ArrayLike<{ clientX: number; clientY: number }>) => {
     const first = touches[0]
@@ -271,7 +291,10 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
             >
               −
             </button>
-            <span aria-hidden="true">{gridZoom + 1}</span>
+            <span aria-live="polite">
+              <span className="sr-only">Gallery size </span>
+              {gridZoom + 1}
+            </span>
             <button
               type="button"
               onClick={() => changeGridZoom(1)}
@@ -514,10 +537,10 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           padding: 0;
           color: inherit;
           text-align: left;
-          transition: transform 0.4s cubic-bezier(.22,1,.36,1), border-color 0.3s ease;
+          transition: none;
         }
 
-        .photo-item:hover { transform: translateY(-4px); border-color: var(--color-border-hover); }
+        .photo-item:hover img { filter: brightness(1.06); }
 
         .photo-grid[data-grid-zoom='3'] .photo-item,
         .photo-grid[data-grid-zoom='4'] .photo-item,
@@ -546,11 +569,6 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.7s cubic-bezier(.22,1,.36,1);
-        }
-
-        .photo-item:hover img {
-          transform: scale(1.05);
         }
 
         .photo-overlay {
@@ -572,7 +590,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
         .load-more-wrap { display: flex; justify-content: center; padding-top: 3rem; }
         .load-more { border-radius: 999px; padding: 0.8rem 1.5rem; }
 
-        .photo-item:hover .photo-overlay {
+        .photo-item:hover .photo-overlay,
+        .photo-item:focus-visible .photo-overlay {
           opacity: 1;
         }
 
