@@ -1,4 +1,11 @@
-import { type CSSProperties, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { formatCalendarDate, parseCalendarDate } from '../lib/dates'
 import { getCanonicalPhotos } from '../lib/photos-client'
 
@@ -30,8 +37,9 @@ function getImageUrl(photo: Photo, size: 'thumb' | 'full' = 'thumb') {
   return size === 'thumb' ? `/img/${id}/?w=800` : `/img/${id}/`
 }
 
-const GRID_MIN_WIDTHS = [140, 190, 260, 360, 520]
-const GRID_GAPS = ['0.2rem', '0.35rem', '0.6rem', '0.9rem', '1.25rem']
+const GRID_MIN_WIDTHS = [64, 96, 160, 260, 420]
+const GRID_GAPS = ['1px', '2px', '0.35rem', '0.65rem', '1rem']
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
   const [photos, setPhotos] = useState(initialPhotos)
@@ -41,6 +49,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const [visibleCount, setVisibleCount] = useState(24)
   const [gridZoom, setGridZoom] = useState(2)
   const pinchStartDistance = useRef<number | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const previousRects = useRef(new Map<string, DOMRect>())
 
   useEffect(() => {
     if (initialPhotos.length > 0 || !apiOrigin) return
@@ -164,9 +174,50 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
 
-  const changeGridZoom = (direction: -1 | 1) => {
-    setGridZoom(level => Math.max(0, Math.min(GRID_MIN_WIDTHS.length - 1, level + direction)))
+  const captureGridLayout = () => {
+    const tiles = gridRef.current?.querySelectorAll<HTMLElement>('[data-photo-id]')
+    if (!tiles) return
+    previousRects.current = new Map(
+      Array.from(tiles, tile => [tile.dataset.photoId ?? '', tile.getBoundingClientRect()]),
+    )
   }
+
+  const changeGridZoom = (direction: -1 | 1) => {
+    setGridZoom(level => {
+      const next = Math.max(0, Math.min(GRID_MIN_WIDTHS.length - 1, level + direction))
+      if (next !== level) captureGridLayout()
+      return next
+    })
+  }
+
+  useIsomorphicLayoutEffect(() => {
+    if (previousRects.current.size === 0) return
+    const tiles = gridRef.current?.querySelectorAll<HTMLElement>('[data-photo-id]')
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (!reduceMotion && tiles) {
+      for (const tile of tiles) {
+        const previous = previousRects.current.get(tile.dataset.photoId ?? '')
+        if (!previous) continue
+        const current = tile.getBoundingClientRect()
+        tile.getAnimations().forEach(animation => {
+          animation.cancel()
+        })
+        tile.animate(
+          [
+            {
+              transform: `translate(${previous.left - current.left}px, ${previous.top - current.top}px) scale(${previous.width / current.width}, ${previous.height / current.height})`,
+              transformOrigin: 'top left',
+            },
+            { transform: 'none', transformOrigin: 'top left' },
+          ],
+          { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' },
+        )
+      }
+    }
+
+    previousRects.current.clear()
+  })
 
   const getTouchDistance = (touches: TouchList) => {
     const first = touches[0]
@@ -177,12 +228,6 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null
     return formatCalendarDate(dateStr, { month: 'long', day: 'numeric', year: 'numeric' })
-  }
-
-  // Determine if photo is tall (original design reference)
-  const isTall = (photo: Photo) => {
-    if (!photo.width || !photo.height) return false
-    return photo.height / photo.width > 1.208
   }
 
   return (
@@ -231,8 +276,9 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
       {/* Gallery Grid */}
       <div
-        key={gridZoom}
+        ref={gridRef}
         className="photo-grid"
+        data-grid-zoom={gridZoom}
         style={
           { '--photo-min-width': `${gridMinWidth}px`, '--photo-gap': gridGap } as CSSProperties
         }
@@ -255,7 +301,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           <button
             type="button"
             key={photo.id}
-            className={`photo-item ${isTall(photo) ? 'photo-item-tall' : ''}`}
+            className="photo-item"
+            data-photo-id={photo.id}
             onClick={() => openLightbox(index)}
             aria-label={`View photo: ${photo.caption || photo.title || 'Mountain photo'}`}
             style={photo.accent_color ? { backgroundColor: photo.accent_color } : undefined}
@@ -388,16 +435,6 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(var(--photo-min-width), 1fr));
           gap: var(--photo-gap);
-          animation: gallery-reflow 240ms ease both;
-        }
-
-        @keyframes gallery-reflow {
-          from { transform: scale(0.985, 0.94); transform-origin: top center; }
-          to { transform: scale(1, 1); transform-origin: top center; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .photo-grid { animation: none; }
         }
 
         .gallery-tools {
@@ -449,7 +486,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
         .photo-item {
           position: relative;
-          aspect-ratio: 4 / 3;
+          aspect-ratio: 1;
           grid-column: span 1;
           min-width: 0;
           overflow: hidden;
@@ -466,10 +503,17 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
         .photo-item:hover { transform: translateY(-4px); border-color: var(--color-border-hover); }
 
-        .photo-item-tall {
-          aspect-ratio: 3 / 4;
-          grid-row: span 2;
+        .photo-grid[data-grid-zoom='3'] .photo-item,
+        .photo-grid[data-grid-zoom='4'] .photo-item { aspect-ratio: 4 / 3; }
+
+        .photo-grid[data-grid-zoom='0'] .photo-item,
+        .photo-grid[data-grid-zoom='1'] .photo-item {
+          border: 0;
+          border-radius: 0;
         }
+
+        .photo-grid[data-grid-zoom='0'] .photo-overlay,
+        .photo-grid[data-grid-zoom='1'] .photo-overlay { display: none; }
 
         .photo-item img {
           width: 100%;
@@ -667,7 +711,6 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           .photo-grid { gap: var(--photo-gap); }
           .photo-item,
           .photo-item:first-child { grid-column: span 1; grid-row: span 1; }
-          .photo-item-tall { grid-row: span 2; }
           .gallery-tools { align-items: flex-start; flex-direction: column; }
           .gallery-status { width: 100%; justify-content: space-between; }
         }
