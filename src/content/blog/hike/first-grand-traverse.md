@@ -2,6 +2,7 @@
 title: 'My First Grand Traverse: The Maroon Bells'
 date: '2022-02-16'
 previewImgUrl: '/img/0c0138cb'
+ogImageAlt: 'North Maroon Peak and the Bells Traverse viewed from Maroon Peak'
 ---
 
 Getting permits for the Maroon Bells can be a bit of a headache, so I like to refresh the website they're sold on regularly to see if anything has been freed up. One night, my fiancé and I were at the local bar when I was doing this routine check and a few spots were shown as available. Each permit costs $10 and is fully refundable up to 48 hours before the permit's start time, so it's a fairly low-risk booking. I chose to book three of those spots, mark them on my calendar, and plan out the climbs later. I had eyes on a number of peaks in that area so I was confident these permits would go to good use.

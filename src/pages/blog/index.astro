@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import { getCollection } from 'astro:content'
+import { formatCalendarDate } from '../../lib/dates'
 
 // Static page with all posts
 export const prerender = true
@@ -27,16 +28,21 @@ const categoryLabels: Record<string, string> = {
 }
 
 function formatDate(dateStr: string) {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  return formatCalendarDate(dateStr, { month: 'long', day: 'numeric', year: 'numeric' })
 }
 ---
 
-<Layout title="Blog" description="Trip reports, gear reviews, and thoughts on hiking and climbing." ogImage="https://kylies.photos/open-graph/blog.jpg">
+<Layout
+  title="Blog"
+  description="Trip reports, gear notes, and mountain stories from 2021 and 2022."
+  ogImage="https://kylies.photos/open-graph/blog.jpg"
+  ogImageAlt="Snow-covered Colorado peaks framed by golden autumn aspens"
+>
   <div class="container page">
     <h1>Blog</h1>
-    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
-      Trip reports, gear reviews, and other thoughts from the trail.
+    <p class="page-subtitle" style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      Trip reports, gear reviews, and other thoughts from the trail. The newest post is from March
+      2022, but <a href="/climbs">the log has newer outings</a>.
     </p>
 
     <!-- Category Filter (client-side) -->

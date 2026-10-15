@@ -2,6 +2,7 @@
 title: 'Soloing the Angel of Shavano'
 date: '2022-03-09'
 previewImgUrl: '/img/32ca2072'
+ogImageAlt: 'The Angel of Shavano couloir beneath gathering storm clouds'
 ---
 
 Spring is known for being a transitional season, and this is especially true in Colorado. With spring comes a mud-riddled shoulder season, but also slightly more stable snowpack and prime couloir climbing time. "Couloir" is a term of French origin that refers to the deep and steep gullies that cut up a mountain, and plenty of these lines exist on some of the most beautiful mountains in our state.

@@ -2,6 +2,7 @@
 title: 'Solo Scrambling Above Herman Gulch'
 date: '2022-01-28'
 previewImgUrl: '/img/a12e9249'
+ogImageAlt: 'Steep scrambling routes on the rocky Citadel in Colorado'
 ---
 
 On a Thursday this past July, I decided to target a scramble near our home in Clear Creek county. Herman Gulch is known for its profusive wildflower season so it already seemed like a great time to go up that way, and the last hike I had been on in this area was in the middle of a snowstorm with visibility no further than 200 feet. I wanted to see what the basin looked like on a clear day but also get a mild, lesser-traveled climb in.

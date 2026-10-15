@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import { getCollection, render } from 'astro:content'
+import { formatCalendarDate } from '../../lib/dates'
 
 export const prerender = true
 
@@ -30,10 +31,14 @@ const categoryLabels: Record<string, string> = {
   gear: 'gear',
   thoughts: 'thoughts',
 }
+const categoryDescriptions: Record<string, string> = {
+  hike: 'A trip report from Kylie’s mountain journal',
+  gear: 'Gear notes from Kylie’s mountain journal',
+  thoughts: 'A story from Kylie’s mountain journal',
+}
 
 function formatDate(dateStr: string) {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  return formatCalendarDate(dateStr, { month: 'long', day: 'numeric', year: 'numeric' })
 }
 
 // Build prev/next navigation
@@ -46,13 +51,14 @@ const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1]
 
 // Extract headers for table of contents
 const slug = post.id.replace(/\.md$/, '')
+const postDescription = `${categoryDescriptions[category]}: ${post.data.title}.`
 ---
 
 <Layout 
   title={post.data.title} 
-  description={`${categoryLabels[category]} - ${post.data.title}`}
+  description={postDescription}
   ogImage={`https://kylies.photos/api/og/${slug}`}
-  ogImageAlt={post.data.title}
+  ogImageAlt={post.data.ogImageAlt}
 >
   <article class="container blog-post">
     <header class="post-header">

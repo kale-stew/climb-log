@@ -155,6 +155,10 @@ body {
   padding-bottom: var(--space-3xl);
 }
 
+.page-subtitle {
+  text-transform: lowercase;
+}
+
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);

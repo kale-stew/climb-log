@@ -8,12 +8,16 @@ export interface Props {
 
 const { title, description, ogImage, ogImageAlt } = Astro.props
 
-const canonicalUrl = `https://kylies.photos${Astro.url.pathname}`
+const canonicalPath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/$/, '')
+const canonicalUrl = `https://kylies.photos${canonicalPath}`
 const defaultOgImage = 'https://kylies.photos/open-graph/home.jpg'
+const defaultDescription = 'Photos and notes from the mountains: mostly Colorado, lately anywhere I can get to.'
+const pageTitle = title === 'Home' ? 'Kylie · Photos & mountain journal' : `${title} · kylies.photos`
+const imageAlt = ogImageAlt ?? 'A mountain landscape from Kylie’s journal'
 
 const navLinks = [
   { name: 'Blog', href: '/blog' },
-  { name: 'Climbs', href: '/climbs' },
+  { name: 'Log', href: '/climbs' },
   { name: 'Peaks', href: '/peaks' },
   { name: 'Gear', href: '/gear' },
   { name: 'Photos', href: '/photos' },
@@ -22,22 +26,11 @@ const navLinks = [
 
 const currentPath = Astro.url.pathname
 
-const footerLinks = {
-  explore: [
-    { title: 'Blog', href: '/blog' },
-    { title: 'Climb Log', href: '/climbs' },
-    { title: 'Peak List', href: '/peaks' },
-    { title: 'Gear List', href: '/gear' },
-    { title: 'Photos', href: '/photos' },
-    { title: 'About', href: '/about' },
-  ],
-  connect: [
-    { title: 'Instagram', href: 'https://www.instagram.com/kalestewski/' },
-    { title: 'Strava', href: 'https://www.strava.com/athletes/46336787' },
-    { title: 'AllTrails', href: 'https://www.alltrails.com/members/kylie-stewart-1' },
-    { title: 'Flickr', href: 'https://flickr.com/photos/189863825@N02/' },
-  ],
-}
+const connectLinks = [
+  { name: 'Instagram', href: 'https://www.instagram.com/kalestewski/' },
+  { name: 'GitHub', href: 'https://github.com/kale-stew' },
+  { name: 'Strava', href: 'https://www.strava.com/athletes/46336787' },
+]
 ---
 
 <!doctype html>
@@ -45,19 +38,19 @@ const footerLinks = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title} — kylies.photos</title>
-    <meta name="description" content={description ?? 'Kylie\'s climbing and hiking adventures in Colorado and beyond.'} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description ?? defaultDescription} />
     
     <link rel="canonical" href={canonicalUrl} />
 
     <!-- Open Graph -->
-    <meta property="og:title" content={`${title} — kylies.photos`} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description ?? ''} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={ogImage ?? defaultOgImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={ogImageAlt ?? `${title} — kylies.photos`} />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="kylies.photos" />
 
@@ -65,10 +58,10 @@ const footerLinks = {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@kyliestew" />
     <meta name="twitter:creator" content="@kyliestew" />
-    <meta name="twitter:title" content={`${title} — kylies.photos`} />
+    <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description ?? ''} />
     <meta name="twitter:image" content={ogImage ?? defaultOgImage} />
-    <meta name="twitter:image:alt" content={ogImageAlt ?? `${title} — kylies.photos`} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     <!-- Theme color for mobile browsers -->
     <meta name="theme-color" content="#FAF8F5" media="(prefers-color-scheme: light)" />
@@ -110,6 +103,7 @@ const footerLinks = {
             <a 
               href={link.href} 
               class:list={['nav-link', { active: currentPath.startsWith(link.href) }]}
+              aria-current={currentPath.startsWith(link.href) ? 'page' : undefined}
             >
               {link.name}
             </a>
@@ -142,11 +136,11 @@ const footerLinks = {
     <footer class="footer">
       <div class="footer-inner">
         <div class="footer-brand">kylies<em>·</em>photos</div>
-        <p>Photos, field notes, and a running record of a life outside.</p>
+        <p>A running record of a life outside.</p>
         <nav class="footer-links" aria-label="Footer navigation">
-          {footerLinks.explore.slice(0, 5).map(link => <a href={link.href}>{link.title}</a>)}
-          {footerLinks.connect.slice(0, 2).map(link => (
-            <a href={link.href} target="_blank" rel="noopener noreferrer">{link.title}</a>
+          {navLinks.map(link => <a href={link.href}>{link.name}</a>)}
+          {connectLinks.map(link => (
+            <a href={link.href} target="_blank" rel="noopener noreferrer">{link.name}</a>
           ))}
         </nav>
       </div>
