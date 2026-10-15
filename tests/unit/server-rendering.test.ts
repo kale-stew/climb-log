@@ -46,5 +46,7 @@ describe('server-rendered collection pages', () => {
     expect(html).toContain('Mountain photo 0')
     expect(html).toContain('Mountain photo 23')
     expect(html).not.toContain('Mountain photo 24')
+    expect(html).toContain('Show more photos')
+    expect(html).toContain('Show larger photos')
   })
 })

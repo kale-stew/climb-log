@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from 'react'
 import { formatCalendarDate, parseCalendarDate } from '../lib/dates'
 import { getCanonicalPhotos } from '../lib/photos-client'
 
@@ -30,12 +30,16 @@ function getImageUrl(photo: Photo, size: 'thumb' | 'full' = 'thumb') {
   return size === 'thumb' ? `/img/${id}/?w=800` : `/img/${id}/`
 }
 
+const GRID_MIN_WIDTHS = [140, 190, 260, 360, 520]
+
 export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
   const [photos, setPhotos] = useState(initialPhotos)
   const [isLoading, setIsLoading] = useState(initialPhotos.length === 0 && Boolean(apiOrigin))
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [filter, setFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(24)
+  const [gridZoom, setGridZoom] = useState(2)
+  const pinchStartDistance = useRef<number | null>(null)
 
   useEffect(() => {
     if (initialPhotos.length > 0 || !apiOrigin) return
@@ -156,6 +160,17 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
   const currentPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null
   const visiblePhotos = filteredPhotos.slice(0, visibleCount)
+  const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
+
+  const changeGridZoom = (direction: -1 | 1) => {
+    setGridZoom(level => Math.max(0, Math.min(GRID_MIN_WIDTHS.length - 1, level + direction)))
+  }
+
+  const getTouchDistance = (touches: TouchList) => {
+    const first = touches[0]
+    const second = touches[1]
+    return Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY)
+  }
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null
@@ -181,15 +196,57 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
             setVisibleCount(24)
           }}
         />
-        <p aria-live="polite">
-          {isLoading
-            ? 'Loading photos…'
-            : `Showing ${Math.min(visibleCount, filteredPhotos.length)} of ${filteredPhotos.length} photos`}
-        </p>
+        <div className="gallery-status">
+          <p aria-live="polite">
+            {isLoading
+              ? 'Loading photos…'
+              : `Showing ${Math.min(visibleCount, filteredPhotos.length)} of ${filteredPhotos.length} photos`}
+          </p>
+          <fieldset className="gallery-zoom">
+            <legend className="sr-only">Gallery size</legend>
+            <button
+              type="button"
+              onClick={() => changeGridZoom(-1)}
+              disabled={gridZoom === 0}
+              aria-label="Show more photos"
+              title="Show more photos"
+            >
+              −
+            </button>
+            <span aria-hidden="true">{gridZoom + 1}</span>
+            <button
+              type="button"
+              onClick={() => changeGridZoom(1)}
+              disabled={gridZoom === GRID_MIN_WIDTHS.length - 1}
+              aria-label="Show larger photos"
+              title="Show larger photos"
+            >
+              +
+            </button>
+          </fieldset>
+        </div>
       </div>
 
       {/* Gallery Grid */}
-      <div className="photo-grid">
+      <div
+        key={gridZoom}
+        className="photo-grid"
+        style={{ '--photo-min-width': `${gridMinWidth}px` } as CSSProperties}
+        onTouchStart={event => {
+          if (event.touches.length === 2)
+            pinchStartDistance.current = getTouchDistance(event.touches)
+        }}
+        onTouchMove={event => {
+          if (event.touches.length !== 2 || pinchStartDistance.current === null) return
+          const distance = getTouchDistance(event.touches)
+          if (Math.abs(distance - pinchStartDistance.current) < 35) return
+          changeGridZoom(distance > pinchStartDistance.current ? 1 : -1)
+          pinchStartDistance.current = distance
+        }}
+        onTouchEnd={() => {
+          pinchStartDistance.current = null
+        }}
+      >
         {visiblePhotos.map((photo, index) => (
           <button
             type="button"
@@ -325,8 +382,18 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
       <style>{`
         .photo-grid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(var(--photo-min-width), 1fr));
           gap: 1.25rem;
+          animation: gallery-reflow 240ms ease both;
+        }
+
+        @keyframes gallery-reflow {
+          from { opacity: 0.55; transform: scale(0.985); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .photo-grid { animation: none; }
         }
 
         .gallery-tools {
@@ -341,6 +408,40 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
         .gallery-tools input { width: min(420px, 100%); border-radius: 999px; }
         .gallery-tools p { margin: 0; color: var(--color-text-tertiary); font-size: 0.8rem; }
+
+        .gallery-status {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .gallery-zoom {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          margin: 0;
+          padding: 0.2rem;
+          border: 1px solid var(--color-border);
+          border-radius: 999px;
+        }
+
+        .gallery-zoom button {
+          display: grid;
+          place-items: center;
+          width: 1.6rem;
+          height: 1.6rem;
+          padding: 0;
+          border: 0;
+          border-radius: 50%;
+          background: transparent;
+          color: var(--color-text-primary);
+          font-size: 1.1rem;
+          line-height: 1;
+        }
+
+        .gallery-zoom button:hover:not(:disabled) { background: var(--color-bg-secondary); }
+        .gallery-zoom button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .gallery-zoom span { min-width: 1rem; text-align: center; color: var(--color-text-tertiary); font-size: 0.75rem; }
 
         .photo-item {
           position: relative;
@@ -559,14 +660,12 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
             right: 0.5rem;
           }
 
-          .photo-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-          }
+          .photo-grid { gap: 0.75rem; }
           .photo-item,
           .photo-item:first-child { grid-column: span 1; grid-row: span 1; }
           .photo-item-tall { grid-row: span 2; }
           .gallery-tools { align-items: flex-start; flex-direction: column; }
+          .gallery-status { width: 100%; justify-content: space-between; }
         }
       `}</style>
     </>
