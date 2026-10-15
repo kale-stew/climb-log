@@ -1,9 +1,10 @@
-import { defineConfig } from 'astro/config'
 import cloudflare from '@astrojs/cloudflare'
 import react from '@astrojs/react'
+import { defineConfig } from 'astro/config'
 
 export default defineConfig({
   output: 'server',
+  trailingSlash: 'always',
   adapter: cloudflare(),
   integrations: [react()],
   vite: {

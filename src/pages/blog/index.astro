@@ -42,7 +42,7 @@ function formatDate(dateStr: string) {
     <h1>Blog</h1>
     <p class="page-subtitle" style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
       Trip reports, gear reviews, and other thoughts from the trail. The newest post is from March
-      2022, but <a href="/climbs">the log has newer outings</a>.
+      2022, but <a href="/climbs/">the log has newer outings</a>.
     </p>
 
     <!-- Category Filter (client-side) -->
@@ -65,7 +65,7 @@ function formatDate(dateStr: string) {
         return (
           <article class="post-card" data-category={category}>
             {post.data.previewImgUrl && (
-              <a href={`/blog/${slug}`} class="post-image">
+              <a href={`/blog/${slug}/`} class="post-image">
                 <img 
                   src={post.data.previewImgUrl} 
                   alt={post.data.title}
@@ -76,7 +76,7 @@ function formatDate(dateStr: string) {
             <div class="post-content">
               <span class={`post-category cat-${category}`}>{categoryLabels[category]}</span>
               <h2>
-                <a href={`/blog/${slug}`}>{post.data.title}</a>
+                <a href={`/blog/${slug}/`}>{post.data.title}</a>
               </h2>
               <time datetime={post.data.date}>{formatDate(post.data.date)}</time>
             </div>

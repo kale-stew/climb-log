@@ -317,7 +317,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                         <div className="climb-thumb-link">
                           {climb.slug ? (
                             <a
-                              href={`/blog/hike/${climb.slug}`}
+                              href={`/blog/hike/${climb.slug}/`}
                               aria-label={climb.title || 'View climb'}
                             >
                               <img
@@ -345,7 +345,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                     <td>{formatDate(climb.date)}</td>
                     <td>
                       {climb.slug ? (
-                        <a href={`/blog/hike/${climb.slug}`}>{climb.title || 'Untitled'}</a>
+                        <a href={`/blog/hike/${climb.slug}/`}>{climb.title || 'Untitled'}</a>
                       ) : (
                         climb.title || 'Untitled'
                       )}
@@ -398,7 +398,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                 </div>
                 <h3 className="climb-mobile-title">
                   {climb.slug ? (
-                    <a href={`/blog/hike/${climb.slug}`}>{climb.title || 'Untitled'}</a>
+                    <a href={`/blog/hike/${climb.slug}/`}>{climb.title || 'Untitled'}</a>
                   ) : (
                     climb.title || 'Untitled'
                   )}

@@ -8,20 +8,20 @@ export interface Props {
 
 const { title, description, ogImage, ogImageAlt } = Astro.props
 
-const canonicalPath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/$/, '')
+const canonicalPath = Astro.url.pathname === '/' ? '/' : `${Astro.url.pathname.replace(/\/+$/, '')}/`
 const canonicalUrl = `https://kylies.photos${canonicalPath}`
 const defaultOgImage = 'https://kylies.photos/open-graph/home.jpg'
-const defaultDescription = 'Photos and notes from the mountains: mostly Colorado, lately anywhere I can get to.'
-const pageTitle = title === 'Home' ? 'Kylie · Photos & mountain journal' : `${title} · kylies.photos`
-const imageAlt = ogImageAlt ?? 'A mountain landscape from Kylie’s journal'
+const defaultDescription = 'Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to.'
+const pageTitle = title === 'Home' ? 'Kylie · Photos & outside journal' : `${title} · kylies.photos`
+const imageAlt = ogImageAlt ?? 'A photo from Kylie’s journal'
 
 const navLinks = [
-  { name: 'Blog', href: '/blog' },
-  { name: 'Log', href: '/climbs' },
-  { name: 'Peaks', href: '/peaks' },
-  { name: 'Gear', href: '/gear' },
-  { name: 'Photos', href: '/photos' },
-  { name: 'About', href: '/about' },
+  { name: 'Photos', href: '/photos/' },
+  { name: 'Log', href: '/climbs/' },
+  { name: 'Peaks', href: '/peaks/' },
+  { name: 'Gear', href: '/gear/' },
+  { name: 'Blog', href: '/blog/' },
+  { name: 'About', href: '/about/' },
 ]
 
 const currentPath = Astro.url.pathname
@@ -78,8 +78,7 @@ const connectLinks = [
     
     <!-- Theme init (prevent flash) -->
     <script is:inline>
-      const theme = localStorage.getItem('theme') || 
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const theme = localStorage.getItem('theme') || 'light';
       document.documentElement.setAttribute('data-theme', theme);
     </script>
   </head>
@@ -137,6 +136,11 @@ const connectLinks = [
       <div class="footer-inner">
         <div class="footer-brand">kylies<em>·</em>photos</div>
         <p>A running record of a life outside.</p>
+        <p class="footer-tech">
+          Built with <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a>
+          on <a href="https://workers.cloudflare.com" target="_blank" rel="noopener noreferrer">Cloudflare Workers</a>,
+          with outings from Notion and photos from photos-api. <a href="https://github.com/kale-stew/climb-log" target="_blank" rel="noopener noreferrer">Source on GitHub.</a>
+        </p>
         <nav class="footer-links" aria-label="Footer navigation">
           {navLinks.map(link => <a href={link.href}>{link.name}</a>)}
           {connectLinks.map(link => (

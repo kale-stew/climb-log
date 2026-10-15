@@ -1,8 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
-import { formatCalendarDate, formatRelativeDate } from '../lib/dates'
-import { getCanonicalPhotos } from '../lib/photos-client'
+import { formatCalendarDate, formatRecentDate } from '../lib/dates'
+import { getCanonicalPhotos, type DisplayPhoto } from '../lib/photos-client'
 import { env } from 'cloudflare:workers'
 
 export const prerender = false
@@ -10,7 +10,8 @@ export const prerender = false
 const DB = env.DB as D1Database | undefined
 
 let recentClimbs: any[] = []
-let heroPhoto: { id: string; title: string | null; area: string | null; state: string | null } | null = null
+let heroPhoto: DisplayPhoto | null = null
+let recentPhotos: DisplayPhoto[] = []
 let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
 
 if (DB) {
@@ -26,6 +27,7 @@ if (DB) {
     await fillMissingPreviewImages(recentClimbs, canonicalPhotos, 800)
 
     heroPhoto = canonicalPhotos[0] ?? null
+    recentPhotos = canonicalPhotos.slice(1, 8)
 
     // Fetch stats
     const statsResult = await DB.prepare(`
@@ -55,99 +57,106 @@ function formatNumber(n: number): string {
 
 function getOutingType(title: string | null): string {
   const match = title?.match(/^(Trail Run|Hike|Climb|Backpack|Ski)\b/i)
-  if (!match) return 'Outing'
-  return match[1].replace(/\b\w/g, letter => letter.toUpperCase())
+  if (!match) return 'outing'
+  return match[1].toLowerCase()
+}
+
+function getOutingTitle(title: string | null): string {
+  return title?.replace(/^(Trail Run|Hike|Climb|Backpack|Ski)\s+/i, '') || 'Untitled outing'
+}
+
+function getPhotoAlt(photo: DisplayPhoto): string {
+  return photo.caption || photo.title || [photo.area, photo.state].filter(Boolean).join(', ') || 'Photo from outside'
 }
 ---
 
 <Layout
   title="Home"
-  description="Photos and notes from the mountains: mostly Colorado, lately anywhere I can get to."
+  description="Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to."
   ogImage="https://kylies.photos/open-graph/home.jpg"
   ogImageAlt="Snow-covered mountains above a forested trail in Colorado"
 >
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-image" style={`background-image: url(${heroPhoto ? `/img/${heroPhoto.id}?w=1600` : '/open-graph/home.jpg'})`}></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Kylie's mountain journal</p>
-      <h1>A little life<br /><em>outside.</em></h1>
-      <p class="hero-subtitle">Photos and notes from the mountains: mostly Colorado, lately anywhere I can get to.</p>
-      <div class="hero-actions">
-        <a href="/photos" class="hero-cta">Explore the photos <span aria-hidden="true">→</span></a>
-        <a href="/climbs" class="hero-link">View the log</a>
-      </div>
-    </div>
+  <figure class="hero-photo">
+    <img
+      src={heroPhoto ? `/img/${heroPhoto.id}?w=1600` : '/open-graph/home.jpg'}
+      alt={heroPhoto ? getPhotoAlt(heroPhoto) : 'Snow-covered mountains above a forested trail in Colorado'}
+    />
     {heroPhoto && (
-      <p class="hero-credit">{heroPhoto.title || 'Latest photo'}{heroPhoto.area && ` · ${heroPhoto.area}`}</p>
+      <figcaption>
+        <span>{heroPhoto.title || heroPhoto.caption || 'Latest photo'}</span>
+        {heroPhoto.area && <span>{heroPhoto.area}{heroPhoto.state && `, ${heroPhoto.state}`}</span>}
+      </figcaption>
     )}
-  </section>
+  </figure>
 
   <div class="container home-content">
-    <!-- Stats -->
-    <section class="home-section" aria-labelledby="stats-heading">
-      <div class="section-heading">
-        <h2 id="stats-heading">By the numbers</h2>
-        <span>Since 2019, a few miles at a time</span>
-      </div>
-      <div class="stats-row">
-      <div class="stat-item">
-        <div class="stat-number">{formatNumber(stats.totalClimbs)}</div>
-        <div class="stat-name">Outings</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">{formatNumber(stats.totalPeaks)}</div>
-        <div class="stat-name">Peaks Summited</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">{formatNumber(stats.totalMiles)}</div>
-        <div class="stat-name">Miles Hiked</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">{formatNumber(stats.totalGain)} ft</div>
-        <div class="stat-name">Elevation Gained</div>
-      </div>
-      </div>
+    <header class="home-intro">
+      <h1>Proof I went <em>outside.</em></h1>
+      <p>Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to.</p>
+      <a href="/photos/">see all the photos <span aria-hidden="true">→</span></a>
+    </header>
+
+    {recentPhotos.length > 0 && (
+      <section class="photo-section" aria-labelledby="photo-heading">
+        <div class="section-heading">
+          <h2 id="photo-heading">A few recent frames</h2>
+          <span>the camera has been getting out more than the log</span>
+        </div>
+        <div class="photo-strip">
+          {recentPhotos.map((photo, index) => (
+            <a href="/photos/" class:list={['photo-strip-item', { wide: index === 0 || index === 5, tall: index === 2 }]}>
+              <img src={`/img/${photo.id}?w=800`} alt={getPhotoAlt(photo)} loading="lazy" />
+              {(photo.title || photo.area) && (
+                <span>{photo.title || photo.area}</span>
+              )}
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="stats-note" aria-label="Journal totals">
+      <p>
+        <em>Since 2019:</em> {formatNumber(stats.totalPeaks)} summits, {formatNumber(stats.totalMiles)} miles,
+        and about {formatNumber(Math.round(stats.totalGain / 1000) * 1000)} feet of uphill
+        <span>(and only 3 ankle surgeries).</span>
+      </p>
     </section>
 
-    <!-- Recent outings -->
-    <section class="home-section">
+    <section class="outing-section">
       <div class="section-heading">
-        <h2>Recent outings</h2>
-        <a href="/climbs">View the log →</a>
+        <h2>From the log</h2>
+        <a href="/climbs/">all {formatNumber(stats.totalClimbs)} outings <span aria-hidden="true">→</span></a>
       </div>
 
       {recentClimbs.length > 0 ? (
-        <div class="climb-card-grid">
+        <div class="outing-list">
           {recentClimbs.slice(0, 3).map((climb) => (
-            <a href={climb.slug ? `/blog/hike/${climb.slug}` : `/climbs?outing=${encodeURIComponent(climb.id)}`} class="climb-card">
-              <div class="climb-card-image">
+            <a href={climb.slug ? `/blog/hike/${climb.slug}/` : `/climbs/?outing=${encodeURIComponent(climb.id)}`} class="outing-entry">
+              <div class="outing-thumb">
                 {climb.preview_img_url ? (
-                  <img 
-                    src={climb.preview_img_url} 
-                    alt={climb.title || 'Climb photo'} 
+                  <img
+                    src={climb.preview_img_url}
+                    alt=""
                     loading="lazy"
-                    onerror="this.style.opacity='0'; this.parentElement.style.background='var(--color-bg-tertiary)'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; this.parentElement.innerHTML='<span style=font-size:14px>🏔️</span>'"
                   />
                 ) : (
-                  <div class="climb-card-image-placeholder">
-                    <span>{getOutingType(climb.title)} · {climb.state || 'On the trail'}</span>
-                  </div>
+                  <span aria-hidden="true">↗</span>
                 )}
               </div>
-              <div class="climb-card-content">
-                <h3>{climb.title || 'Untitled'}</h3>
-                <p class="climb-card-meta">
+              <div class="outing-copy">
+                <p class="outing-tag">{getOutingType(climb.title)}{climb.state && ` · ${climb.state}`}</p>
+                <h3>{getOutingTitle(climb.title)}</h3>
+                <p class="outing-meta">
                   {climb.date && (
                     <time datetime={climb.date} title={formatCalendarDate(climb.date)}>
-                      {formatRelativeDate(climb.date)}
+                      {formatRecentDate(climb.date)}
                     </time>
                   )}
                   {climb.area && ` · ${climb.area}`}
                 </p>
                 {climb.distance && climb.gain && (
-                  <p class="climb-card-stats">
+                  <p class="outing-stats">
                     {climb.distance} mi · {formatNumber(climb.gain)} ft gain
                   </p>
                 )}
@@ -156,275 +165,155 @@ function getOutingType(title: string | null): string {
           ))}
         </div>
       ) : (
-        <p>No outings found. <a href="/climbs">View the log</a></p>
+        <p>No outings found. <a href="/climbs/">View the log</a></p>
       )}
     </section>
   </div>
 
   <style>
-    .hero {
-      position: relative;
-      width: 100%;
+    .hero-photo {
       width: min(calc(100% - 2rem), 1480px);
-      min-height: min(680px, calc(100vh - var(--header-height) - 2rem));
       margin: 1rem auto 0;
-      border-radius: 1.75rem;
-      overflow: hidden;
+    }
+    .hero-photo img {
+      display: block;
+      width: 100%;
+      height: min(72vh, 780px);
+      min-height: 520px;
+      border-radius: 0.5rem;
+      object-fit: cover;
+      filter: saturate(0.9);
+    }
+    .hero-photo figcaption {
       display: flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
-    .hero-image {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      filter: saturate(0.82) contrast(1.05);
-      transform: scale(1.01);
-    }
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 78% 15%, rgba(201,125,87,0.18), transparent 36%),
-        linear-gradient(90deg, rgba(31,24,19,0.82) 0%, rgba(31,24,19,0.48) 52%, rgba(31,24,19,0.12) 100%),
-        linear-gradient(to bottom, rgba(31,24,19,0.05) 52%, rgba(24,20,17,0.78) 100%);
-    }
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      text-align: left;
-      color: white;
-      width: min(760px, calc(100% - 3rem));
-      margin-left: max(1.5rem, calc((100vw - var(--max-width)) / 2 + 1.5rem));
-      padding: 5rem 0 8rem;
-    }
-    .hero-content h1 {
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding: 0.65rem 0.25rem 0;
+      color: var(--color-text-tertiary);
       font-family: var(--font-serif);
-      font-size: clamp(3.2rem, 6vw, 5.8rem);
-      font-weight: 400;
-      letter-spacing: -0.03em;
-      line-height: 0.98;
-      margin: 0 0 var(--space-lg);
-      color: #ffffff;
-      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
-    }
-    .hero-content h1 em,
-    .section-heading h2 em {
-      color: #E2A17E;
-      font-style: italic;
-    }
-    .hero-content .hero-eyebrow {
-      margin-bottom: var(--space-lg);
-      color: #E8C3AA;
-      font-family: var(--font-serif);
-      font-size: 1.05rem;
-      font-style: italic;
-      letter-spacing: 0.02em;
-      text-transform: lowercase;
-    }
-    .hero-content .hero-subtitle {
-      font-size: clamp(1rem, 1.6vw, 1.2rem);
-      max-width: 520px;
-      margin: 0 0 var(--space-xl);
-      color: #ffffff;
-      opacity: 0.78;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.4);
-      text-transform: lowercase;
-    }
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-xl);
-      flex-wrap: wrap;
-    }
-    .hero-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.65rem;
-      padding: 0.8rem 1.5rem;
-      border-radius: 0.85rem;
-      background: #B86E49;
-      color: white;
       font-size: var(--font-size-sm);
-      font-weight: 600;
+      font-style: italic;
     }
-    .hero-cta:hover { text-decoration: none; transform: translateY(-2px); }
-    .hero-link { color: rgba(255,255,255,0.8); font-size: var(--font-size-sm); }
-    .hero-credit {
-      position: absolute;
-      right: var(--space-xl);
-      bottom: var(--space-xl);
-      z-index: 2;
-      margin: 0;
-      color: rgba(255,255,255,0.58);
-      font-size: 0.72rem;
-      letter-spacing: 0.04em;
+    .home-content { max-width: 1180px; padding-bottom: 7rem; }
+    .home-intro { max-width: 880px; padding: 5.5rem 0 4.5rem; }
+    .home-intro h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(3.6rem, 8vw, 7rem);
+      font-weight: 400;
+      letter-spacing: -0.05em;
+      line-height: 0.9;
+      margin: 0 0 1.75rem;
     }
-    .home-content { padding-bottom: 7rem; }
-    .home-section { padding-top: 4.5rem; }
+    .home-intro h1 em { color: var(--color-accent-orange); font-style: italic; }
+    .home-intro p { max-width: 680px; font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.65; }
+    .home-intro a { display: inline-block; margin-top: var(--space-md); font-size: var(--font-size-sm); }
+    .photo-section { padding: 1rem 0 5rem; }
     .section-heading {
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
       gap: var(--space-xl);
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
     .section-heading h2 {
       margin: 0;
-      font-size: clamp(2rem, 3vw, 2.8rem);
+      font-size: clamp(2rem, 4vw, 3.2rem);
       font-weight: 400;
       letter-spacing: -0.03em;
     }
-    .section-heading > span { text-transform: lowercase; }
     .section-heading > span,
     .section-heading > a { color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
     .section-heading > a:hover { color: var(--color-text-accent); }
-
-    .stats-row {
+    .photo-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-      padding: 2rem 0;
-      background: var(--color-bg-secondary);
-      border: 1px solid var(--color-border);
-      border-radius: 1.5rem;
+      grid-auto-rows: 160px;
+      gap: 0.75rem;
     }
-    .stat-item {
-      padding: 0 var(--space-xl);
-      border-right: 1px solid var(--color-border);
-    }
-    .stat-item:last-child { border-right: 0; }
-    .stat-number {
-      font-family: var(--font-serif);
-      font-size: 2.5rem;
-      font-weight: 400;
-      color: var(--color-text-primary);
-      line-height: 1.1;
-      transition: color 0.3s ease;
-    }
-    .stat-name {
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--color-text-tertiary);
-      margin-top: var(--space-xs);
-    }
-
-    .climb-card-grid {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      grid-auto-rows: 210px;
-      gap: 1.25rem;
-    }
-    .climb-card {
-      display: flex;
+    .photo-strip-item {
       position: relative;
-      grid-column: span 4;
+      overflow: hidden;
+      border-radius: 0.35rem;
       background: var(--color-bg-secondary);
-      border-radius: 1.4rem;
-      overflow: hidden;
-      border: 1px solid var(--color-border);
-      text-decoration: none;
-      color: white;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
-    .climb-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
-      border-color: var(--color-border-hover);
-    }
-    .climb-card:first-child { grid-column: span 8; grid-row: span 2; }
-    .climb-card-image {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 75% 20%, rgba(201,125,87,0.2), transparent 40%),
-        linear-gradient(135deg, #332820, #1f1915);
-    }
-    .climb-card-image img {
+    .photo-strip-item.wide { grid-column: span 2; }
+    .photo-strip-item.tall { grid-row: span 2; }
+    .photo-strip-item img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
+      transition: transform 0.5s ease;
     }
-    .climb-card-image::after {
-      content: '';
+    .photo-strip-item:hover img { transform: scale(1.025); }
+    .photo-strip-item span {
       position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.92), transparent 72%);
-    }
-    .climb-card:hover .climb-card-image img {
-      transform: scale(1.05);
-    }
-    .climb-card-image-placeholder {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: var(--space-lg);
-    }
-    .climb-card-image-placeholder span {
-      color: rgba(255,255,255,0.32);
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-    .climb-card-content {
-      position: relative;
-      z-index: 2;
-      align-self: flex-end;
-      width: 100%;
-      padding: var(--space-lg);
-    }
-    .climb-card-content h3 {
-      margin: 0 0 var(--space-sm);
-      font-size: var(--font-size-lg);
-      font-weight: 600;
+      right: 0.6rem;
+      bottom: 0.45rem;
+      left: 0.6rem;
       color: white;
-    }
-    .climb-card-meta {
+      font-family: var(--font-serif);
       font-size: var(--font-size-sm);
-      color: rgba(255,255,255,0.62);
-      margin: 0 0 var(--space-xs);
+      font-style: italic;
+      opacity: 0;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+      transition: opacity 0.2s ease;
     }
-    .climb-card-stats {
-      font-size: var(--font-size-sm);
-      color: rgba(255,255,255,0.78);
-      margin: 0;
+    .photo-strip-item:hover span { opacity: 1; }
+    .stats-note {
+      margin: 0 0 6rem;
+      padding: 2.25rem 0;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .stats-note p { margin: 0; color: var(--color-text-primary); font-family: var(--font-serif); font-size: clamp(1.4rem, 3vw, 2.1rem); }
+    .stats-note p em { color: var(--color-accent); font-weight: 600; }
+    .stats-note p span { color: var(--color-text-tertiary); font-style: italic; }
+    .outing-section { padding-bottom: 2rem; }
+    .outing-list { border-top: 1px solid var(--color-border); }
+    .outing-entry {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+      color: inherit;
+      text-decoration: none;
+    }
+    .outing-entry:hover { text-decoration: none; }
+    .outing-thumb {
+      display: grid;
+      place-items: center;
+      width: 160px;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-radius: 0.35rem;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-tertiary);
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+    }
+    .outing-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .outing-tag { margin: 0 0 0.25rem; color: var(--color-accent); font-size: var(--font-size-xs); text-transform: lowercase; }
+    .outing-copy h3 { margin: 0 0 0.35rem; font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 400; }
+    .outing-entry:hover h3 { color: var(--color-text-accent); }
+    .outing-meta,
+    .outing-stats { margin: 0; color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
+    .outing-stats { margin-top: 0.2rem; }
+
+    @media (hover: none) {
+      .photo-strip-item span { opacity: 1; }
     }
 
     @media (max-width: 768px) {
-      .hero {
-        min-height: 580px;
-      }
-      .hero-content h1 {
-        font-size: clamp(3.2rem, 14vw, 5rem);
-      }
-      .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0;
-      }
-      .stat-number {
-        font-size: 2rem;
-      }
-      .climb-card-grid {
-        grid-template-columns: 1fr;
-        grid-auto-rows: 300px;
-      }
-      .climb-card,
-      .climb-card:first-child { grid-column: span 1; grid-row: span 1; }
+      .hero-photo img { height: 62vh; min-height: 420px; }
+      .hero-photo figcaption { align-items: flex-start; flex-direction: column; gap: 0; }
+      .home-intro { padding: 4rem 0; }
       .section-heading { align-items: flex-start; flex-direction: column; }
-      .hero-content { margin-left: 1.5rem; padding-bottom: 9rem; }
-      .hero-credit { left: 1.5rem; right: auto; }
-      .stat-item { padding: var(--space-lg); }
-      .stat-item:nth-child(2) { border-right: 0; }
-      .stat-item:nth-child(-n+2) { border-bottom: 1px solid var(--color-border); }
+      .photo-strip { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 140px; }
+      .photo-strip-item.wide { grid-column: span 2; }
+      .outing-entry { grid-template-columns: 100px 1fr; gap: var(--space-lg); }
+      .outing-thumb { width: 100px; }
     }
   </style>
 </Layout>

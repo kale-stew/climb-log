@@ -1,4 +1,4 @@
-/* kylies.photos — Global Styles */
+/* kylies.photos global styles */
 
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -398,6 +398,11 @@ select option {
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
+}
+
+.footer .footer-tech {
+  max-width: 700px;
+  font-size: var(--font-size-xs);
 }
 
 .footer-links {

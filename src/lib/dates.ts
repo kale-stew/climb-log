@@ -34,3 +34,14 @@ export function formatRelativeDate(value: string, now = new Date()): string {
 
   return formatter.format(Math.round(days / 365.25), 'year')
 }
+
+/** Use relative time for genuinely recent dates, then switch to a compact date. */
+export function formatRecentDate(value: string, now = new Date()): string {
+  const date = parseCalendarDate(value)
+  const dateUtc = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  const ageInDays = Math.abs(Math.round((nowUtc - dateUtc) / 86_400_000))
+
+  if (ageInDays < 60) return formatRelativeDate(value, now)
+  return formatCalendarDate(value, { month: 'short', day: 'numeric' })
+}

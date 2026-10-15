@@ -39,19 +39,6 @@ const podcasts = [
       </section>
 
       <section>
-        <h2>About this site</h2>
-        <p>
-          This site is built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
-          and runs on <a href="https://workers.cloudflare.com" target="_blank" rel="noopener">Cloudflare Workers</a>.
-          Data is stored in <a href="https://developers.cloudflare.com/d1" target="_blank" rel="noopener">D1</a>
-          (Cloudflare's SQLite database) and managed from my Notion databases.
-        </p>
-        <p>
-          The source code is available on <a href="https://github.com/kale-stew/climb-log" target="_blank" rel="noopener">GitHub</a>.
-        </p>
-      </section>
-
-      <section>
         <h2>Podcasts</h2>
         <ul class="podcasts-list">
           {podcasts.map((podcast) => (
@@ -69,6 +56,9 @@ const podcasts = [
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 style="border: 0; border-radius: 12px; margin-top: 1rem;"
               />
+              <a class="spotify-fallback" href={podcast.embedHref.replace('/embed', '')} target="_blank" rel="noopener noreferrer">
+                Listen on Spotify
+              </a>
             </li>
           ))}
         </ul>
@@ -125,6 +115,12 @@ const podcasts = [
 
     .podcasts-list iframe {
       display: block;
+    }
+
+    .spotify-fallback {
+      display: inline-block;
+      margin-top: var(--space-sm);
+      font-size: var(--font-size-sm);
     }
   </style>
 </Layout>
