@@ -24,7 +24,7 @@ const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
     </header>
 
     <PhotoGallery client:load photos={photos} apiOrigin={env.PHOTOS_API_ORIGIN} />
-    <noscript><p>The latest 24 photos are shown above. Turn on JavaScript to search and load more.</p></noscript>
+    <noscript><p>The latest 50 photos are shown above. Turn on JavaScript to search and load more.</p></noscript>
   </div>
 
   <style>

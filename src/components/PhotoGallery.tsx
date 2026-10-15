@@ -46,7 +46,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const [isLoading, setIsLoading] = useState(initialPhotos.length === 0 && Boolean(apiOrigin))
   const [lightbox, setLightbox] = useState<{ photoIds: string[]; index: number } | null>(null)
   const [filter, setFilter] = useState('')
-  const [visibleCount, setVisibleCount] = useState(24)
+  const [visibleCount, setVisibleCount] = useState(50)
   const [gridZoom, setGridZoom] = useState(2)
   const pinchStartDistance = useRef<number | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
@@ -113,15 +113,20 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const closeLightbox = useCallback(() => setLightbox(null), [])
 
   const goNext = useCallback(() => {
-    setLightbox(current => current
-      ? { ...current, index: (current.index + 1) % current.photoIds.length }
-      : null)
+    setLightbox(current =>
+      current ? { ...current, index: (current.index + 1) % current.photoIds.length } : null,
+    )
   }, [])
 
   const goPrev = useCallback(() => {
-    setLightbox(current => current
-      ? { ...current, index: (current.index - 1 + current.photoIds.length) % current.photoIds.length }
-      : null)
+    setLightbox(current =>
+      current
+        ? {
+            ...current,
+            index: (current.index - 1 + current.photoIds.length) % current.photoIds.length,
+          }
+        : null,
+    )
   }, [])
 
   // Keyboard navigation
@@ -173,7 +178,9 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   }, [lightbox, photos])
 
   const currentPhotoId = lightbox?.photoIds[lightbox.index]
-  const currentPhoto = currentPhotoId ? photos.find(photo => photo.id === currentPhotoId) || null : null
+  const currentPhoto = currentPhotoId
+    ? photos.find(photo => photo.id === currentPhotoId) || null
+    : null
   const visiblePhotos = filteredPhotos.slice(0, visibleCount)
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
@@ -215,7 +222,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
             },
             { transform: 'none', transformOrigin: 'top left' },
           ],
-          { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' },
+          { duration: 220, easing: 'cubic-bezier(.22, 1, .36, 1)' },
         )
       }
     }
@@ -244,7 +251,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           value={filter}
           onChange={e => {
             setFilter(e.target.value)
-            setVisibleCount(24)
+            setVisibleCount(50)
           }}
         />
         <div className="gallery-status">
@@ -315,6 +322,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
               src={getImageUrl(photo, 'thumb')}
               alt=""
               loading="lazy"
+              width={photo.width ?? 800}
+              height={photo.height ?? 600}
               onError={e => {
                 // If image fails to load, hide it to show the background/accent color
                 e.currentTarget.style.display = 'none'
@@ -340,7 +349,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           <button
             type="button"
             className="load-more"
-            onClick={() => setVisibleCount(count => count + 60)}
+            onClick={() => setVisibleCount(count => count + 50)}
           >
             Load more photos
           </button>
@@ -436,6 +445,14 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           gap: var(--photo-gap);
         }
 
+        .photo-grid[data-grid-zoom='2'],
+        .photo-grid[data-grid-zoom='3'],
+        .photo-grid[data-grid-zoom='4'] {
+          display: block;
+          columns: var(--photo-min-width);
+          column-gap: var(--photo-gap);
+        }
+
         .gallery-tools {
           display: flex;
           align-items: flex-end;
@@ -503,7 +520,18 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
         .photo-item:hover { transform: translateY(-4px); border-color: var(--color-border-hover); }
 
         .photo-grid[data-grid-zoom='3'] .photo-item,
-        .photo-grid[data-grid-zoom='4'] .photo-item { aspect-ratio: 4 / 3; }
+        .photo-grid[data-grid-zoom='4'] .photo-item,
+        .photo-grid[data-grid-zoom='2'] .photo-item {
+          display: block;
+          width: 100%;
+          aspect-ratio: auto;
+          break-inside: avoid;
+          margin-bottom: var(--photo-gap);
+        }
+
+        .photo-grid[data-grid-zoom='2'] .photo-item img,
+        .photo-grid[data-grid-zoom='3'] .photo-item img,
+        .photo-grid[data-grid-zoom='4'] .photo-item img { height: auto; }
 
         .photo-grid[data-grid-zoom='0'] .photo-item,
         .photo-grid[data-grid-zoom='1'] .photo-item {
