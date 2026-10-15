@@ -18,7 +18,7 @@ const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
       <span>Mountains, weather, friends, and the small things worth remembering.</span>
     </header>
 
-    <PhotoGallery client:only="react" photos={photos} />
+    <PhotoGallery client:only="react" photos={photos} apiOrigin={env.PHOTOS_API_ORIGIN} />
   </div>
 
   <style>

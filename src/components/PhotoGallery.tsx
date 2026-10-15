@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { formatCalendarDate, parseCalendarDate } from '../lib/dates'
+import { getCanonicalPhotos } from '../lib/photos-client'
 
 interface Photo {
   id: string
@@ -21,12 +22,29 @@ interface Photo {
 
 interface PhotoGalleryProps {
   photos: Photo[]
+  apiOrigin?: string
 }
 
-export default function PhotoGallery({ photos }: PhotoGalleryProps) {
+export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
+  const [photos, setPhotos] = useState(initialPhotos)
+  const [isLoading, setIsLoading] = useState(initialPhotos.length === 0 && Boolean(apiOrigin))
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [filter, setFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(60)
+
+  useEffect(() => {
+    if (initialPhotos.length > 0 || !apiOrigin) return
+
+    let active = true
+    getCanonicalPhotos(apiOrigin, { limit: 500, ttlMs: 0 })
+      .then(canonicalPhotos => {
+        if (active) setPhotos(canonicalPhotos)
+      })
+      .finally(() => {
+        if (active) setIsLoading(false)
+      })
+    return () => { active = false }
+  }, [apiOrigin, initialPhotos.length])
 
   const filteredPhotos = filter
     ? photos.filter(p => {
@@ -152,8 +170,10 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
-        <p>
-          Showing {Math.min(visibleCount, filteredPhotos.length)} of {filteredPhotos.length} photos
+        <p aria-live="polite">
+          {isLoading
+            ? 'Loading photos…'
+            : `Showing ${Math.min(visibleCount, filteredPhotos.length)} of ${filteredPhotos.length} photos`}
         </p>
       </div>
 

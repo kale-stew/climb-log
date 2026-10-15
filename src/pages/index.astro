@@ -57,7 +57,7 @@ function formatNumber(n: number): string {
 <Layout title="Home" description="Kylie's climbing and hiking adventures in Colorado and beyond." ogImage="https://kylies.photos/open-graph/home.jpg">
   <!-- Hero -->
   <section class="hero">
-    <div class="hero-image" style={heroPhoto ? `background-image: url(/img/${heroPhoto.id}?w=1600)` : undefined}></div>
+    <div class="hero-image" style={`background-image: url(${heroPhoto ? `/img/${heroPhoto.id}?w=1600` : '/open-graph/home.jpg'})`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <p class="hero-eyebrow">Kylie's trail journal</p>
