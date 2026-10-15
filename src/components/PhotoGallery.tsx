@@ -104,6 +104,19 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
     }
   }, [lightboxIndex])
 
+  useEffect(() => {
+    if (lightboxIndex === null || filteredPhotos.length < 2) return
+
+    const adjacent = [
+      filteredPhotos[(lightboxIndex - 1 + filteredPhotos.length) % filteredPhotos.length],
+      filteredPhotos[(lightboxIndex + 1) % filteredPhotos.length],
+    ]
+    adjacent.forEach(photo => {
+      const image = new Image()
+      image.src = getImageUrl(photo, 'full')
+    })
+  }, [lightboxIndex, filteredPhotos])
+
   const currentPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null
   const visiblePhotos = filteredPhotos.slice(0, visibleCount)
 
@@ -204,6 +217,8 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
 
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <img
+              key={currentPhoto.id}
+              className="lightbox-image"
               src={getImageUrl(currentPhoto, 'full')}
               alt={currentPhoto.caption || 'Photo'}
             />
@@ -394,6 +409,19 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           max-width: 100%;
           max-height: 75vh;
           object-fit: contain;
+        }
+
+        .lightbox-image {
+          animation: lightbox-reveal 320ms cubic-bezier(.22,1,.36,1) both;
+        }
+
+        @keyframes lightbox-reveal {
+          from { opacity: 0; transform: scale(0.985); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .lightbox-image { animation: none; }
         }
 
         .lightbox-info {
