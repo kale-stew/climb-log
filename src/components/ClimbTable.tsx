@@ -1,4 +1,4 @@
-import { useState, useMemo, type SyntheticEvent } from 'react'
+import { type SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import { formatCalendarDate } from '../lib/dates'
 
 interface Climb {
@@ -33,6 +33,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
   const [useMetric, setUseMetric] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(initialPageSize)
+  const [selectedOutingId, setSelectedOutingId] = useState<string | null>(null)
 
   // Get unique areas and states for filters
   const areas = useMemo(() => {
@@ -52,10 +53,11 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      result = result.filter(c => 
-        c.title?.toLowerCase().includes(query) ||
-        c.area?.toLowerCase().includes(query) ||
-        c.state?.toLowerCase().includes(query)
+      result = result.filter(
+        c =>
+          c.title?.toLowerCase().includes(query) ||
+          c.area?.toLowerCase().includes(query) ||
+          c.state?.toLowerCase().includes(query),
       )
     }
 
@@ -71,19 +73,20 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
 
     // Sort
     result.sort((a, b) => {
-      let aVal: any = a[sortField]
-      let bVal: any = b[sortField]
+      const aVal = a[sortField]
+      const bVal = b[sortField]
 
-      if (aVal === null) aVal = sortOrder === 'asc' ? Infinity : -Infinity
-      if (bVal === null) bVal = sortOrder === 'asc' ? Infinity : -Infinity
+      if (aVal === null && bVal === null) return 0
+      if (aVal === null) return 1
+      if (bVal === null) return -1
 
       if (typeof aVal === 'string') {
-        return sortOrder === 'asc' 
-          ? aVal.localeCompare(bVal) 
-          : bVal.localeCompare(aVal)
+        return sortOrder === 'asc'
+          ? aVal.localeCompare(String(bVal))
+          : String(bVal).localeCompare(aVal)
       }
 
-      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal
+      return sortOrder === 'asc' ? aVal - Number(bVal) : Number(bVal) - aVal
     })
 
     return result
@@ -96,6 +99,17 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
     return filteredClimbs.slice(start, start + pageSize)
   }, [filteredClimbs, currentPage, pageSize])
 
+  useEffect(() => {
+    const outingId = new URLSearchParams(window.location.search).get('outing')
+    if (!outingId) return
+
+    const index = filteredClimbs.findIndex(climb => climb.id === outingId)
+    if (index === -1) return
+
+    setSelectedOutingId(outingId)
+    setCurrentPage(Math.floor(index / pageSize) + 1)
+  }, [filteredClimbs, pageSize])
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
@@ -103,6 +117,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
       setSortField(field)
       setSortOrder('desc')
     }
+    setCurrentPage(1)
   }
 
   const formatDistance = (miles: number | null) => {
@@ -114,7 +129,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
   const formatGain = (feet: number | null) => {
     if (feet === null) return '-'
     if (useMetric) return `${Math.round(feet * 0.3048).toLocaleString()} m`
-    return `${feet.toLocaleString()}'`
+    return `${feet.toLocaleString()} ft`
   }
 
   const formatDate = (dateStr: string | null) => {
@@ -138,33 +153,47 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
       <div className="filter-bar" style={{ marginBottom: '1rem' }}>
         <input
           type="text"
-          placeholder="Search climbs..."
+          placeholder="Search outings..."
           value={searchQuery}
-          onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
+          onChange={e => {
+            setSearchQuery(e.target.value)
+            setCurrentPage(1)
+          }}
           style={{ minWidth: '200px' }}
         />
-        
-        <select 
-          value={areaFilter} 
-          onChange={(e) => { setAreaFilter(e.target.value); setCurrentPage(1) }}
+
+        <select
+          value={areaFilter}
+          onChange={e => {
+            setAreaFilter(e.target.value)
+            setCurrentPage(1)
+          }}
         >
           <option value="">All Areas</option>
           {areas.map(area => (
-            <option key={area} value={area}>{area}</option>
+            <option key={area} value={area}>
+              {area}
+            </option>
           ))}
         </select>
 
-        <select 
-          value={stateFilter} 
-          onChange={(e) => { setStateFilter(e.target.value); setCurrentPage(1) }}
+        <select
+          value={stateFilter}
+          onChange={e => {
+            setStateFilter(e.target.value)
+            setCurrentPage(1)
+          }}
         >
           <option value="">All States</option>
           {states.map(state => (
-            <option key={state} value={state}>{state}</option>
+            <option key={state} value={state}>
+              {state}
+            </option>
           ))}
         </select>
 
-        <button 
+        <button
+          type="button"
           onClick={() => setUseMetric(!useMetric)}
           className={useMetric ? 'filter-btn active' : 'filter-btn'}
         >
@@ -172,19 +201,41 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
         </button>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+        }}
+      >
         <p style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', margin: 0 }}>
-          Showing {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, filteredClimbs.length)} of {filteredClimbs.length} climbs
+          Showing {filteredClimbs.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}-
+          {Math.min(currentPage * pageSize, filteredClimbs.length)} of {filteredClimbs.length}{' '}
+          outings
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)' }}>Per page:</label>
-          <select 
-            value={pageSize} 
-            onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }}
+          <label
+            htmlFor="outings-page-size"
+            style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)' }}
+          >
+            Per page:
+          </label>
+          <select
+            id="outings-page-size"
+            value={pageSize}
+            onChange={e => {
+              setPageSize(Number(e.target.value))
+              setCurrentPage(1)
+            }}
             style={{ width: 'auto' }}
           >
             {PAGE_SIZE_OPTIONS.map(size => (
-              <option key={size} value={size}>{size}</option>
+              <option key={size} value={size}>
+                {size}
+              </option>
             ))}
           </select>
         </div>
@@ -193,8 +244,17 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
       {/* Empty state */}
       {filteredClimbs.length === 0 && (
         <div className="empty-state">
-          <p>No climbs match your filters.</p>
-          <button onClick={() => { setSearchQuery(''); setAreaFilter(''); setStateFilter(''); setCurrentPage(1) }} className="btn">
+          <p>No outings match your filters.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery('')
+              setAreaFilter('')
+              setStateFilter('')
+              setCurrentPage(1)
+            }}
+            className="btn"
+          >
             Clear filters
           </button>
         </div>
@@ -208,32 +268,58 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
               <thead>
                 <tr>
                   <th style={{ width: '80px' }}>Photo</th>
-                  <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }} aria-label={`Sort by date, currently ${sortField === 'date' ? sortOrder : 'unsorted'}`}>
+                  <th
+                    onClick={() => handleSort('date')}
+                    style={{ cursor: 'pointer' }}
+                    aria-label={`Sort by date, currently ${sortField === 'date' ? sortOrder : 'unsorted'}`}
+                  >
                     Date <SortIcon field="date" />
                   </th>
-                  <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }} aria-label={`Sort by title, currently ${sortField === 'title' ? sortOrder : 'unsorted'}`}>
-                    Hike <SortIcon field="title" />
+                  <th
+                    onClick={() => handleSort('title')}
+                    style={{ cursor: 'pointer' }}
+                    aria-label={`Sort by title, currently ${sortField === 'title' ? sortOrder : 'unsorted'}`}
+                  >
+                    Outing <SortIcon field="title" />
                   </th>
-                  <th onClick={() => handleSort('area')} style={{ cursor: 'pointer' }} aria-label={`Sort by area, currently ${sortField === 'area' ? sortOrder : 'unsorted'}`}>
+                  <th
+                    onClick={() => handleSort('area')}
+                    style={{ cursor: 'pointer' }}
+                    aria-label={`Sort by area, currently ${sortField === 'area' ? sortOrder : 'unsorted'}`}
+                  >
                     Area <SortIcon field="area" />
                   </th>
-                  <th onClick={() => handleSort('distance')} style={{ cursor: 'pointer', textAlign: 'right' }} aria-label={`Sort by distance, currently ${sortField === 'distance' ? sortOrder : 'unsorted'}`}>
+                  <th
+                    onClick={() => handleSort('distance')}
+                    style={{ cursor: 'pointer', textAlign: 'right' }}
+                    aria-label={`Sort by distance, currently ${sortField === 'distance' ? sortOrder : 'unsorted'}`}
+                  >
                     Distance <SortIcon field="distance" />
                   </th>
-                  <th onClick={() => handleSort('gain')} style={{ cursor: 'pointer', textAlign: 'right' }} aria-label={`Sort by gain, currently ${sortField === 'gain' ? sortOrder : 'unsorted'}`}>
+                  <th
+                    onClick={() => handleSort('gain')}
+                    style={{ cursor: 'pointer', textAlign: 'right' }}
+                    aria-label={`Sort by gain, currently ${sortField === 'gain' ? sortOrder : 'unsorted'}`}
+                  >
                     Gain <SortIcon field="gain" />
                   </th>
                   <th style={{ textAlign: 'center' }}>Links</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedClimbs.map((climb) => (
-                  <tr key={climb.id}>
+                {paginatedClimbs.map(climb => (
+                  <tr
+                    key={climb.id}
+                    className={selectedOutingId === climb.id ? 'outing-highlight' : undefined}
+                  >
                     <td>
                       {climb.preview_img_url ? (
                         <div className="climb-thumb-link">
                           {climb.slug ? (
-                            <a href={`/blog/hike/${climb.slug}`} aria-label={climb.title || 'View climb'}>
+                            <a
+                              href={`/blog/hike/${climb.slug}`}
+                              aria-label={climb.title || 'View climb'}
+                            >
                               <img
                                 src={climb.preview_img_url}
                                 alt=""
@@ -266,13 +352,20 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                     </td>
                     <td>
                       {climb.area}
-                      {climb.state && <span style={{ color: 'var(--color-text-tertiary)' }}>, {climb.state}</span>}
+                      {climb.state && (
+                        <span style={{ color: 'var(--color-text-tertiary)' }}>, {climb.state}</span>
+                      )}
                     </td>
                     <td style={{ textAlign: 'right' }}>{formatDistance(climb.distance)}</td>
                     <td style={{ textAlign: 'right' }}>{formatGain(climb.gain)}</td>
                     <td style={{ textAlign: 'center' }}>
                       {climb.strava && (
-                        <a href={climb.strava} target="_blank" rel="noopener noreferrer" title="View on Strava">
+                        <a
+                          href={climb.strava}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="View on Strava"
+                        >
                           🏃
                         </a>
                       )}
@@ -285,12 +378,22 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
 
           {/* Mobile Cards */}
           <div className="mobile-only">
-            {paginatedClimbs.map((climb) => (
-              <div className="climb-mobile-card" key={climb.id}>
+            {paginatedClimbs.map(climb => (
+              <div
+                className={`climb-mobile-card ${selectedOutingId === climb.id ? 'outing-highlight' : ''}`}
+                key={climb.id}
+              >
                 <div className="climb-mobile-header">
                   <span className="climb-mobile-date">{formatDate(climb.date)}</span>
                   {climb.strava && (
-                    <a href={climb.strava} target="_blank" rel="noopener noreferrer" title="View on Strava">🏃</a>
+                    <a
+                      href={climb.strava}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="View on Strava"
+                    >
+                      🏃
+                    </a>
                   )}
                 </div>
                 <h3 className="climb-mobile-title">
@@ -301,7 +404,12 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                   )}
                 </h3>
                 <div className="climb-mobile-meta">
-                  {climb.area && <span>{climb.area}{climb.state && `, ${climb.state}`}</span>}
+                  {climb.area && (
+                    <span>
+                      {climb.area}
+                      {climb.state && `, ${climb.state}`}
+                    </span>
+                  )}
                 </div>
                 <div className="climb-mobile-stats">
                   <span>{formatDistance(climb.distance)}</span>
@@ -315,31 +423,36 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="pagination" style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          gap: '0.5rem', 
-          marginTop: '1.5rem',
-          flexWrap: 'wrap'
-        }}>
-          <button 
-            onClick={() => setCurrentPage(1)} 
+        <div
+          className="pagination"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '0.5rem',
+            marginTop: '1.5rem',
+            flexWrap: 'wrap',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             className="pagination-btn"
             title="First page"
           >
             ««
           </button>
-          <button 
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+          <button
+            type="button"
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             className="pagination-btn"
             title="Previous page"
           >
             «
           </button>
-          
+
           {/* Page numbers */}
           {Array.from({ length: totalPages }, (_, i) => i + 1)
             .filter(page => {
@@ -348,39 +461,47 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
               if (Math.abs(page - currentPage) <= 2) return true
               return false
             })
-            .reduce((acc: (number | string)[], page, idx, arr) => {
+            .reduce((acc: { key: string; page: number | null }[], page, idx, arr) => {
               // Add ellipsis between non-consecutive pages
-              if (idx > 0 && typeof arr[idx - 1] === 'number' && page - (arr[idx - 1] as number) > 1) {
-                acc.push('...')
+              if (
+                idx > 0 &&
+                typeof arr[idx - 1] === 'number' &&
+                page - (arr[idx - 1] as number) > 1
+              ) {
+                acc.push({ key: `ellipsis-after-${arr[idx - 1]}`, page: null })
               }
-              acc.push(page)
+              acc.push({ key: `page-${page}`, page })
               return acc
             }, [])
-            .map((item, idx) => (
-              typeof item === 'string' ? (
-                <span key={`ellipsis-${idx}`} style={{ color: 'var(--color-text-tertiary)' }}>...</span>
+            .map(item =>
+              item.page === null ? (
+                <span key={item.key} style={{ color: 'var(--color-text-tertiary)' }}>
+                  ...
+                </span>
               ) : (
                 <button
-                  key={item}
-                  onClick={() => setCurrentPage(item)}
-                  className={`pagination-btn ${currentPage === item ? 'active' : ''}`}
+                  type="button"
+                  key={item.key}
+                  onClick={() => item.page !== null && setCurrentPage(item.page)}
+                  className={`pagination-btn ${currentPage === item.page ? 'active' : ''}`}
                 >
-                  {item}
+                  {item.page}
                 </button>
-              )
-            ))
-          }
-          
-          <button 
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+              ),
+            )}
+
+          <button
+            type="button"
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             className="pagination-btn"
             title="Next page"
           >
             »
           </button>
-          <button 
-            onClick={() => setCurrentPage(totalPages)} 
+          <button
+            type="button"
+            onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}
             className="pagination-btn"
             title="Last page"
@@ -398,6 +519,11 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
         }
         .empty-state p {
           margin-bottom: var(--space-md);
+        }
+
+        .outing-highlight {
+          outline: 3px solid var(--color-text-accent);
+          outline-offset: -3px;
         }
 
         .desktop-only {

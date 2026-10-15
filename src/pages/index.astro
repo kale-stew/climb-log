@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
-import { formatCalendarDate } from '../lib/dates'
+import { formatCalendarDate, formatRelativeDate } from '../lib/dates'
 import { getCanonicalPhotos } from '../lib/photos-client'
 import { env } from 'cloudflare:workers'
 
@@ -52,20 +52,31 @@ if (DB) {
 function formatNumber(n: number): string {
   return n.toLocaleString()
 }
+
+function getOutingType(title: string | null): string {
+  const match = title?.match(/^(Trail Run|Hike|Climb|Backpack|Ski)\b/i)
+  if (!match) return 'Outing'
+  return match[1].replace(/\b\w/g, letter => letter.toUpperCase())
+}
 ---
 
-<Layout title="Home" description="Kylie's climbing and hiking adventures in Colorado and beyond." ogImage="https://kylies.photos/open-graph/home.jpg">
+<Layout
+  title="Home"
+  description="Photos and notes from the mountains: mostly Colorado, lately anywhere I can get to."
+  ogImage="https://kylies.photos/open-graph/home.jpg"
+  ogImageAlt="Snow-covered mountains above a forested trail in Colorado"
+>
   <!-- Hero -->
   <section class="hero">
     <div class="hero-image" style={`background-image: url(${heroPhoto ? `/img/${heroPhoto.id}?w=1600` : '/open-graph/home.jpg'})`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">Kylie's trail journal</p>
+      <p class="hero-eyebrow">Kylie's mountain journal</p>
       <h1>A little life<br /><em>outside.</em></h1>
-      <p class="hero-subtitle">Photos, stories, and trail notes from Colorado and wherever the road wanders next.</p>
+      <p class="hero-subtitle">Photos and notes from the mountains: mostly Colorado, lately anywhere I can get to.</p>
       <div class="hero-actions">
         <a href="/photos" class="hero-cta">Explore the photos <span aria-hidden="true">→</span></a>
-        <a href="/climbs" class="hero-link">View the climb log</a>
+        <a href="/climbs" class="hero-link">View the log</a>
       </div>
     </div>
     {heroPhoto && (
@@ -77,13 +88,13 @@ function formatNumber(n: number): string {
     <!-- Stats -->
     <section class="home-section" aria-labelledby="stats-heading">
       <div class="section-heading">
-        <h2 id="stats-heading">By the trail numbers</h2>
-        <span>A few miles at a time</span>
+        <h2 id="stats-heading">By the numbers</h2>
+        <span>Since 2019, a few miles at a time</span>
       </div>
       <div class="stats-row">
       <div class="stat-item">
         <div class="stat-number">{formatNumber(stats.totalClimbs)}</div>
-        <div class="stat-name">Climbs</div>
+        <div class="stat-name">Outings</div>
       </div>
       <div class="stat-item">
         <div class="stat-number">{formatNumber(stats.totalPeaks)}</div>
@@ -94,23 +105,23 @@ function formatNumber(n: number): string {
         <div class="stat-name">Miles Hiked</div>
       </div>
       <div class="stat-item">
-        <div class="stat-number">{formatNumber(stats.totalGain)}'</div>
+        <div class="stat-number">{formatNumber(stats.totalGain)} ft</div>
         <div class="stat-name">Elevation Gained</div>
       </div>
       </div>
     </section>
 
-    <!-- Recent Climbs -->
+    <!-- Recent outings -->
     <section class="home-section">
       <div class="section-heading">
-        <h2>Lately on the trail</h2>
-        <a href="/climbs">View all climbs →</a>
+        <h2>Recent outings</h2>
+        <a href="/climbs">View the log →</a>
       </div>
 
       {recentClimbs.length > 0 ? (
         <div class="climb-card-grid">
           {recentClimbs.slice(0, 3).map((climb) => (
-            <a href={climb.slug ? `/blog/hike/${climb.slug}` : '/climbs'} class="climb-card">
+            <a href={climb.slug ? `/blog/hike/${climb.slug}` : `/climbs?outing=${encodeURIComponent(climb.id)}`} class="climb-card">
               <div class="climb-card-image">
                 {climb.preview_img_url ? (
                   <img 
@@ -121,19 +132,23 @@ function formatNumber(n: number): string {
                   />
                 ) : (
                   <div class="climb-card-image-placeholder">
-                    <span>Field log · {climb.state || 'On the trail'}</span>
+                    <span>{getOutingType(climb.title)} · {climb.state || 'On the trail'}</span>
                   </div>
                 )}
               </div>
               <div class="climb-card-content">
                 <h3>{climb.title || 'Untitled'}</h3>
                 <p class="climb-card-meta">
-                  {climb.date && formatCalendarDate(climb.date)}
+                  {climb.date && (
+                    <time datetime={climb.date} title={formatCalendarDate(climb.date)}>
+                      {formatRelativeDate(climb.date)}
+                    </time>
+                  )}
                   {climb.area && ` · ${climb.area}`}
                 </p>
                 {climb.distance && climb.gain && (
                   <p class="climb-card-stats">
-                    {climb.distance} mi · {formatNumber(climb.gain)}' gain
+                    {climb.distance} mi · {formatNumber(climb.gain)} ft gain
                   </p>
                 )}
               </div>
@@ -141,7 +156,7 @@ function formatNumber(n: number): string {
           ))}
         </div>
       ) : (
-        <p>No climbs found. <a href="/climbs">View climb log</a></p>
+        <p>No outings found. <a href="/climbs">View the log</a></p>
       )}
     </section>
   </div>
@@ -206,6 +221,7 @@ function formatNumber(n: number): string {
       font-size: 1.05rem;
       font-style: italic;
       letter-spacing: 0.02em;
+      text-transform: lowercase;
     }
     .hero-content .hero-subtitle {
       font-size: clamp(1rem, 1.6vw, 1.2rem);
@@ -214,6 +230,7 @@ function formatNumber(n: number): string {
       color: #ffffff;
       opacity: 0.78;
       text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+      text-transform: lowercase;
     }
     .hero-actions {
       display: flex;
@@ -259,6 +276,7 @@ function formatNumber(n: number): string {
       font-weight: 400;
       letter-spacing: -0.03em;
     }
+    .section-heading > span { text-transform: lowercase; }
     .section-heading > span,
     .section-heading > a { color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
     .section-heading > a:hover { color: var(--color-text-accent); }

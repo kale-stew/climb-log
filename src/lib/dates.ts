@@ -11,7 +11,26 @@ export function parseCalendarDate(value: string): Date {
 
 export function formatCalendarDate(
   value: string,
-  options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }
+  options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' },
 ): string {
   return parseCalendarDate(value).toLocaleDateString('en-US', options)
+}
+
+/** Format a date-only value as a friendly age, such as "8 months ago". */
+export function formatRelativeDate(value: string, now = new Date()): string {
+  const date = parseCalendarDate(value)
+  const dateUtc = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  const days = Math.round((dateUtc - nowUtc) / 86_400_000)
+  const formatter = new Intl.RelativeTimeFormat('en-US', { numeric: 'auto' })
+
+  if (Math.abs(days) < 7) return formatter.format(days, 'day')
+
+  const weeks = Math.round(days / 7)
+  if (Math.abs(days) < 60) return formatter.format(weeks, 'week')
+
+  const months = Math.round(days / 30.4375)
+  if (Math.abs(days) < 365) return formatter.format(months, 'month')
+
+  return formatter.format(Math.round(days / 365.25), 'year')
 }

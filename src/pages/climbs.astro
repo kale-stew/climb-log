@@ -28,13 +28,19 @@ if (DB) {
 }
 ---
 
-<Layout title="Climb Log" description="A log of all my hikes and climbs." ogImage="https://kylies.photos/open-graph/climb-log.jpg">
+<Layout
+  title="Log"
+  description="A searchable log of my hikes, climbs, trail runs, and other mountain outings since 2019."
+  ogImage="https://kylies.photos/open-graph/climb-log.jpg"
+  ogImageAlt="A hiker crossing a snowy slope above Colorado's mountain ranges"
+>
   <div class="container page">
-    <h1>Climb Log</h1>
-    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
-      A complete log of my hikes and climbs. Click on column headers to sort, use filters to narrow down.
+    <h1>Log</h1>
+    <p class="page-subtitle" style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+      A complete log of my hikes and climbs. Search, filter, and sort to explore the list.
     </p>
 
     <ClimbTable client:load climbs={climbs} />
+    <noscript><p>The first 50 outings are shown above. Turn on JavaScript to search, sort, and browse the rest.</p></noscript>
   </div>
 </Layout>
