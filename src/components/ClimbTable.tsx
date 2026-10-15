@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, type SyntheticEvent } from 'react'
+import { formatCalendarDate } from '../lib/dates'
 
 interface Climb {
   id: string
@@ -118,8 +119,12 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '-'
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    return formatCalendarDate(dateStr)
+  }
+
+  const handleThumbnailError = (event: SyntheticEvent<HTMLImageElement>) => {
+    event.currentTarget.hidden = true
+    event.currentTarget.closest('.climb-thumb-link')?.classList.add('is-missing')
   }
 
   const SortIcon = ({ field }: { field: SortField }) => {
@@ -226,23 +231,27 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                   <tr key={climb.id}>
                     <td>
                       {climb.preview_img_url ? (
-                        <a href={climb.slug ? `/blog/hike/${climb.slug}` : '#'} className="climb-thumb-link">
-                          <img 
-                            src={climb.preview_img_url} 
-                            alt={climb.title || ''}
-                            className="climb-thumb"
-                            loading="lazy"
-                            onError={(e) => {
-                              const el = e.target as HTMLImageElement
-                              el.style.opacity = '0'
-                              el.parentElement!.style.background = 'var(--color-bg-tertiary)'
-                              el.parentElement!.style.display = 'flex'
-                              el.parentElement!.style.alignItems = 'center'
-                              el.parentElement!.style.justifyContent = 'center'
-                              el.parentElement!.innerHTML = '<span style="font-size: 10px; color: var(--color-text-tertiary)">📷</span>'
-                            }}
-                          />
-                        </a>
+                        <div className="climb-thumb-link">
+                          {climb.slug ? (
+                            <a href={`/blog/hike/${climb.slug}`} aria-label={climb.title || 'View climb'}>
+                              <img
+                                src={climb.preview_img_url}
+                                alt=""
+                                className="climb-thumb"
+                                loading="lazy"
+                                onError={handleThumbnailError}
+                              />
+                            </a>
+                          ) : (
+                            <img
+                              src={climb.preview_img_url}
+                              alt=""
+                              className="climb-thumb"
+                              loading="lazy"
+                              onError={handleThumbnailError}
+                            />
+                          )}
+                        </div>
                       ) : (
                         <div className="climb-thumb-placeholder" />
                       )}
@@ -446,6 +455,14 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           border-radius: var(--border-radius);
           overflow: hidden;
           background: var(--color-bg-secondary);
+        }
+        .climb-thumb-link.is-missing {
+          display: grid;
+          place-items: center;
+        }
+        .climb-thumb-link.is-missing::after {
+          content: '📷';
+          font-size: 10px;
         }
         .climb-thumb {
           width: 100%;

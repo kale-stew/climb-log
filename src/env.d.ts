@@ -11,6 +11,7 @@ export interface CloudflareEnv {
   R2_IMAGES: R2Bucket
   IMAGES: ImagesBinding
   ALLOWED_WIDTHS: string
+  PHOTOS_API_ORIGIN: string
 }
 
 declare global {

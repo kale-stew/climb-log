@@ -27,7 +27,8 @@
     "binding": "IMAGES"
   },
   "vars": {
-    "ALLOWED_WIDTHS": "200,400,800,1600"
+    "ALLOWED_WIDTHS": "200,400,800,1600",
+    "PHOTOS_API_ORIGIN": "https://photos-api.kylieski.workers.dev"
   },
   "triggers": {
     "crons": ["0 0 * * *"]
@@ -57,11 +58,16 @@
         "binding": "IMAGES"
       },
       "vars": {
-        "ALLOWED_WIDTHS": "200,400,800,1600"
+        "ALLOWED_WIDTHS": "200,400,800,1600",
+        "PHOTOS_API_ORIGIN": "https://photos-api.kylieski.workers.dev"
       }
     },
     "production": {
       "name": "climb-log",
+      "vars": {
+        "ALLOWED_WIDTHS": "200,400,800,1600",
+        "PHOTOS_API_ORIGIN": "https://photos-api.kylieski.workers.dev"
+      },
       "routes": [
         { "pattern": "kylies.photos", "custom_domain": true }
       ]

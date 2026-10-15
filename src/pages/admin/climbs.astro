@@ -1,6 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import { env } from 'cloudflare:workers'
+import { getCanonicalPhotos } from '../../lib/photos-client'
+import { formatCalendarDate } from '../../lib/dates'
 
 export const prerender = false
 
@@ -17,10 +19,10 @@ if (DB) {
   ).all()
   climbsWithoutPhotos = climbsResult.results || []
 
-  const photosResult = await DB.prepare(
-    `SELECT id, short_id, src, caption, area, state, date, accent_color FROM photos WHERE exclude = 0 AND src IS NOT NULL ORDER BY date DESC LIMIT 100`
-  ).all()
-  recentPhotos = photosResult.results || []
+  recentPhotos = (await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 100 })).map(photo => ({
+    ...photo,
+    src: `/img/${photo.id}?w=200`,
+  }))
 
   // Get recent assignments for undo functionality
   const assignmentsResult = await DB.prepare(
@@ -42,7 +44,7 @@ if (DB) {
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return formatCalendarDate(dateStr)
 }
 ---
 
@@ -84,7 +86,7 @@ function formatDate(dateStr: string | null) {
             <div 
               class="photo-thumb" 
               data-photo-url={photo.src}
-              data-photo-id={photo.short_id || photo.id}
+              data-photo-id={photo.id}
             >
               <img src={photo.src} alt={photo.caption || 'Photo'} loading="lazy" />
               <div class="photo-info">

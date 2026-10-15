@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro'
 import { ImageResponse } from 'workers-og'
 import { getCollection } from 'astro:content'
 import { env } from 'cloudflare:workers'
+import { getCanonicalPhoto } from '../../../lib/photos-client'
+import { formatCalendarDate } from '../../../lib/dates'
 
 export const prerender = false
 
@@ -49,35 +51,12 @@ async function getMonoFont(): Promise<ArrayBuffer> {
   return monoFontData
 }
 
-// Look up accent color from photos DB by matching short_id or src URL
-async function getAccentColorFromDb(previewImgUrl: string | undefined): Promise<string | null> {
+async function getAccentColor(previewImgUrl: string | undefined): Promise<string | null> {
   if (!previewImgUrl) return null
-  
-  const DB = env.DB as D1Database | undefined
-  if (!DB) return null
 
-  try {
-    // If it's a photos-api URL like /img/abc123, extract short_id
-    const shortIdMatch = previewImgUrl.match(/\/img\/(\w+)/)
-    if (shortIdMatch) {
-      const photo = await DB.prepare(
-        'SELECT accent_color FROM photos WHERE short_id = ? LIMIT 1'
-      ).bind(shortIdMatch[1]).first<{ accent_color: string | null }>()
-      
-      if (photo?.accent_color) return photo.accent_color
-    }
-
-    // Fallback: try exact src match (for legacy URLs)
-    const photo = await DB.prepare(
-      'SELECT accent_color FROM photos WHERE src = ? LIMIT 1'
-    ).bind(previewImgUrl).first<{ accent_color: string | null }>()
-    
-    if (photo?.accent_color) return photo.accent_color
-  } catch {
-    // DB query failed, fall through to default
-  }
-  
-  return null
+  const identifier = previewImgUrl.match(/\/img\/([^/?#]+)/)?.[1]
+  if (!identifier) return null
+  return (await getCanonicalPhoto(env.PHOTOS_API_ORIGIN, identifier))?.accent_color ?? null
 }
 
 export const GET: APIRoute = async ({ params }) => {
@@ -98,25 +77,25 @@ export const GET: APIRoute = async ({ params }) => {
   const { title, date, previewImgUrl } = post.data
 
   // Format date
-  const formattedDate = new Date(date).toLocaleDateString('en-US', {
+  const formattedDate = formatCalendarDate(date, {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   })
 
   // Get fonts and accent color in parallel
-  const [interFont, crimsonFont, monoFont, dbAccentColor] = await Promise.all([
+  const [interFont, crimsonFont, monoFont, accentColor] = await Promise.all([
     getInterFont(),
     getCrimsonFont(),
     getMonoFont(),
-    getAccentColorFromDb(previewImgUrl),
+    getAccentColor(previewImgUrl),
   ])
 
   // Background color: DB accent_color > default
   // Ensure color has # prefix
   let backgroundColor = DEFAULT_ACCENT
-  if (dbAccentColor) {
-    backgroundColor = dbAccentColor.startsWith('#') ? dbAccentColor : `#${dbAccentColor}`
+  if (accentColor) {
+    backgroundColor = accentColor.startsWith('#') ? accentColor : `#${accentColor}`
   }
 
   // Use post hero or fallback image

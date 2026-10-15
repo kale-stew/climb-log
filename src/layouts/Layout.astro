@@ -9,7 +9,7 @@ export interface Props {
 const { title, description, ogImage, ogImageAlt } = Astro.props
 
 const canonicalUrl = `https://kylies.photos${Astro.url.pathname}`
-const defaultOgImage = 'https://kylies.photos/og/default.jpg'
+const defaultOgImage = 'https://kylies.photos/open-graph/home.jpg'
 
 const navLinks = [
   { name: 'Blog', href: '/blog' },
@@ -94,12 +94,7 @@ const footerLinks = {
     <header class="header">
       <div class="header-inner">
         <a href="/" class="logo" aria-label="Home">
-          <svg class="logo-icon" viewBox="0 0 48 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <!-- Sun behind mountains -->
-            <circle cx="32" cy="12" r="8" stroke="var(--color-accent-orange)" stroke-width="2.5" fill="none" />
-            <!-- Mountains outline -->
-            <path d="M2 38 L14 18 L20 26 L30 10 L46 38" stroke="var(--color-text-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          </svg>
+          <span class="logo-word">kylies<em>·</em>photos</span>
         </a>
         
         <button class="mobile-nav-toggle" aria-label="Toggle navigation" id="nav-toggle">
@@ -146,24 +141,14 @@ const footerLinks = {
 
     <footer class="footer">
       <div class="footer-inner">
-        <div>
-          <h4>Explore</h4>
-          {footerLinks.explore.map(link => (
-            <a href={link.href}>{link.title}</a>
-          ))}
-        </div>
-        <div>
-          <h4>Connect</h4>
-          {footerLinks.connect.map(link => (
+        <div class="footer-brand">kylies<em>·</em>photos</div>
+        <p>Photos, field notes, and a running record of a life outside.</p>
+        <nav class="footer-links" aria-label="Footer navigation">
+          {footerLinks.explore.slice(0, 5).map(link => <a href={link.href}>{link.title}</a>)}
+          {footerLinks.connect.slice(0, 2).map(link => (
             <a href={link.href} target="_blank" rel="noopener noreferrer">{link.title}</a>
           ))}
-        </div>
-        <div>
-          <h4>About</h4>
-          <p style="font-size: 0.875rem; color: var(--color-light-grey); line-height: 1.6;">
-            Photos and stories from Kylie's adventures in the mountains.
-          </p>
-        </div>
+        </nav>
       </div>
     </footer>
 

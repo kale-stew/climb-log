@@ -1,7 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
+import { formatCalendarDate, parseCalendarDate } from '../lib/dates'
 
 interface Photo {
   id: string
+  title?: string | null
   short_id?: string | null
   url: string
   caption: string | null
@@ -24,6 +26,7 @@ interface PhotoGalleryProps {
 export default function PhotoGallery({ photos }: PhotoGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [filter, setFilter] = useState('')
+  const [visibleCount, setVisibleCount] = useState(60)
 
   const filteredPhotos = filter
     ? photos.filter(p => {
@@ -45,7 +48,7 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
         const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december']
         const monthIndex = monthNames.findIndex(m => m.startsWith(query))
         const monthMatch = monthIndex >= 0 && p.date
-          ? new Date(p.date).getMonth() === monthIndex
+          ? parseCalendarDate(p.date).getMonth() === monthIndex
           : false
 
         return captionMatch || areaMatch || stateMatch || tagsMatch || yearMatch || monthMatch
@@ -102,11 +105,13 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
   }, [lightboxIndex])
 
   const currentPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null
+  const visiblePhotos = filteredPhotos.slice(0, visibleCount)
+
+  useEffect(() => setVisibleCount(60), [filter])
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    return formatCalendarDate(dateStr, { month: 'long', day: 'numeric', year: 'numeric' })
   }
 
   // Determine if photo is tall (original design reference)
@@ -127,22 +132,21 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
   return (
     <>
       {/* Search */}
-      <div style={{ marginBottom: '1.5rem' }}>
+      <div className="gallery-tools">
         <input
           type="text"
           placeholder="Search by caption, location, year, month, or tags..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          style={{ minWidth: '300px', maxWidth: '100%' }}
         />
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', marginTop: '0.5rem' }}>
-          Showing {filteredPhotos.length} of {photos.length} photos
+        <p>
+          Showing {Math.min(visibleCount, filteredPhotos.length)} of {filteredPhotos.length} photos
         </p>
       </div>
 
       {/* Gallery Grid */}
       <div className="photo-grid">
-        {filteredPhotos.map((photo, index) => (
+        {visiblePhotos.map((photo, index) => (
           <div
             key={photo.id}
             className={`photo-item ${isTall(photo) ? 'photo-item-tall' : ''}`}
@@ -154,21 +158,30 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           >
             <img
               src={getImageUrl(photo, 'thumb')}
-              alt={photo.caption || 'Photo'}
+              alt={photo.caption || photo.title || 'Photo'}
               loading="lazy"
               onError={(e) => {
                 // If image fails to load, hide it to show the background/accent color
                 (e.target as HTMLImageElement).style.display = 'none'
               }}
             />
-            {photo.caption && (
+            {(photo.caption || photo.title) && (
               <div className="photo-overlay">
-                <span>{photo.caption}</span>
+                <strong>{photo.title || photo.caption}</strong>
+                {photo.area && <span>{photo.area}{photo.state && `, ${photo.state}`}</span>}
               </div>
             )}
           </div>
         ))}
       </div>
+
+      {visibleCount < filteredPhotos.length && (
+        <div className="load-more-wrap">
+          <button className="load-more" onClick={() => setVisibleCount(count => count + 60)}>
+            Load more photos
+          </button>
+        </div>
+      )}
 
       {/* Lightbox */}
       {currentPhoto && (
@@ -240,18 +253,40 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
       <style>{`
         .photo-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 1rem;
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+          gap: 1.25rem;
         }
+
+        .gallery-tools {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 1rem;
+          margin-bottom: 2rem;
+          padding-bottom: 1.5rem;
+          border-bottom: 1px solid var(--color-border);
+        }
+
+        .gallery-tools input { width: min(420px, 100%); border-radius: 999px; }
+        .gallery-tools p { margin: 0; color: var(--color-text-tertiary); font-size: 0.8rem; }
 
         .photo-item {
           position: relative;
           aspect-ratio: 4 / 3;
+          grid-column: span 4;
+          min-width: 0;
           overflow: hidden;
-          border-radius: var(--border-radius);
+          border-radius: var(--border-radius-lg);
           cursor: pointer;
           background: var(--color-bg-secondary);
+          border: 1px solid var(--color-border);
+          transition: transform 0.4s cubic-bezier(.22,1,.36,1), border-color 0.3s ease;
         }
+
+        .photo-item:first-child { grid-column: span 8; grid-row: span 2; }
+        .photo-item:nth-child(9n + 5),
+        .photo-item:nth-child(9n + 6) { grid-column: span 6; }
+        .photo-item:hover { transform: translateY(-4px); border-color: var(--color-border-hover); }
 
         .photo-item-tall {
           aspect-ratio: 3 / 4;
@@ -262,7 +297,7 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.3s ease;
+          transition: transform 0.7s cubic-bezier(.22,1,.36,1);
         }
 
         .photo-item:hover img {
@@ -274,13 +309,19 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           bottom: 0;
           left: 0;
           right: 0;
-          padding: 1rem;
-          background: linear-gradient(transparent, rgba(0,0,0,0.7));
+          padding: 1.5rem;
+          background: linear-gradient(transparent 25%, rgba(0,0,0,0.88));
           color: white;
-          font-size: 0.875rem;
+          font-size: 0.8rem;
           opacity: 0;
           transition: opacity 0.3s ease;
         }
+
+        .photo-overlay strong { display: block; font-family: var(--font-serif); font-size: 1.35rem; font-weight: 400; }
+        .photo-overlay span { display: block; margin-top: 0.25rem; color: rgba(255,255,255,0.65); }
+
+        .load-more-wrap { display: flex; justify-content: center; padding-top: 3rem; }
+        .load-more { border-radius: 999px; padding: 0.8rem 1.5rem; }
 
         .photo-item:hover .photo-overlay {
           opacity: 1;
@@ -420,8 +461,15 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           }
 
           .photo-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
           }
+          .photo-item,
+          .photo-item:first-child,
+          .photo-item:nth-child(9n + 5),
+          .photo-item:nth-child(9n + 6) { grid-column: span 1; grid-row: span 1; }
+          .photo-item-tall { grid-row: span 2; }
+          .gallery-tools { align-items: flex-start; flex-direction: column; }
         }
       `}</style>
     </>

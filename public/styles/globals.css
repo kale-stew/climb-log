@@ -21,9 +21,9 @@
   --color-offwhite: #F0EDE8;
   --color-white: #FAF8F5;
 
-  --color-accent: #8B7355;
+  --color-accent: #C65F3A;
   --color-accent-green: #6B8E5E;
-  --color-accent-orange: #D4845A;
+  --color-accent-orange: #E8754B;
   
   /* Card colors (semi-transparent) */
   --color-card-blue: #277da1d7;
@@ -56,8 +56,8 @@
   --font-size-4xl: 2.5rem;
   
   /* Layout */
-  --max-width: 1200px;
-  --header-height: 64px;
+  --max-width: 1360px;
+  --header-height: 72px;
   --border-radius-sm: 0.25rem;
   --border-radius: 0.5rem;
   --border-radius-lg: 1rem;
@@ -97,24 +97,24 @@
 
 /* Dark theme */
 [data-theme='dark'] {
-  --color-bg-primary: #1C1A18;
-  --color-bg-secondary: #252320;
-  --color-bg-tertiary: #3A3632;
-  --color-bg-card: rgba(40, 38, 35, 0.9);
+  --color-bg-primary: #0A0A0B;
+  --color-bg-secondary: #151519;
+  --color-bg-tertiary: #202025;
+  --color-bg-card: rgba(24, 24, 28, 0.92);
   
   /* Semantic aliases for components */
   --color-bg: var(--color-bg-primary);
   --color-text: var(--color-text-primary);
 
   --color-text-primary: var(--color-offwhite);
-  --color-text-secondary: var(--color-light-grey);
-  --color-text-tertiary: #8A8580;
-  --color-text-accent: #A6906E;
+  --color-text-secondary: #A4A4AC;
+  --color-text-tertiary: #74747D;
+  --color-text-accent: #E8754B;
   
-  --color-accent-hover: #b8a080;
+  --color-accent-hover: #F08B65;
 
-  --color-border: #3A3632;
-  --color-border-hover: #504B46;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.16);
 }
 
 /* Base styles */
@@ -271,10 +271,10 @@ select option {
   top: 0;
   z-index: 100;
   height: var(--header-height);
-  background-color: var(--color-bg-primary);
-  border-bottom: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  backdrop-filter: blur(10px);
+  background-color: color-mix(in srgb, var(--color-bg-primary) 78%, transparent);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: none;
+  backdrop-filter: blur(20px);
 }
 
 .header-inner {
@@ -291,6 +291,20 @@ select option {
   display: flex;
   align-items: center;
   text-decoration: none;
+}
+
+.logo-word,
+.footer-brand {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.logo-word em,
+.footer-brand em {
+  color: var(--color-accent-orange);
+  font-style: normal;
 }
 
 .logo-icon {
@@ -314,14 +328,18 @@ select option {
   font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-secondary);
-  padding: var(--space-sm);
-  border-radius: var(--border-radius);
+  padding: var(--space-sm) 0;
+  margin: 0 var(--space-sm);
   transition: all var(--transition-fast);
 }
 
 .nav-link:hover, .nav-link.active {
   color: var(--color-text-accent);
   text-decoration: none;
+}
+
+.nav-link.active {
+  box-shadow: inset 0 -1px 0 var(--color-accent-orange);
 }
 
 /* Theme toggle */
@@ -356,33 +374,38 @@ select option {
 
 /* Footer */
 .footer {
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-bg-primary);
   color: var(--color-text-secondary);
-  padding: var(--space-2xl) var(--space-lg);
+  padding: var(--space-3xl) var(--space-lg);
   border-top: 1px solid var(--color-border);
 }
 
 .footer-inner {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-md);
   max-width: var(--max-width);
   margin: 0 auto;
 }
 
-.footer h4 {
-  color: var(--color-text-primary);
+.footer p {
+  margin: 0;
   font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-md);
+  color: var(--color-text-tertiary);
 }
 
-.footer a {
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.footer-links a {
   color: var(--color-text-tertiary);
   font-size: var(--font-size-sm);
-  display: block;
-  padding: var(--space-xs) 0;
 }
 
 .footer a:hover {

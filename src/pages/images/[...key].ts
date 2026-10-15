@@ -19,7 +19,6 @@ export const prerender = false
 
 export const GET: APIRoute = async ({ params, request }) => {
   const R2_IMAGES = env.R2_IMAGES as R2Bucket | undefined
-  const DB = env.DB as D1Database | undefined
 
   if (!R2_IMAGES) {
     return new Response('R2 bucket not configured', { status: 500 })
@@ -38,27 +37,23 @@ export const GET: APIRoute = async ({ params, request }) => {
     : 'original'
 
   // Try to redirect to new /img/ endpoint if key matches photos/{id}/ pattern
-  if (DB && key.startsWith('photos/')) {
+  if (key.startsWith('photos/')) {
     const parts = key.split('/')
     if (parts.length >= 2) {
       const photoId = parts[1]
-      // Verify photo exists
-      const photo = await DB.prepare("SELECT id FROM photos WHERE id = ?").bind(photoId).first()
-      if (photo) {
-        const widthMap: Record<string, string> = { '200': '200', '800': '800', '1600': '1600', 'original': 'original' }
-        const widthParam = widthMap[size]
-        const redirectUrl = widthParam && widthParam !== 'original' 
-          ? `/img/${photoId}?w=${widthParam}` 
-          : `/img/${photoId}`
-        return new Response(null, { 
-          status: 301, 
-          headers: { 
-            'Location': redirectUrl,
-            'Deprecation': 'true',
-            'Sunset': 'Sat, 24 Nov 2026 00:00:00 GMT',
-          } 
-        })
-      }
+      const widthMap: Record<string, string> = { '200': '200', '800': '800', '1600': '1600', 'original': 'original' }
+      const widthParam = widthMap[size]
+      const redirectUrl = widthParam && widthParam !== 'original'
+        ? `/img/${photoId}?w=${widthParam}`
+        : `/img/${photoId}`
+      return new Response(null, {
+        status: 301,
+        headers: {
+          'Location': redirectUrl,
+          'Deprecation': 'true',
+          'Sunset': 'Sat, 24 Nov 2026 00:00:00 GMT',
+        }
+      })
     }
   }
 

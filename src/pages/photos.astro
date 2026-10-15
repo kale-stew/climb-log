@@ -2,47 +2,43 @@
 import Layout from '../layouts/Layout.astro'
 import PhotoGallery from '../components/PhotoGallery'
 import { env } from 'cloudflare:workers'
+import { getCanonicalPhotos } from '../lib/photos-client'
 
 export const prerender = false
 
-const DB = env.DB as D1Database | undefined
-
-let photos: any[] = []
-
-if (DB) {
-  // Limit to most recent 500 photos for initial load performance
-  // Client-side filtering handles search within this set
-  const result = await DB.prepare(`
-    SELECT 
-      id, 
-      short_id,
-      src as url, 
-      caption, 
-      date, 
-      area, 
-      width, 
-      height, 
-      title,
-      state,
-      search_tags as tags,
-      r2_key,
-      accent_color
-    FROM photos 
-    WHERE exclude = 0
-    ORDER BY date DESC
-    LIMIT 500
-  `).all()
-  photos = result.results || []
-}
+// Keep the existing initial cap until the gallery gains server-side pagination.
+const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
 ---
 
 <Layout title="Photos" description="A gallery of my favorite hiking and climbing photos." ogImage="https://kylies.photos/open-graph/photos.jpg">
   <div class="container page">
-    <h1>Photos</h1>
-    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
-      A gallery of my favorite shots from the trail. Click any photo to view full size.
-    </p>
+    <header class="photos-intro">
+      <p>Field archive · Colorado & beyond</p>
+      <h1>The full <em>collection.</em></h1>
+      <span>A growing archive of light, weather, and time outside.</span>
+    </header>
 
     <PhotoGallery client:only="react" photos={photos} />
   </div>
+
+  <style>
+    .photos-intro { padding: 3rem 0 4rem; }
+    .photos-intro p {
+      margin-bottom: 1rem;
+      color: var(--color-accent-orange);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .photos-intro h1 {
+      margin: 0 0 1rem;
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      line-height: 0.98;
+    }
+    .photos-intro h1 em { color: var(--color-accent-orange); font-style: italic; }
+    .photos-intro span { color: var(--color-text-tertiary); font-size: 1.05rem; }
+  </style>
 </Layout>

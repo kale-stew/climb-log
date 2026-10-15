@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
+import { formatCalendarDate } from '../lib/dates'
+import { getCanonicalPhotos } from '../lib/photos-client'
 import { env } from 'cloudflare:workers'
 
 export const prerender = false
@@ -8,27 +10,22 @@ export const prerender = false
 const DB = env.DB as D1Database | undefined
 
 let recentClimbs: any[] = []
-let heroPhotos: { short_id: string; accent_color: string | null }[] = []
+let heroPhoto: { id: string; title: string | null; area: string | null; state: string | null } | null = null
 let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
 
 if (DB) {
   try {
+    const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 100 })
     // Fetch recent climbs
     const climbsResult = await DB.prepare(
       'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'
     ).all()
     recentClimbs = climbsResult.results || []
 
-    // Fill missing preview images from photos table
-    await fillMissingPreviewImages(DB, recentClimbs, 800)
+    // Fill missing preview images from canonical photos.
+    await fillMissingPreviewImages(recentClimbs, canonicalPhotos, 800)
 
-    // Fetch hero photos (last 5 from photos table)
-    const photosResult = await DB.prepare(
-      'SELECT short_id, accent_color, src FROM photos WHERE exclude = 0 ORDER BY date DESC LIMIT 5'
-    ).all()
-    heroPhotos = (photosResult.results || [])
-      .filter((p: any) => p.short_id)
-      .map((p: any) => ({ short_id: p.short_id, accent_color: p.accent_color }))
+    heroPhoto = canonicalPhotos[0] ?? null
 
     // Fetch stats
     const statsResult = await DB.prepare(`
@@ -59,18 +56,31 @@ function formatNumber(n: number): string {
 
 <Layout title="Home" description="Kylie's climbing and hiking adventures in Colorado and beyond." ogImage="https://kylies.photos/open-graph/home.jpg">
   <!-- Hero -->
-  <section class="hero" data-photos={JSON.stringify(heroPhotos.map(p => p.short_id))} data-accents={JSON.stringify(Object.fromEntries(heroPhotos.map(p => [p.short_id, p.accent_color])))}>
-    <div class="hero-image" id="hero-image"></div>
+  <section class="hero">
+    <div class="hero-image" style={heroPhoto ? `background-image: url(/img/${heroPhoto.id}?w=1600)` : undefined}></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1>kylies.photos</h1>
-      <p>Climbing, hiking, and exploring the mountains of Colorado and beyond.</p>
+      <p class="hero-eyebrow">Field notes · Colorado & beyond</p>
+      <h1>Miles, peaks,<br />and <em>moments.</em></h1>
+      <p class="hero-subtitle">Climbing, hiking, and a running record of time spent outside.</p>
+      <div class="hero-actions">
+        <a href="/photos" class="hero-cta">Explore the photos <span aria-hidden="true">→</span></a>
+        <a href="/climbs" class="hero-link">View the climb log</a>
+      </div>
     </div>
+    {heroPhoto && (
+      <p class="hero-credit">{heroPhoto.title || 'Latest photo'}{heroPhoto.area && ` · ${heroPhoto.area}`}</p>
+    )}
   </section>
 
-  <div class="container page">
+  <div class="container home-content">
     <!-- Stats -->
-    <section class="stats-row mb-xl">
+    <section class="home-section" aria-labelledby="stats-heading">
+      <div class="section-heading">
+        <h2 id="stats-heading">A life <em>outside</em></h2>
+        <span>By the numbers</span>
+      </div>
+      <div class="stats-row">
       <div class="stat-item">
         <div class="stat-number">{formatNumber(stats.totalClimbs)}</div>
         <div class="stat-name">Climbs</div>
@@ -87,13 +97,14 @@ function formatNumber(n: number): string {
         <div class="stat-number">{formatNumber(stats.totalGain)}'</div>
         <div class="stat-name">Elevation Gained</div>
       </div>
+      </div>
     </section>
 
     <!-- Recent Climbs -->
-    <section>
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
-        <h2 style="margin: 0; font-family: var(--font-serif);">Recent Climbs</h2>
-        <a href="/climbs" class="btn">View All →</a>
+    <section class="home-section">
+      <div class="section-heading">
+        <h2>Recent <em>miles</em></h2>
+        <a href="/climbs">View all climbs →</a>
       </div>
 
       {recentClimbs.length > 0 ? (
@@ -109,13 +120,15 @@ function formatNumber(n: number): string {
                     onerror="this.style.opacity='0'; this.parentElement.style.background='var(--color-bg-tertiary)'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; this.parentElement.innerHTML='<span style=font-size:14px>🏔️</span>'"
                   />
                 ) : (
-                  <div class="climb-card-image-placeholder" />
+                  <div class="climb-card-image-placeholder">
+                    <span>Field log · {climb.state || 'On the trail'}</span>
+                  </div>
                 )}
               </div>
               <div class="climb-card-content">
                 <h3>{climb.title || 'Untitled'}</h3>
                 <p class="climb-card-meta">
-                  {climb.date && new Date(climb.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {climb.date && formatCalendarDate(climb.date)}
                   {climb.area && ` · ${climb.area}`}
                 </p>
                 {climb.distance && climb.gain && (
@@ -133,94 +146,138 @@ function formatNumber(n: number): string {
     </section>
   </div>
 
-  <script>
-    // Cycle hero image through last 5 photos
-    const heroSection = document.querySelector<HTMLElement>('.hero');
-    const heroImage = document.getElementById('hero-image');
-    if (heroSection && heroImage) {
-      const photos = JSON.parse(heroSection.dataset.photos || '[]');
-      const accents = JSON.parse(heroSection.dataset.accents || '{}');
-      if (photos.length > 0) {
-        const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
-        heroImage.style.backgroundImage = `url(/img/${randomPhoto}?w=1600)`;
-        // Apply accent color of the SELECTED photo to stat numbers
-        const accentColor = accents[randomPhoto];
-        if (accentColor) {
-          document.querySelectorAll('.stat-number').forEach(el => {
-            (el as HTMLElement).style.color = accentColor;
-          });
-        }
-      }
-    }
-  </script>
-
   <style>
     .hero {
       position: relative;
       width: 100%;
-      height: 60vh;
-      min-height: 400px;
-      max-height: 700px;
+      min-height: min(820px, calc(100vh - var(--header-height)));
       overflow: hidden;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
     }
     .hero-image {
       position: absolute;
       inset: 0;
       background-size: cover;
       background-position: center;
-      transition: opacity 0.5s ease;
+      filter: saturate(0.82) contrast(1.05);
+      transform: scale(1.01);
     }
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.5) 70%, var(--color-bg-primary) 100%);
+      background:
+        radial-gradient(circle at 78% 15%, rgba(232,117,75,0.2), transparent 34%),
+        linear-gradient(90deg, rgba(5,5,7,0.88) 0%, rgba(5,5,7,0.55) 48%, rgba(5,5,7,0.2) 100%),
+        linear-gradient(to bottom, rgba(0,0,0,0.1) 45%, var(--color-bg-primary) 100%);
     }
     .hero-content {
       position: relative;
       z-index: 2;
-      text-align: center;
+      text-align: left;
       color: white;
-      padding: var(--space-lg);
+      width: min(760px, calc(100% - 3rem));
+      margin-left: max(1.5rem, calc((100vw - var(--max-width)) / 2 + 1.5rem));
+      padding: 5rem 0 8rem;
     }
     .hero-content h1 {
       font-family: var(--font-serif);
-      font-style: italic;
-      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-size: clamp(3.8rem, 8vw, 7.5rem);
       font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      margin-bottom: var(--space-md);
+      letter-spacing: -0.04em;
+      line-height: 0.94;
+      margin: 0 0 var(--space-lg);
       color: #ffffff;
-      text-shadow: 0 4px 24px rgba(0,0,0,0.45);
+      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
     }
-    .hero-content p {
-      font-size: 1.25rem;
-      max-width: 500px;
-      margin: 0 auto;
+    .hero-content h1 em,
+    .section-heading h2 em {
+      color: var(--color-accent-orange);
+      font-style: italic;
+    }
+    .hero-content .hero-eyebrow {
+      margin-bottom: var(--space-lg);
+      color: var(--color-accent-orange);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .hero-content .hero-subtitle {
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      max-width: 520px;
+      margin: 0 0 var(--space-xl);
       color: #ffffff;
-      opacity: 0.95;
+      opacity: 0.78;
       text-shadow: 0 1px 6px rgba(0,0,0,0.4);
-      text-transform: lowercase;
     }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 999px;
+      background: var(--color-accent-orange);
+      color: white;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+    }
+    .hero-cta:hover { text-decoration: none; transform: translateY(-2px); }
+    .hero-link { color: rgba(255,255,255,0.8); font-size: var(--font-size-sm); }
+    .hero-credit {
+      position: absolute;
+      right: var(--space-xl);
+      bottom: var(--space-xl);
+      z-index: 2;
+      margin: 0;
+      color: rgba(255,255,255,0.58);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+    }
+    .home-content { padding-bottom: 7rem; }
+    .home-section { padding-top: 5rem; }
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--space-xl);
+      margin-bottom: 2.5rem;
+    }
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(2.25rem, 4vw, 3.5rem);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+    .section-heading > span,
+    .section-heading > a { color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
+    .section-heading > a:hover { color: var(--color-text-accent); }
 
     .stats-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: var(--space-xl);
-      padding: var(--space-2xl) 0;
+      gap: 0;
+      padding: 2rem 0;
+      border-top: 1px solid var(--color-border);
       border-bottom: 1px solid var(--color-border);
     }
     .stat-item {
-      text-align: center;
+      padding: 0 var(--space-xl);
+      border-right: 1px solid var(--color-border);
     }
+    .stat-item:last-child { border-right: 0; }
     .stat-number {
       font-family: var(--font-serif);
       font-size: 2.5rem;
-      font-weight: 600;
-      color: var(--color-text-accent);
+      font-weight: 400;
+      color: var(--color-text-primary);
       line-height: 1.1;
       transition: color 0.3s ease;
     }
@@ -235,35 +292,47 @@ function formatNumber(n: number): string {
 
     .climb-card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: var(--space-lg);
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-auto-rows: 210px;
+      gap: 1.25rem;
     }
     .climb-card {
-      display: block;
-      background: var(--color-bg-primary);
+      display: flex;
+      position: relative;
+      grid-column: span 4;
+      background: var(--color-bg-secondary);
       border-radius: var(--border-radius-lg);
       overflow: hidden;
       border: 1px solid var(--color-border);
       text-decoration: none;
-      color: inherit;
+      color: white;
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
     .climb-card:hover {
       transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
       border-color: var(--color-border-hover);
     }
+    .climb-card:first-child { grid-column: span 8; grid-row: span 2; }
     .climb-card-image {
-      width: 100%;
-      height: 200px;
+      position: absolute;
+      inset: 0;
       overflow: hidden;
-      background: var(--color-bg-secondary);
+      background:
+        radial-gradient(circle at 75% 20%, rgba(232,117,75,0.28), transparent 38%),
+        linear-gradient(135deg, #1a1b24, #101012);
     }
     .climb-card-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.3s ease;
+    }
+    .climb-card-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.92), transparent 72%);
     }
     .climb-card:hover .climb-card-image img {
       transform: scale(1.05);
@@ -273,47 +342,67 @@ function formatNumber(n: number): string {
       height: 100%;
       background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: var(--space-lg);
+    }
+    .climb-card-image-placeholder span {
+      color: rgba(255,255,255,0.32);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
     }
     .climb-card-content {
-      padding: var(--space-md);
+      position: relative;
+      z-index: 2;
+      align-self: flex-end;
+      width: 100%;
+      padding: var(--space-lg);
     }
     .climb-card-content h3 {
       margin: 0 0 var(--space-sm);
       font-size: var(--font-size-lg);
       font-weight: 600;
-      color: var(--color-text-primary);
+      color: white;
     }
     .climb-card-meta {
       font-size: var(--font-size-sm);
-      color: var(--color-text-tertiary);
+      color: rgba(255,255,255,0.62);
       margin: 0 0 var(--space-xs);
     }
     .climb-card-stats {
       font-size: var(--font-size-sm);
-      color: var(--color-text-secondary);
+      color: rgba(255,255,255,0.78);
       margin: 0;
     }
 
     @media (max-width: 768px) {
       .hero {
-        height: 50vh;
-        min-height: 300px;
+        min-height: 620px;
       }
       .hero-content h1 {
-        font-size: 2.75rem;
+        font-size: clamp(3.2rem, 14vw, 5rem);
       }
       .stats-row {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-lg);
+        gap: 0;
       }
       .stat-number {
         font-size: 2rem;
       }
       .climb-card-grid {
         grid-template-columns: 1fr;
+        grid-auto-rows: 300px;
       }
+      .climb-card,
+      .climb-card:first-child { grid-column: span 1; grid-row: span 1; }
+      .section-heading { align-items: flex-start; flex-direction: column; }
+      .hero-content { margin-left: 1.5rem; padding-bottom: 9rem; }
+      .hero-credit { left: 1.5rem; right: auto; }
+      .stat-item { padding: var(--space-lg); }
+      .stat-item:nth-child(2) { border-right: 0; }
+      .stat-item:nth-child(-n+2) { border-bottom: 1px solid var(--color-border); }
     }
   </style>
 </Layout>
