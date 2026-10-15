@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { formatCalendarDate, parseCalendarDate } from '../lib/dates'
 import { getCanonicalPhotos } from '../lib/photos-client'
 
@@ -25,12 +25,17 @@ interface PhotoGalleryProps {
   apiOrigin?: string
 }
 
+function getImageUrl(photo: Photo, size: 'thumb' | 'full' = 'thumb') {
+  const id = photo.short_id || photo.id
+  return size === 'thumb' ? `/img/${id}?w=800` : `/img/${id}`
+}
+
 export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
   const [photos, setPhotos] = useState(initialPhotos)
   const [isLoading, setIsLoading] = useState(initialPhotos.length === 0 && Boolean(apiOrigin))
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [filter, setFilter] = useState('')
-  const [visibleCount, setVisibleCount] = useState(60)
+  const [visibleCount, setVisibleCount] = useState(24)
 
   useEffect(() => {
     if (initialPhotos.length > 0 || !apiOrigin) return
@@ -43,7 +48,9 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
       .finally(() => {
         if (active) setIsLoading(false)
       })
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [apiOrigin, initialPhotos.length])
 
   const filteredPhotos = filter
@@ -63,18 +70,30 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
         const yearMatch = p.date?.startsWith(query)
 
         // Search month name (e.g., "january", "march")
-        const monthNames = ['january','february','march','april','may','june','july','august','september','october','november','december']
+        const monthNames = [
+          'january',
+          'february',
+          'march',
+          'april',
+          'may',
+          'june',
+          'july',
+          'august',
+          'september',
+          'october',
+          'november',
+          'december',
+        ]
         const monthIndex = monthNames.findIndex(m => m.startsWith(query))
-        const monthMatch = monthIndex >= 0 && p.date
-          ? parseCalendarDate(p.date).getMonth() === monthIndex
-          : false
+        const monthMatch =
+          monthIndex >= 0 && p.date ? parseCalendarDate(p.date).getMonth() === monthIndex : false
 
         return captionMatch || areaMatch || stateMatch || tagsMatch || yearMatch || monthMatch
       })
     : photos
 
   const openLightbox = (index: number) => setLightboxIndex(index)
-  const closeLightbox = () => setLightboxIndex(null)
+  const closeLightbox = useCallback(() => setLightboxIndex(null), [])
 
   const goNext = useCallback(() => {
     if (lightboxIndex !== null) {
@@ -108,7 +127,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [lightboxIndex, goNext, goPrev])
+  }, [lightboxIndex, goNext, goPrev, closeLightbox])
 
   // Prevent body scroll when lightbox is open
   useEffect(() => {
@@ -138,8 +157,6 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   const currentPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null
   const visiblePhotos = filteredPhotos.slice(0, visibleCount)
 
-  useEffect(() => setVisibleCount(60), [filter])
-
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null
     return formatCalendarDate(dateStr, { month: 'long', day: 'numeric', year: 'numeric' })
@@ -151,15 +168,6 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
     return photo.height / photo.width > 1.208
   }
 
-  // Get best available image URL via photos-api
-  const getImageUrl = (photo: Photo, size: 'thumb' | 'full' = 'thumb') => {
-    const id = photo.short_id || photo.id
-    if (size === 'thumb') {
-      return `/img/${id}?w=800`
-    }
-    return `/img/${id}`
-  }
-
   return (
     <>
       {/* Search */}
@@ -168,7 +176,10 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           type="text"
           placeholder="Search by caption, location, year, month, or tags..."
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={e => {
+            setFilter(e.target.value)
+            setVisibleCount(24)
+          }}
         />
         <p aria-live="polite">
           {isLoading
@@ -180,37 +191,45 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
       {/* Gallery Grid */}
       <div className="photo-grid">
         {visiblePhotos.map((photo, index) => (
-          <div
+          <button
+            type="button"
             key={photo.id}
             className={`photo-item ${isTall(photo) ? 'photo-item-tall' : ''}`}
             onClick={() => openLightbox(index)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && openLightbox(index)}
+            aria-label={`View photo: ${photo.caption || photo.title || 'Mountain photo'}`}
             style={photo.accent_color ? { backgroundColor: photo.accent_color } : undefined}
           >
             <img
               src={getImageUrl(photo, 'thumb')}
               alt={photo.caption || photo.title || 'Photo'}
               loading="lazy"
-              onError={(e) => {
+              onError={e => {
                 // If image fails to load, hide it to show the background/accent color
-                (e.target as HTMLImageElement).style.display = 'none'
+                e.currentTarget.style.display = 'none'
               }}
             />
             {(photo.caption || photo.title) && (
               <div className="photo-overlay">
                 <strong>{photo.title || photo.caption}</strong>
-                {photo.area && <span>{photo.area}{photo.state && `, ${photo.state}`}</span>}
+                {photo.area && (
+                  <span>
+                    {photo.area}
+                    {photo.state && `, ${photo.state}`}
+                  </span>
+                )}
               </div>
             )}
-          </div>
+          </button>
         ))}
       </div>
 
       {visibleCount < filteredPhotos.length && (
         <div className="load-more-wrap">
-          <button className="load-more" onClick={() => setVisibleCount(count => count + 60)}>
+          <button
+            type="button"
+            className="load-more"
+            onClick={() => setVisibleCount(count => count + 60)}
+          >
             Load more photos
           </button>
         </div>
@@ -218,8 +237,15 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
       {/* Lightbox */}
       {currentPhoto && (
-        <div className="lightbox" onClick={closeLightbox}>
+        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
           <button
+            type="button"
+            className="lightbox-backdrop"
+            onClick={closeLightbox}
+            aria-label="Close photo viewer"
+          />
+          <button
+            type="button"
             className="lightbox-close"
             onClick={closeLightbox}
             aria-label="Close lightbox"
@@ -228,14 +254,18 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           </button>
 
           <button
+            type="button"
             className="lightbox-nav lightbox-prev"
-            onClick={(e) => { e.stopPropagation(); goPrev() }}
+            onClick={e => {
+              e.stopPropagation()
+              goPrev()
+            }}
             aria-label="Previous photo"
           >
             &#8249;
           </button>
 
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+          <div className="lightbox-content">
             <img
               key={currentPhoto.id}
               className="lightbox-image"
@@ -256,7 +286,9 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
                     <span style={{ opacity: 0.6 }}>🗺️</span> {currentPhoto.state}
                   </span>
                 )}
-                {currentPhoto.date && (currentPhoto.area || currentPhoto.state) && <span className="meta-sep">·</span>}
+                {currentPhoto.date && (currentPhoto.area || currentPhoto.state) && (
+                  <span className="meta-sep">·</span>
+                )}
                 {currentPhoto.date && (
                   <span>
                     <span style={{ opacity: 0.6 }}>📅</span> {formatDate(currentPhoto.date)}
@@ -270,14 +302,19 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
                 )}
               </div>
               <div className="lightbox-counter">
-                {String(lightboxIndex! + 1).padStart(2, '0')} / {String(filteredPhotos.length).padStart(2, '0')}
+                {String((lightboxIndex ?? 0) + 1).padStart(2, '0')} /{' '}
+                {String(filteredPhotos.length).padStart(2, '0')}
               </div>
             </div>
           </div>
 
           <button
+            type="button"
             className="lightbox-nav lightbox-next"
-            onClick={(e) => { e.stopPropagation(); goNext() }}
+            onClick={e => {
+              e.stopPropagation()
+              goNext()
+            }}
             aria-label="Next photo"
           >
             &#8250;
@@ -315,6 +352,10 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           cursor: pointer;
           background: var(--color-bg-secondary);
           border: 1px solid var(--color-border);
+          display: block;
+          padding: 0;
+          color: inherit;
+          text-align: left;
           transition: transform 0.4s cubic-bezier(.22,1,.36,1), border-color 0.3s ease;
         }
 
@@ -391,6 +432,17 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           color: var(--color-accent);
         }
 
+        .lightbox-backdrop {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          padding: 0;
+          border: 0;
+          border-radius: 0;
+          background: transparent;
+        }
+
         .lightbox-nav {
           position: absolute;
           top: 50%;
@@ -423,6 +475,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           display: flex;
           flex-direction: column;
           align-items: center;
+          position: relative;
+          z-index: 1;
         }
 
         .lightbox-content img {

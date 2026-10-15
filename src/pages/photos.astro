@@ -10,15 +10,21 @@ export const prerender = false
 const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
 ---
 
-<Layout title="Photos" description="A gallery of my favorite hiking and climbing photos." ogImage="https://kylies.photos/open-graph/photos.jpg">
+<Layout
+  title="Photos"
+  description="Mountain photos from Colorado, Utah, Norway, and wherever I can get to next."
+  ogImage="https://kylies.photos/open-graph/photos.jpg"
+  ogImageAlt="Two mountain goats standing on a rocky ridge at sunrise"
+>
   <div class="container page">
     <header class="photos-intro">
-      <p>Kylie's photo journal</p>
+      <p>From the journal</p>
       <h1>Photos from the trail.</h1>
       <span>Mountains, weather, friends, and the small things worth remembering.</span>
     </header>
 
-    <PhotoGallery client:only="react" photos={photos} apiOrigin={env.PHOTOS_API_ORIGIN} />
+    <PhotoGallery client:load photos={photos} apiOrigin={env.PHOTOS_API_ORIGIN} />
+    <noscript><p>The latest 24 photos are shown above. Turn on JavaScript to search and load more.</p></noscript>
   </div>
 
   <style>
@@ -30,6 +36,7 @@ const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
       font-size: 1rem;
       font-style: italic;
       letter-spacing: 0.02em;
+      text-transform: lowercase;
     }
     .photos-intro h1 {
       margin: 0 0 1rem;
@@ -38,6 +45,6 @@ const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
       letter-spacing: -0.04em;
       line-height: 0.98;
     }
-    .photos-intro span { color: var(--color-text-tertiary); font-size: 1.05rem; }
+    .photos-intro span { color: var(--color-text-tertiary); font-size: 1.05rem; text-transform: lowercase; }
   </style>
 </Layout>

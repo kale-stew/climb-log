@@ -1,6 +1,9 @@
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+  esbuild: {
+    jsx: 'automatic',
+  },
   test: {
     // Pure unit tests run in Node. Workers/D1-backed integration tests can opt
     // into a Miniflare/workers pool separately when added.
