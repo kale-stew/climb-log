@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
 import { formatCalendarDate } from '../lib/dates'
-import { getCanonicalPhotos } from '../lib/photos-client'
+import { getCanonicalPhotos, getPhotosFetch } from '../lib/photos-client'
 import { env } from 'cloudflare:workers'
 
 export const prerender = false
@@ -15,7 +15,10 @@ let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
 
 if (DB) {
   try {
-    const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 100 })
+    const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, {
+      limit: 100,
+      fetchFn: getPhotosFetch(env.PHOTOS_API),
+    })
     // Fetch recent climbs
     const climbsResult = await DB.prepare(
       'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'
@@ -60,9 +63,9 @@ function formatNumber(n: number): string {
     <div class="hero-image" style={heroPhoto ? `background-image: url(/img/${heroPhoto.id}?w=1600)` : undefined}></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">Field notes · Colorado & beyond</p>
-      <h1>Miles, peaks,<br />and <em>moments.</em></h1>
-      <p class="hero-subtitle">Climbing, hiking, and a running record of time spent outside.</p>
+      <p class="hero-eyebrow">Kylie's trail journal</p>
+      <h1>A little life<br /><em>outside.</em></h1>
+      <p class="hero-subtitle">Photos, stories, and trail notes from Colorado and wherever the road wanders next.</p>
       <div class="hero-actions">
         <a href="/photos" class="hero-cta">Explore the photos <span aria-hidden="true">→</span></a>
         <a href="/climbs" class="hero-link">View the climb log</a>
@@ -77,8 +80,8 @@ function formatNumber(n: number): string {
     <!-- Stats -->
     <section class="home-section" aria-labelledby="stats-heading">
       <div class="section-heading">
-        <h2 id="stats-heading">A life <em>outside</em></h2>
-        <span>By the numbers</span>
+        <h2 id="stats-heading">By the trail numbers</h2>
+        <span>A few miles at a time</span>
       </div>
       <div class="stats-row">
       <div class="stat-item">
@@ -103,7 +106,7 @@ function formatNumber(n: number): string {
     <!-- Recent Climbs -->
     <section class="home-section">
       <div class="section-heading">
-        <h2>Recent <em>miles</em></h2>
+        <h2>Lately on the trail</h2>
         <a href="/climbs">View all climbs →</a>
       </div>
 
@@ -150,7 +153,10 @@ function formatNumber(n: number): string {
     .hero {
       position: relative;
       width: 100%;
-      min-height: min(820px, calc(100vh - var(--header-height)));
+      width: min(calc(100% - 2rem), 1480px);
+      min-height: min(680px, calc(100vh - var(--header-height) - 2rem));
+      margin: 1rem auto 0;
+      border-radius: 1.75rem;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -168,9 +174,9 @@ function formatNumber(n: number): string {
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 78% 15%, rgba(232,117,75,0.2), transparent 34%),
-        linear-gradient(90deg, rgba(5,5,7,0.88) 0%, rgba(5,5,7,0.55) 48%, rgba(5,5,7,0.2) 100%),
-        linear-gradient(to bottom, rgba(0,0,0,0.1) 45%, var(--color-bg-primary) 100%);
+        radial-gradient(circle at 78% 15%, rgba(201,125,87,0.18), transparent 36%),
+        linear-gradient(90deg, rgba(31,24,19,0.82) 0%, rgba(31,24,19,0.48) 52%, rgba(31,24,19,0.12) 100%),
+        linear-gradient(to bottom, rgba(31,24,19,0.05) 52%, rgba(24,20,17,0.78) 100%);
     }
     .hero-content {
       position: relative;
@@ -183,26 +189,26 @@ function formatNumber(n: number): string {
     }
     .hero-content h1 {
       font-family: var(--font-serif);
-      font-size: clamp(3.8rem, 8vw, 7.5rem);
+      font-size: clamp(3.2rem, 6vw, 5.8rem);
       font-weight: 400;
-      letter-spacing: -0.04em;
-      line-height: 0.94;
+      letter-spacing: -0.03em;
+      line-height: 0.98;
       margin: 0 0 var(--space-lg);
       color: #ffffff;
       text-shadow: 0 4px 30px rgba(0,0,0,0.5);
     }
     .hero-content h1 em,
     .section-heading h2 em {
-      color: var(--color-accent-orange);
+      color: #E2A17E;
       font-style: italic;
     }
     .hero-content .hero-eyebrow {
       margin-bottom: var(--space-lg);
-      color: var(--color-accent-orange);
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
+      color: #E8C3AA;
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-style: italic;
+      letter-spacing: 0.02em;
     }
     .hero-content .hero-subtitle {
       font-size: clamp(1rem, 1.6vw, 1.2rem);
@@ -223,8 +229,8 @@ function formatNumber(n: number): string {
       align-items: center;
       gap: 0.65rem;
       padding: 0.8rem 1.5rem;
-      border-radius: 999px;
-      background: var(--color-accent-orange);
+      border-radius: 0.85rem;
+      background: #B86E49;
       color: white;
       font-size: var(--font-size-sm);
       font-weight: 600;
@@ -242,7 +248,7 @@ function formatNumber(n: number): string {
       letter-spacing: 0.04em;
     }
     .home-content { padding-bottom: 7rem; }
-    .home-section { padding-top: 5rem; }
+    .home-section { padding-top: 4.5rem; }
     .section-heading {
       display: flex;
       align-items: flex-end;
@@ -252,7 +258,7 @@ function formatNumber(n: number): string {
     }
     .section-heading h2 {
       margin: 0;
-      font-size: clamp(2.25rem, 4vw, 3.5rem);
+      font-size: clamp(2rem, 3vw, 2.8rem);
       font-weight: 400;
       letter-spacing: -0.03em;
     }
@@ -265,8 +271,9 @@ function formatNumber(n: number): string {
       grid-template-columns: repeat(4, 1fr);
       gap: 0;
       padding: 2rem 0;
-      border-top: 1px solid var(--color-border);
-      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 1.5rem;
     }
     .stat-item {
       padding: 0 var(--space-xl);
@@ -301,7 +308,7 @@ function formatNumber(n: number): string {
       position: relative;
       grid-column: span 4;
       background: var(--color-bg-secondary);
-      border-radius: var(--border-radius-lg);
+      border-radius: 1.4rem;
       overflow: hidden;
       border: 1px solid var(--color-border);
       text-decoration: none;
@@ -319,8 +326,8 @@ function formatNumber(n: number): string {
       inset: 0;
       overflow: hidden;
       background:
-        radial-gradient(circle at 75% 20%, rgba(232,117,75,0.28), transparent 38%),
-        linear-gradient(135deg, #1a1b24, #101012);
+        radial-gradient(circle at 75% 20%, rgba(201,125,87,0.2), transparent 40%),
+        linear-gradient(135deg, #332820, #1f1915);
     }
     .climb-card-image img {
       width: 100%;
@@ -379,7 +386,7 @@ function formatNumber(n: number): string {
 
     @media (max-width: 768px) {
       .hero {
-        min-height: 620px;
+        min-height: 580px;
       }
       .hero-content h1 {
         font-size: clamp(3.2rem, 14vw, 5rem);

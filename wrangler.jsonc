@@ -26,6 +26,13 @@
   "images": {
     "binding": "IMAGES"
   },
+  "services": [
+    {
+      "binding": "PHOTOS_API",
+      "service": "photos-api",
+      "remote": true
+    }
+  ],
   "vars": {
     "ALLOWED_WIDTHS": "200,400,800,1600",
     "PHOTOS_API_ORIGIN": "https://photos-api.kylieski.workers.dev"
@@ -57,6 +64,13 @@
       "images": {
         "binding": "IMAGES"
       },
+      "services": [
+        {
+          "binding": "PHOTOS_API",
+          "service": "photos-api",
+          "remote": true
+        }
+      ],
       "vars": {
         "ALLOWED_WIDTHS": "200,400,800,1600",
         "PHOTOS_API_ORIGIN": "https://photos-api.kylieski.workers.dev"
@@ -68,6 +82,13 @@
         "ALLOWED_WIDTHS": "200,400,800,1600",
         "PHOTOS_API_ORIGIN": "https://photos-api.kylieski.workers.dev"
       },
+      "services": [
+        {
+          "binding": "PHOTOS_API",
+          "service": "photos-api",
+          "remote": true
+        }
+      ],
       "routes": [
         { "pattern": "kylies.photos", "custom_domain": true }
       ]

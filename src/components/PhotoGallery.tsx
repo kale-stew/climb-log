@@ -253,7 +253,7 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
       <style>{`
         .photo-grid {
           display: grid;
-          grid-template-columns: repeat(12, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 1.25rem;
         }
 
@@ -273,7 +273,7 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
         .photo-item {
           position: relative;
           aspect-ratio: 4 / 3;
-          grid-column: span 4;
+          grid-column: span 1;
           min-width: 0;
           overflow: hidden;
           border-radius: var(--border-radius-lg);
@@ -283,9 +283,6 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
           transition: transform 0.4s cubic-bezier(.22,1,.36,1), border-color 0.3s ease;
         }
 
-        .photo-item:first-child { grid-column: span 8; grid-row: span 2; }
-        .photo-item:nth-child(9n + 5),
-        .photo-item:nth-child(9n + 6) { grid-column: span 6; }
         .photo-item:hover { transform: translateY(-4px); border-color: var(--color-border-hover); }
 
         .photo-item-tall {
@@ -465,9 +462,7 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
             gap: 0.75rem;
           }
           .photo-item,
-          .photo-item:first-child,
-          .photo-item:nth-child(9n + 5),
-          .photo-item:nth-child(9n + 6) { grid-column: span 1; grid-row: span 1; }
+          .photo-item:first-child { grid-column: span 1; grid-row: span 1; }
           .photo-item-tall { grid-row: span 2; }
           .gallery-tools { align-items: flex-start; flex-direction: column; }
         }

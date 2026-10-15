@@ -14,7 +14,10 @@ export const GET: APIRoute = async ({ request, params }) => {
     try {
       const upstreamUrl = new URL(`/img/${encodeURIComponent(photoId)}`, env.PHOTOS_API_ORIGIN)
       upstreamUrl.search = new URL(request.url).search
-      const upstream = await fetch(new Request(upstreamUrl, request))
+      const upstreamRequest = new Request(upstreamUrl, request)
+      const upstream = env.PHOTOS_API
+        ? await env.PHOTOS_API.fetch(upstreamRequest)
+        : await fetch(upstreamRequest)
       if (upstream.status !== 404) return upstream
     } catch (error) {
       console.error('Canonical image request failed; trying legacy storage:', error)

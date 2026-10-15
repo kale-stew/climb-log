@@ -2,20 +2,23 @@
 import Layout from '../layouts/Layout.astro'
 import PhotoGallery from '../components/PhotoGallery'
 import { env } from 'cloudflare:workers'
-import { getCanonicalPhotos } from '../lib/photos-client'
+import { getCanonicalPhotos, getPhotosFetch } from '../lib/photos-client'
 
 export const prerender = false
 
 // Keep the existing initial cap until the gallery gains server-side pagination.
-const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
+const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, {
+  limit: 500,
+  fetchFn: getPhotosFetch(env.PHOTOS_API),
+})
 ---
 
 <Layout title="Photos" description="A gallery of my favorite hiking and climbing photos." ogImage="https://kylies.photos/open-graph/photos.jpg">
   <div class="container page">
     <header class="photos-intro">
-      <p>Field archive · Colorado & beyond</p>
-      <h1>The full <em>collection.</em></h1>
-      <span>A growing archive of light, weather, and time outside.</span>
+      <p>Kylie's photo journal</p>
+      <h1>Photos from the trail.</h1>
+      <span>Mountains, weather, friends, and the small things worth remembering.</span>
     </header>
 
     <PhotoGallery client:only="react" photos={photos} />
@@ -25,20 +28,19 @@ const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
     .photos-intro { padding: 3rem 0 4rem; }
     .photos-intro p {
       margin-bottom: 1rem;
-      color: var(--color-accent-orange);
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
+      color: var(--color-text-accent);
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-style: italic;
+      letter-spacing: 0.02em;
     }
     .photos-intro h1 {
       margin: 0 0 1rem;
-      font-size: clamp(3rem, 7vw, 6rem);
+      font-size: clamp(2.8rem, 5vw, 4.8rem);
       font-weight: 400;
       letter-spacing: -0.04em;
       line-height: 0.98;
     }
-    .photos-intro h1 em { color: var(--color-accent-orange); font-style: italic; }
     .photos-intro span { color: var(--color-text-tertiary); font-size: 1.05rem; }
   </style>
 </Layout>

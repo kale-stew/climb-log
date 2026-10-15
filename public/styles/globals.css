@@ -14,16 +14,16 @@
 /* CSS Custom Properties */
 :root {
   /* Colors - base palette (Trail Dust) */
-  --color-black: #2C2926;
-  --color-dark-grey: #3E3A36;
-  --color-medium-grey: #6B6560;
-  --color-light-grey: #A39E98;
-  --color-offwhite: #F0EDE8;
-  --color-white: #FAF8F5;
+  --color-black: #342D27;
+  --color-dark-grey: #51473F;
+  --color-medium-grey: #786C62;
+  --color-light-grey: #AAA097;
+  --color-offwhite: #F3ECE2;
+  --color-white: #FCF8F2;
 
-  --color-accent: #C65F3A;
-  --color-accent-green: #6B8E5E;
-  --color-accent-orange: #E8754B;
+  --color-accent: #A96443;
+  --color-accent-green: #7C8C6D;
+  --color-accent-orange: #C97D57;
   
   /* Card colors (semi-transparent) */
   --color-card-blue: #277da1d7;
@@ -77,7 +77,7 @@
 [data-theme='light'] {
   --color-bg-primary: var(--color-white);
   --color-bg-secondary: var(--color-offwhite);
-  --color-bg-tertiary: #E8E4DE;
+  --color-bg-tertiary: #E7DDD0;
   --color-bg-card: rgba(255, 255, 255, 0.9);
   
   /* Semantic aliases for components */
@@ -89,7 +89,7 @@
   --color-text-tertiary: var(--color-medium-grey);
   --color-text-accent: var(--color-accent);
   
-  --color-accent-hover: #7a6248;
+  --color-accent-hover: #8F5035;
 
   --color-border: #E0DCD6;
   --color-border-hover: #C9C4BC;
@@ -97,24 +97,24 @@
 
 /* Dark theme */
 [data-theme='dark'] {
-  --color-bg-primary: #0A0A0B;
-  --color-bg-secondary: #151519;
-  --color-bg-tertiary: #202025;
-  --color-bg-card: rgba(24, 24, 28, 0.92);
+  --color-bg-primary: #181411;
+  --color-bg-secondary: #231D19;
+  --color-bg-tertiary: #302720;
+  --color-bg-card: rgba(38, 31, 26, 0.94);
   
   /* Semantic aliases for components */
   --color-bg: var(--color-bg-primary);
   --color-text: var(--color-text-primary);
 
-  --color-text-primary: var(--color-offwhite);
-  --color-text-secondary: #A4A4AC;
-  --color-text-tertiary: #74747D;
-  --color-text-accent: #E8754B;
+  --color-text-primary: #F4EBDF;
+  --color-text-secondary: #C1B5A8;
+  --color-text-tertiary: #918477;
+  --color-text-accent: #D4936F;
   
-  --color-accent-hover: #F08B65;
+  --color-accent-hover: #E0A17E;
 
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.16);
+  --color-border: rgba(244, 235, 223, 0.1);
+  --color-border-hover: rgba(244, 235, 223, 0.2);
 }
 
 /* Base styles */

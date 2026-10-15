@@ -12,6 +12,7 @@ export interface CloudflareEnv {
   IMAGES: ImagesBinding
   ALLOWED_WIDTHS: string
   PHOTOS_API_ORIGIN: string
+  PHOTOS_API?: Fetcher
 }
 
 declare global {
