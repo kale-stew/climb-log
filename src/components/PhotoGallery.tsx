@@ -44,7 +44,7 @@ const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : us
 export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
   const [photos, setPhotos] = useState(initialPhotos)
   const [isLoading, setIsLoading] = useState(initialPhotos.length === 0 && Boolean(apiOrigin))
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [lightbox, setLightbox] = useState<{ photoIds: string[]; index: number } | null>(null)
   const [filter, setFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(24)
   const [gridZoom, setGridZoom] = useState(2)
@@ -107,25 +107,27 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
       })
     : photos
 
-  const openLightbox = (index: number) => setLightboxIndex(index)
-  const closeLightbox = useCallback(() => setLightboxIndex(null), [])
+  const openLightbox = (index: number) => {
+    setLightbox({ photoIds: filteredPhotos.map(photo => photo.id), index })
+  }
+  const closeLightbox = useCallback(() => setLightbox(null), [])
 
   const goNext = useCallback(() => {
-    if (lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex + 1) % filteredPhotos.length)
-    }
-  }, [lightboxIndex, filteredPhotos.length])
+    setLightbox(current => current
+      ? { ...current, index: (current.index + 1) % current.photoIds.length }
+      : null)
+  }, [])
 
   const goPrev = useCallback(() => {
-    if (lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex - 1 + filteredPhotos.length) % filteredPhotos.length)
-    }
-  }, [lightboxIndex, filteredPhotos.length])
+    setLightbox(current => current
+      ? { ...current, index: (current.index - 1 + current.photoIds.length) % current.photoIds.length }
+      : null)
+  }, [])
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (lightboxIndex === null) return
+      if (lightbox === null) return
 
       switch (e.key) {
         case 'Escape':
@@ -142,11 +144,11 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [lightboxIndex, goNext, goPrev, closeLightbox])
+  }, [lightbox, goNext, goPrev, closeLightbox])
 
   // Prevent body scroll when lightbox is open
   useEffect(() => {
-    if (lightboxIndex !== null) {
+    if (lightbox !== null) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -154,22 +156,24 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
     return () => {
       document.body.style.overflow = ''
     }
-  }, [lightboxIndex])
+  }, [lightbox])
 
   useEffect(() => {
-    if (lightboxIndex === null || filteredPhotos.length < 2) return
+    if (!lightbox || lightbox.photoIds.length < 2) return
 
-    const adjacent = [
-      filteredPhotos[(lightboxIndex - 1 + filteredPhotos.length) % filteredPhotos.length],
-      filteredPhotos[(lightboxIndex + 1) % filteredPhotos.length],
+    const adjacentIds = [
+      lightbox.photoIds[(lightbox.index - 1 + lightbox.photoIds.length) % lightbox.photoIds.length],
+      lightbox.photoIds[(lightbox.index + 1) % lightbox.photoIds.length],
     ]
+    const adjacent = adjacentIds.flatMap(id => photos.find(photo => photo.id === id) || [])
     adjacent.forEach(photo => {
       const image = new Image()
       image.src = getImageUrl(photo, 'full')
     })
-  }, [lightboxIndex, filteredPhotos])
+  }, [lightbox, photos])
 
-  const currentPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null
+  const currentPhotoId = lightbox?.photoIds[lightbox.index]
+  const currentPhoto = currentPhotoId ? photos.find(photo => photo.id === currentPhotoId) || null : null
   const visiblePhotos = filteredPhotos.slice(0, visibleCount)
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
@@ -219,7 +223,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
     previousRects.current.clear()
   })
 
-  const getTouchDistance = (touches: TouchList) => {
+  const getTouchDistance = (touches: ArrayLike<{ clientX: number; clientY: number }>) => {
     const first = touches[0]
     const second = touches[1]
     return Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY)
@@ -346,12 +350,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
       {/* Lightbox */}
       {currentPhoto && (
         <div className="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
-          <button
-            type="button"
-            className="lightbox-backdrop"
-            onClick={closeLightbox}
-            aria-label="Close photo viewer"
-          />
+          <div className="lightbox-backdrop" aria-hidden="true" />
           <button
             type="button"
             className="lightbox-close"
@@ -410,8 +409,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
                 )}
               </div>
               <div className="lightbox-counter">
-                {String((lightboxIndex ?? 0) + 1).padStart(2, '0')} /{' '}
-                {String(filteredPhotos.length).padStart(2, '0')}
+                {String((lightbox?.index ?? 0) + 1).padStart(2, '0')} /{' '}
+                {String(lightbox?.photoIds.length ?? 0).padStart(2, '0')}
               </div>
             </div>
           </div>
