@@ -5,6 +5,7 @@ import {
   getClimbPhotoAssignments,
   getCanonicalPhoto,
   getCanonicalPhotos,
+  getCollectionPage,
   normalizePhotoLocation,
   normalizePhotoText,
 } from '../../src/lib/photos-client'
@@ -91,6 +92,32 @@ describe('photos client', () => {
       new URL('https://photos.example/api/photos/legacy-alias'),
       expect.any(Object),
     )
+  })
+
+  it('requests one collection page with search and returns the total', async () => {
+    const fetchFn = vi.fn(async () =>
+      Response.json({ photos: [photo], meta: { count: 1, total: 847 } }),
+    ) as typeof fetch
+
+    await expect(
+      getCollectionPage('https://photos.example', 'portfolio', {
+        limit: 60,
+        offset: 120,
+        query: ' kauai ',
+        fetchFn,
+      }),
+    ).resolves.toMatchObject({ total: 847, photos: [{ id: 'canonical-1' }] })
+    expect(fetchFn).toHaveBeenCalledWith(
+      new URL('https://photos.example/api/collections/portfolio/photos?limit=60&offset=120&q=kauai'),
+      expect.any(Object),
+    )
+  })
+
+  it('surfaces collection failures for retry', async () => {
+    const fetchFn = vi.fn(async () => new Response('nope', { status: 503 })) as typeof fetch
+    await expect(
+      getCollectionPage('https://photos.example', 'portfolio', { fetchFn }),
+    ).rejects.toThrow('503')
   })
 
   it('prefers a primary formal climb assignment', async () => {

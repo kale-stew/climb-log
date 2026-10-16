@@ -2,12 +2,17 @@
 import Layout from '../layouts/Layout.astro'
 import PhotoGallery from '../components/PhotoGallery'
 import { env } from 'cloudflare:workers'
-import { getCanonicalPhotos } from '../lib/photos-client'
+import { getCollectionPage, type PhotoPage } from '../lib/photos-client'
 
 export const prerender = false
 
-// Keep the existing initial cap until the gallery gains server-side pagination.
-const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
+const COLLECTION = 'portfolio'
+let firstPage: PhotoPage = { photos: [], total: 0 }
+try {
+  if (env.PHOTOS_API_ORIGIN) firstPage = await getCollectionPage(env.PHOTOS_API_ORIGIN, COLLECTION, { limit: 60 })
+} catch (error) {
+  console.error('Failed to fetch portfolio photos:', error)
+}
 ---
 
 <Layout
@@ -23,8 +28,14 @@ const photos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 500 })
       <span>Mountains, weather, friends, and the small things worth remembering.</span>
     </header>
 
-    <PhotoGallery client:load photos={photos} apiOrigin={env.PHOTOS_API_ORIGIN} />
-    <noscript><p>The latest 50 photos are shown above. Turn on JavaScript to search and load more.</p></noscript>
+    <PhotoGallery
+      client:load
+      photos={firstPage.photos}
+      total={firstPage.total}
+      apiOrigin={env.PHOTOS_API_ORIGIN}
+      collection={COLLECTION}
+    />
+    <noscript><p>The first {firstPage.photos.length} photos are shown above. Turn on JavaScript to search and load more.</p></noscript>
   </div>
 
   <style>

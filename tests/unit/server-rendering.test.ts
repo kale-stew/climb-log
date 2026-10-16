@@ -29,8 +29,8 @@ describe('server-rendered collection pages', () => {
     expect(html).toContain('Garfield County')
   })
 
-  it('includes the first 50 photos in HTML', () => {
-    const photos = Array.from({ length: 51 }, (_, index) => ({
+  it('renders the server-provided page and offers more from the collection', () => {
+    const photos = Array.from({ length: 60 }, (_, index) => ({
       id: `photo-${index}`,
       url: `/img/photo-${index}/`,
       caption: `Mountain photo ${index}`,
@@ -41,11 +41,12 @@ describe('server-rendered collection pages', () => {
       height: 600,
     }))
 
-    const html = renderToStaticMarkup(createElement(PhotoGallery, { photos }))
+    const html = renderToStaticMarkup(createElement(PhotoGallery, { photos, total: 847 }))
 
     expect(html).toContain('Mountain photo 0')
-    expect(html).toContain('Mountain photo 49')
-    expect(html).not.toContain('Mountain photo 50')
+    expect(html).toContain('Mountain photo 59')
+    expect(html).toContain('Showing 60 of 847 photos')
+    expect(html).toContain('Load more photos')
     expect(html).toContain('Show more photos')
     expect(html).toContain('Show larger photos')
   })

@@ -163,6 +163,40 @@ export async function getCanonicalPhotos(
   }
 }
 
+export interface PhotoPage {
+  photos: DisplayPhoto[]
+  total: number
+}
+
+interface CollectionPageOptions extends PhotoOptions {
+  limit?: number
+  offset?: number
+  query?: string
+  signal?: AbortSignal
+}
+
+/** Fetch one page of a curated collection. Throws so callers can show a retry state. */
+export async function getCollectionPage(
+  origin: string,
+  slug: string,
+  options: CollectionPageOptions = {},
+): Promise<PhotoPage> {
+  const url = new URL(`/api/collections/${encodeURIComponent(slug)}/photos`, normalizeOrigin(origin))
+  url.searchParams.set('limit', String(Math.min(Math.max(1, options.limit ?? PAGE_SIZE), PAGE_SIZE)))
+  url.searchParams.set('offset', String(Math.max(0, options.offset ?? 0)))
+  const query = options.query?.trim()
+  if (query) url.searchParams.set('q', query)
+
+  const response = await (options.fetchFn ?? fetch)(url, {
+    headers: { Accept: 'application/json' },
+    signal: options.signal,
+  })
+  if (!response.ok) throw new Error(`photos-api returned ${response.status}`)
+  const body = (await response.json()) as PhotosResponse & { meta: { total?: number } }
+  const photos = body.photos.map(adaptCanonicalPhoto)
+  return { photos, total: body.meta.total ?? photos.length }
+}
+
 export async function getCanonicalPhoto(
   origin: string | undefined,
   identifier: string,

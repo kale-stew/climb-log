@@ -6,8 +6,8 @@ import {
   useRef,
   useState,
 } from 'react'
-import { formatCalendarDate, parseCalendarDate } from '../lib/dates'
-import { getCanonicalPhotos } from '../lib/photos-client'
+import { formatCalendarDate } from '../lib/dates'
+import { getCollectionPage } from '../lib/photos-client'
 
 interface Photo {
   id: string
@@ -29,8 +29,12 @@ interface Photo {
 
 interface PhotoGalleryProps {
   photos: Photo[]
+  total?: number
   apiOrigin?: string
+  collection?: string
 }
+
+const PAGE_SIZE = 60
 
 function getImageUrl(photo: Photo, size: 'thumb' | 'full' = 'thumb') {
   const id = photo.short_id || photo.id
@@ -41,82 +45,87 @@ const GRID_MIN_WIDTHS = [64, 96, 160, 260, 420]
 const GRID_GAPS = ['1px', '2px', '0.35rem', '0.65rem', '1rem']
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: PhotoGalleryProps) {
+export default function PhotoGallery({
+  photos: initialPhotos,
+  total: initialTotal = initialPhotos.length,
+  apiOrigin,
+  collection = 'portfolio',
+}: PhotoGalleryProps) {
   const [photos, setPhotos] = useState(initialPhotos)
+  const [total, setTotal] = useState(initialTotal)
   const [isLoading, setIsLoading] = useState(initialPhotos.length === 0 && Boolean(apiOrigin))
-  const [lightbox, setLightbox] = useState<{ photoIds: string[]; index: number } | null>(null)
+  const [loadError, setLoadError] = useState(false)
+  const [lightbox, setLightbox] = useState<{ photos: Photo[]; index: number } | null>(null)
   const [filter, setFilter] = useState('')
-  const [visibleCount, setVisibleCount] = useState(50)
+  const [activeQuery, setActiveQuery] = useState('')
   const [gridZoom, setGridZoom] = useState(2)
   const gridZoomRef = useRef(gridZoom)
   const pinchStartDistance = useRef<number | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const previousRects = useRef(new Map<string, DOMRect>())
   const activeAnimations = useRef(new Set<Animation>())
+  const requestRef = useRef<AbortController | null>(null)
+  const hasInitialPage = useRef(initialPhotos.length > 0)
+
+  const fetchPage = useCallback(
+    async (query: string, offset: number) => {
+      if (!apiOrigin) return
+      requestRef.current?.abort()
+      const controller = new AbortController()
+      requestRef.current = controller
+      setIsLoading(true)
+      setLoadError(false)
+      try {
+        const page = await getCollectionPage(apiOrigin, collection, {
+          limit: PAGE_SIZE,
+          offset,
+          query,
+          signal: controller.signal,
+        })
+        setPhotos(current => {
+          if (offset === 0) return page.photos
+          const seen = new Set(current.map(photo => photo.id))
+          return [...current, ...page.photos.filter(photo => !seen.has(photo.id))]
+        })
+        setTotal(page.total)
+      } catch (error) {
+        if (!controller.signal.aborted) setLoadError(true)
+      } finally {
+        if (requestRef.current === controller) {
+          requestRef.current = null
+          setIsLoading(false)
+        }
+      }
+    },
+    [apiOrigin, collection],
+  )
 
   useEffect(() => {
-    if (initialPhotos.length > 0 || !apiOrigin) return
+    const timer = window.setTimeout(() => setActiveQuery(filter.trim()), 250)
+    return () => window.clearTimeout(timer)
+  }, [filter])
 
-    let active = true
-    getCanonicalPhotos(apiOrigin, { limit: 500, ttlMs: 0 })
-      .then(canonicalPhotos => {
-        if (active) setPhotos(canonicalPhotos)
-      })
-      .finally(() => {
-        if (active) setIsLoading(false)
-      })
-    return () => {
-      active = false
+  useEffect(() => {
+    if (!activeQuery && hasInitialPage.current) {
+      hasInitialPage.current = false
+      return
     }
-  }, [apiOrigin, initialPhotos.length])
+    hasInitialPage.current = false
+    fetchPage(activeQuery, 0)
+  }, [activeQuery, fetchPage])
 
-  const filteredPhotos = filter
-    ? photos.filter(p => {
-        const query = filter.toLowerCase().trim()
-        if (!query) return true
+  useEffect(() => () => requestRef.current?.abort(), [])
 
-        // Search caption and location
-        const captionMatch = p.caption?.toLowerCase().includes(query)
-        const areaMatch = p.area?.toLowerCase().includes(query)
-        const stateMatch = p.state?.toLowerCase().includes(query)
-
-        // Search tags
-        const tagsMatch = p.tags?.toLowerCase().includes(query)
-
-        // Search year (e.g., "2023")
-        const yearMatch = p.date?.startsWith(query)
-
-        // Search month name (e.g., "january", "march")
-        const monthNames = [
-          'january',
-          'february',
-          'march',
-          'april',
-          'may',
-          'june',
-          'july',
-          'august',
-          'september',
-          'october',
-          'november',
-          'december',
-        ]
-        const monthIndex = monthNames.findIndex(m => m.startsWith(query))
-        const monthMatch =
-          monthIndex >= 0 && p.date ? parseCalendarDate(p.date).getMonth() === monthIndex : false
-
-        return captionMatch || areaMatch || stateMatch || tagsMatch || yearMatch || monthMatch
-      })
-    : photos
+  const filteredPhotos = photos
 
   const openLightbox = (index: number) => {
-    setLightbox({ photoIds: filteredPhotos.map(photo => photo.id), index })
+    setLightbox({ photos: filteredPhotos, index })
   }
   const closeLightbox = useCallback(() => setLightbox(null), [])
 
   const goNext = useCallback(() => {
     setLightbox(current =>
-      current ? { ...current, index: (current.index + 1) % current.photoIds.length } : null,
+      current ? { ...current, index: (current.index + 1) % current.photos.length } : null,
     )
   }, [])
 
@@ -125,7 +134,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
       current
         ? {
             ...current,
-            index: (current.index - 1 + current.photoIds.length) % current.photoIds.length,
+            index: (current.index - 1 + current.photos.length) % current.photos.length,
           }
         : null,
     )
@@ -166,24 +175,20 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
   }, [lightbox])
 
   useEffect(() => {
-    if (!lightbox || lightbox.photoIds.length < 2) return
+    if (!lightbox || lightbox.photos.length < 2) return
 
-    const adjacentIds = [
-      lightbox.photoIds[(lightbox.index - 1 + lightbox.photoIds.length) % lightbox.photoIds.length],
-      lightbox.photoIds[(lightbox.index + 1) % lightbox.photoIds.length],
-    ]
-    const adjacent = adjacentIds.flatMap(id => photos.find(photo => photo.id === id) || [])
-    adjacent.forEach(photo => {
+    const count = lightbox.photos.length
+    for (const photo of [
+      lightbox.photos[(lightbox.index - 1 + count) % count],
+      lightbox.photos[(lightbox.index + 1) % count],
+    ]) {
       const image = new Image()
       image.src = getImageUrl(photo, 'full')
-    })
-  }, [lightbox, photos])
+    }
+  }, [lightbox])
 
-  const currentPhotoId = lightbox?.photoIds[lightbox.index]
-  const currentPhoto = currentPhotoId
-    ? photos.find(photo => photo.id === currentPhotoId) || null
-    : null
-  const visiblePhotos = filteredPhotos.slice(0, visibleCount)
+  const currentPhoto = lightbox ? lightbox.photos[lightbox.index] : null
+  const visiblePhotos = filteredPhotos
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
 
@@ -269,16 +274,13 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
           type="text"
           placeholder="Search by caption, location, year, month, or tags..."
           value={filter}
-          onChange={e => {
-            setFilter(e.target.value)
-            setVisibleCount(50)
-          }}
+          onChange={e => setFilter(e.target.value)}
         />
         <div className="gallery-status">
           <p aria-live="polite">
-            {isLoading
+            {isLoading && photos.length === 0
               ? 'Loading photos…'
-              : `Showing ${Math.min(visibleCount, filteredPhotos.length)} of ${filteredPhotos.length} photos`}
+              : `Showing ${photos.length} of ${total} photos`}
           </p>
           <fieldset className="gallery-zoom">
             <legend className="sr-only">Gallery size</legend>
@@ -367,14 +369,19 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
         ))}
       </div>
 
-      {visibleCount < filteredPhotos.length && (
+      {!isLoading && photos.length === 0 && !loadError && (
+        <p className="gallery-empty">No photos match that search.</p>
+      )}
+
+      {(photos.length < total || loadError) && (
         <div className="load-more-wrap">
           <button
             type="button"
             className="load-more"
-            onClick={() => setVisibleCount(count => count + 50)}
+            disabled={isLoading}
+            onClick={() => fetchPage(activeQuery, loadError && photos.length === 0 ? 0 : photos.length)}
           >
-            Load more photos
+            {isLoading ? 'Loading…' : loadError ? 'Try again' : 'Load more photos'}
           </button>
         </div>
       )}
@@ -442,7 +449,7 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
               </div>
               <div className="lightbox-counter">
                 {String((lightbox?.index ?? 0) + 1).padStart(2, '0')} /{' '}
-                {String(lightbox?.photoIds.length ?? 0).padStart(2, '0')}
+                {String(lightbox?.photos.length ?? 0).padStart(2, '0')}
               </div>
             </div>
           </div>
@@ -589,6 +596,8 @@ export default function PhotoGallery({ photos: initialPhotos, apiOrigin }: Photo
 
         .load-more-wrap { display: flex; justify-content: center; padding-top: 3rem; }
         .load-more { border-radius: 999px; padding: 0.8rem 1.5rem; }
+        .load-more:disabled { cursor: progress; opacity: 0.7; }
+        .gallery-empty { padding: 3rem 0; color: var(--color-text-tertiary); text-align: center; }
 
         .photo-item:hover .photo-overlay,
         .photo-item:focus-visible .photo-overlay {
