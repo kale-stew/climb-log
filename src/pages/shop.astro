@@ -1,0 +1,307 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+import { getCanonicalPhoto, type DisplayPhoto } from '../lib/photos-client'
+import {
+  PRINTS,
+  PRODUCTS,
+  formatPrice,
+  printableSizes,
+  requestMailto,
+  statusLabel,
+} from '../lib/shop'
+
+export const prerender = false
+
+const photoIds = [...new Set([...PRODUCTS.flatMap(product => product.photoIds), ...PRINTS.map(print => print.photoId)])]
+const fetched = await Promise.all(photoIds.map(id => getCanonicalPhoto(env.PHOTOS_API_ORIGIN, id)))
+const photos = new Map<string, DisplayPhoto>()
+fetched.forEach((photo, index) => {
+  if (photo) photos.set(photoIds[index], photo)
+})
+
+const products = PRODUCTS.map(product => ({
+  ...product,
+  images: product.photoIds.map(id => photos.get(id)).filter((photo): photo is DisplayPhoto => Boolean(photo)),
+}))
+
+const prints = PRINTS.flatMap(listing => {
+  const photo = photos.get(listing.photoId)
+  if (!photo) return []
+  const sizes = printableSizes(photo.width, photo.height)
+  if (sizes.length === 0) return []
+  return [{ ...listing, photo, sizes }]
+})
+
+function productHref(product: (typeof products)[number]) {
+  if (product.checkoutUrl) return product.checkoutUrl
+  const verb = product.status === 'preorder' ? 'Preorder' : 'Notify me'
+  return requestMailto(`${verb}: ${product.name}`, `Hi Kylie! I'd like ${product.name}.\n\nQuantity: 1\nShip to (US only): `)
+}
+
+function productCta(product: (typeof products)[number]) {
+  if (product.status === 'preorder') return 'Preorder'
+  if (product.status === 'coming-soon') return 'Notify me'
+  return 'Request'
+}
+---
+
+<Layout
+  title="Shop"
+  description="Prints, postcards, and calendars from Kylie's photos, packed by hand in San Francisco."
+  ogImageAlt="A photo from Kylie's shop"
+>
+  <div class="container page">
+    <header class="shop-intro">
+      <p class="shop-eyebrow">Kylie's Photos</p>
+      <h1>Shop</h1>
+      <p>
+        Prints, postcards, and calendars from the photos on this site. Everything is packed by hand
+        in San Francisco and ships within the US.
+      </p>
+    </header>
+
+    <section aria-labelledby="goods-heading" class="shop-section">
+      <h2 id="goods-heading">Paper goods</h2>
+      <div class="product-grid">
+        {products.map(product => (
+          <article class="product-card">
+            <div class="product-stack" aria-hidden={product.images.length === 0}>
+              {product.images.slice(0, 3).map((photo, index) => (
+                <img
+                  src={`/img/${photo.id}/?w=800`}
+                  alt={index === 0 ? (photo.title ?? product.name) : ''}
+                  loading="lazy"
+                  width={photo.width ?? 800}
+                  height={photo.height ?? 600}
+                  style={photo.accent_color ? `background-color: ${photo.accent_color}` : undefined}
+                />
+              ))}
+            </div>
+            <div class="product-body">
+              <div class="product-heading">
+                <h3>{product.name}</h3>
+                <span class={`status status-${product.status}`}>{statusLabel(product.status)}</span>
+              </div>
+              <p>{product.blurb}</p>
+              <div class="product-footer">
+                <span class="price">{formatPrice(product.price)}</span>
+                <a class="btn btn-primary" href={productHref(product)}>{productCta(product)}</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="prints-heading" class="shop-section">
+      <h2 id="prints-heading">Prints</h2>
+      <p class="section-note">
+        Archival fine-art paper, unframed. Sizes are limited to what each original can print sharply.
+        Prints are made to order; email me and I'll confirm the details.
+      </p>
+      {prints.length === 0 ? (
+        <p class="empty">Prints are loading slowly right now. Check back in a minute.</p>
+      ) : (
+        <div class="print-grid">
+          {prints.map(({ photo, sizes, note }) => (
+            <article class="print-card">
+              <img
+                src={`/img/${photo.id}/?w=800`}
+                alt={photo.title ?? 'Print'}
+                loading="lazy"
+                width={photo.width ?? 800}
+                height={photo.height ?? 600}
+                style={photo.accent_color ? `background-color: ${photo.accent_color}` : undefined}
+              />
+              <div class="print-body">
+                <h3>{photo.title ?? 'Untitled'}</h3>
+                {(note || photo.location) && <p class="print-meta">{note ?? photo.location}</p>}
+                <ul class="size-list" aria-label="Available sizes">
+                  {sizes.map(size => (
+                    <li>{size.label} · {formatPrice(size.price)}</li>
+                  ))}
+                </ul>
+                <a
+                  class="btn"
+                  href={requestMailto(
+                    `Print request: ${photo.title ?? photo.id}`,
+                    `Hi Kylie! I'd like a print of "${photo.title ?? photo.id}" (${photo.id}).\n\nSize: \nShip to (US only): `,
+                  )}
+                >
+                  Request this print
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <section class="shop-section shop-faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">Good to know</h2>
+      <dl>
+        <dt>Shipping</dt>
+        <dd>US only for now. Prints ship flat in rigid mailers; postcards and calendars ship in sleeves.</dd>
+        <dt>Want something else?</dt>
+        <dd>
+          Any photo in the <a href="/photos/">gallery</a> may be printable. Email
+          <a href={requestMailto('Custom print request')}>hi@kylies.photos</a> with the photo and size.
+        </dd>
+      </dl>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .shop-intro {
+    max-width: 42rem;
+    margin-bottom: var(--space-2xl);
+  }
+  .shop-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-xs);
+  }
+  .shop-section {
+    margin-bottom: var(--space-3xl);
+  }
+  .section-note {
+    max-width: 42rem;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-xl);
+  }
+  .product-card,
+  .print-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+  .product-stack {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    aspect-ratio: 3 / 2;
+    background-color: var(--color-bg-tertiary);
+  }
+  .product-stack img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .product-stack img:first-child {
+    grid-row: 1 / 3;
+  }
+  .product-stack img:only-child {
+    grid-column: 1 / 3;
+  }
+  .product-body,
+  .print-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: var(--space-lg);
+  }
+  .product-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+  .product-heading h3 {
+    margin-bottom: var(--space-sm);
+  }
+  .status {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+  .status-preorder {
+    color: var(--color-white);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .product-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-top: auto;
+  }
+  .price {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .print-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--space-lg);
+  }
+  .print-card img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+  .print-body h3 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-xs);
+  }
+  .print-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-sm);
+  }
+  .size-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+  }
+  .size-list li {
+    font-size: var(--font-size-xs, 0.75rem);
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    color: var(--color-text-secondary);
+  }
+  .print-body .btn {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+  .shop-faq dl {
+    max-width: 42rem;
+  }
+  .shop-faq dt {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-top: var(--space-md);
+  }
+  .shop-faq dd {
+    color: var(--color-text-secondary);
+  }
+</style>
