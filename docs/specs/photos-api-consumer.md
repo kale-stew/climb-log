@@ -162,8 +162,9 @@ that page's image origin to canonical first.
   eight IDs for photos intentionally quarantined or made private in photos-api.
 - [x] Alias three replaced local-only photos to their higher-resolution
   canonical uploads (`8e76be2f6827`, `39590f7413c3`, `3cd7a78fd6ba`).
-- [ ] Retire the remaining climb mapper (`/admin/climbs`, `map-photo`,
-  `undo-photo`) in favor of the photos-api hike selector.
+- [x] Retire the climb mapper: `/admin/climbs` redirects to the photos-api
+  admin and `map-photo`/`undo-photo` return 410. Its three logged assignments
+  (May 2026) were already superseded by formal primary hike links.
 - [x] Fix blog OG images: heroes now come from photos-api JPEG transforms
   (`?w=1600&format=jpeg`) inlined as data URIs. The old Twitter avatar URL
   returns 404, so cards omit it until a replacement avatar is chosen.
@@ -183,13 +184,14 @@ Run only with explicit confirmation, as its own commit and operation.
    `climbs.preview_img_url`, and every local `photos.id`/`short_id` through
    `GET photos-api/api/photos/{id}`). Any new unresolved ID blocks deletion
    unless the photo was intentionally hidden in photos-api.
-3. Export `climb-log-db` `photos` (and `photo_climb_links`) to an archive outside
+3. Export `climb-log-db` `photos`, `photo_climb_links`, and
+   `photo_assignment_log` (3 rows) to an archive outside
    the repository; record row counts (607 photos at retirement).
 4. Inventory `climb-log-images` and `climb-log-images-preview` (object count and
    bytes) and store the manifest with the export.
 5. Capture a D1 Time Travel bookmark, then apply a numbered migration that drops
-   the local `photos` and `photo_climb_links` tables; insert the matching
-   `d1_migrations` row if applied out of band.
+   the local `photos`, `photo_climb_links`, and `photo_assignment_log` tables;
+   insert the matching `d1_migrations` row if applied out of band.
 6. Empty and delete the buckets only after the export and manifest are verified.
 7. Remove or rewrite scripts that still read the local table
    (`scripts/backfill-embeddings.ts`, `scripts/migrate/*`).
