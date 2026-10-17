@@ -1,19 +1,31 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import QuickView from '../components/shop/QuickView.astro'
+import ShopImage from '../components/shop/ShopImage.astro'
 import { env } from 'cloudflare:workers'
 import { getCanonicalPhoto, type DisplayPhoto } from '../lib/photos-client'
 import {
   PRINTS,
   PRODUCTS,
   formatPrice,
+  imagePhotoIds,
+  photo as photoImage,
   printableSizes,
+  quickViewSlug,
   requestMailto,
+  resolveImages,
   statusLabel,
+  type PrintSize,
 } from '../lib/shop'
 
 export const prerender = false
 
-const photoIds = [...new Set([...PRODUCTS.flatMap(product => product.photoIds), ...PRINTS.map(print => print.photoId)])]
+const photoIds = [
+  ...new Set([
+    ...PRODUCTS.flatMap(product => imagePhotoIds(product.images)),
+    ...PRINTS.flatMap(print => [print.photoId, ...imagePhotoIds(print.images ?? [])]),
+  ]),
+]
 const fetched = await Promise.all(photoIds.map(id => getCanonicalPhoto(env.PHOTOS_API_ORIGIN, id)))
 const photos = new Map<string, DisplayPhoto>()
 fetched.forEach((photo, index) => {
@@ -22,7 +34,8 @@ fetched.forEach((photo, index) => {
 
 const products = PRODUCTS.map(product => ({
   ...product,
-  images: product.photoIds.map(id => photos.get(id)).filter((photo): photo is DisplayPhoto => Boolean(photo)),
+  qv: quickViewSlug(product),
+  gallery: resolveImages(product.images, photos),
 }))
 
 const prints = PRINTS.flatMap(listing => {
@@ -30,7 +43,8 @@ const prints = PRINTS.flatMap(listing => {
   if (!photo) return []
   const sizes = printableSizes(photo.width, photo.height)
   if (sizes.length === 0) return []
-  return [{ ...listing, photo, sizes }]
+  const gallery = resolveImages([photoImage(listing.photoId), ...(listing.images ?? [])], photos)
+  return [{ ...listing, qv: quickViewSlug(listing), photo, sizes, gallery }]
 })
 
 function productHref(product: (typeof products)[number]) {
@@ -43,6 +57,14 @@ function productCta(product: (typeof products)[number]) {
   if (product.status === 'preorder') return 'Preorder'
   if (product.status === 'coming-soon') return 'Notify me'
   return 'Request'
+}
+
+function printHref(photo: DisplayPhoto, size?: PrintSize) {
+  const name = photo.title ?? photo.id
+  return requestMailto(
+    `Print request: ${name}${size ? ` (${size.label})` : ''}`,
+    `Hi Kylie! I'd like a print of "${name}" (${photo.id}).\n\nSize: ${size?.label ?? ''}\nShip to (US only): `,
+  )
 }
 ---
 
@@ -65,22 +87,20 @@ function productCta(product: (typeof products)[number]) {
       <h2 id="goods-heading">Paper goods</h2>
       <div class="product-grid">
         {products.map(product => (
-          <article class="product-card">
-            <div class="product-stack" aria-hidden={product.images.length === 0}>
-              {product.images.slice(0, 3).map((photo, index) => (
-                <img
-                  src={`/img/${photo.id}/?w=800`}
-                  alt={index === 0 ? (photo.title ?? product.name) : ''}
-                  loading="lazy"
-                  width={photo.width ?? 800}
-                  height={photo.height ?? 600}
-                  style={photo.accent_color ? `background-color: ${photo.accent_color}` : undefined}
-                />
-              ))}
-            </div>
+          <article class="product-card" id={product.qv}>
+            {product.gallery[0] && (
+              <a class="card-media product-media" href={`#${product.qv}`} data-quick-view={product.qv} aria-label={`Quick view: ${product.name}`}>
+                <ShopImage image={product.gallery[0].image} photo={product.gallery[0].photo} width={800} />
+                <span class="quick-view-hint" aria-hidden="true">
+                  Quick view{product.gallery.length > 1 ? ` · ${product.gallery.length} images` : ''}
+                </span>
+              </a>
+            )}
             <div class="product-body">
               <div class="product-heading">
-                <h3>{product.name}</h3>
+                <h3>
+                  <a class="card-title" href={`#${product.qv}`} data-quick-view={product.qv}>{product.name}</a>
+                </h3>
                 <span class={`status status-${product.status}`}>{statusLabel(product.status)}</span>
               </div>
               <p>{product.blurb}</p>
@@ -104,33 +124,21 @@ function productCta(product: (typeof products)[number]) {
         <p class="empty">Prints are loading slowly right now. Check back in a minute.</p>
       ) : (
         <div class="print-grid">
-          {prints.map(({ photo, sizes, note }) => (
-            <article class="print-card">
-              <img
-                src={`/img/${photo.id}/?w=800`}
-                alt={photo.title ?? 'Print'}
-                loading="lazy"
-                width={photo.width ?? 800}
-                height={photo.height ?? 600}
-                style={photo.accent_color ? `background-color: ${photo.accent_color}` : undefined}
-              />
+          {prints.map(({ photo, sizes, note, qv, gallery }) => (
+            <article class="print-card" id={qv}>
+              <a class="card-media print-media" href={`#${qv}`} data-quick-view={qv} aria-label={`Quick view: ${photo.title ?? 'Print'}`}>
+                <ShopImage image={gallery[0].image} photo={gallery[0].photo} width={800} />
+                <span class="quick-view-hint" aria-hidden="true">Quick view</span>
+              </a>
               <div class="print-body">
-                <h3>{photo.title ?? 'Untitled'}</h3>
+                <h3>
+                  <a class="card-title" href={`#${qv}`} data-quick-view={qv}>{photo.title ?? 'Untitled'}</a>
+                </h3>
                 {(note || photo.location) && <p class="print-meta">{note ?? photo.location}</p>}
-                <ul class="size-list" aria-label="Available sizes">
-                  {sizes.map(size => (
-                    <li>{size.label} · {formatPrice(size.price)}</li>
-                  ))}
-                </ul>
-                <a
-                  class="btn"
-                  href={requestMailto(
-                    `Print request: ${photo.title ?? photo.id}`,
-                    `Hi Kylie! I'd like a print of "${photo.title ?? photo.id}" (${photo.id}).\n\nSize: \nShip to (US only): `,
-                  )}
-                >
-                  Request this print
-                </a>
+                <p class="print-from">
+                  From {formatPrice(sizes[0].price)} · {sizes[0].label} to {sizes[sizes.length - 1].label}
+                </p>
+                <a class="btn" href={printHref(photo)}>Request this print</a>
               </div>
             </article>
           ))}
@@ -151,6 +159,43 @@ function productCta(product: (typeof products)[number]) {
       </dl>
     </section>
   </div>
+
+  {products.map(product => (
+    <QuickView slug={product.qv} title={product.name} gallery={product.gallery}>
+      <div class="qv-meta">
+        <span class="price">{formatPrice(product.price)}</span>
+        <span class={`status status-${product.status}`}>{statusLabel(product.status)}</span>
+      </div>
+      <p>{product.blurb}</p>
+      {product.details && (
+        <ul class="qv-details">
+          {product.details.map(detail => <li>{detail}</li>)}
+        </ul>
+      )}
+      <a class="btn btn-primary qv-cta" href={productHref(product)}>{productCta(product)}</a>
+      <p class="qv-fine">US shipping only. You'll get a confirmation email before anything is charged.</p>
+    </QuickView>
+  ))}
+
+  {prints.map(({ photo, sizes, note, qv, gallery }) => (
+    <QuickView slug={qv} title={photo.title ?? 'Untitled'} gallery={gallery}>
+      {(note || photo.location) && <p class="print-meta">{note ?? photo.location}</p>}
+      <fieldset class="size-picker">
+        <legend>Size</legend>
+        {sizes.map((size, index) => (
+          <label class="size-option">
+            <input type="radio" name={`size-${qv}`} value={size.label} data-href={printHref(photo, size)} checked={index === 0} />
+            <span class="size-label">{size.label}</span>
+            <span class="size-price">{formatPrice(size.price)}</span>
+          </label>
+        ))}
+      </fieldset>
+      <a class="btn btn-primary qv-cta" href={printHref(photo, sizes[0])} data-qv-cta>Request this print</a>
+      <p class="qv-fine">
+        Archival fine-art paper, unframed. Larger sizes are hidden when the original can't print sharply at that size.
+      </p>
+    </QuickView>
+  ))}
 </Layout>
 
 <style>
@@ -187,25 +232,61 @@ function productCta(product: (typeof products)[number]) {
     border-radius: var(--border-radius-lg);
     overflow: hidden;
   }
-  .product-stack {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 2px;
-    aspect-ratio: 3 / 2;
-    background-color: var(--color-bg-tertiary);
-  }
-  .product-stack img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .card-media {
+    position: relative;
     display: block;
+    color: inherit;
   }
-  .product-stack img:first-child {
-    grid-row: 1 / 3;
+  .product-media {
+    aspect-ratio: 3 / 2;
   }
-  .product-stack img:only-child {
-    grid-column: 1 / 3;
+  .print-media {
+    aspect-ratio: 4 / 3;
+  }
+  .card-media :global(img) {
+    transition: transform 300ms ease;
+  }
+  .card-media:hover :global(img),
+  .card-media:focus-visible :global(img) {
+    transform: scale(1.02);
+  }
+  .quick-view-hint {
+    position: absolute;
+    left: var(--space-sm);
+    bottom: var(--space-sm);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background-color: rgba(20, 16, 13, 0.7);
+    color: #fcf8f2;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 150ms ease, transform 150ms ease;
+  }
+  .card-media:hover .quick-view-hint,
+  .card-media:focus-visible .quick-view-hint {
+    opacity: 1;
+    transform: none;
+  }
+  @media (hover: none) {
+    .quick-view-hint {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card-media :global(img),
+    .quick-view-hint {
+      transition: none;
+    }
+  }
+  .card-title {
+    color: inherit;
+    text-decoration: none;
+  }
+  .card-title:hover {
+    text-decoration: underline;
   }
   .product-body,
   .print-body {
@@ -259,13 +340,6 @@ function productCta(product: (typeof products)[number]) {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
     gap: var(--space-lg);
   }
-  .print-card img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    display: block;
-  }
   .print-body h3 {
     font-size: var(--font-size-xl);
     margin-bottom: var(--space-xs);
@@ -275,24 +349,94 @@ function productCta(product: (typeof products)[number]) {
     color: var(--color-text-tertiary);
     margin-bottom: var(--space-sm);
   }
-  .size-list {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    margin-bottom: var(--space-md);
-  }
-  .size-list li {
-    font-size: var(--font-size-xs, 0.75rem);
-    padding: 0.15rem 0.5rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
+  .print-from {
+    font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+    margin-bottom: var(--space-md);
   }
   .print-body .btn {
     margin-top: auto;
     align-self: flex-start;
   }
+
+  .qv-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  .qv-details {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+  .qv-details li + li {
+    margin-top: var(--space-xs);
+  }
+  .qv-cta {
+    align-self: stretch;
+    padding-block: var(--space-md);
+    font-size: var(--font-size-base);
+  }
+  @media (max-width: 760px) {
+    .qv-cta {
+      position: sticky;
+      bottom: var(--space-md);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    }
+  }
+  .qv-fine {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+  }
+  .size-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .size-picker legend {
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+  .size-option {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+  .size-option:hover {
+    border-color: var(--color-border-hover);
+  }
+  .size-option:has(input:checked) {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-secondary);
+  }
+  .size-option:has(input:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .size-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .size-label {
+    font-weight: 600;
+  }
+  .size-price {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
   .shop-faq dl {
     max-width: 42rem;
   }
