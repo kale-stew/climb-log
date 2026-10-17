@@ -17,8 +17,10 @@ export interface ShopProduct {
   status: ProductStatus
   /** Placeholder retail price in USD. */
   price: number
-  /** Canonical photos-api IDs used as the product imagery. */
-  photoIds: string[]
+  /** Ordered imagery: the first entry is the card cover, and the full list is the quick-view gallery. */
+  images: ShopImage[]
+  /** Spec lines shown in the quick view, such as size and paper. */
+  details?: string[]
   /** Stripe Payment Link or Shopify checkout URL. Falls back to an email request when unset. */
   checkoutUrl?: string
 }
@@ -27,7 +29,51 @@ export interface PrintListing {
   photoId: string
   /** Optional caption override, such as summit elevation for a peak print. */
   note?: string
+  /** Extra quick-view images shown after the photo itself, such as a framed shot. */
+  images?: ShopImage[]
 }
+
+export type MockupTemplate =
+  | 'calendar-cover'
+  | 'calendar-month'
+  | 'postcard-front'
+  | 'postcard-back'
+
+/**
+ * One image in a product gallery.
+ * - `photo`: a canonical photos-api photo, shown as-is.
+ * - `mockup`: a product visual rendered in HTML/CSS around a canonical photo, for use before real product shots exist.
+ * - `asset`: a static product shot committed under `public/shop/`, such as a photo of the printed proof.
+ */
+export type ShopImage =
+  | { kind: 'photo'; photoId: string; alt?: string }
+  | {
+      kind: 'mockup'
+      template: MockupTemplate
+      photoId: string
+      /** 1–12; the month shown on a `calendar-month` page. */
+      month?: number
+      alt?: string
+    }
+  | { kind: 'asset'; src: string; alt: string; width: number; height: number }
+
+export const photo = (photoId: string, alt?: string): ShopImage => ({ kind: 'photo', photoId, alt })
+
+export const mockup = (
+  template: MockupTemplate,
+  photoId: string,
+  options: { month?: number; alt?: string } = {},
+): ShopImage => ({ kind: 'mockup', template, photoId, ...options })
+
+export const asset = (src: string, alt: string, width: number, height: number): ShopImage => ({
+  kind: 'asset',
+  src,
+  alt,
+  width,
+  height,
+})
+
+export const CALENDAR_YEAR = 2027
 
 /** Minimum effective resolution for a sharp fine-art print viewed at arm's length. */
 export const MIN_PRINT_DPI = 200
@@ -53,7 +99,18 @@ export const PRODUCTS: ShopProduct[] = [
       'Twelve months from the mountains, opening to 11×17. Printed in a small run and packed by hand in San Francisco.',
     status: 'preorder',
     price: 32,
-    photoIds: ['f6e666c3d224', '41c7f22db347', '67216862f7b1'],
+    images: [
+      mockup('calendar-cover', 'f6e666c3d224'),
+      mockup('calendar-month', '41c7f22db347', { month: 1 }),
+      mockup('calendar-month', '67216862f7b1', { month: 7 }),
+      mockup('calendar-month', 'cc4957db86c2', { month: 10 }),
+    ],
+    details: [
+      '11×8.5 closed, opens to 11×17',
+      'Thirteen photos: a cover and one per month',
+      'Wire-bound, with a hanging hole',
+      'Ships the first week of December',
+    ],
   },
   {
     slug: 'postcard-set',
@@ -62,7 +119,16 @@ export const PRODUCTS: ShopProduct[] = [
       'Eight heavyweight postcards: Norway, Utah, Colorado, and Sicily. Write on them or tape them to your monitor.',
     status: 'coming-soon',
     price: 18,
-    photoIds: ['cc4957db86c2', '882e9f19715c', 'f968ed549f84'],
+    images: [
+      mockup('postcard-front', 'cc4957db86c2'),
+      mockup('postcard-front', '882e9f19715c'),
+      mockup('postcard-front', 'f968ed549f84'),
+      mockup('postcard-back', 'cc4957db86c2'),
+    ],
+    details: [
+      'Eight 4×6 cards on heavyweight matte stock',
+      'Blank backs with a caption, ready to mail',
+    ],
   },
 ]
 
@@ -76,6 +142,49 @@ export const PRINTS: PrintListing[] = [
   { photoId: '67216862f7b1' },
   { photoId: '6c0e91103a5b' },
 ]
+
+/** Canonical photo IDs a gallery needs fetched. Assets need none. */
+export function imagePhotoIds(images: ShopImage[]): string[] {
+  return images.flatMap(image => (image.kind === 'asset' ? [] : [image.photoId]))
+}
+
+/**
+ * Pairs each image with its fetched photo and drops images whose photo could not be loaded,
+ * so a missing photo hides one gallery entry rather than breaking the product.
+ */
+export function resolveImages<P>(
+  images: ShopImage[],
+  photos: ReadonlyMap<string, P>,
+): Array<{ image: ShopImage; photo: P | null }> {
+  return images.flatMap((image): Array<{ image: ShopImage; photo: P | null }> => {
+    if (image.kind === 'asset') return [{ image, photo: null }]
+    const found = photos.get(image.photoId)
+    return found ? [{ image, photo: found }] : []
+  })
+}
+
+export interface CalendarMonth {
+  name: string
+  /** Weeks starting Sunday; `null` pads days outside the month. */
+  weeks: Array<Array<number | null>>
+}
+
+export function calendarMonth(year: number, month: number): CalendarMonth {
+  const first = new Date(Date.UTC(year, month - 1, 1))
+  const days = new Date(Date.UTC(year, month, 0)).getUTCDate()
+  const cells: Array<number | null> = Array(first.getUTCDay()).fill(null)
+  for (let day = 1; day <= days; day++) cells.push(day)
+  while (cells.length % 7 !== 0) cells.push(null)
+  const weeks = []
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7))
+  const name = first.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })
+  return { name, weeks }
+}
+
+/** Stable DOM id for a product or print quick view, also used as the URL hash. */
+export function quickViewSlug(item: { slug: string } | { photoId: string }): string {
+  return 'slug' in item ? item.slug : `print-${item.photoId}`
+}
 
 /**
  * Effective DPI when the image is center-cropped to the print's aspect ratio

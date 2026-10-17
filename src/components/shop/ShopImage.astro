@@ -1,0 +1,312 @@
+---
+import type { DisplayPhoto } from '../../lib/photos-client'
+import { CALENDAR_YEAR, calendarMonth, type ShopImage } from '../../lib/shop'
+
+interface Props {
+  image: ShopImage
+  photo: DisplayPhoto | null
+  /** Requested transform width in CSS pixels for photo-backed images. */
+  width: number
+  /** `cover` fills the stage with photos; `contain` letterboxes them. Mockups always sit centered. */
+  fit?: 'cover' | 'contain'
+  eager?: boolean
+  /** Hide from assistive tech, for duplicates such as gallery thumbnails. */
+  decorative?: boolean
+}
+
+const { image, photo, width, fit = 'cover', eager = false, decorative = false } = Astro.props
+const loading = eager ? 'eager' : 'lazy'
+const title = photo?.title ?? 'a mountain photo'
+const src = photo ? `/img/${photo.id}/?w=${width}` : image.kind === 'asset' ? image.src : ''
+const accent = photo?.accent_color ? `background-color: ${photo.accent_color}` : undefined
+
+const month = image.kind === 'mockup' && image.template === 'calendar-month' ? calendarMonth(CALENDAR_YEAR, image.month ?? 1) : null
+
+function defaultAlt(): string {
+  if (image.kind === 'asset') return image.alt
+  if (image.alt) return image.alt
+  if (image.kind === 'photo') return photo?.title ?? 'Photo'
+  switch (image.template) {
+    case 'calendar-cover':
+      return `${CALENDAR_YEAR} calendar cover with ${title}`
+    case 'calendar-month':
+      return `${month?.name} ${CALENDAR_YEAR} calendar page with ${title}`
+    case 'postcard-front':
+      return `Postcard of ${title}`
+    case 'postcard-back':
+      return `Back of a postcard, captioned ${title}`
+  }
+}
+
+const alt = decorative ? '' : defaultAlt()
+const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+---
+
+<div class="shop-stage" data-kind={image.kind} data-fit={fit}>
+  {image.kind === 'photo' && photo && (
+    <img class="stage-photo" src={src} alt={alt} loading={loading} width={photo.width ?? 800} height={photo.height ?? 600} style={accent} />
+  )}
+
+  {image.kind === 'asset' && (
+    <img class="stage-photo" src={src} alt={alt} loading={loading} width={image.width} height={image.height} />
+  )}
+
+  {image.kind === 'mockup' && photo && (
+    <div class={`mockup mockup-${image.template}`} role="img" aria-label={alt || undefined} aria-hidden={decorative ? 'true' : undefined}>
+      {image.template === 'calendar-cover' && (
+        <>
+          <span class="binding" />
+          <img src={src} alt="" loading={loading} style={accent} />
+          <div class="cover-band">
+            <span class="cover-year">{CALENDAR_YEAR}</span>
+            <span class="cover-brand">Kylie's Photos</span>
+          </div>
+        </>
+      )}
+
+      {image.template === 'calendar-month' && month && (
+        <>
+          <img src={src} alt="" loading={loading} style={accent} />
+          <span class="binding" />
+          <div class="month">
+            <div class="month-heading">
+              <span>{month.name}</span>
+              <span>{CALENDAR_YEAR}</span>
+            </div>
+            <div class="month-grid">
+              {weekdays.map(day => <span class="weekday">{day}</span>)}
+              {month.weeks.flat().map(day => <span class="day">{day ?? ''}</span>)}
+            </div>
+            {photo.title && <p class="month-caption">{photo.title}{photo.location ? ` · ${photo.location}` : ''}</p>}
+          </div>
+        </>
+      )}
+
+      {image.template === 'postcard-front' && <img src={src} alt="" loading={loading} style={accent} />}
+
+      {image.template === 'postcard-back' && (
+        <>
+          <div class="back-message">
+            <p class="back-caption">{photo.title ?? 'Untitled'}</p>
+            {photo.location && <p class="back-location">{photo.location}</p>}
+            <p class="back-brand">kylies.photos</p>
+          </div>
+          <div class="back-address">
+            <span class="stamp" />
+            <span class="line" />
+            <span class="line" />
+            <span class="line" />
+          </div>
+        </>
+      )}
+    </div>
+  )}
+</div>
+
+<style>
+  .shop-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    container-type: size;
+    background-color: var(--color-bg-tertiary);
+  }
+  .shop-stage[data-kind='mockup'] {
+    padding: 8%;
+  }
+  .stage-photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .shop-stage[data-fit='contain'] .stage-photo {
+    object-fit: contain;
+    background-color: transparent !important;
+  }
+
+  .mockup {
+    --paper: #fbf8f3;
+    --ink: #2f2925;
+    --ink-soft: #7c7067;
+    --aspect: 3 / 2;
+    --ratio: 1.5;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(100cqw, 100cqh * var(--ratio));
+    aspect-ratio: var(--aspect);
+    container-type: inline-size;
+    background-color: var(--paper);
+    color: var(--ink);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.12),
+      0 8px 24px rgba(0, 0, 0, 0.18);
+    border-radius: 0.6cqi;
+    overflow: hidden;
+  }
+  .mockup img {
+    display: block;
+    width: 100%;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .binding {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    height: 2.4cqi;
+    background-image: radial-gradient(circle, #8c847c 38%, transparent 42%);
+    background-size: 2.4cqi 2.4cqi;
+    background-repeat: repeat-x;
+    z-index: 1;
+  }
+
+  .mockup-calendar-cover {
+    --aspect: 11 / 8.5;
+    --ratio: 1.294;
+  }
+  .mockup-calendar-cover .binding {
+    top: 1.2cqi;
+  }
+  .mockup-calendar-cover img {
+    flex: 1;
+  }
+  .cover-band {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 3cqi 5cqi;
+  }
+  .cover-year {
+    font-family: var(--font-serif);
+    font-size: 8cqi;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .cover-brand {
+    font-size: 2.6cqi;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .mockup-calendar-month {
+    --aspect: 11 / 17;
+    --ratio: 0.647;
+  }
+  .mockup-calendar-month img {
+    aspect-ratio: 11 / 8.5;
+    flex: none;
+  }
+  .mockup-calendar-month .binding {
+    top: calc(100cqi * 8.5 / 11 - 1.2cqi);
+  }
+  .month {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 5cqi 6cqi 4cqi;
+  }
+  .month-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--font-serif);
+    font-size: 6cqi;
+    font-weight: 600;
+    margin-bottom: 2.5cqi;
+  }
+  .month-heading span:last-child {
+    font-size: 3.5cqi;
+    color: var(--ink-soft);
+  }
+  .month-grid {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 1fr;
+    border-top: 0.25cqi solid var(--ink);
+  }
+  .weekday {
+    font-size: 2.6cqi;
+    font-weight: 600;
+    color: var(--ink-soft);
+    padding: 1cqi 0;
+    text-align: left;
+  }
+  .day {
+    font-size: 2.8cqi;
+    padding: 0.8cqi 1cqi;
+    border-top: 0.15cqi solid #e2dbd2;
+  }
+  .month-caption {
+    margin: 2cqi 0 0;
+    font-size: 2.4cqi;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mockup-postcard-front img {
+    height: 100%;
+  }
+
+  .mockup-postcard-back {
+    flex-direction: row;
+    padding: 6cqi 5cqi;
+  }
+  .back-message {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding-right: 4cqi;
+    border-right: 0.3cqi solid #d8d0c6;
+  }
+  .back-caption {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 3.6cqi;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .back-location {
+    margin: 1cqi 0 0;
+    font-size: 2.6cqi;
+    color: var(--ink-soft);
+  }
+  .back-brand {
+    margin: auto 0 0;
+    font-size: 2.2cqi;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .back-address {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 7cqi;
+    padding-left: 4cqi;
+    padding-bottom: 4cqi;
+    position: relative;
+  }
+  .stamp {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 11cqi;
+    height: 13cqi;
+    border: 0.3cqi dashed #b9afa4;
+  }
+  .line {
+    display: block;
+    border-bottom: 0.3cqi solid #d8d0c6;
+  }
+</style>
