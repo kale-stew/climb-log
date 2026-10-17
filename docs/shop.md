@@ -8,7 +8,7 @@
 - `src/pages/shop.astro` fetches metadata for those IDs at request time and renders images through `/img/{id}`.
 - Print sizes are derived from each original's pixel dimensions. A size is offered only when the center crop prints at `MIN_PRINT_DPI` (200) or better, so web-sized images never appear.
 - A product with `checkoutUrl` links there. Without one, the button opens a prefilled email to `hi@kylies.photos`.
-- Every card opens a quick-view `<dialog>` (`src/components/shop/QuickView.astro`) with a swipeable gallery, thumbnails, details, and the CTA. `/shop/#calendar-2027` and `/shop/#print-{photoId}` deep-link to it. Without JS, the link scrolls to the card.
+- Every card opens a quick-view `<dialog>` (`src/components/shop/QuickView.astro`) with a swipeable gallery, thumbnails, details, and the CTA. `/shop#calendar-2027` and `/shop#print-{photoId}` deep-link to it. Without JS, the link scrolls to the card.
 
 ## Product images
 
@@ -30,7 +30,7 @@ Prints show the photo first; add `images` on a `PrintListing` to append extra vi
 - Replace the sample photo selection with the curated launch set.
 - Choose checkout (Stripe Payment Links or Shopify) and set `checkoutUrl` per product.
 - Publish shipping, returns, and damaged-in-transit policies.
-- Add a dedicated OG image for `/shop/`.
+- Add a dedicated OG image for `/shop`.
 
 ## Calendar spike (weekend of Oct 17–18)
 
