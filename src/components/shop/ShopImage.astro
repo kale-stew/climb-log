@@ -17,7 +17,7 @@ interface Props {
 const { image, photo, width, fit = 'cover', eager = false, decorative = false } = Astro.props
 const loading = eager ? 'eager' : 'lazy'
 const title = photo?.title ?? 'a mountain photo'
-const src = photo ? `/img/${photo.id}/?w=${width}` : image.kind === 'asset' ? image.src : ''
+const src = photo ? `/img/${photo.id}?w=${width}` : image.kind === 'asset' ? image.src : ''
 const accent = photo?.accent_color ? `background-color: ${photo.accent_color}` : undefined
 
 const month = image.kind === 'mockup' && image.template === 'calendar-month' ? calendarMonth(CALENDAR_YEAR, image.month ?? 1) : null
