@@ -164,6 +164,14 @@ that page's image origin to canonical first.
   canonical uploads (`8e76be2f6827`, `39590f7413c3`, `3cd7a78fd6ba`).
 - [ ] Retire the remaining climb mapper (`/admin/climbs`, `map-photo`,
   `undo-photo`) in favor of the photos-api hike selector.
+- [ ] Fix blog OG images: `/api/og/{slug}/` returns `200 image/png` with an
+  empty body (pre-existing, unrelated to retirement). The renderer receives a
+  relative `/img/...` hero URL it cannot fetch, and photos-api transforms are
+  WebP-only. Add a JPEG/PNG transform (for example `?w=1200&format=jpeg`) in
+  photos-api and pass an absolute photos-api URL from `src/pages/api/og/[...slug].ts`.
+- [ ] Optional: `/images/photos/{id}/original.jpg` (no trailing slash) 404s
+  because `trailingSlash: 'always'` rejects file-like paths before routing; the
+  slash form redirects. No current references use `/images/`.
 - [ ] **Delete local photo storage (earliest 2026-10-23, after a quiet soak).**
   Follow the runbook below in a future session.
 
