@@ -1,9 +1,10 @@
 # photos-api Consumer Contract (climb-log / kylies.photos)
 
-> **Status: canonical read cutover is live; compatibility retirement remains.**
-> The photo client, same-origin image proxy, formal hike-photo assignments, and
-> exact-date unique fallback are active. Treat the sequence below as rollout
-> history and use the remaining-work list for new changes.
+> **Status: compatibility layer retired 2026-10-16; local storage deletion pending.**
+> The gallery pages the `portfolio` collection, `/img/{id}` proxies only to
+> photos-api, and the embedded photo service, local photo admin, and `R2_IMAGES`
+> binding are removed. The local `photos` table and `climb-log-images` bucket
+> remain intact and unread until the deletion runbook below is executed.
 
 ## Summary
 
@@ -150,15 +151,42 @@ that page's image origin to canonical first.
 
 ## Remaining Work
 
-- [ ] Switch the public gallery from the compatibility listing to the curated
-  `portfolio` collection and add server-side pagination.
-- [ ] Redirect `/admin/photos/*` and `/api/admin/photos/*` to the canonical
-  `photos-api` admin; keep only the canonical hike selector.
-- [ ] Remove photo writes from the Notion cron while preserving climb, gear,
-  peak, and blog synchronization.
-- [ ] Audit literal and generated image references against canonical aliases.
-- [ ] After the audit, remove the local photo table and `climb-log-images` R2
-  bucket in a separate rollback-safe change.
+- [x] Switch the public gallery to the curated `portfolio` collection with
+  server-side pagination and search (552 compatibility-listed photos were added
+  to `portfolio`; six exact-title duplicates were left out).
+- [x] Redirect `/admin/photos/*` to the photos-api admin; `/api/admin/photos/*`
+  returns 410.
+- [x] Confirm the Notion cron writes no photo data.
+- [x] Audit literal and generated image references: all source/data `/img/{id}`
+  values, live climb previews, and the 1,214 local IDs/short IDs resolve, except
+  eight IDs for photos intentionally quarantined or made private in photos-api.
+- [x] Alias three replaced local-only photos to their higher-resolution
+  canonical uploads (`8e76be2f6827`, `39590f7413c3`, `3cd7a78fd6ba`).
+- [ ] Retire the remaining climb mapper (`/admin/climbs`, `map-photo`,
+  `undo-photo`) in favor of the photos-api hike selector.
+- [ ] **Delete local photo storage (earliest 2026-10-23, after a quiet soak).**
+  Follow the runbook below in a future session.
+
+### Local storage deletion runbook
+
+Run only with explicit confirmation, as its own commit and operation.
+
+1. Soak check: Workers logs for `climb-log` show no 5xx or `Canonical image
+   request failed` spikes on `/img/*` since 2026-10-16.
+2. Re-run the reference audit from this document (source, data, live
+   `climbs.preview_img_url`, and every local `photos.id`/`short_id` through
+   `GET photos-api/api/photos/{id}`). Any new unresolved ID blocks deletion
+   unless the photo was intentionally hidden in photos-api.
+3. Export `climb-log-db` `photos` (and `photo_climb_links`) to an archive outside
+   the repository; record row counts (607 photos at retirement).
+4. Inventory `climb-log-images` and `climb-log-images-preview` (object count and
+   bytes) and store the manifest with the export.
+5. Capture a D1 Time Travel bookmark, then apply a numbered migration that drops
+   the local `photos` and `photo_climb_links` tables; insert the matching
+   `d1_migrations` row if applied out of band.
+6. Empty and delete the buckets only after the export and manifest are verified.
+7. Remove or rewrite scripts that still read the local table
+   (`scripts/backfill-embeddings.ts`, `scripts/migrate/*`).
 
 ## Verification
 
@@ -171,6 +199,6 @@ that page's image origin to canonical first.
 
 ## Rollback
 
-Consumer changes only swap read sources. The local table and `/img` route stay
-intact, so reverting the consumer commits restores prior behavior with no data
-restoration. Compatibility and deletion remain separate changes.
+Retirement removed code only. Reverting the retirement commit restores the local
+fallback because the table and bucket still exist. After the deletion runbook,
+rollback requires restoring from its export and object manifest.

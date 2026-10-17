@@ -6,8 +6,6 @@ import { defineMiddleware } from 'astro:middleware'
  * Admin routes require either:
  * - Cf-Access-Jwt-Assertion header (from Cloudflare Access)
  * - Authorization: Bearer <CRON_SECRET> header
- * 
- * This matches the auth pattern used in utils/photos-api.ts
  */
 export const onRequest = defineMiddleware(async (ctx, next) => {
   const { pathname } = ctx.url

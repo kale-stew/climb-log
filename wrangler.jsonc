@@ -18,12 +18,6 @@
       "database_id": "95cf00b1-027f-4ae9-a9f1-4351aafa056d"
     }
   ],
-  "r2_buckets": [
-    {
-      "binding": "R2_IMAGES",
-      "bucket_name": "climb-log-images"
-    }
-  ],
   "images": {
     "binding": "IMAGES"
   },
@@ -54,12 +48,6 @@
           "binding": "DB",
           "database_name": "climb-log-db-preview",
           "database_id": "c0e56b31-fbfd-46f9-992e-af369d9c2cb9"
-        }
-      ],
-      "r2_buckets": [
-        {
-          "binding": "R2_IMAGES",
-          "bucket_name": "climb-log-images-preview"
         }
       ],
       "images": {

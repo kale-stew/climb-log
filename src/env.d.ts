@@ -8,7 +8,6 @@
  */
 export interface CloudflareEnv {
   DB: D1Database
-  R2_IMAGES: R2Bucket
   IMAGES: ImagesBinding
   ALLOWED_WIDTHS: string
   PHOTOS_API_ORIGIN: string

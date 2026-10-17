@@ -1,41 +1,23 @@
 import type { APIRoute } from 'astro'
 import { env } from 'cloudflare:workers'
-import { createPhotosApp } from '../../../utils/photos-api'
 
 export const prerender = false
 
+// Same-origin proxy so every published /img/{legacy-or-canonical-id} URL keeps
+// resolving. photos-api resolves canonical IDs and every compatibility alias.
 export const GET: APIRoute = async ({ request, params }) => {
   const photoId = params.id
   if (!photoId) return new Response('Missing photo ID', { status: 400 })
+  if (!env.PHOTOS_API_ORIGIN) return new Response('Photo service not configured', { status: 503 })
 
-  // Canonical storage is authoritative. Keep this same-origin route so every
-  // published /img/{legacy-or-canonical-id} URL remains stable during cutover.
-  if (env.PHOTOS_API_ORIGIN) {
-    try {
-      const upstreamUrl = new URL(`/img/${encodeURIComponent(photoId)}`, env.PHOTOS_API_ORIGIN)
-      upstreamUrl.search = new URL(request.url).search
-      const upstreamRequest = new Request(upstreamUrl, request)
-      const upstream = env.PHOTOS_API
-        ? await env.PHOTOS_API.fetch(upstreamRequest)
-        : await fetch(upstreamRequest)
-      if (upstream.status !== 404) return upstream
-    } catch (error) {
-      console.error('Canonical image request failed; trying legacy storage:', error)
-    }
+  const upstreamUrl = new URL(`/img/${encodeURIComponent(photoId)}`, env.PHOTOS_API_ORIGIN)
+  upstreamUrl.search = new URL(request.url).search
+  const upstreamRequest = new Request(upstreamUrl, request)
+
+  try {
+    return env.PHOTOS_API ? await env.PHOTOS_API.fetch(upstreamRequest) : await fetch(upstreamRequest)
+  } catch (error) {
+    console.error('Canonical image request failed:', error)
+    return new Response('Photo service unavailable', { status: 502 })
   }
-
-  // Temporary rollback path for identifiers not imported into the canonical
-  // service yet. Remove only after the full reference audit passes.
-  const app = createPhotosApp({
-    DB: env.DB as D1Database,
-    R2_IMAGES: env.R2_IMAGES as R2Bucket,
-    IMAGES: (env as any).IMAGES as ImagesBinding,
-  })
-
-  // Rewrite the URL to include the path param
-  const url = new URL(request.url)
-  url.pathname = `/img/${photoId}`
-
-  const newRequest = new Request(url, request)
-  return app.fetch(newRequest)
 }

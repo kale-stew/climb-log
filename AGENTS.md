@@ -11,12 +11,11 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 | React components | `src/components/` |
 | Notion synchronization | `src/pages/api/cron.ts` |
 | Photo fallbacks | `src/lib/photo-fallbacks.ts` |
-| Embedded legacy photo service | `utils/photos-api.ts` |
 | D1 migrations | `migrations/` |
 | Generated seed inputs and outputs | `data/`, `db/` |
 | Worker bindings and routes | `wrangler.jsonc` |
 
-`photos-api` is the canonical photo service. The local `photos` table, `climb-log-images` bucket, and `utils/photos-api.ts` are compatibility infrastructure, not an independent source of truth.
+`photos-api` is the canonical photo service. The embedded legacy photo service and the `R2_IMAGES` binding are retired: `/img/{id}` proxies only to `photos-api`, and `/images/photos/{id}/…` redirects to it. The local `photos` table and `climb-log-images` bucket are unread and await a separate, confirmed deletion (tracked in `docs/specs/photos-api-consumer.md`). Never read from or write to them.
 
 ## Photo References
 
