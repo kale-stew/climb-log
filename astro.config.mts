@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config'
 
 export default defineConfig({
   output: 'server',
-  trailingSlash: 'always',
+  trailingSlash: 'never',
   adapter: cloudflare(),
   integrations: [react()],
   vite: {

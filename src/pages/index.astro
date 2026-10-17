@@ -103,7 +103,7 @@ function getPhotoAlt(photo: DisplayPhoto): string {
     <header class="home-intro">
       <h1>Proof I went <em>outside.</em></h1>
       <p>Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to.</p>
-      <a href="/photos/">see all the photos <span aria-hidden="true">→</span></a>
+      <a href="/photos">see all the photos <span aria-hidden="true">→</span></a>
     </header>
 
     {recentPhotos.length > 0 && (
@@ -114,7 +114,7 @@ function getPhotoAlt(photo: DisplayPhoto): string {
         </div>
         <div class="photo-strip">
           {recentPhotos.map(photo => (
-            <a href="/photos/" class="photo-strip-item" aria-label={`View ${getPhotoAlt(photo)}`}>
+            <a href="/photos" class="photo-strip-item" aria-label={`View ${getPhotoAlt(photo)}`}>
               <img src={`/img/${photo.id}/?w=800`} alt="" loading="lazy" width={photo.width ?? 800} height={photo.height ?? 600} />
               {(photo.title || photo.area) && (
                 <span aria-hidden="true">{photo.title || photo.area}</span>
@@ -136,7 +136,7 @@ function getPhotoAlt(photo: DisplayPhoto): string {
     <section class="outing-section">
       <div class="section-heading">
         <h2>From the log</h2>
-        <a href="/climbs/">all {formatNumber(stats.totalClimbs)} outings <span aria-hidden="true">→</span></a>
+        <a href="/climbs">all {formatNumber(stats.totalClimbs)} outings <span aria-hidden="true">→</span></a>
       </div>
 
       {recentClimbs.length > 0 ? (
@@ -175,7 +175,7 @@ function getPhotoAlt(photo: DisplayPhoto): string {
           ))}
         </div>
       ) : (
-        <p>No outings found. <a href="/climbs/">View the log</a></p>
+        <p>No outings found. <a href="/climbs">View the log</a></p>
       )}
     </section>
   </div>

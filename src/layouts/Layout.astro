@@ -8,7 +8,7 @@ export interface Props {
 
 const { title, description, ogImage, ogImageAlt } = Astro.props
 
-const canonicalPath = Astro.url.pathname === '/' ? '/' : `${Astro.url.pathname.replace(/\/+$/, '')}/`
+const canonicalPath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/+$/, '')
 const canonicalUrl = `https://kylies.photos${canonicalPath}`
 const defaultOgImage = 'https://kylies.photos/open-graph/home.jpg'
 const defaultDescription = 'Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to.'
@@ -16,12 +16,12 @@ const pageTitle = title === 'Home' ? 'Kylie · Photos & outside journal' : `${ti
 const imageAlt = ogImageAlt ?? 'A photo from Kylie’s journal'
 
 const navLinks = [
-  { name: 'Photos', href: '/photos/' },
-  { name: 'Log', href: '/climbs/' },
-  { name: 'Peaks', href: '/peaks/' },
-  { name: 'Gear', href: '/gear/' },
-  { name: 'Blog', href: '/blog/' },
-  { name: 'About', href: '/about/' },
+  { name: 'Photos', href: '/photos' },
+  { name: 'Log', href: '/climbs' },
+  { name: 'Peaks', href: '/peaks' },
+  { name: 'Gear', href: '/gear' },
+  { name: 'Blog', href: '/blog' },
+  { name: 'About', href: '/about' },
 ]
 
 const currentPath = Astro.url.pathname

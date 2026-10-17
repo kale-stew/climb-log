@@ -62,7 +62,7 @@ const postDescription = `${categoryDescriptions[category]}: ${post.data.title}.`
 >
   <article class="container blog-post">
     <header class="post-header">
-      <a href="/blog/" class="back-link">&larr; Back to blog</a>
+      <a href="/blog" class="back-link">&larr; Back to blog</a>
       <span class={`post-category cat-${category}`}>{categoryLabels[category]}</span>
       <h1>{post.data.title}</h1>
       <time datetime={post.data.date}>{formatDate(post.data.date)}</time>
@@ -107,7 +107,7 @@ const postDescription = `${categoryDescriptions[category]}: ${post.data.title}.`
     )}
 
     <footer class="post-footer">
-      <a href="/blog/" class="back-link">&larr; Back to blog</a>
+      <a href="/blog" class="back-link">&larr; Back to blog</a>
     </footer>
   </article>
 </Layout>
