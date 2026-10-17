@@ -8,6 +8,21 @@
 - `src/pages/shop.astro` fetches metadata for those IDs at request time and renders images through `/img/{id}`.
 - Print sizes are derived from each original's pixel dimensions. A size is offered only when the center crop prints at `MIN_PRINT_DPI` (200) or better, so web-sized images never appear.
 - A product with `checkoutUrl` links there. Without one, the button opens a prefilled email to `hi@kylies.photos`.
+- Every card opens a quick-view `<dialog>` (`src/components/shop/QuickView.astro`) with a swipeable gallery, thumbnails, details, and the CTA. `/shop/#calendar-2027` and `/shop/#print-{photoId}` deep-link to it. Without JS, the link scrolls to the card.
+
+## Product images
+
+Each product's `images` list is ordered: the first entry is the card cover, and the full list is the quick-view gallery. Build entries with the helpers in `src/lib/shop.ts`:
+
+| Helper | Renders | Use for |
+|---|---|---|
+| `photo(id)` | The canonical photo as-is | Prints, plain photo views |
+| `mockup(template, id, { month })` | An HTML/CSS product visual around a canonical photo: `calendar-cover`, `calendar-month`, `postcard-front`, `postcard-back` | Calendar and postcard previews before real product shots exist |
+| `asset(src, alt, width, height)` | A static image under `public/shop/` | Photos of the printed proof, flat lays, packaging |
+
+Mockups render at any size from the same markup (container query units), so card, quick view, and thumbnails stay consistent. Once the physical proof arrives, swap `mockup(...)` entries for `asset(...)` photos of the real thing. Product shots are not portfolio photography, so they live in `public/shop/` rather than photos-api.
+
+Prints show the photo first; add `images` on a `PrintListing` to append extra views such as a framed shot.
 
 ## Before launch
 

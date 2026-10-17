@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import {
+  asset,
+  calendarMonth,
   effectiveDpi,
+  imagePhotoIds,
   MIN_PRINT_DPI,
+  mockup,
   PRINT_SIZES,
   PRINTS,
   PRODUCTS,
+  photo,
   printableSizes,
+  quickViewSlug,
   requestMailto,
+  resolveImages,
 } from '../../src/lib/shop'
 
 const size = (label: string) => {
@@ -68,10 +75,72 @@ describe('catalog', () => {
 
   it('references canonical 12-character photo IDs', () => {
     const ids = [
-      ...PRODUCTS.flatMap(product => product.photoIds),
-      ...PRINTS.map(print => print.photoId),
+      ...PRODUCTS.flatMap(product => imagePhotoIds(product.images)),
+      ...PRINTS.flatMap(print => [print.photoId, ...imagePhotoIds(print.images ?? [])]),
     ]
     for (const id of ids) expect(id).toMatch(/^[0-9a-f]{12}$/)
+  })
+
+  it('gives every product a cover image', () => {
+    for (const product of PRODUCTS) expect(product.images.length).toBeGreaterThan(0)
+  })
+
+  it('sets a valid month on every calendar page mockup', () => {
+    const months = PRODUCTS.flatMap(product => product.images).flatMap(image =>
+      image.kind === 'mockup' && image.template === 'calendar-month' ? [image.month] : [],
+    )
+    for (const month of months)
+      expect(month).toSatisfy(m => Number.isInteger(m) && m >= 1 && m <= 12)
+  })
+
+  it('serves static product shots from public/shop/', () => {
+    const assets = [
+      ...PRODUCTS.flatMap(product => product.images),
+      ...PRINTS.flatMap(print => print.images ?? []),
+    ]
+    for (const image of assets) if (image.kind === 'asset') expect(image.src).toMatch(/^\/shop\//)
+  })
+
+  it('uses unique quick-view slugs', () => {
+    const slugs = [...PRODUCTS.map(quickViewSlug), ...PRINTS.map(quickViewSlug)]
+    expect(new Set(slugs).size).toBe(slugs.length)
+  })
+})
+
+describe('shop images', () => {
+  const images = [
+    mockup('calendar-cover', 'aaaaaaaaaaaa'),
+    photo('bbbbbbbbbbbb'),
+    asset('/shop/proof.jpg', 'The printed proof', 1600, 1200),
+  ]
+
+  it('collects photo IDs from photos and mockups but not assets', () => {
+    expect(imagePhotoIds(images)).toEqual(['aaaaaaaaaaaa', 'bbbbbbbbbbbb'])
+  })
+
+  it('drops images whose photo failed to load and keeps assets', () => {
+    const resolved = resolveImages(images, new Map([['aaaaaaaaaaaa', { id: 'aaaaaaaaaaaa' }]]))
+    expect(resolved.map(entry => entry.image.kind)).toEqual(['mockup', 'asset'])
+    expect(resolved[1].photo).toBeNull()
+  })
+})
+
+describe('calendarMonth', () => {
+  it('starts January 2027 on a Friday', () => {
+    const { name, weeks } = calendarMonth(2027, 1)
+    expect(name).toBe('January')
+    expect(weeks[0]).toEqual([null, null, null, null, null, 1, 2])
+    expect(weeks.flat().filter(Boolean)).toHaveLength(31)
+  })
+
+  it('pads every week to seven days', () => {
+    for (let month = 1; month <= 12; month++) {
+      for (const week of calendarMonth(2027, month).weeks) expect(week).toHaveLength(7)
+    }
+  })
+
+  it('handles February in a non-leap year', () => {
+    expect(calendarMonth(2027, 2).weeks.flat().filter(Boolean)).toHaveLength(28)
   })
 })
 
