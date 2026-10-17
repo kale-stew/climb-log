@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content'
 import { env } from 'cloudflare:workers'
 import { getCanonicalPhoto } from '../../../lib/photos-client'
 import { formatCalendarDate } from '../../../lib/dates'
+import { fetchImageDataUri, ogImageSource } from '../../../lib/og-image'
 
 export const prerender = false
 
@@ -12,6 +13,7 @@ const DEFAULT_ACCENT = '#8B7355'
 
 // Fallback hero image when post doesn't have one
 const FALLBACK_HERO = '/img/9943163a/'
+const AVATAR_URL = 'https://pbs.twimg.com/profile_images/2058684479225610241/5SP70J78_400x400.jpg'
 
 // Cache the font fetch
 let interFontData: ArrayBuffer | null = null
@@ -84,11 +86,14 @@ export const GET: APIRoute = async ({ params }) => {
   })
 
   // Get fonts and accent color in parallel
-  const [interFont, crimsonFont, monoFont, accentColor] = await Promise.all([
+  const heroSource = ogImageSource(previewImgUrl || FALLBACK_HERO, env.PHOTOS_API_ORIGIN)
+  const [interFont, crimsonFont, monoFont, accentColor, heroImage, avatarImage] = await Promise.all([
     getInterFont(),
     getCrimsonFont(),
     getMonoFont(),
     getAccentColor(previewImgUrl),
+    heroSource ? fetchImageDataUri(heroSource) : Promise.resolve(null),
+    fetchImageDataUri(AVATAR_URL),
   ])
 
   // Background color: DB accent_color > default
@@ -98,14 +103,11 @@ export const GET: APIRoute = async ({ params }) => {
     backgroundColor = accentColor.startsWith('#') ? accentColor : `#${accentColor}`
   }
 
-  // Use post hero or fallback image
-  const heroImage = previewImgUrl || FALLBACK_HERO
-
   // Create the OG image HTML
   // Using a semi-transparent overlay on the hero image with title and metadata
   const html = `
     <div style="display: flex; flex-direction: column; width: 1200px; height: 630px; position: relative; font-family: 'Inter'; background: ${backgroundColor};">
-      <img src="${heroImage}" width="1200" height="630" style="position: absolute; top: 0; left: 0; width: 1200px; height: 630px; object-fit: cover;" />
+      ${heroImage ? `<img src="${heroImage}" width="1200" height="630" style="position: absolute; top: 0; left: 0; width: 1200px; height: 630px; object-fit: cover;" />` : ''}
       
       <div style="display: flex; position: absolute; top: 0; left: 0; width: 1200px; height: 630px; background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.85) 100%);"></div>
       
@@ -118,7 +120,7 @@ export const GET: APIRoute = async ({ params }) => {
           <h1 style="font-family: 'Crimson Pro'; font-size: 60px; font-weight: 600; color: white; margin: 0 0 24px 0; line-height: 1.15; max-width: 1000px;">${title}</h1>
           
           <div style="display: flex; align-items: center;">
-            <img src="https://pbs.twimg.com/profile_images/2058684479225610241/5SP70J78_400x400.jpg" width="44" height="44" style="width: 44px; height: 44px; border-radius: 22px; margin-right: 12px; border: 2px solid rgba(255,255,255,0.3);" />
+            ${avatarImage ? `<img src="${avatarImage}" width="44" height="44" style="width: 44px; height: 44px; border-radius: 22px; margin-right: 12px; border: 2px solid rgba(255,255,255,0.3);" />` : ''}
             <div style="display: flex; flex-direction: column;">
               <span style="font-size: 18px; color: white; font-weight: 500;">Kylie Czajkowski</span>
               <span style="font-size: 14px; color: rgba(255,255,255,0.7);">${formattedDate}</span>

@@ -164,11 +164,9 @@ that page's image origin to canonical first.
   canonical uploads (`8e76be2f6827`, `39590f7413c3`, `3cd7a78fd6ba`).
 - [ ] Retire the remaining climb mapper (`/admin/climbs`, `map-photo`,
   `undo-photo`) in favor of the photos-api hike selector.
-- [ ] Fix blog OG images: `/api/og/{slug}/` returns `200 image/png` with an
-  empty body (pre-existing, unrelated to retirement). The renderer receives a
-  relative `/img/...` hero URL it cannot fetch, and photos-api transforms are
-  WebP-only. Add a JPEG/PNG transform (for example `?w=1200&format=jpeg`) in
-  photos-api and pass an absolute photos-api URL from `src/pages/api/og/[...slug].ts`.
+- [x] Fix blog OG images: heroes now come from photos-api JPEG transforms
+  (`?w=1600&format=jpeg`) inlined as data URIs. The old Twitter avatar URL
+  returns 404, so cards omit it until a replacement avatar is chosen.
 - [ ] Optional: `/images/photos/{id}/original.jpg` (no trailing slash) 404s
   because `trailingSlash: 'always'` rejects file-like paths before routing; the
   slash form redirects. No current references use `/images/`.
