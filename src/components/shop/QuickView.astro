@@ -138,6 +138,8 @@ const count = gallery.length
       input.addEventListener('change', () => {
         const cta = dialog.querySelector<HTMLAnchorElement>('[data-qv-cta]')
         if (cta && input.dataset.href) cta.href = input.dataset.href
+        const price = dialog.querySelector<HTMLElement>('[data-qv-price]')
+        if (price && input.dataset.price) price.textContent = input.dataset.price
       })
     })
   })
@@ -328,6 +330,9 @@ const count = gallery.length
     }
     .qv-close {
       position: fixed;
+    }
+    .qv-arrow {
+      display: none;
     }
     .qv-media {
       padding: var(--space-sm);
