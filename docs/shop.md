@@ -1,13 +1,14 @@
 # Shop
 
-`/shop` sells paper goods and prints from canonical photos-api images. This is a spike: checkout is an email request until a payment provider is chosen.
+`/shop` sells paper goods and prints from canonical photos-api images. Checkout will use Stripe Payment Links; until links are created, buttons fall back to an email request.
 
 ## How it works
 
+- The canonical URL is `/shop` (without a trailing slash), matching the site's `trailingSlash: 'never'` setting. `/shop/` redirects for compatibility.
 - The catalog lives in `src/lib/shop.ts`. Products and prints reference canonical 12-character photos-api IDs; nothing reads the local `photos` table.
 - `src/pages/shop.astro` fetches metadata for those IDs at request time and renders images through `/img/{id}`.
 - Print sizes are derived from each original's pixel dimensions. A size is offered only when the center crop prints at `MIN_PRINT_DPI` (200) or better, so web-sized images never appear.
-- A product with `checkoutUrl` links there. Without one, the button opens a prefilled email to `hi@kylies.photos`.
+- A product with `checkoutUrl` links to its Stripe Payment Link. Without one, the button opens a prefilled email to `hi@kylies.photos`.
 - Every card opens a quick-view `<dialog>` (`src/components/shop/QuickView.astro`) with a swipeable gallery, thumbnails, details, and the CTA. `/shop#calendar-2027` and `/shop#print-{photoId}` deep-link to it. Without JS, the link scrolls to the card.
 
 ## Product images
@@ -28,7 +29,8 @@ Prints show the photo first; add `images` on a `PrintListing` to append extra vi
 
 - Replace placeholder prices with lab quotes plus packaging and postage, keeping at least 50% margin.
 - Replace the sample photo selection with the curated launch set.
-- Choose checkout (Stripe Payment Links or Shopify) and set `checkoutUrl` per product.
+- Create the Stripe products/payment links, configure shipping and tax settings, and set each product's `checkoutUrl`.
+- Confirm Stripe's payment, preorder, refund, and receipt emails with a test purchase; no Shopify connection is required.
 - Publish shipping, returns, and damaged-in-transit policies.
 - Add a dedicated OG image for `/shop`.
 
@@ -39,6 +41,6 @@ Prints show the photo first; add `images` on a `PrintListing` to append extra vi
 - [ ] Get bulk quotes for 25, 50, and 100 copies, including proof turnaround.
 - [ ] Build the layout and order a physical proof.
 - [ ] Set the price from per-unit cost, mailer, and postage.
-- [ ] Draft the preorder post and set the calendar `checkoutUrl`.
+- [ ] Draft the preorder post, create the Stripe Payment Link, and set the calendar `checkoutUrl`.
 
 Timeline: proof approved about Oct 26, preorders through about Nov 16, print order about Nov 17, ship Dec 1–5.
