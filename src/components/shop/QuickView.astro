@@ -1,0 +1,348 @@
+---
+import type { DisplayPhoto } from '../../lib/photos-client'
+import type { ShopImage as ShopImageType } from '../../lib/shop'
+import ShopImage from './ShopImage.astro'
+
+interface Props {
+  slug: string
+  title: string
+  gallery: Array<{ image: ShopImageType; photo: DisplayPhoto | null }>
+}
+
+const { slug, title, gallery } = Astro.props
+const titleId = `qv-${slug}-title`
+const count = gallery.length
+---
+
+<dialog class="quick-view" id={`qv-${slug}`} data-slug={slug} aria-labelledby={titleId}>
+  <div class="qv-panel">
+    <button type="button" class="qv-close" data-qv-close aria-label="Close">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+    </button>
+
+    <div class="qv-media">
+      <div class="qv-main">
+        <div class="qv-track" data-qv-track tabindex="0" role="region" aria-label={`${title} images`}>
+          {gallery.map(({ image, photo }, index) => (
+            <div class="qv-slide" aria-label={`Image ${index + 1} of ${count}`} role="group">
+              <ShopImage image={image} photo={photo} width={1600} fit="contain" />
+            </div>
+          ))}
+        </div>
+        {count > 1 && (
+          <>
+            <button type="button" class="qv-arrow qv-prev" data-qv-prev aria-label="Previous image">‹</button>
+            <button type="button" class="qv-arrow qv-next" data-qv-next aria-label="Next image">›</button>
+          </>
+        )}
+      </div>
+      {count > 1 && (
+        <div class="qv-thumbs">
+          {gallery.map(({ image, photo }, index) => (
+            <button
+              type="button"
+              class="qv-thumb"
+              data-qv-thumb={index}
+              aria-label={`Show image ${index + 1} of ${count}`}
+              aria-current={index === 0 ? 'true' : undefined}
+            >
+              <ShopImage image={image} photo={photo} width={200} decorative />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="qv-info">
+      <h2 id={titleId} class="qv-title">{title}</h2>
+      <slot />
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+  function dialogFor(slug: string) {
+    const dialog = document.getElementById(`qv-${slug}`)
+    return dialog instanceof HTMLDialogElement ? dialog : null
+  }
+
+  function clearHash(slug: string) {
+    if (location.hash === `#${slug}`) history.replaceState(history.state, '', location.pathname + location.search)
+  }
+
+  function open(slug: string) {
+    const dialog = dialogFor(slug)
+    if (!dialog || dialog.open) return false
+    document.querySelectorAll<HTMLDialogElement>('dialog.quick-view[open]').forEach(other => other.close())
+    dialog.showModal()
+    if (location.hash !== `#${slug}`) history.replaceState(history.state, '', `#${slug}`)
+    return true
+  }
+
+  function setupGallery(dialog: HTMLDialogElement) {
+    const track = dialog.querySelector<HTMLElement>('[data-qv-track]')
+    if (!track) return
+    const thumbs = [...dialog.querySelectorAll<HTMLButtonElement>('[data-qv-thumb]')]
+    const prev = dialog.querySelector<HTMLButtonElement>('[data-qv-prev]')
+    const next = dialog.querySelector<HTMLButtonElement>('[data-qv-next]')
+    const count = track.children.length
+    const current = () => Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))
+
+    const go = (index: number) => {
+      const target = Math.max(0, Math.min(count - 1, index))
+      track.scrollTo({ left: target * track.clientWidth, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
+    }
+
+    const sync = () => {
+      const index = current()
+      thumbs.forEach((thumb, i) => {
+        if (i === index) thumb.setAttribute('aria-current', 'true')
+        else thumb.removeAttribute('aria-current')
+      })
+      if (prev) prev.disabled = index <= 0
+      if (next) next.disabled = index >= count - 1
+    }
+
+    track.addEventListener('scroll', sync, { passive: true })
+    thumbs.forEach(thumb => thumb.addEventListener('click', () => go(Number(thumb.dataset.qvThumb))))
+    prev?.addEventListener('click', () => go(current() - 1))
+    next?.addEventListener('click', () => go(current() + 1))
+    dialog.addEventListener('keydown', event => {
+      const target = event.target as HTMLElement
+      if (target.matches('input, select, textarea')) return
+      if (event.key === 'ArrowLeft') go(current() - 1)
+      else if (event.key === 'ArrowRight') go(current() + 1)
+      else return
+      event.preventDefault()
+    })
+    dialog.addEventListener('close', () => {
+      track.scrollLeft = 0
+      sync()
+    })
+    sync()
+  }
+
+  document.querySelectorAll<HTMLDialogElement>('dialog.quick-view').forEach(dialog => {
+    const slug = dialog.dataset.slug ?? ''
+    setupGallery(dialog)
+    dialog.querySelector('[data-qv-close]')?.addEventListener('click', () => dialog.close())
+    // A click on the dialog element itself lands on the backdrop, outside the panel.
+    dialog.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close()
+    })
+    dialog.addEventListener('close', () => clearHash(slug))
+
+    dialog.querySelectorAll<HTMLInputElement>('input[data-href]').forEach(input => {
+      input.addEventListener('change', () => {
+        const cta = dialog.querySelector<HTMLAnchorElement>('[data-qv-cta]')
+        if (cta && input.dataset.href) cta.href = input.dataset.href
+        const price = dialog.querySelector<HTMLElement>('[data-qv-price]')
+        if (price && input.dataset.price) price.textContent = input.dataset.price
+      })
+    })
+  })
+
+  document.querySelectorAll<HTMLElement>('[data-quick-view]').forEach(trigger => {
+    trigger.addEventListener('click', event => {
+      if (open(trigger.dataset.quickView ?? '')) event.preventDefault()
+    })
+  })
+
+  const openFromHash = () => {
+    const slug = decodeURIComponent(location.hash.slice(1))
+    if (slug) open(slug)
+  }
+  window.addEventListener('hashchange', openFromHash)
+  openFromHash()
+</script>
+
+<style>
+  .quick-view {
+    width: min(68rem, calc(100vw - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 2rem);
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+  }
+  .quick-view::backdrop {
+    background-color: rgba(20, 16, 13, 0.6);
+    backdrop-filter: blur(4px);
+  }
+  .quick-view[open] {
+    animation: qv-in 180ms ease-out;
+  }
+  @keyframes qv-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .quick-view[open] {
+      animation: none;
+    }
+  }
+  :global(html:has(dialog.quick-view[open])) {
+    overflow: hidden;
+  }
+
+  .qv-panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr);
+    max-height: calc(100dvh - 2rem);
+  }
+  .qv-close {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0;
+    background-color: var(--color-bg-card);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background-color 150ms ease;
+  }
+
+  .qv-media {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    justify-content: center;
+    min-width: 0;
+    padding: var(--space-md);
+    background-color: var(--color-bg-secondary);
+  }
+  .qv-main {
+    position: relative;
+  }
+  .qv-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    border-radius: var(--border-radius);
+  }
+  .qv-track::-webkit-scrollbar {
+    display: none;
+  }
+  .qv-track:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .qv-slide {
+    flex: 0 0 100%;
+    height: min(36rem, calc(100dvh - 12rem));
+    scroll-snap-align: start;
+  }
+  .qv-arrow {
+    position: absolute;
+    top: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    transform: translateY(-50%);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background-color: var(--color-bg-card);
+    color: var(--color-text-primary);
+    padding: 0 0 0.15rem;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity 150ms ease, background-color 150ms ease;
+  }
+  .qv-arrow:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .qv-prev {
+    left: var(--space-sm);
+  }
+  .qv-next {
+    right: var(--space-sm);
+  }
+  .qv-thumbs {
+    display: flex;
+    gap: var(--space-sm);
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .qv-thumb {
+    flex: 0 0 4.5rem;
+    height: 3.5rem;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 150ms ease, border-color 150ms ease;
+  }
+  .qv-thumb[aria-current='true'] {
+    border-color: var(--color-accent);
+    opacity: 1;
+  }
+
+  .qv-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    min-width: 0;
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
+    overflow-y: auto;
+  }
+  .qv-title {
+    margin: 0;
+    padding-right: var(--space-xl);
+    font-size: var(--font-size-3xl);
+  }
+
+  @media (max-width: 760px) {
+    .quick-view {
+      width: 100vw;
+      max-height: 100dvh;
+      height: 100dvh;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+    }
+    .qv-panel {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      height: 100dvh;
+      max-height: none;
+      overflow-y: auto;
+    }
+    .qv-close {
+      position: fixed;
+    }
+    .qv-arrow {
+      display: none;
+    }
+    .qv-media {
+      padding: var(--space-sm);
+    }
+    .qv-slide {
+      height: min(46dvh, 26rem);
+    }
+    .qv-info {
+      padding: var(--space-lg) var(--space-md);
+      overflow-y: visible;
+    }
+  }
+</style>

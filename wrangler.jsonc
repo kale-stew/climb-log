@@ -9,7 +9,7 @@
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/", "/climbs", "/climbs/*", "/peaks", "/peaks/*", "/gear", "/gear/*", "/photos", "/photos/*", "/api/*", "/images/*", "/img/*", "/admin/*"]
+    "run_worker_first": ["/", "/climbs", "/climbs/*", "/peaks", "/peaks/*", "/gear", "/gear/*", "/photos", "/photos/*", "/shop", "/shop/*", "/api/*", "/images/*", "/img/*", "/admin/*"]
   },
   "d1_databases": [
     {
