@@ -21,7 +21,7 @@ export interface ShopProduct {
   images: ShopImage[]
   /** Spec lines shown in the quick view, such as size and paper. */
   details?: string[]
-  /** Stripe Payment Link or Shopify checkout URL. Falls back to an email request when unset. */
+  /** Stripe Payment Link. Falls back to an email request when unset. */
   checkoutUrl?: string
 }
 
