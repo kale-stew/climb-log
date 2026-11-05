@@ -1,0 +1,198 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+import { formatCalendarDate } from '../../lib/dates'
+import { formatNumber, loadJournal, roundedFeet } from '../../lib/journal-data'
+import { buildChapters, outingHref, outingName, yearSpan, type Chapter } from '../../lib/places'
+
+export const prerender = false
+
+const journal = await loadJournal(env, 800)
+const chapters = buildChapters(journal.outings)
+
+function listOf(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? ''
+  return `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+}
+
+function whereLine(chapter: Chapter): string {
+  if (chapter.regions.length > 1) return `Across ${listOf(chapter.regions.slice(0, 5).map(region => region.name))}.`
+  if (chapter.topAreas.length === 0) return ''
+  return `Most often around ${listOf(chapter.topAreas.slice(0, 3).map(area => area.name))}.`
+}
+---
+
+<Layout
+  title="Places"
+  description="Kylie's outings, organized by the places they happened: Colorado, Utah, Arizona, California, and beyond."
+  ogImage="https://kylies.photos/open-graph/peak-list.jpg"
+  ogImageAlt="A summit cairn and route sign above Colorado's mountain ranges"
+>
+  <div class="container page">
+    <header class="places-intro">
+      <h1>Places</h1>
+      <p class="page-subtitle">
+        The journal, sorted by where it happened. Each chapter starts with the first outing logged there.
+      </p>
+    </header>
+
+    {journal.loadError && (
+      <p class="places-empty">The route book couldn't be loaded right now. Try again in a little while.</p>
+    )}
+
+    <ol class="chapter-list">
+      {chapters.map(chapter => (
+        <li class="chapter-row">
+          <div class="chapter-margin">
+            <span class="chapter-number">No. {chapter.number}</span>
+            <span class="measure">{yearSpan(chapter)}</span>
+          </div>
+
+          <div class="chapter-body">
+            <h2><a href={`/places/${chapter.slug}`}>{chapter.name}</a></h2>
+            <p class="chapter-summary">
+              {formatNumber(chapter.count)} {chapter.count === 1 ? 'outing' : 'outings'},
+              {' '}{formatNumber(chapter.miles)} miles, and about {roundedFeet(chapter.gain)} feet of climbing.
+              {' '}{whereLine(chapter)}
+            </p>
+
+            <ul class="logbook chapter-recent">
+              {chapter.outings.slice(0, 3).map(outing => (
+                <li class="logbook-row">
+                  <span class="entry-date">
+                    {outing.date ? formatCalendarDate(outing.date, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                  </span>
+                  <h3><a href={outingHref(outing)}>{outingName(outing.title)}</a></h3>
+                  <span class="measure">{outing.distance ? `${outing.distance.toFixed(1)} mi` : ''}</span>
+                </li>
+              ))}
+            </ul>
+
+            <a class="text-link" href={`/places/${chapter.slug}`}>
+              Read the {chapter.name} chapter <span aria-hidden="true">→</span>
+            </a>
+          </div>
+
+          <a class="chapter-cover photo-plate" href={`/places/${chapter.slug}`} tabindex="-1" aria-hidden="true">
+            {chapter.cover?.preview_img_url ? (
+              <img src={chapter.cover.preview_img_url} alt="" loading="lazy" width="800" height="600" />
+            ) : (
+              <span class="chapter-cover-empty">{chapter.name}</span>
+            )}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <style>
+    .places-intro {
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .places-intro .page-subtitle {
+      margin-bottom: 0;
+    }
+
+    .places-empty {
+      margin-top: var(--space-xl);
+    }
+
+    .chapter-list {
+      list-style: none;
+    }
+
+    .chapter-row {
+      display: grid;
+      grid-template-columns: 7rem minmax(0, 1fr) minmax(220px, 34%);
+      gap: var(--space-lg) var(--space-xl);
+      padding: var(--space-xl) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .chapter-margin {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding-top: 0.45rem;
+    }
+
+    .chapter-body h2 {
+      margin-bottom: 0.4rem;
+      font-size: var(--font-size-3xl);
+    }
+
+    .chapter-body h2 a {
+      color: var(--ink);
+    }
+
+    .chapter-body h2 a:hover {
+      color: var(--water);
+    }
+
+    .chapter-summary {
+      max-width: 36rem;
+      margin-bottom: var(--space-sm);
+      font-size: var(--font-size-lg);
+    }
+
+    .chapter-recent {
+      margin-bottom: var(--space-md);
+    }
+
+    .chapter-recent .logbook-row {
+      padding: 0.45rem 0;
+    }
+
+    .chapter-recent h3 {
+      font-size: var(--font-size-base);
+    }
+
+    .chapter-cover {
+      align-self: start;
+      aspect-ratio: 4 / 3;
+    }
+
+    .chapter-cover-empty {
+      display: grid;
+      height: 100%;
+      place-items: center;
+      font-family: var(--font-serif);
+      font-size: var(--font-size-2xl);
+      color: var(--ink-faint);
+    }
+
+    @media (max-width: 900px) {
+      .chapter-row {
+        grid-template-columns: 5.5rem minmax(0, 1fr);
+      }
+
+      .chapter-cover {
+        grid-column: 2;
+        grid-row: 1;
+        max-width: 420px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .chapter-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+      }
+
+      .chapter-margin {
+        flex-direction: row;
+        gap: var(--space-md);
+        padding-top: 0;
+      }
+
+      .chapter-cover {
+        grid-column: 1;
+        grid-row: auto;
+        order: -1;
+        max-width: none;
+      }
+    }
+  </style>
+</Layout>

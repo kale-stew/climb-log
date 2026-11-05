@@ -1,79 +1,31 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import { fillMissingPreviewImages } from '../lib/photo-fallbacks'
-import { formatCalendarDate, formatRecentDate } from '../lib/dates'
-import { getCanonicalPhotos, getClimbPhotoAssignments, type DisplayPhoto } from '../lib/photos-client'
 import { env } from 'cloudflare:workers'
+import { formatCalendarDate, formatRecentDate } from '../lib/dates'
+import { formatNumber, loadJournal, photoAlt, roundedFeet } from '../lib/journal-data'
+import {
+  buildChapters,
+  chapterSlugFor,
+  normalizeState,
+  outingHref,
+  outingName,
+  outingType,
+  yearOf,
+  yearSpan,
+} from '../lib/places'
 
 export const prerender = false
 
-const DB = env.DB as D1Database | undefined
+const journal = await loadJournal(env, 800)
+const chapters = buildChapters(journal.outings)
+const [latest, ...rest] = journal.outings
+const lately = rest.slice(0, 7)
+const latestChapter = latest ? chapters.find(chapter => chapter.slug === chapterSlugFor(latest.state)) : null
+const frames = journal.photos.slice(0, 6)
+const sinceYear = yearOf(journal.totals.firstDate)
 
-let recentClimbs: any[] = []
-let heroPhoto: DisplayPhoto | null = null
-let recentPhotos: DisplayPhoto[] = []
-let stats = { totalClimbs: 0, totalPeaks: 0, totalMiles: 0, totalGain: 0 }
-
-if (DB) {
-  try {
-    const [canonicalPhotos, assignments] = await Promise.all([
-      getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 1500 }),
-      getClimbPhotoAssignments(env.PHOTOS_API_ORIGIN),
-    ])
-    // Fetch recent climbs
-    const climbsResult = await DB.prepare(
-      'SELECT id, date, title, slug, preview_img_url, distance, gain, area, state FROM climbs ORDER BY date DESC LIMIT 5'
-    ).all()
-    recentClimbs = climbsResult.results || []
-
-    // Fill missing preview images from canonical photos.
-    fillMissingPreviewImages(recentClimbs, canonicalPhotos, 800, assignments)
-
-    const landscapePhotos = canonicalPhotos
-      .filter(photo => (photo.width ?? 0) > (photo.height ?? 0) * 1.25)
-      .filter(photo => (photo.width ?? 0) >= 1200)
-    const heroCandidates = landscapePhotos.length > 0 ? landscapePhotos : canonicalPhotos
-    heroPhoto = heroCandidates[Math.floor(Math.random() * heroCandidates.length)] ?? null
-    recentPhotos = canonicalPhotos.filter(photo => photo.id !== heroPhoto?.id).slice(0, 8)
-
-    // Fetch stats
-    const statsResult = await DB.prepare(`
-      SELECT 
-        (SELECT COUNT(*) FROM climbs) as totalClimbs,
-        (SELECT COUNT(*) FROM peaks WHERE first_completed IS NOT NULL) as totalPeaks,
-        (SELECT COALESCE(SUM(distance), 0) FROM climbs) as totalMiles,
-        (SELECT COALESCE(SUM(gain), 0) FROM climbs) as totalGain
-    `).first<{ totalClimbs: number; totalPeaks: number; totalMiles: number; totalGain: number }>()
-    
-    if (statsResult) {
-      stats = {
-        totalClimbs: statsResult.totalClimbs || 0,
-        totalPeaks: statsResult.totalPeaks || 0,
-        totalMiles: Math.round(statsResult.totalMiles || 0),
-        totalGain: Math.round(statsResult.totalGain || 0),
-      }
-    }
-  } catch (e) {
-    console.error('Failed to fetch data:', e)
-  }
-}
-
-function formatNumber(n: number): string {
-  return n.toLocaleString()
-}
-
-function getOutingType(title: string | null): string {
-  const match = title?.match(/^(Trail Run|Hike|Climb|Backpack|Ski)\b/i)
-  if (!match) return 'outing'
-  return match[1].toLowerCase()
-}
-
-function getOutingTitle(title: string | null): string {
-  return title?.replace(/^(Trail Run|Hike|Climb|Backpack|Ski)\s+/i, '') || 'Untitled outing'
-}
-
-function getPhotoAlt(photo: DisplayPhoto): string {
-  return photo.caption || photo.title || [photo.area, photo.state].filter(Boolean).join(', ') || 'Photo from outside'
+function placeOf(area: string | null, state: string | null): string {
+  return [area, normalizeState(state)].filter(Boolean).join(', ')
 }
 ---
 
@@ -83,246 +35,325 @@ function getPhotoAlt(photo: DisplayPhoto): string {
   ogImage="https://kylies.photos/open-graph/home.jpg"
   ogImageAlt="Snow-covered mountains above a forested trail in Colorado"
 >
-  <figure class="hero-photo">
-    <img
-      src={heroPhoto ? `/img/${heroPhoto.id}/?w=1600` : '/open-graph/home.jpg'}
-      alt={heroPhoto ? getPhotoAlt(heroPhoto) : 'Snow-covered mountains above a forested trail in Colorado'}
-      width={heroPhoto?.width ?? 1200}
-      height={heroPhoto?.height ?? 630}
-      fetchpriority="high"
-    />
-    {heroPhoto && (
-      <figcaption>
-        <span>{heroPhoto.title || heroPhoto.caption || 'Latest photo'}</span>
-        {heroPhoto.area && <span>{heroPhoto.area}{heroPhoto.state && `, ${heroPhoto.state}`}</span>}
-      </figcaption>
-    )}
-  </figure>
-
-  <div class="container home-content">
-    <header class="home-intro">
-      <h1>Proof I went <em>outside.</em></h1>
-      <p>Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to.</p>
-      <a href="/photos">see all the photos <span aria-hidden="true">→</span></a>
+  <div class="container home">
+    <header class="masthead">
+      <h1>Proof I went outside.</h1>
+      <p class="masthead-note">
+        Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to.
+        {journal.totals.outings > 0 && (
+          <>
+            {' '}{sinceYear ? `Since ${sinceYear}: ` : ''}
+            <span class="tally">{formatNumber(journal.totals.outings)} outings</span>,{' '}
+            <span class="tally">{formatNumber(journal.totals.miles)} miles</span>,{' '}
+            <span class="tally">{roundedFeet(journal.totals.gain)} feet</span> of climbing, and{' '}
+            <span class="tally">{formatNumber(journal.totals.summits)} summits</span>.
+          </>
+        )}
+      </p>
     </header>
 
-    {recentPhotos.length > 0 && (
-      <section class="photo-section" aria-labelledby="photo-heading">
-        <div class="section-heading">
-          <h2 id="photo-heading">A few recent frames</h2>
-          <span>the camera has been getting out more than the log</span>
+    {journal.loadError && (
+      <p class="home-error">The journal couldn't be loaded right now. Photos and older trip reports are still available.</p>
+    )}
+
+    {latest && (
+      <section class="spread" aria-labelledby="latest-heading">
+        <article class="latest">
+          {latest.preview_img_url && (
+            <a class="latest-photo photo-plate" href={outingHref(latest)} tabindex="-1" aria-hidden="true">
+              <img
+                src={latest.preview_img_url.replace(/w=\d+/, 'w=1600')}
+                alt=""
+                width="1200"
+                height="800"
+                fetchpriority="high"
+              />
+            </a>
+          )}
+          <p class="latest-meta">
+            {latest.date && (
+              <time class="entry-date" datetime={latest.date}>
+                {formatCalendarDate(latest.date, { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })}
+              </time>
+            )}
+            <span>{placeOf(latest.area, latest.state)}</span>
+          </p>
+          <h2 id="latest-heading"><a href={outingHref(latest)}>{outingName(latest.title)}</a></h2>
+          <p class="latest-stats">
+            <span class="logbook-kind">{outingType(latest.title)}</span>
+            {latest.distance && <span class="measure">{latest.distance.toFixed(1)} mi</span>}
+            {latest.gain && <span class="measure">{formatNumber(latest.gain)} ft gain</span>}
+          </p>
+          {latestChapter && (
+            <a class="text-link" href={`/places/${latestChapter.slug}`}>
+              From chapter {latestChapter.number}, {latestChapter.name} <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </article>
+
+        <aside class="lately" aria-labelledby="lately-heading">
+          <div class="section-head">
+            <h2 id="lately-heading">Lately</h2>
+            <a class="text-link" href="/climbs">The whole journal <span aria-hidden="true">→</span></a>
+          </div>
+          <ol class="logbook">
+            {lately.map(outing => (
+              <li class="logbook-row lately-row">
+                <span class="entry-date">{outing.date ? formatRecentDate(outing.date) : '—'}</span>
+                <div>
+                  <h3><a href={outingHref(outing)}>{outingName(outing.title)}</a></h3>
+                  <p class="logbook-place">{placeOf(outing.area, outing.state)}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      </section>
+    )}
+
+    {chapters.length > 0 && (
+      <section class="section" aria-labelledby="chapters-heading">
+        <div class="section-head">
+          <h2 id="chapters-heading">The route book</h2>
+          <a class="text-link" href="/places">All places <span aria-hidden="true">→</span></a>
         </div>
-        <div class="photo-strip">
-          {recentPhotos.map(photo => (
-            <a href="/photos" class="photo-strip-item" aria-label={`View ${getPhotoAlt(photo)}`}>
-              <img src={`/img/${photo.id}/?w=800`} alt="" loading="lazy" width={photo.width ?? 800} height={photo.height ?? 600} />
-              {(photo.title || photo.area) && (
-                <span aria-hidden="true">{photo.title || photo.area}</span>
-              )}
+        <ol class="chapter-index">
+          {chapters.map(chapter => (
+            <li>
+              <a href={`/places/${chapter.slug}`}>
+                <span class="chapter-number">No. {chapter.number}</span>
+                <span class="chapter-index-name">{chapter.name}</span>
+                <span class="measure">{yearSpan(chapter)}</span>
+                <span class="measure chapter-index-count">{formatNumber(chapter.count)} outings</span>
+                {chapter.cover?.preview_img_url ? (
+                  <span class="chapter-index-thumb photo-plate">
+                    <img src={chapter.cover.preview_img_url.replace(/w=\d+/, 'w=400')} alt="" loading="lazy" width="400" height="300" />
+                  </span>
+                ) : (
+                  <span />
+                )}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {frames.length > 0 && (
+      <section class="section" aria-labelledby="frames-heading">
+        <div class="section-head">
+          <h2 id="frames-heading">Recent frames</h2>
+          <a class="text-link" href="/photos">All the photos <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="frames">
+          {frames.map(photo => (
+            <a class="frame" href="/photos" aria-label={`View photos, including ${photoAlt(photo)}`}>
+              <span class="photo-plate frame-image">
+                <img src={`/img/${photo.id}/?w=800`} alt="" loading="lazy" width={photo.width ?? 800} height={photo.height ?? 600} />
+              </span>
+              {(photo.title || photo.area) && <span class="caption">{photo.title || photo.area}</span>}
             </a>
           ))}
         </div>
       </section>
     )}
-
-    <section class="stats-note" aria-label="Journal totals">
-      <p>
-        <em>Since 2019:</em> {formatNumber(stats.totalPeaks)} summits, {formatNumber(stats.totalMiles)} miles,
-        and about {formatNumber(Math.round(stats.totalGain / 1000) * 1000)} feet of uphill
-        <span>(and only 3 ankle surgeries).</span>
-      </p>
-    </section>
-
-    <section class="outing-section">
-      <div class="section-heading">
-        <h2>From the log</h2>
-        <a href="/climbs">all {formatNumber(stats.totalClimbs)} outings <span aria-hidden="true">→</span></a>
-      </div>
-
-      {recentClimbs.length > 0 ? (
-        <div class="outing-list">
-          {recentClimbs.slice(0, 3).map((climb) => (
-            <a href={climb.slug ? `/blog/hike/${climb.slug}/` : `/climbs/?outing=${encodeURIComponent(climb.id)}`} class="outing-entry">
-              <div class="outing-thumb">
-                {climb.preview_img_url ? (
-                  <img
-                    src={climb.preview_img_url}
-                    alt=""
-                    loading="lazy"
-                  />
-                ) : (
-                  <span aria-hidden="true">↗</span>
-                )}
-              </div>
-              <div class="outing-copy">
-                <p class="outing-tag">{getOutingType(climb.title)}{climb.state && ` · ${climb.state}`}</p>
-                <h3>{getOutingTitle(climb.title)}</h3>
-                <p class="outing-meta">
-                  {climb.date && (
-                    <time datetime={climb.date} title={formatCalendarDate(climb.date)}>
-                      {formatRecentDate(climb.date)}
-                    </time>
-                  )}
-                  {climb.area && ` · ${climb.area}`}
-                </p>
-                {climb.distance && climb.gain && (
-                  <p class="outing-stats">
-                    {climb.distance} mi · {formatNumber(climb.gain)} ft gain
-                  </p>
-                )}
-              </div>
-            </a>
-          ))}
-        </div>
-      ) : (
-        <p>No outings found. <a href="/climbs">View the log</a></p>
-      )}
-    </section>
   </div>
 
   <style>
-    .hero-photo {
-      width: min(calc(100% - 2rem), 1480px);
-      margin: 1rem auto 0;
+    .home {
+      padding-top: var(--space-xl);
+      padding-bottom: var(--space-2xl);
     }
-    .hero-photo img {
-      display: block;
-      width: 100%;
-      height: min(72vh, 780px);
-      min-height: 520px;
-      border-radius: 0.5rem;
-      object-fit: cover;
-      filter: saturate(0.9);
-    }
-    .hero-photo figcaption {
-      display: flex;
-      justify-content: space-between;
-      gap: var(--space-md);
-      padding: 0.65rem 0.25rem 0;
-      color: var(--color-text-tertiary);
-      font-family: var(--font-serif);
-      font-size: var(--font-size-sm);
-      font-style: italic;
-    }
-    .home-content { max-width: 1180px; padding-bottom: 7rem; }
-    .home-intro { max-width: 880px; padding: 5.5rem 0 4.5rem; }
-    .home-intro h1 {
-      font-family: var(--font-serif);
-      font-size: clamp(2.8rem, 5.5vw, 5rem);
-      font-weight: 400;
-      letter-spacing: -0.05em;
-      line-height: 0.9;
-      margin: 0 0 1rem;
-    }
-    .home-intro h1 em { color: var(--color-accent-orange); font-style: italic; }
-    .home-intro p { max-width: 680px; font-size: clamp(1rem, 1.4vw, 1.15rem); line-height: 1.55; }
-    .home-intro a { display: inline-block; margin-top: var(--space-md); font-size: var(--font-size-sm); }
-    .photo-section { padding: 1rem 0 5rem; }
-    .section-heading {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: var(--space-xl);
-      margin-bottom: 2rem;
-    }
-    .section-heading h2 {
-      margin: 0;
-      font-size: clamp(1.7rem, 3vw, 2.4rem);
-      font-weight: 400;
-      letter-spacing: -0.03em;
-    }
-    .section-heading > span,
-    .section-heading > a { color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
-    .section-heading > a:hover { color: var(--color-text-accent); }
-    .photo-strip {
-      columns: 4 180px;
-      column-gap: 0.75rem;
-      column-fill: balance;
-    }
-    .photo-strip-item {
-      display: block;
-      position: relative;
-      break-inside: avoid;
-      overflow: hidden;
-      border-radius: 0.35rem;
-      background: var(--color-bg-secondary);
-      margin-bottom: 0.75rem;
-    }
-    .photo-strip-item img {
-      display: block;
-      width: 100%;
-      height: auto;
-      transition: transform 0.5s ease;
-    }
-    .photo-strip-item:hover img { transform: scale(1.025); }
-    .photo-strip-item span {
-      position: absolute;
-      right: 0.6rem;
-      bottom: 0.45rem;
-      left: 0.6rem;
-      color: white;
-      font-family: var(--font-serif);
-      font-size: var(--font-size-sm);
-      font-style: italic;
-      opacity: 0;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.8);
-      transition: opacity 0.2s ease;
-    }
-    .photo-strip-item:hover span { opacity: 1; }
-    .stats-note {
-      margin: 0 0 6rem;
-      padding: 2.25rem 0;
-      border-top: 1px solid var(--color-border);
-      border-bottom: 1px solid var(--color-border);
-    }
-    .stats-note p { margin: 0; color: var(--color-text-primary); font-family: var(--font-serif); font-size: clamp(1.2rem, 2.2vw, 1.65rem); }
-    .stats-note p em { color: var(--color-accent); font-weight: 600; }
-    .stats-note p span { color: var(--color-text-tertiary); font-style: italic; }
-    .outing-section { padding-bottom: 2rem; }
-    .outing-list { border-top: 1px solid var(--color-border); }
-    .outing-entry {
+
+    .masthead {
       display: grid;
-      grid-template-columns: 160px 1fr;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
       gap: var(--space-xl);
+      align-items: end;
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .masthead h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 4vw, 3.1rem);
+      line-height: 1.05;
+      text-wrap: wrap;
+    }
+
+    .masthead-note {
+      max-width: 34rem;
+      margin: 0;
+      font-size: var(--font-size-lg);
+    }
+
+    .tally {
+      font-weight: 650;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .home-error {
+      margin-top: var(--space-lg);
+    }
+
+    .spread {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      gap: var(--space-xl) var(--space-2xl);
+      margin-top: var(--space-xl);
+    }
+
+    .latest-photo {
+      aspect-ratio: 3 / 2;
+      margin-bottom: var(--space-md);
+    }
+
+    .latest-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem var(--space-md);
+      margin-bottom: 0.25rem;
+      font-size: var(--font-size-base);
+      color: var(--ink-soft);
+    }
+
+    .latest h2 {
+      margin-bottom: 0.35rem;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+    }
+
+    .latest h2 a {
+      color: var(--ink);
+    }
+
+    .latest h2 a:hover {
+      color: var(--water);
+    }
+
+    .latest-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    .lately .section-head h2 {
+      font-size: var(--font-size-xl);
+    }
+
+    .lately-row {
+      grid-template-columns: 5.75rem minmax(0, 1fr);
+      padding: 0.55rem 0;
+    }
+
+    .lately-row h3 {
+      font-size: var(--font-size-base);
+    }
+
+    .lately-row .logbook-place {
+      font-size: var(--font-size-sm);
+    }
+
+    .chapter-index {
+      list-style: none;
+    }
+
+    .chapter-index a {
+      display: grid;
+      grid-template-columns: 4.5rem minmax(0, 1fr) 7rem 7.5rem 88px;
+      gap: var(--space-md);
       align-items: center;
-      padding: 1.5rem 0;
-      border-bottom: 1px solid var(--color-border);
+      padding: 0.55rem 0;
+      color: var(--ink);
+      border-bottom: 1px dashed var(--color-border-hover);
+    }
+
+    .chapter-index li:last-child a {
+      border-bottom: 0;
+    }
+
+    .chapter-index a:hover {
+      text-decoration: none;
+      background: color-mix(in srgb, var(--paper-deep) 70%, transparent);
+    }
+
+    .chapter-index a:hover .chapter-index-name {
+      color: var(--water);
+    }
+
+    .chapter-index-name {
+      font-size: var(--font-size-xl);
+      font-weight: 650;
+    }
+
+    .chapter-index-count {
+      text-align: right;
+    }
+
+    .chapter-index-thumb {
+      width: 88px;
+      aspect-ratio: 4 / 3;
+    }
+
+    .frames {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+
+    .frame {
+      display: block;
       color: inherit;
+    }
+
+    .frame:hover {
       text-decoration: none;
     }
-    .outing-entry:hover { text-decoration: none; }
-    .outing-thumb {
-      display: grid;
-      place-items: center;
-      width: 160px;
-      aspect-ratio: 4 / 3;
+
+    .frame-image {
+      aspect-ratio: 4 / 5;
+    }
+
+    .frame .caption {
+      display: block;
       overflow: hidden;
-      border-radius: 0.35rem;
-      background: var(--color-bg-secondary);
-      color: var(--color-text-tertiary);
-      font-family: var(--font-serif);
-      font-size: 1.5rem;
-    }
-    .outing-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .outing-tag { margin: 0 0 0.25rem; color: var(--color-accent); font-size: var(--font-size-xs); text-transform: lowercase; }
-    .outing-copy h3 { margin: 0 0 0.35rem; font-size: clamp(1.3rem, 2.2vw, 1.7rem); font-weight: 400; }
-    .outing-entry:hover h3 { color: var(--color-text-accent); }
-    .outing-meta,
-    .outing-stats { margin: 0; color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
-    .outing-stats { margin-top: 0.2rem; }
-
-    @media (hover: none) {
-      .photo-strip-item span { opacity: 1; }
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    @media (max-width: 768px) {
-      .hero-photo img { height: 62vh; min-height: 420px; }
-      .hero-photo figcaption { align-items: flex-start; flex-direction: column; gap: 0; }
-      .home-intro { padding: 4rem 0; }
-      .section-heading { align-items: flex-start; flex-direction: column; }
-      .photo-strip { columns: 2 140px; }
-      .outing-entry { grid-template-columns: 100px 1fr; gap: var(--space-lg); }
-      .outing-thumb { width: 100px; }
+    @media (max-width: 960px) {
+      .masthead,
+      .spread {
+        grid-template-columns: 1fr;
+      }
+
+      .masthead {
+        gap: var(--space-sm);
+      }
+
+      .frames {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .chapter-index a {
+        grid-template-columns: 3.75rem minmax(0, 1fr) 72px;
+        row-gap: 0;
+      }
+
+      .chapter-index a > .measure {
+        display: none;
+      }
+
+      .chapter-index-thumb {
+        width: 72px;
+      }
+
+      .frames {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
   </style>
 </Layout>

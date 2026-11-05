@@ -1,0 +1,399 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+import { formatCalendarDate } from '../../lib/dates'
+import { formatNumber, loadJournal, roundedFeet } from '../../lib/journal-data'
+import {
+  buildChapters,
+  groupByYear,
+  outingHref,
+  outingName,
+  outingType,
+  yearSpan,
+} from '../../lib/places'
+
+export const prerender = false
+
+interface PeakRow {
+  title: string | null
+  elevation: number
+  range: string | null
+  first_completed: string | null
+}
+
+const journal = await loadJournal(env, 400)
+const chapters = buildChapters(journal.outings)
+const index = chapters.findIndex(chapter => chapter.slug === Astro.params.slug)
+
+if (index === -1) {
+  return new Response('Place not found', { status: 404 })
+}
+
+const chapter = chapters[index]
+const previous = chapters[index - 1] ?? null
+const next = chapters[index + 1] ?? null
+const years = groupByYear(chapter.outings)
+
+let peakRanges: { range: string; peaks: PeakRow[] }[] = []
+let summitCount = 0
+if (chapter.slug === 'colorado' && env.DB) {
+  try {
+    const result = await env.DB.prepare(
+      'SELECT title, elevation, range, first_completed FROM peaks WHERE first_completed IS NOT NULL ORDER BY elevation DESC',
+    ).all<PeakRow>()
+    const peaks = result.results ?? []
+    summitCount = peaks.length
+    const byRange = new Map<string, PeakRow[]>()
+    for (const peak of peaks) {
+      const range = peak.range ? `${peak.range} Range` : 'Other ranges'
+      byRange.set(range, [...(byRange.get(range) ?? []), peak])
+    }
+    peakRanges = [...byRange.entries()]
+      .map(([range, list]) => ({ range, peaks: list }))
+      .sort((a, b) => b.peaks.length - a.peaks.length)
+  } catch (error) {
+    console.error('Failed to load peaks:', error)
+  }
+}
+
+function placeLine(area: string | null, state: string | null): string {
+  if (chapter.regions.length > 1) return [area, state].filter(Boolean).join(', ')
+  return area ?? ''
+}
+
+const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAreas
+---
+
+<Layout
+  title={chapter.name}
+  description={`${formatNumber(chapter.count)} outings in ${chapter.name}, from Kylie's route book.`}
+  ogImage="https://kylies.photos/open-graph/climb-log.jpg"
+  ogImageAlt="A hiker crossing a snowy slope above Colorado's mountain ranges"
+>
+  <div class="container page">
+    <a class="text-link back-link" href="/places"><span aria-hidden="true">←</span> All places</a>
+
+    <header class="chapter-head">
+      <div class="chapter-head-text">
+        <p class="chapter-head-margin">
+          <span class="chapter-number">No. {chapter.number}</span>
+          <span class="measure">{yearSpan(chapter)}</span>
+        </p>
+        <h1>{chapter.name}</h1>
+        <p class="chapter-lede">
+          {formatNumber(chapter.count)} {chapter.count === 1 ? 'outing' : 'outings'}, {formatNumber(chapter.miles)} miles,
+          and about {roundedFeet(chapter.gain)} feet of climbing
+          {chapter.firstDate && <> since {formatCalendarDate(chapter.firstDate, { month: 'long', year: 'numeric' })}</>}.
+        </p>
+
+        {listedAreas.length > 0 && (
+          <div class="where">
+            <h2 class="where-title">{chapter.regions.length > 1 ? 'Where' : 'Where the miles went'}</h2>
+            <ul class="where-list">
+              {listedAreas.map(area => (
+                <li>
+                  <span>{area.name}</span>
+                  <span class="measure">{area.count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {chapter.cover?.preview_img_url && (
+        <figure class="chapter-head-photo">
+          <a class="photo-plate" href={outingHref(chapter.cover)}>
+            <img src={chapter.cover.preview_img_url.replace(/w=\d+/, 'w=1600')} alt="" width="1200" height="900" fetchpriority="high" />
+          </a>
+          <figcaption class="caption">
+            {[
+              outingName(chapter.cover.title),
+              chapter.cover.date ? formatCalendarDate(chapter.cover.date, { month: 'long', year: 'numeric' }) : null,
+            ]
+              .filter(Boolean)
+              .join(', ')}
+          </figcaption>
+        </figure>
+      )}
+    </header>
+
+    {peakRanges.length > 0 && (
+      <section class="section" aria-labelledby="peaks-heading">
+        <div class="section-head">
+          <h2 id="peaks-heading">Summits</h2>
+          <a class="text-link" href="/peaks">Full peak list <span aria-hidden="true">→</span></a>
+        </div>
+        <p class="summit-note">{formatNumber(summitCount)} peaks reached so far, grouped by range.</p>
+        <div class="ranges">
+          {peakRanges.map(group => (
+            <div class="range">
+              <h3>
+                {group.range} <span class="measure">{group.peaks.length}</span>
+              </h3>
+              <ul>
+                {group.peaks.map(peak => (
+                  <li>
+                    <span>{peak.title}</span>
+                    <span class="measure">{formatNumber(peak.elevation)}′</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="section" aria-labelledby="log-heading">
+      <div class="section-head">
+        <h2 id="log-heading">The log</h2>
+        <a class="text-link" href="/climbs">Search every outing <span aria-hidden="true">→</span></a>
+      </div>
+
+      {years.map(group => (
+        <div class="year">
+          <h3 class="year-label">
+            {group.year} <span class="measure">{group.outings.length}</span>
+          </h3>
+          <ol class="logbook">
+            {group.outings.map(outing => (
+              <li class="logbook-row chapter-entry">
+                <span class="entry-date">
+                  {outing.date ? formatCalendarDate(outing.date, { month: 'short', day: 'numeric' }) : '—'}
+                </span>
+                <div>
+                  <h3><a href={outingHref(outing)}>{outingName(outing.title)}</a></h3>
+                  <p class="logbook-place">
+                    <span class="logbook-kind">{outingType(outing.title)}</span>
+                    {placeLine(outing.area, outing.state) && <> · {placeLine(outing.area, outing.state)}</>}
+                    {(outing.distance || outing.gain) && (
+                      <span class="measure">
+                        {' '}· {outing.distance ? `${outing.distance.toFixed(1)} mi` : ''}
+                        {outing.distance && outing.gain ? ' · ' : ''}
+                        {outing.gain ? `${formatNumber(outing.gain)} ft` : ''}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                {outing.preview_img_url ? (
+                  <a class="entry-thumb photo-plate" href={outingHref(outing)} tabindex="-1" aria-hidden="true">
+                    <img src={outing.preview_img_url} alt="" loading="lazy" width="400" height="300" />
+                  </a>
+                ) : (
+                  <span />
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </section>
+
+    <nav class="chapter-pager" aria-label="Chapters">
+      {previous ? (
+        <a href={`/places/${previous.slug}`}>
+          <span class="measure">← No. {previous.number}</span>
+          <span class="pager-name">{previous.name}</span>
+        </a>
+      ) : <span />}
+      {next ? (
+        <a class="pager-next" href={`/places/${next.slug}`}>
+          <span class="measure">No. {next.number} →</span>
+          <span class="pager-name">{next.name}</span>
+        </a>
+      ) : <span />}
+    </nav>
+  </div>
+
+  <style>
+    .back-link {
+      display: inline-block;
+      margin-bottom: var(--space-md);
+    }
+
+    .chapter-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: var(--space-xl);
+      align-items: start;
+      padding-bottom: var(--space-xl);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .chapter-head-margin {
+      display: flex;
+      gap: var(--space-md);
+      margin-bottom: 0.35rem;
+    }
+
+    .chapter-head h1 {
+      margin-bottom: var(--space-sm);
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+    }
+
+    .chapter-lede {
+      max-width: 32rem;
+      font-size: var(--font-size-lg);
+      color: var(--ink-soft);
+    }
+
+    .where {
+      margin-top: var(--space-lg);
+    }
+
+    .where-title {
+      margin-bottom: 0.4rem;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--ink-soft);
+    }
+
+    .where-list {
+      list-style: none;
+      max-width: 26rem;
+    }
+
+    .where-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding: 0.3rem 0;
+      border-bottom: 1px dashed var(--color-border-hover);
+    }
+
+    .chapter-head-photo .photo-plate {
+      aspect-ratio: 4 / 3;
+    }
+
+    .summit-note {
+      margin-bottom: var(--space-md);
+    }
+
+    .ranges {
+      columns: 3 240px;
+      column-gap: var(--space-xl);
+    }
+
+    .range {
+      break-inside: avoid;
+      margin-bottom: var(--space-lg);
+    }
+
+    .range h3 {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+      font-size: var(--font-size-base);
+      font-weight: 650;
+    }
+
+    .range ul {
+      list-style: none;
+    }
+
+    .range li {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding: 0.18rem 0;
+      font-size: var(--font-size-base);
+      border-bottom: 1px dotted var(--color-border);
+    }
+
+    .year {
+      display: grid;
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: var(--space-lg);
+      padding-top: var(--space-md);
+    }
+
+    .year + .year {
+      border-top: 1px solid var(--color-border);
+    }
+
+    .year-label {
+      position: sticky;
+      top: calc(var(--header-height) + 0.75rem);
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      margin: 0.55rem 0 0;
+      font-size: var(--font-size-2xl);
+    }
+
+    .chapter-entry {
+      grid-template-columns: 4.5rem minmax(0, 1fr) 96px;
+      align-items: center;
+    }
+
+    .entry-thumb {
+      width: 96px;
+      aspect-ratio: 4 / 3;
+    }
+
+    .chapter-pager {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      margin-top: var(--space-2xl);
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--ink);
+    }
+
+    .chapter-pager a {
+      display: flex;
+      flex-direction: column;
+      color: var(--ink);
+    }
+
+    .chapter-pager a:hover {
+      color: var(--water);
+      text-decoration: none;
+    }
+
+    .pager-next {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .pager-name {
+      font-size: var(--font-size-2xl);
+      font-weight: 650;
+    }
+
+    @media (max-width: 900px) {
+      .chapter-head {
+        grid-template-columns: 1fr;
+      }
+
+      .chapter-head-photo {
+        grid-row: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .year {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .year-label {
+        position: static;
+        flex-direction: row;
+        align-items: baseline;
+        gap: var(--space-sm);
+      }
+
+      .chapter-entry {
+        grid-template-columns: 3.75rem minmax(0, 1fr) 72px;
+        gap: 0.25rem var(--space-md);
+      }
+
+      .entry-thumb {
+        width: 72px;
+      }
+    }
+  </style>
+</Layout>

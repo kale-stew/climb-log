@@ -23,9 +23,8 @@ try {
 >
   <div class="container page">
     <header class="photos-intro">
-      <p>From the journal</p>
       <h1>Photos from outside.</h1>
-      <span>Mountains, weather, friends, and the small things worth remembering.</span>
+      <p class="page-subtitle">Mountains, weather, friends, and the small things worth remembering.</p>
     </header>
 
     <PhotoGallery
@@ -39,23 +38,15 @@ try {
   </div>
 
   <style>
-    .photos-intro { padding: 3rem 0 4rem; }
-    .photos-intro p {
-      margin-bottom: 1rem;
-      color: var(--color-text-accent);
-      font-family: var(--font-serif);
-      font-size: 1rem;
-      font-style: italic;
-      letter-spacing: 0.02em;
-      text-transform: lowercase;
+    .photos-intro {
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--ink);
     }
     .photos-intro h1 {
-      margin: 0 0 1rem;
-      font-size: clamp(2.8rem, 5vw, 4.8rem);
-      font-weight: 400;
-      letter-spacing: -0.04em;
-      line-height: 0.98;
+      margin: 0 0 0.4rem;
+      font-size: clamp(2.3rem, 4.4vw, 3.2rem);
     }
-    .photos-intro span { color: var(--color-text-tertiary); font-size: 1.05rem; text-transform: lowercase; }
+    .photos-intro .page-subtitle { margin: 0; }
   </style>
 </Layout>

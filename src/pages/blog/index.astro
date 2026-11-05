@@ -33,16 +33,16 @@ function formatDate(dateStr: string) {
 ---
 
 <Layout
-  title="Blog"
+  title="Trip reports"
   description="Trip reports, gear notes, and mountain stories from 2021 and 2022."
   ogImage="https://kylies.photos/open-graph/blog.jpg"
   ogImageAlt="Snow-covered Colorado peaks framed by golden autumn aspens"
 >
   <div class="container page">
-    <h1>Blog</h1>
-    <p class="page-subtitle" style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
+    <h1>Trip reports</h1>
+    <p class="page-subtitle" style="margin-bottom: var(--space-xl);">
       Trip reports, gear reviews, and other thoughts from the trail. The newest post is from March
-      2022, but <a href="/climbs">the log has newer outings</a>.
+      2022, but <a href="/climbs">the journal has newer outings</a>.
     </p>
 
     <!-- Category Filter (client-side) -->
@@ -170,15 +170,15 @@ function formatDate(dateStr: string) {
     }
 
     .post-category.cat-hike {
-      color: var(--color-purple, #8b5cf6);
+      color: var(--forest);
     }
 
     .post-category.cat-gear {
-      color: var(--color-orange, #f97316);
+      color: var(--contour);
     }
 
     .post-category.cat-thoughts {
-      color: var(--color-pink, #ec4899);
+      color: var(--water);
     }
 
     .post-content h2 {

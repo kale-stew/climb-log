@@ -32,18 +32,25 @@ if (DB) {
 ---
 
 <Layout
-  title="Log"
-  description="A searchable log of my hikes, climbs, trail runs, and other mountain outings since 2019."
+  title="Journal"
+  description="A searchable journal of my hikes, climbs, trail runs, and other mountain outings since 2019."
   ogImage="https://kylies.photos/open-graph/climb-log.jpg"
   ogImageAlt="A hiker crossing a snowy slope above Colorado's mountain ranges"
 >
   <div class="container page">
-    <h1>Log</h1>
-    <p class="page-subtitle" style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
-      A complete log of my hikes and climbs. Search, filter, and sort to explore the list.
+    <h1>Journal</h1>
+    <p class="page-subtitle journal-intro">
+      Every outing, newest first. The longer write-ups live in the <a href="/blog">trip reports</a>, and the same
+      entries are grouped by place in <a href="/places">the route book</a>.
     </p>
 
     <ClimbTable client:load climbs={climbs} />
     <noscript><p>The first 50 outings are shown above. Turn on JavaScript to search, sort, and browse the rest.</p></noscript>
   </div>
+
+  <style>
+    .journal-intro {
+      margin-bottom: var(--space-xl);
+    }
+  </style>
 </Layout>
