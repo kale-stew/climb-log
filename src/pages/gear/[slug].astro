@@ -1,0 +1,232 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import NotionContent from '../../components/NotionContent.astro'
+import { env } from 'cloudflare:workers'
+import { parseNotionBody } from '../../lib/notion-render'
+import type { Gear } from '../../lib/types'
+
+export const prerender = false
+
+const { slug } = Astro.params
+const DB = env.DB as D1Database | undefined
+
+let gear: Gear | null = null
+
+if (DB && slug) {
+  gear =
+    (await DB.prepare('SELECT * FROM gear WHERE slug = ? LIMIT 1').bind(slug).first<Gear>()) ?? null
+}
+
+if (!gear) {
+  Astro.response.status = 404
+}
+
+const name = gear?.name ?? gear?.title ?? 'Gear'
+const notionBlocks = gear ? parseNotionBody(gear.notion_body) : []
+const hasNotionBody = notionBlocks.length > 0
+
+function getStatus(item: Gear): string | null {
+  if (item.status) return item.status
+  if (item.retired_on) return 'Retired'
+  if (item.acquired_on) return 'Own'
+  return null
+}
+
+function ratingStars(rating: number | null): string | null {
+  if (rating == null) return null
+  const rounded = Math.round(rating)
+  const clamped = Math.max(0, Math.min(5, rounded))
+  return '★'.repeat(clamped) + '☆'.repeat(5 - clamped)
+}
+
+const status = gear ? getStatus(gear) : null
+const stars = gear ? ratingStars(gear.rating) : null
+
+const specs = gear
+  ? [
+      gear.weight_oz != null ? { label: 'Weight', value: `${gear.weight_oz} oz` } : null,
+      gear.price != null ? { label: 'Price paid', value: `$${gear.price}` } : null,
+      gear.retailer ? { label: 'Purchased from', value: gear.retailer } : null,
+    ].filter((s): s is { label: string; value: string } => s !== null)
+  : []
+---
+
+<Layout title={name} description={gear ? `${name} — gear notes and specs.` : 'Gear not found'}>
+  <article class="container gear-detail">
+    <a href="/gear" class="back-link">&larr; Back to gear</a>
+
+    {!gear && (
+      <div class="not-found">
+        <h1>Gear not found</h1>
+        <p>We couldn't find a gear item at this address.</p>
+      </div>
+    )}
+
+    {gear && (
+      <>
+        <header class="gear-header">
+          <h1>{name}</h1>
+          <p class="gear-meta">
+            {gear.brand && <span>{gear.brand}</span>}
+            {gear.brand && gear.category && <span> &middot; </span>}
+            {gear.category && <span>{gear.category}</span>}
+          </p>
+          <div class="gear-badges">
+            {stars && <span class="rating" aria-label={`Rating ${gear.rating} of 5`}>{stars}</span>}
+            {status && <span class="status">{status}</span>}
+          </div>
+        </header>
+
+        {gear.image_url && (
+          <figure class="gear-image">
+            <img src={gear.image_url} alt={name} loading="lazy" onerror="this.style.display='none'" />
+          </figure>
+        )}
+
+        {specs.length > 0 && (
+          <dl class="stats-grid">
+            {specs.map(spec => (
+              <div class="stat">
+                <dt>{spec.label}</dt>
+                <dd>{spec.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        {gear.notes && <p class="gear-notes">{gear.notes}</p>}
+
+        {hasNotionBody && (
+          <section class="notion-section">
+            <NotionContent blocks={notionBlocks} />
+          </section>
+        )}
+
+        {!hasNotionBody && !gear.notes && specs.length === 0 && (
+          <p class="empty-note">No details yet for this item.</p>
+        )}
+      </>
+    )}
+  </article>
+</Layout>
+
+<style>
+  .gear-detail {
+    max-width: 800px;
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-3xl);
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    margin-bottom: var(--space-lg);
+  }
+
+  .back-link:hover {
+    color: var(--color-accent-orange);
+  }
+
+  .gear-header h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-bottom: var(--space-xs);
+  }
+
+  .gear-meta {
+    color: var(--color-text-tertiary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-sm);
+  }
+
+  .gear-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+  }
+
+  .rating {
+    color: var(--color-accent-orange);
+    letter-spacing: 2px;
+  }
+
+  .status {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+  }
+
+  .gear-image {
+    margin: 0 0 var(--space-xl);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    background: var(--color-bg-secondary);
+    display: flex;
+    justify-content: center;
+    padding: var(--space-lg);
+  }
+
+  .gear-image img {
+    max-width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-md);
+    margin: 0 0 var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .stat dt {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .stat dd {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .gear-notes {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+  }
+
+  .notion-section {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .empty-note {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .not-found {
+    padding: var(--space-2xl) 0;
+  }
+
+  @media (max-width: 640px) {
+    .gear-header h1 {
+      font-size: 1.75rem;
+    }
+  }
+</style>

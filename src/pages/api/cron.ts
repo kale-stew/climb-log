@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers'
 import { Client, isNotionClientError } from '@notionhq/client'
 import type { APIRoute } from 'astro'
-import { getNotionProp } from '../../lib/notion-helpers'
+import { chunk, getNotionProp } from '../../lib/notion-helpers'
 import type { SyncResult } from '../../lib/types'
 
 export const prerender = false
@@ -113,6 +113,17 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
     }
     if (notionDbIds.gear) {
       results.push(await syncGear(notion, DB, notionDbIds.gear))
+    }
+
+    // Sync Notion page bodies for content tables (requires notion_id, populated above)
+    if (notionDbIds.climbs) {
+      results.push(await syncNotionBodies(notion, DB, 'climbs'))
+    }
+    if (notionDbIds.peaks) {
+      results.push(await syncNotionBodies(notion, DB, 'peaks'))
+    }
+    if (notionDbIds.gear) {
+      results.push(await syncNotionBodies(notion, DB, 'gear'))
     }
 
     // Calculate totals
@@ -458,4 +469,82 @@ async function syncGear(notion: Client, db: D1Database, dbId: string): Promise<S
   }
 
   return result
+}
+
+/** Tables that support Notion body sync. Whitelist guards SQL interpolation. */
+const BODY_SYNC_TABLES = ['climbs', 'peaks', 'gear'] as const
+type BodySyncTable = (typeof BODY_SYNC_TABLES)[number]
+
+/** Max concurrent Notion block-fetch requests (respect Notion rate limits). */
+const BODY_SYNC_CONCURRENCY = 3
+
+/**
+ * Fetch and store the Notion page body (block children) for every record in a
+ * content table. Bodies are stored as a JSON-stringified block array in
+ * `<table>.notion_body`. Errors are isolated per record so a single failure
+ * does not abort the rest of the sync.
+ */
+async function syncNotionBodies(
+  notion: Client,
+  db: D1Database,
+  table: BodySyncTable
+): Promise<SyncResult> {
+  const result: SyncResult = { table: `${table}_bodies`, inserted: 0, updated: 0, errors: [] }
+
+  // `table` is constrained to the BODY_SYNC_TABLES whitelist, so interpolation is safe.
+  if (!BODY_SYNC_TABLES.includes(table)) {
+    result.errors.push(`Invalid table for body sync: ${table}`)
+    return result
+  }
+
+  let records: Array<{ id: string; notion_id: string }>
+  try {
+    const rows = await db
+      .prepare(`SELECT id, notion_id FROM ${table} WHERE notion_id IS NOT NULL`)
+      .all<{ id: string; notion_id: string }>()
+    records = rows.results || []
+  } catch (error) {
+    result.errors.push(`Failed to list ${table} for body sync: ${formatError(error)}`)
+    return result
+  }
+
+  logSync('info', 'Syncing Notion bodies', { table, count: records.length })
+
+  for (const batch of chunk(records, BODY_SYNC_CONCURRENCY)) {
+    await Promise.all(
+      batch.map(async record => {
+        try {
+          const blocks = await fetchAllBlocks(notion, record.notion_id)
+          await db.prepare(
+            `UPDATE ${table} SET notion_body = ?, notion_body_synced_at = datetime('now') WHERE id = ?`
+          ).bind(JSON.stringify(blocks), record.id).run()
+          result.updated++
+        } catch (error) {
+          result.errors.push(`Body ${table} ${record.notion_id}: ${formatError(error)}`)
+        }
+      })
+    )
+  }
+
+  return result
+}
+
+/**
+ * Fetch all block children for a Notion page/block, following pagination.
+ */
+async function fetchAllBlocks(notion: Client, blockId: string): Promise<Array<Record<string, unknown>>> {
+  const blocks: Array<Record<string, unknown>> = []
+  let cursor: string | undefined
+
+  do {
+    const response = await notion.blocks.children.list({
+      block_id: blockId,
+      start_cursor: cursor,
+      page_size: 100,
+    })
+    blocks.push(...(response.results as Array<Record<string, unknown>>))
+    cursor = response.has_more ? response.next_cursor ?? undefined : undefined
+  } while (cursor)
+
+  return blocks
 }

@@ -1,0 +1,311 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import NotionContent from '../../components/NotionContent.astro'
+import { env } from 'cloudflare:workers'
+import { getCollection, render } from 'astro:content'
+import { fillMissingPreviewImages } from '../../lib/photo-fallbacks'
+import { getCanonicalPhotos, getClimbPhotoAssignments } from '../../lib/photos-client'
+import { parseNotionBody } from '../../lib/notion-render'
+import type { Climb } from '../../lib/types'
+
+export const prerender = false
+
+const { slug } = Astro.params
+const DB = env.DB as D1Database | undefined
+
+interface LinkedPhoto {
+  id: string
+}
+
+let climb: Climb | null = null
+let photos: LinkedPhoto[] = []
+
+if (DB && slug) {
+  climb =
+    (await DB.prepare('SELECT * FROM climbs WHERE slug = ? ORDER BY date DESC LIMIT 1')
+      .bind(slug)
+      .first<Climb>()) ?? null
+
+  if (climb) {
+    const [assignments, canonicalPhotos] = await Promise.all([
+      getClimbPhotoAssignments(env.PHOTOS_API_ORIGIN),
+      climb.preview_img_url ? Promise.resolve([]) : getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 1500 }),
+    ])
+    photos = (assignments.get(climb.id) ?? []).map(({ photoId }) => ({ id: photoId }))
+
+    if (!climb.preview_img_url) {
+      fillMissingPreviewImages([climb], canonicalPhotos, 1600, assignments)
+    }
+  }
+}
+
+// Optional markdown trip report: a `hike` blog post whose slug matches the climb.
+let TripReport: Awaited<ReturnType<typeof render>>['Content'] | null = null
+if (climb && slug) {
+  const posts = await getCollection('blog')
+  const match = posts.find(p => p.id.replace(/\.md$/, '').replace(/^hike\//, '') === slug)
+  if (match) {
+    const rendered = await render(match)
+    TripReport = rendered.Content
+  }
+}
+
+if (!climb) {
+  Astro.response.status = 404
+}
+
+const notionBlocks = climb ? parseNotionBody(climb.notion_body) : []
+const hasNotionBody = notionBlocks.length > 0
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  if (Number.isNaN(date.getTime())) return dateStr
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+}
+
+function formatNumber(value: number | null): string | null {
+  if (value == null) return null
+  return value.toLocaleString('en-US')
+}
+
+const title = climb?.title ?? 'Climb'
+const locationParts = [climb?.area, climb?.state].filter(Boolean)
+const stats = climb
+  ? [
+      climb.distance != null ? { label: 'Distance', value: `${climb.distance} mi` } : null,
+      climb.gain != null ? { label: 'Elevation gain', value: `${formatNumber(climb.gain)} ft` } : null,
+      climb.max_elevation != null
+        ? { label: 'Max elevation', value: `${formatNumber(climb.max_elevation)} ft` }
+        : null,
+    ].filter((s): s is { label: string; value: string } => s !== null)
+  : []
+---
+
+<Layout title={title} description={climb ? `Trip report and photos from ${title}.` : 'Climb not found'}>
+  <article class="container climb-detail">
+    <a href="/climbs" class="back-link">&larr; Back to climbs</a>
+
+    {!climb && (
+      <div class="not-found">
+        <h1>Climb not found</h1>
+        <p>We couldn't find a climb at this address.</p>
+      </div>
+    )}
+
+    {climb && (
+      <>
+        <header class="climb-header">
+          <h1>{title}</h1>
+          <p class="climb-meta">
+            {climb.date && <time datetime={climb.date}>{formatDate(climb.date)}</time>}
+            {locationParts.length > 0 && <span> &middot; {locationParts.join(', ')}</span>}
+          </p>
+        </header>
+
+        {climb.preview_img_url && (
+          <figure class="hero-image">
+            <img src={climb.preview_img_url} alt={title} />
+          </figure>
+        )}
+
+        {stats.length > 0 && (
+          <dl class="stats-grid">
+            {stats.map(stat => (
+              <div class="stat">
+                <dt>{stat.label}</dt>
+                <dd>{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        {TripReport && (
+          <div class="prose trip-report">
+            <TripReport />
+          </div>
+        )}
+
+        {hasNotionBody && (
+          <section class="notion-section">
+            {TripReport && <h2>Additional notes</h2>}
+            <NotionContent blocks={notionBlocks} />
+          </section>
+        )}
+
+        {!TripReport && !hasNotionBody && (
+          <p class="empty-note">No trip report yet — just the stats above for now.</p>
+        )}
+
+        {photos.length > 0 && (
+          <section class="photos-section">
+            <h2>Photos</h2>
+            <div class="photo-grid">
+              {photos.map(photo => (
+                <a href={`/img/${photo.id}?w=2000`} class="photo-thumb">
+                  <img src={`/img/${photo.id}?w=800`} alt={title} loading="lazy" />
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {(climb.strava || climb.alltrails) && (
+          <section class="links-section">
+            {climb.strava && (
+              <a href={climb.strava} target="_blank" rel="noopener noreferrer" class="external-link">Strava</a>
+            )}
+            {climb.alltrails && (
+              <a href={climb.alltrails} target="_blank" rel="noopener noreferrer" class="external-link">AllTrails</a>
+            )}
+          </section>
+        )}
+      </>
+    )}
+  </article>
+</Layout>
+
+<style>
+  .climb-detail {
+    max-width: 800px;
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-3xl);
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    margin-bottom: var(--space-lg);
+  }
+
+  .back-link:hover {
+    color: var(--color-accent-orange);
+  }
+
+  .climb-header h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-bottom: var(--space-xs);
+  }
+
+  .climb-meta {
+    color: var(--color-text-tertiary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-xl);
+  }
+
+  .hero-image {
+    margin: 0 0 var(--space-xl);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-md);
+    margin: 0 0 var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .stat dt {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .stat dd {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .notion-section,
+  .photos-section,
+  .trip-report {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .notion-section h2,
+  .photos-section h2 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-md);
+  }
+
+  .empty-note {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .photo-thumb {
+    display: block;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+  }
+
+  .photo-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+  }
+
+  .photo-thumb:hover img {
+    transform: scale(1.03);
+  }
+
+  .links-section {
+    display: flex;
+    gap: var(--space-md);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .external-link {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  .external-link:hover {
+    border-color: var(--color-accent-orange);
+    color: var(--color-accent-orange);
+  }
+
+  .not-found {
+    padding: var(--space-2xl) 0;
+  }
+
+  @media (max-width: 640px) {
+    .climb-header h1 {
+      font-size: 1.75rem;
+    }
+  }
+</style>

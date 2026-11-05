@@ -7,6 +7,7 @@
 
 import { describe, it, expect } from 'vitest'
 import {
+  chunk,
   getNotionProp,
   normalizeStateName,
   parseAreaFallback,
@@ -197,6 +198,24 @@ describe('parseTags', () => {
   it('returns null for whitespace/empty input', () => {
     expect(parseTags('   ')).toBeNull()
     expect(parseTags(', ,')).toBeNull()
+  })
+})
+
+describe('chunk', () => {
+  it('splits an array into batches of the given size', () => {
+    expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]])
+  })
+
+  it('returns a single batch when size exceeds length', () => {
+    expect(chunk([1, 2], 5)).toEqual([[1, 2]])
+  })
+
+  it('returns an empty array for empty input', () => {
+    expect(chunk([], 3)).toEqual([])
+  })
+
+  it('throws when size is less than 1', () => {
+    expect(() => chunk([1], 0)).toThrow()
   })
 })
 

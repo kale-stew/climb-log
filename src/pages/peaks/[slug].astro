@@ -1,0 +1,238 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import NotionContent from '../../components/NotionContent.astro'
+import { env } from 'cloudflare:workers'
+import { parseNotionBody } from '../../lib/notion-render'
+import { getCanonicalPhotos } from '../../lib/photos-client'
+import type { Peak } from '../../lib/types'
+
+export const prerender = false
+
+const { slug } = Astro.params
+const DB = env.DB as D1Database | undefined
+
+interface TaggedPhoto {
+  id: string
+  caption: string | null
+}
+
+let peak: Peak | null = null
+let photos: TaggedPhoto[] = []
+
+if (DB && slug) {
+  peak =
+    (await DB.prepare('SELECT * FROM peaks WHERE slug = ? LIMIT 1').bind(slug).first<Peak>()) ?? null
+
+  if (peak) {
+    const name = peak.name ?? peak.title
+    if (name) {
+      // Best-effort: photos whose tags mention this peak by name.
+      const needle = name.toLowerCase()
+      const canonicalPhotos = await getCanonicalPhotos(env.PHOTOS_API_ORIGIN, { limit: 1500 })
+      photos = canonicalPhotos
+        .filter(photo => [photo.tags, photo.title, photo.caption].some(value => value?.toLowerCase().includes(needle)))
+        .slice(0, 12)
+        .map(photo => ({ id: photo.id, caption: photo.caption ?? photo.title }))
+    }
+  }
+}
+
+if (!peak) {
+  Astro.response.status = 404
+}
+
+const name = peak?.name ?? peak?.title ?? 'Peak'
+const notionBlocks = peak ? parseNotionBody(peak.notion_body) : []
+const hasNotionBody = notionBlocks.length > 0
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  if (Number.isNaN(date.getTime())) return dateStr
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+}
+
+function formatNumber(value: number | null | undefined): string | null {
+  if (value == null) return null
+  return value.toLocaleString('en-US')
+}
+
+const stats = peak
+  ? [
+      peak.elevation != null ? { label: 'Elevation', value: `${formatNumber(peak.elevation)} ft` } : null,
+      peak.prominence != null ? { label: 'Prominence', value: `${formatNumber(peak.prominence)} ft` } : null,
+      peak.list_class ? { label: 'Class', value: peak.list_class } : null,
+      peak.first_completed
+        ? { label: 'First completed', value: formatDate(peak.first_completed) }
+        : null,
+      peak.attempts != null ? { label: 'Attempts', value: String(peak.attempts) } : null,
+    ].filter((s): s is { label: string; value: string } => s !== null)
+  : []
+---
+
+<Layout title={name} description={peak ? `Stats and notes for ${name}.` : 'Peak not found'}>
+  <article class="container peak-detail">
+    <a href="/peaks" class="back-link">&larr; Back to peaks</a>
+
+    {!peak && (
+      <div class="not-found">
+        <h1>Peak not found</h1>
+        <p>We couldn't find a peak at this address.</p>
+      </div>
+    )}
+
+    {peak && (
+      <>
+        <header class="peak-header">
+          <h1>{name}</h1>
+          {peak.range && <p class="peak-meta">{peak.range}</p>}
+        </header>
+
+        {stats.length > 0 && (
+          <dl class="stats-grid">
+            {stats.map(stat => (
+              <div class="stat">
+                <dt>{stat.label}</dt>
+                <dd>{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        {hasNotionBody && (
+          <section class="notion-section">
+            <NotionContent blocks={notionBlocks} />
+          </section>
+        )}
+
+        {!hasNotionBody && stats.length === 0 && (
+          <p class="empty-note">No details yet for this peak.</p>
+        )}
+
+        {photos.length > 0 && (
+          <section class="photos-section">
+            <h2>Photos</h2>
+            <div class="photo-grid">
+              {photos.map(photo => {
+                const idForUrl = photo.id
+                return (
+                  <a href={`/img/${idForUrl}?w=2000`} class="photo-thumb">
+                    <img src={`/img/${idForUrl}?w=800`} alt={photo.caption ?? name} loading="lazy" />
+                  </a>
+                )
+              })}
+            </div>
+          </section>
+        )}
+      </>
+    )}
+  </article>
+</Layout>
+
+<style>
+  .peak-detail {
+    max-width: 800px;
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-3xl);
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    margin-bottom: var(--space-lg);
+  }
+
+  .back-link:hover {
+    color: var(--color-accent-orange);
+  }
+
+  .peak-header h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-bottom: var(--space-xs);
+  }
+
+  .peak-meta {
+    color: var(--color-text-tertiary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-xl);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-md);
+    margin: 0 0 var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .stat dt {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .stat dd {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .notion-section,
+  .photos-section {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .photos-section h2 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-md);
+  }
+
+  .empty-note {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .photo-thumb {
+    display: block;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+  }
+
+  .photo-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+  }
+
+  .photo-thumb:hover img {
+    transform: scale(1.03);
+  }
+
+  .not-found {
+    padding: var(--space-2xl) 0;
+  }
+
+  @media (max-width: 640px) {
+    .peak-header h1 {
+      font-size: 1.75rem;
+    }
+  }
+</style>

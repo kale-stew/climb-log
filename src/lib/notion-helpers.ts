@@ -116,6 +116,19 @@ export function parseTags(tagsRaw: string | null): string | null {
 }
 
 /**
+ * Split an array into chunks of at most `size` items.
+ * Used to bound concurrency when syncing Notion bodies (respecting rate limits).
+ */
+export function chunk<T>(items: T[], size: number): T[][] {
+  if (size < 1) throw new Error('chunk size must be >= 1')
+  const out: T[][] = []
+  for (let i = 0; i < items.length; i += size) {
+    out.push(items.slice(i, i + size))
+  }
+  return out
+}
+
+/**
  * Normalize state names/abbreviations to full state names.
  * Unknown values pass through trimmed.
  */

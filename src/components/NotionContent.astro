@@ -1,0 +1,99 @@
+---
+/**
+ * Renders a Notion page body (stored as JSON in `<table>.notion_body`) to HTML.
+ *
+ * Pass either the raw JSON string from D1 (`raw`) or an already-parsed block
+ * array (`blocks`). Renders nothing when there is no content.
+ */
+import { parseNotionBody, renderNotionBlocks, type NotionBlock } from '../lib/notion-render'
+
+interface Props {
+  raw?: string | null
+  blocks?: NotionBlock[]
+}
+
+const { raw, blocks } = Astro.props
+const resolved = blocks ?? parseNotionBody(raw)
+const html = renderNotionBlocks(resolved)
+---
+
+{html && <div class="notion-content" set:html={html} />}
+
+<style>
+  .notion-content {
+    line-height: 1.7;
+    color: var(--color-text-primary);
+  }
+
+  .notion-content :global(h2),
+  .notion-content :global(h3),
+  .notion-content :global(h4) {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-sm);
+    line-height: 1.3;
+  }
+
+  .notion-content :global(p) {
+    margin: 0 0 var(--space-md);
+  }
+
+  .notion-content :global(ul),
+  .notion-content :global(ol) {
+    margin: 0 0 var(--space-md);
+    padding-left: var(--space-xl);
+  }
+
+  .notion-content :global(li) {
+    margin-bottom: var(--space-xs);
+  }
+
+  .notion-content :global(a) {
+    color: var(--color-accent-orange);
+    text-decoration: underline;
+  }
+
+  .notion-content :global(blockquote) {
+    margin: 0 0 var(--space-md);
+    padding-left: var(--space-md);
+    border-left: 3px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  .notion-content :global(pre) {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    overflow-x: auto;
+    margin: 0 0 var(--space-md);
+  }
+
+  .notion-content :global(code) {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.9em;
+  }
+
+  .notion-content :global(hr) {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-xl) 0;
+  }
+
+  .notion-content :global(figure) {
+    margin: 0 0 var(--space-md);
+  }
+
+  .notion-content :global(figure img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md);
+  }
+
+  .notion-content :global(figcaption) {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    margin-top: var(--space-xs);
+    text-align: center;
+  }
+</style>

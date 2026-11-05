@@ -21,6 +21,9 @@ export interface Climb {
   strava: string | null
   alltrails: string | null
   published: number
+  /** JSON-stringified array of Notion block objects (see migration 0007) */
+  notion_body: string | null
+  notion_body_synced_at: string | null
   created_at: string
   updated_at: string
 }
@@ -31,6 +34,7 @@ export interface Peak {
   notion_id: string | null
   name: string | null
   title: string | null // legacy column
+  slug: string | null
   elevation: number
   prominence: number | null
   range: string | null
@@ -39,6 +43,9 @@ export interface Peak {
   list_class: string | null
   img: string | null
   rank: number | null
+  /** JSON-stringified array of Notion block objects (see migration 0007) */
+  notion_body: string | null
+  notion_body_synced_at: string | null
   created_at: string
   updated_at: string
 }
@@ -49,6 +56,7 @@ export interface Gear {
   notion_id: string | null
   name: string | null
   title: string | null // legacy column
+  slug: string | null
   brand: string | null
   category: string | null
   weight_oz: number | null
@@ -65,6 +73,10 @@ export interface Gear {
   pack_list: string | null
   product_str: string | null
   retailer: string | null
+  url_parsed_at: string | null
+  /** JSON-stringified array of Notion block objects (see migration 0007) */
+  notion_body: string | null
+  notion_body_synced_at: string | null
   created_at: string
   updated_at: string
 }
