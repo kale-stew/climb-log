@@ -90,13 +90,26 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
           <div class="where">
             <h2 class="where-title">{chapter.regions.length > 1 ? 'Where' : 'Where the miles went'}</h2>
             <ul class="where-list">
-              {listedAreas.map(area => (
+              {listedAreas.slice(0, 3).map(area => (
                 <li>
                   <span>{area.name}</span>
                   <span class="measure">{area.count}</span>
                 </li>
               ))}
             </ul>
+            {listedAreas.length > 3 && (
+              <details class="where-more">
+                <summary>Show all {listedAreas.length} places</summary>
+                <ul class="where-list where-list-extra">
+                  {listedAreas.slice(3).map(area => (
+                    <li>
+                      <span>{area.name}</span>
+                      <span class="measure">{area.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
           </div>
         )}
       </div>
@@ -263,6 +276,19 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
       border-bottom: 1px dashed var(--color-border-hover);
     }
 
+    .where-more {
+      display: none;
+    }
+
+    .where-more summary {
+      margin-top: 0.5rem;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--water);
+      cursor: pointer;
+    }
+
     .chapter-head-photo .photo-plate {
       aspect-ratio: 4 / 3;
     }
@@ -374,6 +400,10 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
     }
 
     @media (max-width: 640px) {
+      .where-more {
+        display: block;
+      }
+
       .year {
         grid-template-columns: 1fr;
         gap: 0;

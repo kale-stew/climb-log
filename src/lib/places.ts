@@ -107,7 +107,7 @@ export function buildChapters(climbs: ClimbListItem[]): Chapter[] {
         gain: Math.round(outings.reduce((sum, outing) => sum + (outing.gain ?? 0), 0)),
         firstDate: dated.at(-1)?.date ?? null,
         lastDate: dated[0]?.date ?? null,
-        topAreas: tally(outings.map(outing => outing.area)).slice(0, 4),
+        topAreas: tally(outings.map(outing => outing.area)),
         regions: tally(outings.map(outing => normalizeState(outing.state))),
         cover: outings.find(outing => outing.preview_img_url) ?? null,
       } satisfies Chapter,
