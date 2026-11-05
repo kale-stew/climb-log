@@ -15,7 +15,17 @@ export const GET: APIRoute = async ({ request, params }) => {
   const upstreamRequest = new Request(upstreamUrl, request)
 
   try {
-    return env.PHOTOS_API ? await env.PHOTOS_API.fetch(upstreamRequest) : await fetch(upstreamRequest)
+    if (env.PHOTOS_API) {
+      try {
+        const serviceResponse = await env.PHOTOS_API.fetch(upstreamRequest)
+        if (serviceResponse.ok) return serviceResponse
+        console.warn(`Photos API service binding returned ${serviceResponse.status}; falling back to origin`)
+      } catch (error) {
+        console.warn('Photos API service binding failed; falling back to origin:', error)
+      }
+    }
+
+    return await fetch(upstreamRequest)
   } catch (error) {
     console.error('Canonical image request failed:', error)
     return new Response('Photo service unavailable', { status: 502 })
