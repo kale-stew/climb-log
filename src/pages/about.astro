@@ -23,10 +23,9 @@ const california = chapterFor('california')
 const coloradoIsLongest = Boolean(colorado && chapters.every(chapter => chapter.count <= colorado.count))
 const firstEntry = journal.outings.filter(outing => outing.date).at(-1) ?? null
 
-const fieldPhoto =
-  journal.photos.find(photo => (photo.width ?? 0) > (photo.height ?? 0) && (photo.width ?? 0) >= 1200) ??
-  journal.photos[0] ??
-  null
+const taggedKyliePhotos = journal.photos.filter(photo => photo.tags?.toLowerCase().includes('kylie'))
+const kyliePhotoPool = taggedKyliePhotos.length > 0 ? taggedKyliePhotos : journal.photos
+const fieldPhoto = kyliePhotoPool[Math.floor(Math.random() * kyliePhotoPool.length)] ?? null
 
 interface YearRow {
   year: string
@@ -61,8 +60,8 @@ const yearRows: YearRow[] = (() => {
 })()
 
 function placesLine(places: string[]): string {
-  if (places.length <= 3) return places.join(', ')
-  return `${places.slice(0, 3).join(', ')} + ${places.length - 3} more`
+  if (places.length <= 1) return places[0] ?? ''
+  return `${places.slice(0, -1).join(', ')}, and ${places.at(-1)}`
 }
 ---
 
