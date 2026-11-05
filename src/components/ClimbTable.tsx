@@ -366,7 +366,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                           rel="noopener noreferrer"
                           title="View on Strava"
                         >
-                          🏃
+                          🏃🏼‍♀️
                         </a>
                       )}
                     </td>
@@ -392,7 +392,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                       rel="noopener noreferrer"
                       title="View on Strava"
                     >
-                      🏃
+                      🏃🏼
                     </a>
                   )}
                 </div>
