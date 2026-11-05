@@ -1,8 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import { env } from 'cloudflare:workers'
+import { formatNumber, loadJournal, roundedFeet } from '../lib/journal-data'
+import { buildChapters, normalizeState, yearOf } from '../lib/places'
 
-// Static page - no SSR needed
-export const prerender = true
+export const prerender = false
 
 const podcasts = [
   {
@@ -12,6 +14,56 @@ const podcasts = [
     description: 'I talked about hiking, burnout, and finding a little more balance outside.',
   },
 ]
+
+const journal = await loadJournal(env, 800)
+const chapters = buildChapters(journal.outings)
+const chapterFor = (slug: string) => chapters.find(chapter => chapter.slug === slug)
+const colorado = chapterFor('colorado')
+const california = chapterFor('california')
+const coloradoIsLongest = Boolean(colorado && chapters.every(chapter => chapter.count <= colorado.count))
+const firstEntry = journal.outings.filter(outing => outing.date).at(-1) ?? null
+
+const fieldPhoto =
+  journal.photos.find(photo => (photo.width ?? 0) > (photo.height ?? 0) && (photo.width ?? 0) >= 1200) ??
+  journal.photos[0] ??
+  null
+
+interface YearRow {
+  year: string
+  outings: number
+  miles: number
+  gain: number
+  places: string[]
+}
+
+const yearRows: YearRow[] = (() => {
+  const years = new Map<string, { outings: number; miles: number; gain: number; places: Map<string, number> }>()
+  for (const outing of journal.outings) {
+    const year = yearOf(outing.date)
+    if (!year) continue
+    const row = years.get(year) ?? { outings: 0, miles: 0, gain: 0, places: new Map() }
+    row.outings += 1
+    row.miles += outing.distance ?? 0
+    row.gain += outing.gain ?? 0
+    const place = normalizeState(outing.state)
+    if (place) row.places.set(place, (row.places.get(place) ?? 0) + 1)
+    years.set(year, row)
+  }
+  return [...years.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([year, row]) => ({
+      year,
+      outings: row.outings,
+      miles: Math.round(row.miles),
+      gain: Math.round(row.gain),
+      places: [...row.places.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name),
+    }))
+})()
+
+function placesLine(places: string[]): string {
+  if (places.length <= 3) return places.join(', ')
+  return `${places.slice(0, 3).join(', ')} + ${places.length - 3} more`
+}
 ---
 
 <Layout
@@ -20,12 +72,10 @@ const podcasts = [
   ogImage="https://kylies.photos/open-graph/about.jpg"
   ogImageAlt="Kylie smiling in a climbing helmet on a rocky mountain summit"
 >
-  <div class="container page">
-    <h1>About</h1>
-
-    <div class="about-content">
-      <section>
-        <h2>Hey, I'm Kylie</h2>
+  <div class="container page about">
+    <section class="intro">
+      <div class="intro-text">
+        <h1>Hey, I'm Kylie</h1>
         <p>
           I'm an engineering manager in San Francisco, and this is where I keep track of my time in
           the mountains: hikes, climbs, photos, and the occasional trip report.
@@ -36,91 +86,300 @@ const podcasts = [
           <em>probably</em> a bit too sketchy. I moved to SF in 2023, but I still spend as much free
           time as I can somewhere high, from the Rockies to Utah's canyons to bigger mountains abroad.
         </p>
-      </section>
+        <p class="find-me ui">
+          <a href="https://www.instagram.com/kalestewski/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.strava.com/athletes/46336787" target="_blank" rel="noopener">Strava</a>
+          <a href="https://github.com/kale-stew" target="_blank" rel="noopener">GitHub</a>
+          <a href="mailto:hi@kylies.photos">hi@kylies.photos</a>
+        </p>
+      </div>
 
-      <section>
-        <h2>Podcasts</h2>
-        <ul class="podcasts-list">
-          {podcasts.map((podcast) => (
+      {fieldPhoto && (
+        <figure class="intro-photo">
+          <span class="photo-plate">
+            <img
+              src={`/img/${fieldPhoto.id}/?w=1600`}
+              alt={fieldPhoto.caption || fieldPhoto.title || 'A recent photo from outside'}
+              width={fieldPhoto.width ?? 1200}
+              height={fieldPhoto.height ?? 800}
+              fetchpriority="high"
+            />
+          </span>
+          {(fieldPhoto.title || fieldPhoto.area) && (
+            <figcaption class="caption">
+              {[fieldPhoto.title, [fieldPhoto.area, fieldPhoto.state].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}
+            </figcaption>
+          )}
+        </figure>
+      )}
+    </section>
+
+    {journal.totals.outings > 0 && (
+      <section class="section" aria-labelledby="record-heading">
+        <div class="section-head">
+          <h2 id="record-heading">The record so far</h2>
+          <a class="text-link" href="/places">The route book <span aria-hidden="true">→</span></a>
+        </div>
+
+        <ol class="timeline">
+          {firstEntry?.date && yearOf(firstEntry.date) !== '2019' && (
             <li>
-              <a href={podcast.brandHref} target="_blank" rel="noopener">
-                <strong>{podcast.name}</strong>
-              </a>
-              {podcast.description && `: ${podcast.description}`}
-              <iframe
-                src={`${podcast.embedHref}?utm_source=generator&theme=0`}
-                title={`${podcast.name} podcast episode with Kylie`}
-                width="100%"
-                height="80"
-                loading="lazy"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                style="border: 0; border-radius: 12px; margin-top: 1rem;"
-              />
-              <a class="spotify-fallback" href={podcast.embedHref.replace('/embed', '')} target="_blank" rel="noopener noreferrer">
-                Listen on Spotify
-              </a>
+              <span class="timeline-when">{yearOf(firstEntry.date)}</span>
+              <div>
+                <h3>First entry in the journal</h3>
+                <p>
+                  <a href={`/climbs/?outing=${encodeURIComponent(firstEntry.id)}`}>{firstEntry.title}</a>{firstEntry.state ? `, ${normalizeState(firstEntry.state)}` : ''}
+                </p>
+              </div>
             </li>
-          ))}
-        </ul>
-      </section>
+          )}
+          <li>
+            <span class="timeline-when">2019</span>
+            <div>
+              <h3>Started hiking Colorado's peaks</h3>
+              {colorado && (
+                <p>
+                  <a href="/places/colorado">The Colorado chapter</a>{coloradoIsLongest ? ' is still the longest' : ''}:
+                  {' '}<span class="measure">{formatNumber(colorado.count)} outings · {formatNumber(colorado.miles)} mi · {roundedFeet(colorado.gain)} ft</span>
+                </p>
+              )}
+            </div>
+          </li>
+          <li>
+            <span class="timeline-when">2023</span>
+            <div>
+              <h3>Moved to San Francisco</h3>
+              {california && (
+                <p>
+                  <a href="/places/california">California</a> so far:
+                  {' '}<span class="measure">{formatNumber(california.count)} outings · {formatNumber(california.miles)} mi · {roundedFeet(california.gain)} ft</span>
+                </p>
+              )}
+            </div>
+          </li>
+          <li>
+            <span class="timeline-when">Now</span>
+            <div>
+              <h3>From the Rockies to Utah's canyons to bigger mountains abroad</h3>
+              <dl class="totals">
+                <div><dt>Outings</dt><dd>{formatNumber(journal.totals.outings)}</dd></div>
+                <div><dt>Miles</dt><dd>{formatNumber(journal.totals.miles)}</dd></div>
+                <div><dt>Feet climbed</dt><dd>{roundedFeet(journal.totals.gain)}</dd></div>
+                <div><dt>Summits</dt><dd>{formatNumber(journal.totals.summits)}</dd></div>
+                <div><dt>Chapters</dt><dd>{chapters.length}</dd></div>
+              </dl>
+            </div>
+          </li>
+        </ol>
 
-      <section>
-        <h2>Get in touch</h2>
+        <div class="ledger-wrap">
+          <table class="ledger">
+            <caption class="sr-only">Outings by year</caption>
+            <thead>
+              <tr>
+                <th scope="col">Year</th>
+                <th scope="col">Outings</th>
+                <th scope="col">Miles</th>
+                <th scope="col">Feet</th>
+                <th scope="col">Where</th>
+              </tr>
+            </thead>
+            <tbody>
+              {yearRows.map(row => (
+                <tr>
+                  <th scope="row">{row.year}</th>
+                  <td>{formatNumber(row.outings)}</td>
+                  <td>{formatNumber(row.miles)}</td>
+                  <td>{formatNumber(row.gain)}</td>
+                  <td class="ledger-where">{placesLine(row.places)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    <section class="section closing">
+      <div>
+        <div class="section-head">
+          <h2>On a podcast</h2>
+        </div>
+        {podcasts.map(podcast => (
+          <div class="podcast">
+            <p>
+              <a href={podcast.brandHref} target="_blank" rel="noopener"><strong>{podcast.name}</strong></a>: {podcast.description}
+            </p>
+            <iframe
+              src={`${podcast.embedHref}?utm_source=generator&theme=0`}
+              title={`${podcast.name} podcast episode with Kylie`}
+              width="100%"
+              height="80"
+              loading="lazy"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            />
+            <a class="text-link" href={podcast.embedHref.replace('/embed', '')} target="_blank" rel="noopener noreferrer">
+              Listen on Spotify
+            </a>
+          </div>
+        ))}
+      </div>
+      <div>
+        <div class="section-head">
+          <h2>Get in touch</h2>
+        </div>
         <p>
           Find me on <a href="https://www.instagram.com/kalestewski/" target="_blank" rel="noopener">Instagram</a>,
-          <a href="https://github.com/kale-stew" target="_blank" rel="noopener">GitHub</a>,
-          <a href="https://www.strava.com/athletes/46336787" target="_blank" rel="noopener">Strava</a>,
+          {' '}<a href="https://github.com/kale-stew" target="_blank" rel="noopener">GitHub</a>,
+          {' '}<a href="https://www.strava.com/athletes/46336787" target="_blank" rel="noopener">Strava</a>,
           or shoot me an email at <a href="mailto:hi@kylies.photos">hi@kylies.photos</a>.
         </p>
-      </section>
-    </div>
+      </div>
+    </section>
   </div>
 
   <style>
-    .about-content {
-      max-width: 700px;
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-2xl);
+      align-items: start;
+      padding-bottom: var(--space-xl);
+      border-bottom: 1px solid var(--ink);
     }
 
-    .about-content section {
-      margin-bottom: var(--space-2xl);
+    .intro h1 {
+      font-size: clamp(2.3rem, 4.4vw, 3.2rem);
     }
 
-    .about-content h2 {
-      margin-bottom: var(--space-md);
+    .intro-text p {
+      max-width: 36rem;
+      font-size: var(--font-size-lg);
+      line-height: 1.7;
     }
 
-    .about-content p {
-      line-height: 1.75;
-      margin-bottom: var(--space-md);
+    .intro-text .find-me {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 1.1rem;
+      margin-top: var(--space-md);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
     }
 
-    .about-content a {
-      text-decoration: underline;
-      text-underline-offset: 2px;
+    .intro-photo .photo-plate {
+      aspect-ratio: 4 / 3;
     }
 
-    .podcasts-list {
+    .timeline {
       list-style: none;
-      padding: 0;
+    }
+
+    .timeline li {
+      display: grid;
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: var(--space-lg);
+      padding: var(--space-md) 0;
+      border-bottom: 1px dashed var(--color-border-hover);
+    }
+
+    .timeline-when {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-lg);
+      color: var(--contour);
+    }
+
+    .timeline h3 {
+      margin-bottom: 0.2rem;
+      font-size: var(--font-size-xl);
+    }
+
+    .timeline p {
       margin: 0;
     }
 
-    .podcasts-list li {
-      margin-bottom: var(--space-xl);
-    }
-
-    .podcasts-list li:last-child {
-      margin-bottom: 0;
-    }
-
-    .podcasts-list iframe {
-      display: block;
-    }
-
-    .spotify-fallback {
-      display: inline-block;
+    .totals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md) var(--space-xl);
       margin-top: var(--space-sm);
+    }
+
+    .totals dt {
+      font-family: var(--font-sans);
       font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--ink-faint);
+    }
+
+    .totals dd {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-2xl);
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+    }
+
+    .ledger-wrap {
+      margin-top: var(--space-xl);
+      overflow-x: auto;
+      border-top: 1px solid var(--ink);
+    }
+
+    .ledger th[scope='row'],
+    .ledger td {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+
+    .ledger th[scope='row'] {
+      color: var(--contour);
+      border-top: 1px dashed var(--color-border);
+      border-bottom: 0;
+    }
+
+    .ledger td.ledger-where {
+      font-family: var(--font-serif);
+      font-size: var(--font-size-base);
+      color: var(--ink-soft);
+    }
+
+    .closing {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-2xl);
+    }
+
+    .closing .section-head h2 {
+      font-size: var(--font-size-xl);
+    }
+
+    .podcast iframe {
+      display: block;
+      margin: var(--space-sm) 0;
+      border: 0;
+      border-radius: var(--border-radius);
+    }
+
+    @media (max-width: 900px) {
+      .intro,
+      .closing {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+
+      .intro-photo {
+        grid-row: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .timeline li {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+      }
     }
   </style>
 </Layout>
