@@ -171,7 +171,7 @@ img {
 
 .page {
   min-height: calc(100vh - var(--header-height));
-  padding-top: var(--space-xl);
+  padding-top: var(--space-2xl);
   padding-bottom: var(--space-3xl);
 }
 
@@ -367,6 +367,7 @@ select {
 }
 
 .filter-btn {
+  height: 40px;
   padding: 0.35rem 0.85rem;
   font-size: var(--font-size-sm);
   background-color: var(--paper);
@@ -416,7 +417,7 @@ select {
 .logo-word,
 .footer-brand {
   font-family: var(--font-serif);
-  font-size: 1.3rem;
+  font-size: 1.05rem;
   font-weight: 650;
   letter-spacing: -0.015em;
   color: var(--ink);
