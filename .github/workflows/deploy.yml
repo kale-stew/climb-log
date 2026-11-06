@@ -127,7 +127,7 @@ jobs:
           PREVIEW_URL: ${{ steps.deploy-preview.outputs.preview_url }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -fsS -X POST "$PREVIEW_URL/api/cron" \
+          curl -sS --fail-with-body -X POST "$PREVIEW_URL/api/cron" \
             -H "Origin: $PREVIEW_URL" \
             -H "Authorization: Bearer $CRON_SECRET"
 
