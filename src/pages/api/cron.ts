@@ -141,7 +141,17 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
       }
 
       logSync('info', `Syncing ${spec.table}`, { count: pages.length })
-      results.push(await syncTable(DB, spec, pages))
+      try {
+        results.push(await syncTable(DB, spec, pages))
+      } catch (error) {
+        results.push({
+          table: spec.table,
+          inserted: 0,
+          updated: 0,
+          deleted: 0,
+          errors: [`Failed to write ${spec.table}: ${formatError(error)}`],
+        })
+      }
     }
 
     const duration = Date.now() - startTime

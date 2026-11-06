@@ -120,9 +120,46 @@ export function isExpiringNotionUrl(url: string): boolean {
   )
 }
 
+/**
+ * Notion returns every database property on every page, even when empty, so a
+ * missing key means the property was renamed or removed. Fail loudly instead of
+ * overwriting the column with NULL on every row.
+ */
+function requireProperties(page: NotionPage, names: string[]): void {
+  const missing = names.filter(name => !(name in page.properties))
+  if (missing.length > 0) throw new Error(`missing Notion properties: ${missing.join(', ')}`)
+}
+
+const CLIMB_PROPERTIES = [
+  'date',
+  'hike_title',
+  'related_slug',
+  'related_img',
+  'distance',
+  'gain',
+  'area',
+  'strava',
+]
+const PEAK_PROPERTIES = ['peak_name', 'elevation', 'first_completed_on', 'range', 'rank', 'img_url']
+const GEAR_PROPERTIES = [
+  'title',
+  'acquired_on',
+  'brand',
+  'category',
+  'color',
+  'img_slug',
+  'more_info',
+  'pack_list',
+  'product',
+  'retired_on',
+  'url',
+]
+
 export function mapClimb(page: NotionPage, today: string): Row | null {
+  requireProperties(page, CLIMB_PROPERTIES)
   const props = page.properties
   const date = str(fmt(props.date))
+  // Future-dated climbs are intentionally unpublished.
   if (date && date > today) return null
 
   let preview = str(fmt(props.related_img))
@@ -146,11 +183,12 @@ export function mapClimb(page: NotionPage, today: string): Row | null {
 }
 
 export function mapPeak(page: NotionPage): Row | null {
+  requireProperties(page, PEAK_PROPERTIES)
   const props = page.properties
   const title = str(fmt(props.peak_name))
   const elevation = num(fmt(props.elevation))
-  // Both columns are NOT NULL in D1.
-  if (!title || elevation === null) return null
+  // Both columns are NOT NULL in D1; treat gaps as errors so the row is not deleted.
+  if (!title || elevation === null) throw new Error('peak is missing a name or elevation')
   return {
     id: page.id,
     title,
@@ -163,11 +201,14 @@ export function mapPeak(page: NotionPage): Row | null {
 }
 
 export function mapGear(page: NotionPage): Row | null {
+  requireProperties(page, GEAR_PROPERTIES)
   const props = page.properties
   const acquiredOn = str(fmt(props.acquired_on))
+  // Only acquired gear is published.
+  if (!acquiredOn) return null
   const title = str(fmt(props.title))
-  // Only acquired gear is published; title is NOT NULL in D1.
-  if (!acquiredOn || !title) return null
+  // title is NOT NULL in D1; treat a gap as an error so the row is not deleted.
+  if (!title) throw new Error('gear is missing a title')
   const imgSlug = str(fmt(props.img_slug))
   return {
     id: page.id,
