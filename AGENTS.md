@@ -9,7 +9,7 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 | Astro pages and API routes | `src/pages/` |
 | Published Markdown content | `src/content/` |
 | React components | `src/components/` |
-| Notion synchronization | `src/pages/api/cron.ts` |
+| Notion synchronization | `src/pages/api/cron.ts` (endpoint), `src/lib/notion-sync.ts` (mapping and writes) |
 | Photo fallbacks | `src/lib/photo-fallbacks.ts` |
 | D1 migrations | `migrations/` |
 | Generated seed inputs and outputs | `data/`, `db/` |
@@ -33,6 +33,10 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 
 - Do not hand-edit generated seed output. Change its source or generator and regenerate it.
 - The Notion cron owns climb, gear, and peak synchronization. Photo metadata and originals are owned by photos-api; do not add photo writes back to the climb-log cron.
+- The sync mirrors Notion: it upserts by dashed Notion page ID, using the property names in `scripts/export-data.mjs`, and deletes rows that are gone from Notion. A missing Notion property, an invalid row, or more than 10% of rows disappearing fails the run (HTTP 500, `sync_log.status = 'partial'`) and skips deletes; fix the source rather than loosening the guard.
+- An existing `climbs.preview_img_url` that starts with `/img/` is never overwritten by the sync. Change climb previews through photos-api climb assignments, not Notion `related_img`.
+- Deploys do not sync data. After changing sync code or secrets, trigger it with `POST /api/cron`, `Authorization: Bearer $CRON_SECRET`, and an `Origin` header matching the host (Astro rejects cross-origin POSTs). Both Workers need `NOTION_TOKEN`, `NOTION_{CLIMBS,PEAKS,GEAR}_DB_ID`, and `CRON_SECRET` set as secrets.
+- `@notionhq/client` v2 defaults to `node-fetch`, which fails on Workers; always pass `fetch` to the client.
 - Preview image values can be external URLs, canonical API URLs, or generated `/img/{id}` fallbacks. Audit all forms before changing resolution behavior.
 
 ## Deployment

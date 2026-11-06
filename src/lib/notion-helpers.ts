@@ -2,60 +2,8 @@
  * Pure helpers for parsing Notion data during sync.
  *
  * These functions have no Cloudflare/Workers dependencies so they can be
- * imported by both the cron sync (`src/pages/api/cron.ts`) and unit tests.
+ * imported by both runtime code and unit tests.
  */
-
-/**
- * Extract a typed property value from a Notion page.
- */
-export function getNotionProp(
-  page: Record<string, unknown>,
-  name: string,
-  type: string
-): unknown {
-  const properties = page.properties as Record<string, Record<string, unknown>> | undefined
-  if (!properties) return null
-
-  const prop = properties[name]
-  if (!prop) return null
-
-  switch (type) {
-    case 'title': {
-      const titleArray = prop.title as Array<{ plain_text?: string }> | undefined
-      return titleArray?.[0]?.plain_text || null
-    }
-    case 'rich_text': {
-      const textArray = prop.rich_text as Array<{ plain_text?: string }> | undefined
-      return textArray?.[0]?.plain_text || null
-    }
-    case 'number':
-      return prop.number ?? null
-    case 'date': {
-      const dateObj = prop.date as { start?: string } | null
-      return dateObj?.start || null
-    }
-    case 'select': {
-      const selectObj = prop.select as { name?: string } | null
-      return selectObj?.name || null
-    }
-    case 'multi_select': {
-      const multiSelect = prop.multi_select as Array<{ name?: string }> | undefined
-      return multiSelect?.map(s => s.name).filter(Boolean) || []
-    }
-    case 'url':
-      return prop.url || null
-    case 'checkbox':
-      return prop.checkbox ?? false
-    case 'files': {
-      const files = prop.files as
-        | Array<{ file?: { url?: string }; external?: { url?: string } }>
-        | undefined
-      return files?.[0]?.file?.url || files?.[0]?.external?.url || null
-    }
-    default:
-      return null
-  }
-}
 
 /**
  * Parse `area_fallback` into `area` and `state`.
