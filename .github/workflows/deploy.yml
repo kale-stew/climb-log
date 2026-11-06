@@ -119,13 +119,17 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
-      - name: seed preview db
+      # Sync from Notion instead of re-seeding: the committed seed is a stale
+      # snapshot and would overwrite synced rows in the shared preview database.
+      - name: sync preview db from notion
         if: github.event_name == 'pull_request'
-        run: |
-          npx tsx db/seed.ts
-          npx wrangler d1 execute climb-log-db-preview --remote --file=db/seed.sql
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PREVIEW_URL: ${{ steps.deploy-preview.outputs.preview_url }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS -X POST "$PREVIEW_URL/api/cron" \
+            -H "Origin: $PREVIEW_URL" \
+            -H "Authorization: Bearer $CRON_SECRET"
 
       - name: Update Preview Deployment Status
         if: github.event_name == 'pull_request'
