@@ -153,5 +153,6 @@ export interface SyncResult {
   table: string
   inserted: number
   updated: number
+  deleted: number
   errors: string[]
 }
