@@ -15,7 +15,8 @@ export default {
       handle(
         new Request('https://kylies.photos/api/cron', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${env.CRON_SECRET}` },
+          // Astro's checkOrigin rejects POSTs without a same-origin Origin header.
+          headers: { Authorization: `Bearer ${env.CRON_SECRET}`, Origin: 'https://kylies.photos' },
         }),
         env,
         ctx,
