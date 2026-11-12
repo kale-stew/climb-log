@@ -19,7 +19,7 @@ export const prerender = false
 const journal = await loadJournal(env, 800)
 const chapters = buildChapters(journal.outings)
 const recentWithPhotos = journal.outings.filter(outing => outing.preview_img_url).slice(0, 3)
-const latest = recentWithPhotos[Math.floor(Math.random() * recentWithPhotos.length)] ?? journal.outings[0]
+const latest = recentWithPhotos[0] ?? journal.outings[0]
 const rest = journal.outings.filter(outing => outing.id !== latest?.id)
 const lately = rest.slice(0, 7)
 const latestChapter = latest ? chapters.find(chapter => chapter.slug === chapterSlugFor(latest.state)) : null

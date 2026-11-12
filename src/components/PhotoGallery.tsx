@@ -6,8 +6,8 @@ import {
   useRef,
   useState,
 } from 'react'
-import { formatCalendarDate } from '../lib/dates'
 import { getCollectionPage } from '../lib/photos-client'
+import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
 interface Photo {
   id: string
@@ -56,6 +56,7 @@ export default function PhotoGallery({
   const [isLoading, setIsLoading] = useState(initialPhotos.length === 0 && Boolean(apiOrigin))
   const [loadError, setLoadError] = useState(false)
   const [lightbox, setLightbox] = useState<{ photos: Photo[]; index: number } | null>(null)
+  const [lightboxOpener, setLightboxOpener] = useState<HTMLElement | null>(null)
   const [filter, setFilter] = useState('')
   const [activeQuery, setActiveQuery] = useState('')
   const [gridZoom, setGridZoom] = useState(2)
@@ -88,7 +89,7 @@ export default function PhotoGallery({
           return [...current, ...page.photos.filter(photo => !seen.has(photo.id))]
         })
         setTotal(page.total)
-      } catch (error) {
+      } catch (_error) {
         if (!controller.signal.aborted) setLoadError(true)
       } finally {
         if (requestRef.current === controller) {
@@ -118,53 +119,19 @@ export default function PhotoGallery({
 
   const filteredPhotos = photos
 
-  const openLightbox = (index: number) => {
+  const openLightbox = (index: number, opener: HTMLElement) => {
     setLightbox({ photos: filteredPhotos, index })
+    setLightboxOpener(opener)
   }
-  const closeLightbox = useCallback(() => setLightbox(null), [])
 
-  const goNext = useCallback(() => {
-    setLightbox(current =>
-      current ? { ...current, index: (current.index + 1) % current.photos.length } : null,
-    )
+  const closeLightbox = useCallback(() => {
+    setLightbox(null)
+    setLightboxOpener(null)
   }, [])
-
-  const goPrev = useCallback(() => {
-    setLightbox(current =>
-      current
-        ? {
-            ...current,
-            index: (current.index - 1 + current.photos.length) % current.photos.length,
-          }
-        : null,
-    )
-  }, [])
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (lightbox === null) return
-
-      switch (e.key) {
-        case 'Escape':
-          closeLightbox()
-          break
-        case 'ArrowRight':
-          goNext()
-          break
-        case 'ArrowLeft':
-          goPrev()
-          break
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [lightbox, goNext, goPrev, closeLightbox])
 
   // Prevent body scroll when lightbox is open
   useEffect(() => {
-    if (lightbox !== null) {
+    if (lightbox) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -176,7 +143,6 @@ export default function PhotoGallery({
 
   useEffect(() => {
     if (!lightbox || lightbox.photos.length < 2) return
-
     const count = lightbox.photos.length
     for (const photo of [
       lightbox.photos[(lightbox.index - 1 + count) % count],
@@ -186,8 +152,6 @@ export default function PhotoGallery({
       image.src = getImageUrl(photo, 'full')
     }
   }, [lightbox])
-
-  const currentPhoto = lightbox ? lightbox.photos[lightbox.index] : null
   const visiblePhotos = filteredPhotos
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
@@ -261,11 +225,6 @@ export default function PhotoGallery({
     return Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY)
   }
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null
-    return formatCalendarDate(dateStr, { month: 'long', day: 'numeric', year: 'numeric' })
-  }
-
   return (
     <>
       {/* Search */}
@@ -276,6 +235,11 @@ export default function PhotoGallery({
           value={filter}
           onChange={e => setFilter(e.target.value)}
         />
+        {filter && (
+          <button type="button" className="clear-search" onClick={() => setFilter('')}>
+            Clear search
+          </button>
+        )}
         <div className="gallery-status">
           <p aria-live="polite">
             {isLoading && photos.length === 0
@@ -339,7 +303,7 @@ export default function PhotoGallery({
             key={photo.id}
             className="photo-item"
             data-photo-id={photo.id}
-            onClick={() => openLightbox(index)}
+            onClick={event => openLightbox(index, event.currentTarget)}
             aria-label={`View photo: ${photo.caption || photo.title || 'Mountain photo'}`}
             style={photo.accent_color ? { backgroundColor: photo.accent_color } : undefined}
           >
@@ -379,93 +343,32 @@ export default function PhotoGallery({
             type="button"
             className="load-more"
             disabled={isLoading}
-            onClick={() => fetchPage(activeQuery, loadError && photos.length === 0 ? 0 : photos.length)}
+            onClick={() =>
+              fetchPage(activeQuery, loadError && photos.length === 0 ? 0 : photos.length)
+            }
           >
             {isLoading ? 'Loading…' : loadError ? 'Try again' : 'Load more photos'}
           </button>
         </div>
       )}
 
-      {/* Lightbox */}
-      {currentPhoto && (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
-          <div className="lightbox-backdrop" aria-hidden="true" />
-          <button
-            type="button"
-            className="lightbox-close"
-            onClick={closeLightbox}
-            aria-label="Close lightbox"
-          >
-            &times;
-          </button>
-
-          <button
-            type="button"
-            className="lightbox-nav lightbox-prev"
-            onClick={e => {
-              e.stopPropagation()
-              goPrev()
-            }}
-            aria-label="Previous photo"
-          >
-            &#8249;
-          </button>
-
-          <div className="lightbox-content">
-            <img
-              key={currentPhoto.id}
-              className="lightbox-image"
-              src={getImageUrl(currentPhoto, 'full')}
-              alt={currentPhoto.caption || 'Photo'}
-            />
-            <div className="lightbox-info">
-              {currentPhoto.caption && <h3>{currentPhoto.caption}</h3>}
-              <div className="lightbox-meta">
-                {currentPhoto.area && (
-                  <span>
-                    <span style={{ opacity: 0.6 }}>📍</span> {currentPhoto.area}
-                  </span>
-                )}
-                {currentPhoto.state && currentPhoto.area && <span className="meta-sep">·</span>}
-                {currentPhoto.state && (
-                  <span>
-                    <span style={{ opacity: 0.6 }}>🗺️</span> {currentPhoto.state}
-                  </span>
-                )}
-                {currentPhoto.date && (currentPhoto.area || currentPhoto.state) && (
-                  <span className="meta-sep">·</span>
-                )}
-                {currentPhoto.date && (
-                  <span>
-                    <span style={{ opacity: 0.6 }}>📅</span> {formatDate(currentPhoto.date)}
-                  </span>
-                )}
-                {currentPhoto.camera && currentPhoto.date && <span className="meta-sep">·</span>}
-                {currentPhoto.camera && (
-                  <span>
-                    <span style={{ opacity: 0.6 }}>📷</span> {currentPhoto.camera}
-                  </span>
-                )}
-              </div>
-              <div className="lightbox-counter">
-                {String((lightbox?.index ?? 0) + 1).padStart(2, '0')} /{' '}
-                {String(lightbox?.photos.length ?? 0).padStart(2, '0')}
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="lightbox-nav lightbox-next"
-            onClick={e => {
-              e.stopPropagation()
-              goNext()
-            }}
-            aria-label="Next photo"
-          >
-            &#8250;
-          </button>
-        </div>
+      {lightbox && (
+        <PhotoLightbox
+          photos={lightbox.photos.map<LightboxPhoto>(photo => ({
+            id: photo.id,
+            src: getImageUrl(photo, 'full'),
+            alt: photo.caption || photo.title || 'Photo',
+            title: photo.caption || photo.title,
+            area: photo.area,
+            state: photo.state,
+            date: photo.date,
+            camera: photo.camera,
+          }))}
+          index={lightbox.index}
+          onIndexChange={index => setLightbox(current => (current ? { ...current, index } : null))}
+          onClose={closeLightbox}
+          opener={lightboxOpener}
+        />
       )}
 
       <style>{`
@@ -494,6 +397,7 @@ export default function PhotoGallery({
         }
 
         .gallery-tools input { width: min(420px, 100%); border-radius: 999px; }
+        .clear-search { min-height: 40px; padding-inline: 0.75rem; font-size: 0.875rem; }
         .gallery-tools p { margin: 0; color: var(--color-text-tertiary); font-size: 0.8rem; }
 
         .gallery-status {
@@ -547,7 +451,6 @@ export default function PhotoGallery({
           transition: none;
         }
 
-        .photo-item:hover img { filter: brightness(1.06); }
 
         .photo-grid[data-grid-zoom='3'] .photo-item,
         .photo-grid[data-grid-zoom='4'] .photo-item,
@@ -599,9 +502,13 @@ export default function PhotoGallery({
         .load-more:disabled { cursor: progress; opacity: 0.7; }
         .gallery-empty { padding: 3rem 0; color: var(--color-text-tertiary); text-align: center; }
 
-        .photo-item:hover .photo-overlay,
         .photo-item:focus-visible .photo-overlay {
           opacity: 1;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .photo-item:hover img { filter: brightness(1.06); }
+          .photo-item:hover .photo-overlay { opacity: 1; }
         }
 
         /* Lightbox */
@@ -616,6 +523,7 @@ export default function PhotoGallery({
           display: flex;
           align-items: center;
           justify-content: center;
+          padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         .lightbox-close {
@@ -768,6 +676,7 @@ export default function PhotoGallery({
           .photo-item:first-child { grid-column: span 1; grid-row: span 1; }
           .gallery-tools { align-items: flex-start; flex-direction: column; }
           .gallery-status { width: 100%; justify-content: space-between; }
+          .lightbox-content { max-width: calc(100vw - 5rem); }
         }
       `}</style>
     </>

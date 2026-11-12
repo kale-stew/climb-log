@@ -1,5 +1,6 @@
-import { type SyntheticEvent, useEffect, useMemo, useState } from 'react'
+import { type SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { formatCalendarDate } from '../lib/dates'
+import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
 interface Climb {
   id: string
@@ -17,6 +18,7 @@ interface Climb {
 interface ClimbTableProps {
   climbs: Climb[]
   pageSize?: number
+  climbImages?: Record<string, LightboxPhoto[]>
 }
 
 type SortField = 'date' | 'title' | 'distance' | 'gain' | 'area'
@@ -24,7 +26,11 @@ type SortOrder = 'asc' | 'desc'
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100]
 
-export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: ClimbTableProps) {
+export default function ClimbTable({
+  climbs,
+  pageSize: initialPageSize = 50,
+  climbImages = {},
+}: ClimbTableProps) {
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
   const [searchQuery, setSearchQuery] = useState('')
@@ -34,6 +40,13 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(initialPageSize)
   const [selectedOutingId, setSelectedOutingId] = useState<string | null>(null)
+  const [lightbox, setLightbox] = useState<{ photos: LightboxPhoto[]; index: number } | null>(null)
+  const [lightboxOpener, setLightboxOpener] = useState<HTMLElement | null>(null)
+  const selectedItemRef = useRef<HTMLElement | null>(null)
+
+  const setSelectedItemRef = (element: HTMLElement | null) => {
+    if (element && element.getClientRects().length > 0) selectedItemRef.current = element
+  }
 
   // Get unique areas and states for filters
   const areas = useMemo(() => {
@@ -110,6 +123,17 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
     setCurrentPage(Math.floor(index / pageSize) + 1)
   }, [filteredClimbs, pageSize])
 
+  useEffect(() => {
+    if (!selectedOutingId || currentPage < 1) return
+    const frame = window.requestAnimationFrame(() => {
+      selectedItemRef.current?.scrollIntoView({
+        block: 'center',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [selectedOutingId, currentPage])
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
@@ -142,6 +166,30 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
     event.currentTarget.closest('.climb-thumb-link')?.classList.add('is-missing')
   }
 
+  const imagesFor = (climb: Climb): LightboxPhoto[] =>
+    climbImages[climb.id] ??
+    (climb.preview_img_url
+      ? [
+          {
+            id: `${climb.id}-preview`,
+            src: climb.preview_img_url,
+            alt: climb.title || 'Outing photo',
+          },
+        ]
+      : [])
+
+  const openLightbox = (climb: Climb, index: number, opener: HTMLElement) => {
+    const photos = imagesFor(climb)
+    if (!photos.length) return
+    setLightbox({ photos, index })
+    setLightboxOpener(opener)
+  }
+
+  const closeLightbox = () => {
+    setLightbox(null)
+    setLightboxOpener(null)
+  }
+
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <span style={{ opacity: 0.3 }}>↕</span>
     return sortOrder === 'asc' ? <span>↑</span> : <span>↓</span>
@@ -161,6 +209,18 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           }}
           style={{ minWidth: '200px' }}
         />
+        {searchQuery && (
+          <button
+            type="button"
+            className="clear-search"
+            onClick={() => {
+              setSearchQuery('')
+              setCurrentPage(1)
+            }}
+          >
+            Clear search
+          </button>
+        )}
 
         <select
           value={areaFilter}
@@ -269,39 +329,79 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                 <tr>
                   <th style={{ width: '80px' }}>Photo</th>
                   <th
-                    onClick={() => handleSort('date')}
-                    style={{ cursor: 'pointer' }}
-                    aria-label={`Sort by date, currently ${sortField === 'date' ? sortOrder : 'unsorted'}`}
+                    aria-sort={
+                      sortField === 'date'
+                        ? sortOrder === 'asc'
+                          ? 'ascending'
+                          : 'descending'
+                        : 'none'
+                    }
                   >
-                    Date <SortIcon field="date" />
+                    <button type="button" className="table-sort" onClick={() => handleSort('date')}>
+                      Date <SortIcon field="date" />
+                    </button>
                   </th>
                   <th
-                    onClick={() => handleSort('title')}
-                    style={{ cursor: 'pointer' }}
-                    aria-label={`Sort by title, currently ${sortField === 'title' ? sortOrder : 'unsorted'}`}
+                    aria-sort={
+                      sortField === 'title'
+                        ? sortOrder === 'asc'
+                          ? 'ascending'
+                          : 'descending'
+                        : 'none'
+                    }
                   >
-                    Outing <SortIcon field="title" />
+                    <button
+                      type="button"
+                      className="table-sort"
+                      onClick={() => handleSort('title')}
+                    >
+                      Outing <SortIcon field="title" />
+                    </button>
                   </th>
                   <th
-                    onClick={() => handleSort('area')}
-                    style={{ cursor: 'pointer' }}
-                    aria-label={`Sort by area, currently ${sortField === 'area' ? sortOrder : 'unsorted'}`}
+                    aria-sort={
+                      sortField === 'area'
+                        ? sortOrder === 'asc'
+                          ? 'ascending'
+                          : 'descending'
+                        : 'none'
+                    }
                   >
-                    Area <SortIcon field="area" />
+                    <button type="button" className="table-sort" onClick={() => handleSort('area')}>
+                      Area <SortIcon field="area" />
+                    </button>
                   </th>
                   <th
-                    onClick={() => handleSort('distance')}
-                    style={{ cursor: 'pointer', textAlign: 'right' }}
-                    aria-label={`Sort by distance, currently ${sortField === 'distance' ? sortOrder : 'unsorted'}`}
+                    style={{ textAlign: 'right' }}
+                    aria-sort={
+                      sortField === 'distance'
+                        ? sortOrder === 'asc'
+                          ? 'ascending'
+                          : 'descending'
+                        : 'none'
+                    }
                   >
-                    Distance <SortIcon field="distance" />
+                    <button
+                      type="button"
+                      className="table-sort"
+                      onClick={() => handleSort('distance')}
+                    >
+                      Distance <SortIcon field="distance" />
+                    </button>
                   </th>
                   <th
-                    onClick={() => handleSort('gain')}
-                    style={{ cursor: 'pointer', textAlign: 'right' }}
-                    aria-label={`Sort by gain, currently ${sortField === 'gain' ? sortOrder : 'unsorted'}`}
+                    style={{ textAlign: 'right' }}
+                    aria-sort={
+                      sortField === 'gain'
+                        ? sortOrder === 'asc'
+                          ? 'ascending'
+                          : 'descending'
+                        : 'none'
+                    }
                   >
-                    Gain <SortIcon field="gain" />
+                    <button type="button" className="table-sort" onClick={() => handleSort('gain')}>
+                      Gain <SortIcon field="gain" />
+                    </button>
                   </th>
                   <th style={{ textAlign: 'center' }}>Links</th>
                 </tr>
@@ -310,25 +410,18 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                 {paginatedClimbs.map(climb => (
                   <tr
                     key={climb.id}
+                    ref={selectedOutingId === climb.id ? setSelectedItemRef : undefined}
                     className={selectedOutingId === climb.id ? 'outing-highlight' : undefined}
                   >
                     <td>
                       {climb.preview_img_url ? (
                         <div className="climb-thumb-link">
-                          {climb.slug ? (
-                            <a
-                              href={`/blog/hike/${climb.slug}/`}
-                              aria-label={climb.title || 'View climb'}
-                            >
-                              <img
-                                src={climb.preview_img_url}
-                                alt=""
-                                className="climb-thumb"
-                                loading="lazy"
-                                onError={handleThumbnailError}
-                              />
-                            </a>
-                          ) : (
+                          <button
+                            type="button"
+                            className="climb-thumb-button"
+                            onClick={event => openLightbox(climb, 0, event.currentTarget)}
+                            aria-label={`View photos from ${climb.title || 'this outing'}`}
+                          >
                             <img
                               src={climb.preview_img_url}
                               alt=""
@@ -336,7 +429,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                               loading="lazy"
                               onError={handleThumbnailError}
                             />
-                          )}
+                          </button>
                         </div>
                       ) : (
                         <div className="climb-thumb-placeholder" />
@@ -380,6 +473,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           <div className="mobile-only">
             {paginatedClimbs.map(climb => (
               <div
+                ref={selectedOutingId === climb.id ? setSelectedItemRef : undefined}
                 className={`climb-mobile-card ${selectedOutingId === climb.id ? 'outing-highlight' : ''}`}
                 key={climb.id}
               >
@@ -396,6 +490,21 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
                     </a>
                   )}
                 </div>
+                {climb.preview_img_url && (
+                  <button
+                    type="button"
+                    className="climb-mobile-photo"
+                    onClick={event => openLightbox(climb, 0, event.currentTarget)}
+                    aria-label={`View photos from ${climb.title || 'this outing'}`}
+                  >
+                    <img
+                      src={climb.preview_img_url}
+                      alt=""
+                      loading="lazy"
+                      onError={handleThumbnailError}
+                    />
+                  </button>
+                )}
                 <h3 className="climb-mobile-title">
                   {climb.slug ? (
                     <a href={`/blog/hike/${climb.slug}/`}>{climb.title || 'Untitled'}</a>
@@ -511,6 +620,16 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
         </div>
       )}
 
+      {lightbox && (
+        <PhotoLightbox
+          photos={lightbox.photos}
+          index={lightbox.index}
+          onIndexChange={index => setLightbox(current => (current ? { ...current, index } : null))}
+          onClose={closeLightbox}
+          opener={lightboxOpener}
+        />
+      )}
+
       <style>{`
         .empty-state {
           text-align: center;
@@ -524,7 +643,27 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
         .outing-highlight {
           outline: 3px solid var(--color-text-accent);
           outline-offset: -3px;
+          scroll-margin-top: calc(var(--header-height) + var(--space-lg));
         }
+
+        .table-sort {
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          font: inherit;
+          letter-spacing: inherit;
+          text-transform: inherit;
+        }
+
+        .climb-thumb-button,
+        .climb-mobile-photo {
+          display: block;
+          padding: 0;
+          border: 0;
+          background: transparent;
+        }
+        .climb-thumb-button { width: 100%; height: 100%; }
 
         .desktop-only {
           display: block;
@@ -539,6 +678,20 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           border-radius: var(--border-radius-lg);
           padding: var(--space-md);
           margin-bottom: var(--space-md);
+        }
+        .climb-mobile-photo {
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          margin-bottom: var(--space-md);
+          overflow: hidden;
+          background: var(--color-bg-secondary);
+          border-radius: var(--border-radius);
+        }
+        .climb-mobile-photo img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
         .climb-mobile-header {
           display: flex;
@@ -559,8 +712,13 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           color: inherit;
           text-decoration: none;
         }
-        .climb-mobile-title a:hover {
-          color: var(--color-text-accent);
+        @media (hover: hover) and (pointer: fine) {
+          .climb-mobile-title a:hover { color: var(--color-text-accent); }
+          .climb-thumb-link:hover .climb-thumb { transform: scale(1.05); }
+          .pagination-btn:hover:not(:disabled) {
+            border-color: var(--color-border-hover);
+            background: var(--color-bg-secondary);
+          }
         }
         .climb-mobile-meta {
           font-size: var(--font-size-sm);
@@ -596,9 +754,6 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           object-fit: cover;
           transition: transform 0.2s ease;
         }
-        .climb-thumb-link:hover .climb-thumb {
-          transform: scale(1.05);
-        }
         .climb-thumb-placeholder {
           width: 60px;
           height: 45px;
@@ -614,11 +769,7 @@ export default function ClimbTable({ climbs, pageSize: initialPageSize = 50 }: C
           border-radius: var(--border-radius);
           cursor: pointer;
           font-size: 0.875rem;
-          transition: all 0.2s;
-        }
-        .pagination-btn:hover:not(:disabled) {
-          border-color: var(--color-border-hover);
-          background: var(--color-bg-secondary);
+          transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
         .pagination-btn:disabled {
           opacity: 0.4;

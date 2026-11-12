@@ -48,7 +48,7 @@ const connectLinks = [
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{pageTitle}</title>
     <meta name="description" content={description ?? defaultDescription} />
     
@@ -190,11 +190,23 @@ const connectLinks = [
       navToggle?.addEventListener('click', () => {
         const isOpen = nav?.classList.toggle('open') ?? false;
         navToggle.setAttribute('aria-expanded', String(isOpen));
+        if (isOpen) nav?.querySelector<HTMLElement>('a')?.focus();
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && nav?.classList.contains('open')) {
+          nav.classList.remove('open');
+          navToggle?.setAttribute('aria-expanded', 'false');
+          navToggle?.focus();
+        }
       });
       
       // Close mobile nav on link click
       nav?.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => nav?.classList.remove('open'));
+          link.addEventListener('click', () => {
+            nav?.classList.remove('open');
+            navToggle?.setAttribute('aria-expanded', 'false');
+          });
       });
       
       // Close mobile nav on outside click
