@@ -30,6 +30,9 @@ function metaParts(photo: LightboxPhoto) {
 
 const pad = (value: number) => String(value).padStart(2, '0')
 
+const WHEEL_STEP_DISTANCE = 50
+const WHEEL_GESTURE_GAP_MS = 180
+
 interface PhotoLightboxProps {
   photos: LightboxPhoto[]
   index: number
@@ -92,6 +95,39 @@ export default function PhotoLightbox({
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [index, onClose, onIndexChange, photos.length])
+
+  // Wheel and two-finger trackpad swipes step one photo per gesture. A gesture
+  // ends after a short pause, so trackpad momentum can't skip several photos.
+  const wheelGesture = useRef({ distance: 0, stepped: false, timer: 0 })
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    const gesture = wheelGesture.current
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault()
+      if (photos.length < 2) return
+      window.clearTimeout(gesture.timer)
+      gesture.timer = window.setTimeout(() => {
+        gesture.distance = 0
+        gesture.stepped = false
+      }, WHEEL_GESTURE_GAP_MS)
+      if (gesture.stepped) return
+
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
+      gesture.distance += delta * unit
+      if (Math.abs(gesture.distance) < WHEEL_STEP_DISTANCE) return
+
+      const direction = gesture.distance > 0 ? 1 : -1
+      onIndexChange((index + direction + photos.length) % photos.length)
+      gesture.distance = 0
+      gesture.stepped = true
+    }
+    dialog.addEventListener('wheel', handleWheel, { passive: false })
+    return () => dialog.removeEventListener('wheel', handleWheel)
+  }, [index, onIndexChange, photos.length])
+
+  useEffect(() => () => window.clearTimeout(wheelGesture.current.timer), [])
 
   useEffect(() => {
     const count = photos.length
