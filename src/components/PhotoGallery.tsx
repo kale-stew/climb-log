@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -129,17 +130,22 @@ export default function PhotoGallery({
     setLightboxOpener(null)
   }, [])
 
-  useEffect(() => {
-    if (!lightbox || lightbox.photos.length < 2) return
-    const count = lightbox.photos.length
-    for (const photo of [
-      lightbox.photos[(lightbox.index - 1 + count) % count],
-      lightbox.photos[(lightbox.index + 1) % count],
-    ]) {
-      const image = new Image()
-      image.src = getImageUrl(photo, 'full')
-    }
-  }, [lightbox])
+  const lightboxSourcePhotos = lightbox?.photos
+  const lightboxPhotos = useMemo(
+    () =>
+      (lightboxSourcePhotos ?? []).map<LightboxPhoto>(photo => ({
+        id: photo.id,
+        src: getImageUrl(photo, 'full'),
+        alt: photo.caption || 'Photo',
+        caption: photo.caption,
+        area: photo.area,
+        state: photo.state,
+        date: photo.date,
+        camera: photo.camera,
+      })),
+    [lightboxSourcePhotos],
+  )
+
   const visiblePhotos = filteredPhotos
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
@@ -342,16 +348,7 @@ export default function PhotoGallery({
 
       {lightbox && (
         <PhotoLightbox
-          photos={lightbox.photos.map<LightboxPhoto>(photo => ({
-            id: photo.id,
-            src: getImageUrl(photo, 'full'),
-            alt: photo.caption || photo.title || 'Photo',
-            title: photo.caption || photo.title,
-            area: photo.area,
-            state: photo.state,
-            date: photo.date,
-            camera: photo.camera,
-          }))}
+          photos={lightboxPhotos}
           index={lightbox.index}
           onIndexChange={index => setLightbox(current => (current ? { ...current, index } : null))}
           onClose={closeLightbox}
