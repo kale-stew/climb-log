@@ -26,11 +26,14 @@ type SortOrder = 'asc' | 'desc'
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100]
 
-// Previews are 200px thumbnails, often written as /img/{id}/?w=200. Ask for a
-// larger size, and drop the trailing slash so the request skips a redirect.
-function fullSizeUrl(url: string): string {
+// Previews are stored as 200px thumbnails, often as /img/{id}/?w=200. Request
+// the width each surface needs, and drop the trailing slash so the request
+// skips a redirect.
+function sizedImageUrl(url: string, width: number): string {
   if (!url.startsWith('/img/')) return url
-  return url.replace(/\/(?=\?|$)/, '').replace(/([?&]w=)\d+/, (_, prefix) => `${prefix}1600`)
+  const path = url.replace(/\/(?=\?|$)/, '')
+  if (/[?&]w=\d+/.test(path)) return path.replace(/([?&]w=)\d+/, (_, prefix) => `${prefix}${width}`)
+  return `${path}${path.includes('?') ? '&' : '?'}w=${width}`
 }
 
 export default function ClimbTable({
@@ -173,13 +176,19 @@ export default function ClimbTable({
     event.currentTarget.closest('.climb-thumb-link')?.classList.add('is-missing')
   }
 
+  // A full-width photo slot with nothing in it reads as broken, so drop it.
+  const handleMobilePhotoError = (event: SyntheticEvent<HTMLImageElement>) => {
+    const button = event.currentTarget.closest<HTMLElement>('.climb-mobile-photo')
+    if (button) button.style.display = 'none'
+  }
+
   const imagesFor = (climb: Climb): LightboxPhoto[] =>
     climbImages[climb.id] ??
     (climb.preview_img_url
       ? [
           {
             id: `${climb.id}-preview`,
-            src: fullSizeUrl(climb.preview_img_url),
+            src: sizedImageUrl(climb.preview_img_url, 1600),
             alt: climb.title || 'Outing photo',
           },
         ]
@@ -430,7 +439,7 @@ export default function ClimbTable({
                             aria-label={`View photos from ${climb.title || 'this outing'}`}
                           >
                             <img
-                              src={climb.preview_img_url}
+                              src={sizedImageUrl(climb.preview_img_url, 200)}
                               alt=""
                               className="climb-thumb"
                               loading="lazy"
@@ -505,10 +514,10 @@ export default function ClimbTable({
                     aria-label={`View photos from ${climb.title || 'this outing'}`}
                   >
                     <img
-                      src={climb.preview_img_url}
+                      src={sizedImageUrl(climb.preview_img_url, 800)}
                       alt=""
                       loading="lazy"
-                      onError={handleThumbnailError}
+                      onError={handleMobilePhotoError}
                     />
                   </button>
                 )}
