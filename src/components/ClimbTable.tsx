@@ -26,6 +26,13 @@ type SortOrder = 'asc' | 'desc'
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100]
 
+// Previews are 200px thumbnails, often written as /img/{id}/?w=200. Ask for a
+// larger size, and drop the trailing slash so the request skips a redirect.
+function fullSizeUrl(url: string): string {
+  if (!url.startsWith('/img/')) return url
+  return url.replace(/\/(?=\?|$)/, '').replace(/([?&]w=)\d+/, (_, prefix) => `${prefix}1600`)
+}
+
 export default function ClimbTable({
   climbs,
   pageSize: initialPageSize = 50,
@@ -172,7 +179,7 @@ export default function ClimbTable({
       ? [
           {
             id: `${climb.id}-preview`,
-            src: climb.preview_img_url,
+            src: fullSizeUrl(climb.preview_img_url),
             alt: climb.title || 'Outing photo',
           },
         ]
