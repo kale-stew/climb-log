@@ -38,11 +38,23 @@ function sizedImageUrl(url: string, width: number): string {
 
 const NO_CLIMB_IMAGES: Record<string, LightboxPhoto[]> = {}
 
-// Assigned photos when the outing has them; otherwise its preview image,
-// labeled with the outing's own place and date.
+// Assigned photos when the outing has them; otherwise its preview image. Any
+// photo missing a place or date borrows the outing's, so none shows up bare.
+// Place moves as a unit: mixing a photo's area with the outing's state could
+// pair names that don't belong together.
 function imagesFor(climb: Climb, climbImages: Record<string, LightboxPhoto[]>): LightboxPhoto[] {
   const assigned = climbImages[climb.id]
-  if (assigned?.length) return assigned
+  if (assigned?.length) {
+    return assigned.map(photo => {
+      const hasPlace = Boolean(photo.area || photo.state)
+      return {
+        ...photo,
+        area: hasPlace ? photo.area : climb.area,
+        state: hasPlace ? photo.state : climb.state,
+        date: photo.date || climb.date,
+      }
+    })
+  }
   if (!climb.preview_img_url) return []
   return [
     {
@@ -202,24 +214,24 @@ export default function ClimbTable({
     if (button) button.style.display = 'none'
   }
 
-  // Like the photo grid, the viewer steps through everything on screen: every
-  // photo from every outing on this page, in table order.
-  const pageImages = useMemo(() => {
+  // The viewer steps through every photo from every outing that matches the
+  // current search and filters, in table order, across all pages.
+  const journalImages = useMemo(() => {
     const photos: LightboxPhoto[] = []
     const startIndex = new Map<string, number>()
-    for (const climb of paginatedClimbs) {
+    for (const climb of filteredClimbs) {
       const images = imagesFor(climb, climbImages)
       if (!images.length) continue
       startIndex.set(climb.id, photos.length)
       photos.push(...images)
     }
     return { photos, startIndex }
-  }, [paginatedClimbs, climbImages])
+  }, [filteredClimbs, climbImages])
 
   const openLightbox = (climb: Climb, opener: HTMLElement) => {
-    const start = pageImages.startIndex.get(climb.id)
+    const start = journalImages.startIndex.get(climb.id)
     if (start === undefined) return
-    setLightbox({ photos: pageImages.photos, index: start })
+    setLightbox({ photos: journalImages.photos, index: start })
     setLightboxOpener(opener)
   }
 
