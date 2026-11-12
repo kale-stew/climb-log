@@ -5,12 +5,30 @@ export interface LightboxPhoto {
   id: string
   src: string
   alt: string
-  title?: string | null
+  caption?: string | null
   area?: string | null
   state?: string | null
   date?: string | null
   camera?: string | null
 }
+
+const META_ICONS = { area: '📍', state: '🗺️', date: '📅', camera: '📷' } as const
+
+function metaParts(photo: LightboxPhoto) {
+  const date = photo.date
+    ? formatCalendarDate(photo.date, { month: 'long', day: 'numeric', year: 'numeric' })
+    : null
+  return (
+    [
+      ['area', photo.area],
+      ['state', photo.state],
+      ['date', date],
+      ['camera', photo.camera],
+    ] as const
+  ).filter((part): part is readonly [keyof typeof META_ICONS, string] => Boolean(part[1]))
+}
+
+const pad = (value: number) => String(value).padStart(2, '0')
 
 interface PhotoLightboxProps {
   photos: LightboxPhoto[]
@@ -75,6 +93,15 @@ export default function PhotoLightbox({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [index, onClose, onIndexChange, photos.length])
 
+  useEffect(() => {
+    const count = photos.length
+    if (count < 2) return
+    for (const neighbor of [photos[(index - 1 + count) % count], photos[(index + 1) % count]]) {
+      const image = new Image()
+      image.src = neighbor.src
+    }
+  }, [index, photos])
+
   if (!photo) return null
 
   const move = (direction: -1 | 1) => {
@@ -138,26 +165,23 @@ export default function PhotoLightbox({
       <div className="lightbox-content">
         <img key={photo.id} className="lightbox-image" src={photo.src} alt={photo.alt} />
         <div className="lightbox-info">
-          {(photo.title || photo.alt) && <h3>{photo.title || photo.alt}</h3>}
+          {photo.caption && <h3>{photo.caption}</h3>}
           <div className="lightbox-meta">
-            {photo.area && (
-              <span>
-                {photo.area}
-                {photo.state && `, ${photo.state}`}
+            {metaParts(photo).map(([kind, value], partIndex) => (
+              <span key={kind} className="meta-part">
+                {partIndex > 0 && <span className="meta-sep">·</span>}
+                <span>
+                  <span className="meta-icon" aria-hidden="true">
+                    {META_ICONS[kind]}
+                  </span>{' '}
+                  {value}
+                </span>
               </span>
-            )}
-            {photo.date && (
-              <span>
-                {formatCalendarDate(photo.date, { month: 'long', day: 'numeric', year: 'numeric' })}
-              </span>
-            )}
-            {photo.camera && <span>{photo.camera}</span>}
+            ))}
           </div>
-          {photos.length > 1 && (
-            <div className="lightbox-counter">
-              {index + 1} / {photos.length}
-            </div>
-          )}
+          <div className="lightbox-counter">
+            {pad(index + 1)} / {pad(photos.length)}
+          </div>
         </div>
       </div>
       <style>{LIGHTBOX_CSS}</style>
@@ -272,24 +296,41 @@ const LIGHTBOX_CSS = `
     font-size: 1.25rem;
     font-weight: 500;
     color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
 
   .lightbox-meta {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
     gap: 0.25rem 0.75rem;
-    font-family: var(--font-mono);
+    margin-top: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .lightbox-meta .meta-part {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .lightbox-meta .meta-icon { opacity: 0.6; }
+
+  .lightbox-meta .meta-sep {
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.4);
   }
 
   .lightbox-counter {
     margin-top: 0.75rem;
-    font-family: var(--font-mono);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
   }
 
   @media (max-width: 768px) {

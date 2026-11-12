@@ -36,10 +36,30 @@ function sizedImageUrl(url: string, width: number): string {
   return `${path}${path.includes('?') ? '&' : '?'}w=${width}`
 }
 
+const NO_CLIMB_IMAGES: Record<string, LightboxPhoto[]> = {}
+
+// Assigned photos when the outing has them; otherwise its preview image,
+// labeled with the outing's own place and date.
+function imagesFor(climb: Climb, climbImages: Record<string, LightboxPhoto[]>): LightboxPhoto[] {
+  const assigned = climbImages[climb.id]
+  if (assigned?.length) return assigned
+  if (!climb.preview_img_url) return []
+  return [
+    {
+      id: `${climb.id}-preview`,
+      src: sizedImageUrl(climb.preview_img_url, 1600),
+      alt: climb.title || 'Photo',
+      area: climb.area,
+      state: climb.state,
+      date: climb.date,
+    },
+  ]
+}
+
 export default function ClimbTable({
   climbs,
   pageSize: initialPageSize = 50,
-  climbImages = {},
+  climbImages = NO_CLIMB_IMAGES,
 }: ClimbTableProps) {
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
@@ -182,22 +202,24 @@ export default function ClimbTable({
     if (button) button.style.display = 'none'
   }
 
-  const imagesFor = (climb: Climb): LightboxPhoto[] =>
-    climbImages[climb.id] ??
-    (climb.preview_img_url
-      ? [
-          {
-            id: `${climb.id}-preview`,
-            src: sizedImageUrl(climb.preview_img_url, 1600),
-            alt: climb.title || 'Outing photo',
-          },
-        ]
-      : [])
+  // Like the photo grid, the viewer steps through everything on screen: every
+  // photo from every outing on this page, in table order.
+  const pageImages = useMemo(() => {
+    const photos: LightboxPhoto[] = []
+    const startIndex = new Map<string, number>()
+    for (const climb of paginatedClimbs) {
+      const images = imagesFor(climb, climbImages)
+      if (!images.length) continue
+      startIndex.set(climb.id, photos.length)
+      photos.push(...images)
+    }
+    return { photos, startIndex }
+  }, [paginatedClimbs, climbImages])
 
-  const openLightbox = (climb: Climb, index: number, opener: HTMLElement) => {
-    const photos = imagesFor(climb)
-    if (!photos.length) return
-    setLightbox({ photos, index })
+  const openLightbox = (climb: Climb, opener: HTMLElement) => {
+    const start = pageImages.startIndex.get(climb.id)
+    if (start === undefined) return
+    setLightbox({ photos: pageImages.photos, index: start })
     setLightboxOpener(opener)
   }
 
@@ -435,7 +457,7 @@ export default function ClimbTable({
                           <button
                             type="button"
                             className="climb-thumb-button"
-                            onClick={event => openLightbox(climb, 0, event.currentTarget)}
+                            onClick={event => openLightbox(climb, event.currentTarget)}
                             aria-label={`View photos from ${climb.title || 'this outing'}`}
                           >
                             <img
@@ -510,7 +532,7 @@ export default function ClimbTable({
                   <button
                     type="button"
                     className="climb-mobile-photo"
-                    onClick={event => openLightbox(climb, 0, event.currentTarget)}
+                    onClick={event => openLightbox(climb, event.currentTarget)}
                     aria-label={`View photos from ${climb.title || 'this outing'}`}
                   >
                     <img
