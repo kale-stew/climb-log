@@ -11,6 +11,7 @@ export const prerender = false
 const DB = env.DB
 
 let climbs: ClimbListItem[] = []
+let climbImages: Record<string, Array<{ id: string; src: string; alt: string; title: string | null; area: string | null; state: string | null; date: string | null; camera: string | null }>> = {}
 
 if (DB) {
   try {
@@ -25,6 +26,26 @@ if (DB) {
       getClimbPhotoAssignments(env.PHOTOS_API_ORIGIN),
     ])
     fillMissingPreviewImages(climbs, canonicalPhotos, 200, assignments)
+
+    const photosById = new Map(canonicalPhotos.map(photo => [photo.id, photo]))
+    climbImages = {}
+    for (const [climbId, entries] of assignments) {
+      climbImages[climbId] = entries
+        .slice()
+        .sort((a, b) => Number(b.primary) - Number(a.primary))
+        .map(entry => photosById.get(entry.photoId))
+        .filter((photo): photo is (typeof canonicalPhotos)[number] => Boolean(photo))
+        .map(photo => ({
+          id: photo.id,
+          src: photo.url,
+          alt: photo.caption || photo.title || 'Outing photo',
+          title: photo.caption || photo.title,
+          area: photo.area,
+          state: photo.state,
+          date: photo.date,
+          camera: null,
+        }))
+    }
   } catch (e) {
     console.error('Failed to fetch climbs:', e)
   }
@@ -44,7 +65,7 @@ if (DB) {
       entries are grouped by place in <a href="/places">the route book</a>.
     </p>
 
-    <ClimbTable client:load climbs={climbs} />
+    <ClimbTable client:load climbs={climbs} climbImages={climbImages} />
     <noscript><p>The first 50 outings are shown above. Turn on JavaScript to search, sort, and browse the rest.</p></noscript>
   </div>
 
