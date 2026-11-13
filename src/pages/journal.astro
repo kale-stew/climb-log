@@ -11,7 +11,7 @@ export const prerender = false
 const DB = env.DB
 
 let climbs: ClimbListItem[] = []
-let climbImages: Record<string, Array<{ id: string; src: string; alt: string; caption: string | null; area: string | null; state: string | null; date: string | null; camera: string | null }>> = {}
+let climbImages: Record<string, Array<{ id: string; src: string; alt: string; title: string | null; caption: string | null; area: string | null; state: string | null; date: string | null; camera: string | null }>> = {}
 
 if (DB) {
   try {
@@ -38,7 +38,8 @@ if (DB) {
         .map(photo => ({
           id: photo.id,
           src: `/img/${encodeURIComponent(photo.id)}?w=1600`,
-          alt: photo.caption || 'Photo',
+          alt: photo.caption || photo.title || 'Photo',
+          title: photo.title,
           caption: photo.caption,
           area: photo.area,
           state: photo.state,

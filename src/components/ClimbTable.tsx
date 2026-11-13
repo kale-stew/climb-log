@@ -72,6 +72,7 @@ function imagesFor(climb: Climb, climbImages: Record<string, LightboxPhoto[]>): 
       id: `${climb.id}-preview`,
       src: sizedImageUrl(climb.preview_img_url, 1600),
       alt: climb.title || 'Photo',
+      title: climb.title ? outingName(climb.title) : null,
       area: climb.area,
       state: climb.state,
       date: climb.date,
