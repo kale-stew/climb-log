@@ -160,10 +160,19 @@ export function outingHref(outing: Pick<ClimbListItem, 'id' | 'slug'>): string {
 const OUTING_TYPE =
   /^(Trail Run|Hike|Climb|Backpack|Ski|Scramble|Run|Attempt|Sunrise Hike|Sunset Hike|Sunset Run)\b\s*/i
 
+/** The leading activity in a title ("Trail Run …" → "trail run"), or null when the title has none. */
+export function knownOutingType(title: string | null): string | null {
+  return title?.match(OUTING_TYPE)?.[1]?.toLowerCase() ?? null
+}
+
 export function outingType(title: string | null): string {
-  return title?.match(OUTING_TYPE)?.[1]?.toLowerCase() ?? 'outing'
+  return knownOutingType(title) ?? 'outing'
 }
 
 export function outingName(title: string | null): string {
-  return title?.replace(OUTING_TYPE, '').trim() || title || 'Untitled outing'
+  if (!title) return 'Untitled outing'
+  const name = title.replace(OUTING_TYPE, '').trim()
+  if (!name) return title
+  // "Run the Baquiano Trail" leaves "the Baquiano Trail"; capitalize what was mid-sentence.
+  return name === title ? name : name.charAt(0).toUpperCase() + name.slice(1)
 }

@@ -3,6 +3,7 @@ import {
   buildChapters,
   chapterSlugFor,
   groupByYear,
+  knownOutingType,
   normalizeState,
   outingHref,
   outingName,
@@ -99,6 +100,13 @@ describe('places', () => {
     expect(outingType('Trail Run Alamere Falls')).toBe('trail run')
     expect(outingName('Trail Run Alamere Falls')).toBe('Alamere Falls')
     expect(outingType('Mount Dana')).toBe('outing')
+    expect(knownOutingType('Mount Dana')).toBeNull()
+    expect(knownOutingType('Rainy Mori Point Hike')).toBeNull()
     expect(outingName('Mount Dana')).toBe('Mount Dana')
+  })
+
+  it('capitalizes a name that started mid-sentence', () => {
+    expect(outingName('Run the Baquiano Trail')).toBe('The Baquiano Trail')
+    expect(outingName('the Silver Couloir')).toBe('the Silver Couloir')
   })
 })

@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react'
 import { formatCalendarDate } from '../lib/dates'
-import { outingName, outingType } from '../lib/places'
+import { knownOutingType, outingName } from '../lib/places'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
 interface Climb {
@@ -88,6 +88,18 @@ function StravaMark() {
         d="M15.39 17.94 13.3 13.8h-3.07L15.39 24l5.15-10.2h-3.07M10.15 0 3.3 13.8h4.04l2.81-5.55 2.79 5.55h4.01L10.15 0z"
       />
     </svg>
+  )
+}
+
+/** The activity from the title's prefix. Titles without one get no tag rather than a vague "outing". */
+function OutingTag({ title }: { title: string | null }) {
+  const type = knownOutingType(title)
+  if (!type) return null
+  return (
+    <>
+      {' '}
+      <span className="outing-tag">{type}</span>
+    </>
   )
 }
 
@@ -224,12 +236,18 @@ export default function ClimbTable({
   const pageLink = (
     page: number,
     label: ReactNode,
-    options: { key?: string; title?: string; disabled?: boolean; active?: boolean } = {},
+    options: {
+      key?: string
+      title?: string
+      disabled?: boolean
+      active?: boolean
+      className?: string
+    } = {},
   ) =>
     options.disabled ? (
       <span
         key={options.key}
-        className="pagination-btn is-disabled"
+        className={`pagination-btn is-disabled${options.className ? ` ${options.className}` : ''}`}
         aria-disabled="true"
         title={options.title}
       >
@@ -240,7 +258,7 @@ export default function ClimbTable({
         key={options.key}
         href={pageHref(page)}
         onClick={event => goToPage(event, page)}
-        className={`pagination-btn${options.active ? ' active' : ''}`}
+        className={`pagination-btn${options.active ? ' active' : ''}${options.className ? ` ${options.className}` : ''}`}
         aria-current={options.active ? 'page' : undefined}
         aria-label={options.title ?? `Page ${page}`}
         title={options.title}
@@ -352,7 +370,7 @@ export default function ClimbTable({
             setCurrentPage(1)
           }}
         >
-          <option value="">All Areas</option>
+          <option value="">All areas</option>
           {areas.map(area => (
             <option key={area} value={area}>
               {area}
@@ -543,7 +561,7 @@ export default function ClimbTable({
                             type="button"
                             className="climb-thumb-button"
                             onClick={event => openLightbox(climb, event.currentTarget)}
-                            aria-label={`View photos from ${climb.title || 'this outing'}`}
+                            aria-label={`View photos from ${outingName(climb.title)}`}
                           >
                             <img
                               src={sizedImageUrl(climb.preview_img_url, 200)}
@@ -558,14 +576,14 @@ export default function ClimbTable({
                         <div className="climb-thumb-placeholder" />
                       )}
                     </td>
-                    <td>{formatDate(climb.date)}</td>
+                    <td className="cell-fixed">{formatDate(climb.date)}</td>
                     <td>
                       {climb.slug ? (
                         <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
                       ) : (
                         outingName(climb.title)
-                      )}{' '}
-                      <span className="outing-tag">{outingType(climb.title)}</span>
+                      )}
+                      <OutingTag title={climb.title} />
                     </td>
                     <td>
                       {climb.area}
@@ -573,8 +591,8 @@ export default function ClimbTable({
                         <span style={{ color: 'var(--color-text-tertiary)' }}>, {climb.state}</span>
                       )}
                     </td>
-                    <td style={{ textAlign: 'right' }}>{formatDistance(climb.distance)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatGain(climb.gain)}</td>
+                    <td className="cell-fixed cell-number">{formatDistance(climb.distance)}</td>
+                    <td className="cell-fixed cell-number">{formatGain(climb.gain)}</td>
                     <td style={{ textAlign: 'center' }}>
                       {climb.strava && (
                         <a
@@ -623,7 +641,7 @@ export default function ClimbTable({
                     type="button"
                     className="climb-mobile-photo"
                     onClick={event => openLightbox(climb, event.currentTarget)}
-                    aria-label={`View photos from ${climb.title || 'this outing'}`}
+                    aria-label={`View photos from ${outingName(climb.title)}`}
                   >
                     <img
                       src={sizedImageUrl(climb.preview_img_url, 800)}
@@ -638,8 +656,8 @@ export default function ClimbTable({
                     <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
                   ) : (
                     outingName(climb.title)
-                  )}{' '}
-                  <span className="outing-tag">{outingType(climb.title)}</span>
+                  )}
+                  <OutingTag title={climb.title} />
                 </h3>
                 <div className="climb-mobile-meta">
                   {climb.area && (
@@ -673,7 +691,10 @@ export default function ClimbTable({
             flexWrap: 'wrap',
           }}
         >
-          {pageLink(1, '««', { title: 'First page', disabled: currentPage === 1 })}
+          {pageLink(1, '««', {
+            title: 'First page',
+            disabled: currentPage === 1,
+          })}
           {pageLink(currentPage - 1, '«', { title: 'Previous page', disabled: currentPage === 1 })}
 
           {/* Page numbers */}
@@ -698,19 +719,33 @@ export default function ClimbTable({
             }, [])
             .map(item =>
               item.page === null ? (
-                <span key={item.key} style={{ color: 'var(--color-text-tertiary)' }}>
+                <span
+                  key={item.key}
+                  className="pagination-number"
+                  style={{ color: 'var(--color-text-tertiary)' }}
+                >
                   ...
                 </span>
               ) : (
-                pageLink(item.page, item.page, { key: item.key, active: currentPage === item.page })
+                pageLink(item.page, item.page, {
+                  key: item.key,
+                  active: currentPage === item.page,
+                  className: 'pagination-number',
+                })
               ),
             )}
+          <span className="pagination-status">
+            Page {currentPage} of {totalPages}
+          </span>
 
           {pageLink(currentPage + 1, '»', {
             title: 'Next page',
             disabled: currentPage === totalPages,
           })}
-          {pageLink(totalPages, '»»', { title: 'Last page', disabled: currentPage === totalPages })}
+          {pageLink(totalPages, '»»', {
+            title: 'Last page',
+            disabled: currentPage === totalPages,
+          })}
         </nav>
       )}
 
@@ -809,6 +844,8 @@ export default function ClimbTable({
           white-space: nowrap;
         }
         .strava-link { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; }
+        .cell-fixed { white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .cell-number { text-align: right; }
         .climb-mobile-title {
           font-size: var(--font-size-lg);
           font-weight: 600;
@@ -878,8 +915,9 @@ export default function ClimbTable({
           line-height: 1.2;
           text-decoration: none;
           display: inline-block;
-          transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+          transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.12s ease-out;
         }
+        a.pagination-btn:active { transform: scale(0.97); }
         .pagination-btn.is-disabled {
           opacity: 0.4;
           cursor: not-allowed;
@@ -896,6 +934,29 @@ export default function ClimbTable({
           }
           .mobile-only {
             display: block;
+          }
+        }
+        /* Fingers need bigger targets than the compact desktop controls. */
+        @media (pointer: coarse) {
+          .pagination-btn {
+            min-width: 44px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .strava-link { min-width: 44px; min-height: 44px; margin: -10px; }
+        }
+        /* Every page number can't fit one row at touch size, so phones get "Page N of M" between the arrows. */
+        .pagination-status { display: none; }
+        @media (max-width: 480px) {
+          .pagination-number { display: none; }
+          .pagination-status {
+            display: inline;
+            padding: 0 var(--space-sm);
+            font-size: 0.875rem;
+            font-variant-numeric: tabular-nums;
+            color: var(--color-text-secondary);
           }
         }
       `,
