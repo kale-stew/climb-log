@@ -46,19 +46,31 @@ stripped before import. Today, EXIF alone would place **48 of 426 outings**.
 
 ## Location data
 
-Add one coordinate per outing, plus optional per-photo coordinates for finer
-pins. Fill them from these sources, best first:
+Pins only need to be roughly right, so the goal is one approximate coordinate
+per outing. Fill them from these sources, best first:
 
-1. **Photo EXIF.** Use the median GPS of the outing's linked photos. Covers 48
-   outings.
-2. **Strava.** Use the activity's `start_latlng`. 302 of 426 outings have a
-   `strava` URL. This needs a Strava API app and a one-time OAuth token for
-   your account. It's a one-time backfill of about 302 requests, which fits
-   inside the 1,000-a-day read limit. It's also the most accurate source for
-   trailheads.
-3. **Geocoding `area, state`.** There are 116 distinct pairs, all filled in. A
-   one-time Nominatim pass with a reviewed manifest would cover the rest.
-   Results are coarse (a park's centroid), so mark them `approximate`.
+1. **Photo EXIF already in photos-api.** Use the median GPS of the outing's
+   linked photos. Covers 48 outings.
+2. **Flickr geotags.** The Flickr copies imported into photos-api had their
+   EXIF stripped, but Flickr still holds the geotags. 528 of 529 Flickr rows
+   have `flickr_id`, and 403 outing-linked Flickr photos have no GPS. In a
+   random sample of 30 outing-linked Flickr photos, 20 had a geotag on their
+   Flickr page. Fetch them with `flickr.photos.geo.getLocation` (needs a free
+   API key) or the public photo page, at about 1 request a second. This is
+   probably the biggest single gain.
+3. **Apple Photos library on this Mac.** If iCloud Photos syncs to Photos.app,
+   `osxphotos` can read locations from the library database without changing
+   it. Match by capture time against the outing date. This needs Full Disk
+   Access for the terminal running the script.
+4. **Strava `start_latlng`.** 302 of 426 outings have a `strava` URL. This
+   needs a Strava API app and a one-time OAuth authorization.
+5. **Geocoding `area, state`.** There are 116 distinct pairs, all filled in.
+   Run a one-time Nominatim pass with a reviewed manifest. It covers every
+   remaining outing at park or town precision, which is enough for this map.
+
+Google Photos isn't a practical source. Since March 2025 its Library API
+returns only media the app created itself. A Google Takeout export includes
+`geoData` in its JSON sidecars, but it's a heavy one-time export to match up.
 
 ### Storage
 
@@ -100,58 +112,55 @@ Today the site publishes no coordinates. Adding a map changes that, so:
 
 ## Rendering
 
-| Option | Look | Cost | Notes |
-|---|---|---|---|
-| **MapLibre GL + Protomaps basemap on R2** (recommended) | Vector tiles you can style to match the site, with light and dark variants | No per-load fees, just R2 storage for one `.pmtiles` file | About 210 KB of JS gzipped, so lazy-load it. No API keys. Self-hosted tiles match how the rest of the site is built. |
-| Apple MapKit JS | Closest to the screenshot | Needs an Apple Developer account ($99/yr). A Worker signs the JWT tokens. Free tier covers 250k map views a day. | Apple's style can't be customized much, and MapKit adds a third-party runtime. |
-| Leaflet + raster OSM tiles | Plain | Free | About 40 KB. The OSM tile policy rules out production traffic, so a paid tile provider and key would be needed. |
+The map doesn't pan or zoom, so it doesn't need a map library at runtime.
 
-### Recommended design
+### Recommended: pre-rendered basemap, server-placed pins
 
-- **Island.** A `PlaceMap` React island mounted with `client:visible`, so
-  MapLibre loads only when the map scrolls into view. It sits below the chapter
-  header. Reserve an aspect-ratio box so the page doesn't jump while it loads.
-- **Data.** The page computes `{ id, lat, lng, coverPhotoId, count, title, date }`
-  for each outing on the server and inlines it as JSON. That's at most 220
-  entries (Colorado), well under 30 KB.
-- **Pins.** HTML markers like the Apple Photos ones: a rounded
-  `/img/{id}?w=160` thumbnail, a white border, a pointer tail, and a count
-  badge. Cluster with MapLibre's GeoJSON source clustering. A cluster pin
-  shows the newest outing's cover and the total photo count. Only the visible
-  pins get DOM markers, so dense Colorado stays fast.
-- **Interaction.** Tapping a single outing opens the lightbox on that outing's
-  photos. Tapping a cluster zooms to fit it, or opens a combined lightbox once
-  you're at the maximum zoom. Approximate locations get a dashed border.
-- **Initial view.** Fit to the chapter's pins. `elsewhere` spans Italy,
-  Tanzania, Hawaiʻi, Alaska, and Wyoming, so it opens near world scale and
-  depends on clustering. A pin may need to step aside where it would sit on top
-  of the attribution.
-- **Motion and accessibility.** Under `prefers-reduced-motion`, jump instead
-  of flying. Every pin is a focusable button labeled with the outing name and
-  photo count. Add a "List view" link that skips past the map, since the page's
-  existing outing list already gives full keyboard and screen-reader access.
+- **Basemap.** A one-off script renders one image per chapter, with light and
+  dark variants, framed to that chapter's pins. Draw it with MapLibre in a
+  headless browser against OpenFreeMap or Protomaps tiles, or project Natural
+  Earth shapes with `d3-geo` for a flatter look. Upload the WebP files to R2 or
+  `public/maps/`. Regenerate only when a chapter's framing changes.
+- **Pins.** The Astro page projects each outing's coordinate into the image
+  with the same Web Mercator bounds the script used, and renders the pins as
+  absolutely positioned HTML (`left`/`top` in %). Each pin is a rounded
+  `/img/{id}?w=160` thumbnail with a white border, a pointer tail, and a count
+  badge.
+- **Clustering** happens on the server. Greedily merge pins that would overlap
+  at the rendered size, keeping the newest outing's cover and summing the
+  photo counts. Mobile and desktop need different merge distances: render both
+  sets and switch between them with CSS, or render one set at mobile spacing.
+- **Interaction.** Pins are links or buttons. Tapping one opens the existing
+  lightbox on that outing's photos, or on a cluster's combined photos, through
+  a small island that's already on the page.
+- **Cost.** No map JavaScript, one image request per page, and no tile API at
+  runtime. Attribution goes in a caption under the map.
+
+| Option | Runtime JS | Notes |
+|---|---|---|
+| **Pre-rendered image + HTML pins** (recommended) | None for the map | Lightest option. Framing is fixed per chapter. |
+| Inline SVG with `d3-geo` on the server | None | Vector and themeable with CSS, but outlines only, with no terrain. A 50–200 KB SVG would sit inline in the page. |
+| MapLibre GL, non-interactive | About 210 KB gzipped | Not worth it without pan and zoom. |
+| Mapbox or Stadia Static Images API | None | Similar result, but it needs an API key and a third-party request on every view unless the images are cached in R2. |
 
 ## Phases
 
 1. **Locations.** Add the migration and a backfill script that defaults to dry
-   run and writes a reviewable manifest (EXIF, then Strava, then geocoding),
-   then apply it. Done means `climb_locations` covers every outing that has
-   photos.
-2. **Basemap.** Build a Protomaps extract (planet z0–z6 plus z7–z14 for the US
-   West and the specific places in `elsewhere`) and upload it to R2. Serve it
-   through the Worker with range requests. Ship the light and dark styles.
-3. **Map island.** Build the map with pins, clustering, and the lightbox hookup
-   on `/places/elsewhere` first, where the data is small, then turn it on for
-   every chapter.
-4. **Polish.** Lazy-loading, the dark theme, mobile gestures (so the map
-   doesn't capture page scroll; use two-finger pan or a tap to activate), and a
-   design review at 390 px and 1440 px on a preview deploy.
+   run and writes a reviewable manifest (EXIF, then Flickr, Apple Photos,
+   Strava, and geocoding), then apply it.
+2. **Basemaps.** Write the render script and generate the chapter images.
+   Start with `elsewhere`.
+3. **Pins.** Add server-side projection and clustering on `/places/elsewhere`,
+   then turn it on for every chapter.
+4. **Review.** Test light and dark modes at 390 px and 1440 px on a preview
+   deploy.
 
 ## Open questions
 
-- Strava backfill: OK to create a Strava API app and authorize it once?
-- Map style: self-hosted MapLibre, or pay for MapKit to get the exact Apple
-  look?
+- Which sources to use for the backfill: a Flickr API key, Full Disk Access
+  for `osxphotos`, or a Strava app?
+- Basemap look: terrain (headless MapLibre render) or flat outlines
+  (`d3-geo`)?
 - Privacy: how coarse should pins be, and are there outings to keep off the
   map?
 - Should the `/places` index also get a single overview map of all chapters?
