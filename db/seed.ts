@@ -23,6 +23,7 @@ interface Climb {
   area: string | null
   state: string | null
   strava: string | null
+  summits: string | null
 }
 
 interface Peak {
@@ -126,7 +127,7 @@ async function main() {
   })
   sql += '-- Climbs\n'
   sql += generateInsertSQL('climbs', climbsWithCleanImages, [
-    'id', 'date', 'title', 'slug', 'preview_img_url', 'distance', 'gain', 'area', 'state', 'strava'
+    'id', 'date', 'title', 'slug', 'preview_img_url', 'distance', 'gain', 'area', 'state', 'strava', 'summits'
   ])
   sql += '\n\n'
 

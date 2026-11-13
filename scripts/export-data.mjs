@@ -145,6 +145,7 @@ function formatClimbs(pages) {
         area: area.region,
         state: area.state,
         strava: fmt(props.strava),
+        summits: fmt(props.summits)?.join(',') ?? null,
       }
     })
     .filter(Boolean)

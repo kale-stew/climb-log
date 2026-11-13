@@ -24,6 +24,10 @@ export function climbPage(
       gain: { type: 'number', number: 2100 },
       area: { type: 'rich_text', rich_text: text('Mount Tamalpais SP, CA') },
       strava: { type: 'url', url: 'https://strava.com/1' },
+      summits: {
+        type: 'multi_select',
+        multi_select: [{ name: 'Mount Tamalpais' }, { name: 'Mount Diablo' }],
+      },
       ...overrides,
     } as NotionPage['properties'],
   }
