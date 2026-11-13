@@ -5,6 +5,7 @@ export interface LightboxPhoto {
   id: string
   src: string
   alt: string
+  title?: string | null
   caption?: string | null
   area?: string | null
   state?: string | null
@@ -199,9 +200,12 @@ export default function PhotoLightbox({
       )}
 
       <div className="lightbox-content">
-        <img key={photo.id} className="lightbox-image" src={photo.src} alt={photo.alt} />
+        <div key={photo.id} className="lightbox-frame">
+          <img className="lightbox-image" src={photo.src} alt={photo.alt} />
+          {photo.title && <p className="lightbox-title">{photo.title}</p>}
+        </div>
         <div className="lightbox-info">
-          {photo.caption && <h3>{photo.caption}</h3>}
+          {photo.caption && photo.caption !== photo.title && <h3>{photo.caption}</h3>}
           <div className="lightbox-meta">
             {/* The icons mark each part, so wrapped lines never start with a stray separator. */}
             {metaParts(photo).map(([kind, value]) => (
@@ -299,14 +303,37 @@ const LIGHTBOX_CSS = `
     max-height: 90vh;
   }
 
+  .lightbox-frame {
+    position: relative;
+    display: flex;
+    animation: lightbox-reveal 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
   .lightbox-content img {
-    max-width: 100%;
+    max-width: 90vw;
     max-height: 75vh;
     object-fit: contain;
   }
 
-  .lightbox-image {
-    animation: lightbox-reveal 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  /* Sits on the photo itself, so a scrim keeps it legible over bright skies and snow. */
+  .lightbox-title {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    padding: 3rem 1.25rem 1rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1rem, 0.85rem + 0.8vw, 1.5rem);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #fff;
+    text-align: left;
+    text-wrap: balance;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.25) 55%, transparent);
+    pointer-events: none;
   }
 
   @keyframes lightbox-reveal {
@@ -315,7 +342,7 @@ const LIGHTBOX_CSS = `
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .lightbox-image { animation: none; }
+    .lightbox-frame { animation: none; }
   }
 
   .lightbox-info {
@@ -364,5 +391,7 @@ const LIGHTBOX_CSS = `
     .lightbox .lightbox-prev { left: calc(env(safe-area-inset-left) + 0.5rem); }
     .lightbox .lightbox-next { right: calc(env(safe-area-inset-right) + 0.5rem); }
     .lightbox-content { max-width: calc(100vw - 5rem); }
+    .lightbox-content img { max-width: calc(100vw - 5rem); }
+    .lightbox-title { padding: 2.25rem 0.75rem 0.65rem; }
   }
 `

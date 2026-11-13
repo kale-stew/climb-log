@@ -153,7 +153,8 @@ export default function PhotoGallery({
       (lightboxSourcePhotos ?? []).map<LightboxPhoto>(photo => ({
         id: photo.id,
         src: getImageUrl(photo, 'full'),
-        alt: photo.caption || 'Photo',
+        alt: photo.caption || photo.title || 'Photo',
+        title: photo.title,
         caption: photo.caption,
         area: photo.area,
         state: photo.state,
