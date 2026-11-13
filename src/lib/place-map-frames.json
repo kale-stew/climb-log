@@ -1,0 +1,44 @@
+{
+  "elsewhere": {
+    "zoom": 3,
+    "x0": 68,
+    "y0": 340,
+    "width": 1206,
+    "height": 753
+  },
+  "colorado": {
+    "zoom": 8,
+    "x0": 12871,
+    "y0": 24401,
+    "width": 1365,
+    "height": 1153
+  },
+  "utah": {
+    "zoom": 8,
+    "x0": 11960,
+    "y0": 24156,
+    "width": 1002,
+    "height": 1398
+  },
+  "arizona": {
+    "zoom": 8,
+    "x0": 11833,
+    "y0": 25371,
+    "width": 1129,
+    "height": 1414
+  },
+  "california": {
+    "zoom": 7,
+    "x0": 5043,
+    "y0": 12065,
+    "width": 974,
+    "height": 1210
+  },
+  "pacific-northwest": {
+    "zoom": 7,
+    "x0": 5006,
+    "y0": 11141,
+    "width": 1293,
+    "height": 1047
+  }
+}

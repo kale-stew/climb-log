@@ -1,14 +1,38 @@
 ---
 import Layout from '../../layouts/Layout.astro'
+import PlaceMap from '../../components/PlaceMap.astro'
+import PlaceMapSources from '../../components/PlaceMapSources.astro'
 import { env } from 'cloudflare:workers'
 import { formatCalendarDate } from '../../lib/dates'
 import { formatNumber, loadJournal, roundedFeet } from '../../lib/journal-data'
+import { loadOutingLocations, type MapOuting } from '../../lib/place-map'
 import { buildChapters, outingHref, outingName, yearSpan, type Chapter } from '../../lib/places'
 
 export const prerender = false
 
 const journal = await loadJournal(env, 800)
 const chapters = buildChapters(journal.outings)
+
+// Every outing on one world map; each pin's list links back to its place.
+const locations = await loadOutingLocations(env.DB)
+const mapOutings: MapOuting[] = chapters.flatMap(chapter =>
+  chapter.outings.flatMap(outing => {
+    const location = locations.get(outing.id)
+    if (!location) return []
+    return [
+      {
+        id: outing.id,
+        date: outing.date,
+        title: outing.title,
+        href: outingHref(outing),
+        cover: outing.preview_img_url,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        group: { name: chapter.name, href: `/places/${chapter.slug}` },
+      },
+    ]
+  }),
+)
 
 function listOf(names: string[]): string {
   if (names.length <= 1) return names[0] ?? ''
@@ -41,48 +65,57 @@ function whereLine(chapter: Chapter): string {
     )}
 
     <ol class="chapter-list">
-      {chapters.map(chapter => (
-        <li class="chapter-row">
-          <div class="chapter-margin">
-            <span class="chapter-number">No. {chapter.number}</span>
-            <span class="measure">{yearSpan(chapter)}</span>
-          </div>
+      {chapters.map((chapter, index) => (
+        <>
+          {index === 1 && mapOutings.length > 0 && (
+            <li class="chapter-map">
+              <PlaceMap map="elsewhere" name="every place" outings={mapOutings} />
+            </li>
+          )}
+          <li class="chapter-row">
+            <div class="chapter-margin">
+              <span class="chapter-number">No. {chapter.number}</span>
+              <span class="measure">{yearSpan(chapter)}</span>
+            </div>
 
-          <div class="chapter-body">
-            <h2><a href={`/places/${chapter.slug}`}>{chapter.name}</a></h2>
-            <p class="chapter-summary">
-              {formatNumber(chapter.count)} {chapter.count === 1 ? 'outing' : 'outings'},
-              {' '}{formatNumber(chapter.miles)} miles, and about {roundedFeet(chapter.gain)} feet of climbing.
-              {' '}{whereLine(chapter)}
-            </p>
+            <div class="chapter-body">
+              <h2><a href={`/places/${chapter.slug}`}>{chapter.name}</a></h2>
+              <p class="chapter-summary">
+                {formatNumber(chapter.count)} {chapter.count === 1 ? 'outing' : 'outings'},
+                {' '}{formatNumber(chapter.miles)} miles, and about {roundedFeet(chapter.gain)} feet of climbing.
+                {' '}{whereLine(chapter)}
+              </p>
 
-            <ul class="logbook chapter-recent">
-              {chapter.outings.slice(0, 3).map(outing => (
-                <li class="logbook-row">
-                  <span class="entry-date">
-                    {outing.date ? formatCalendarDate(outing.date, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
-                  </span>
-                  <h3><a href={outingHref(outing)}>{outingName(outing.title)}</a></h3>
-                  <span class="measure">{outing.distance ? `${outing.distance.toFixed(1)} mi` : ''}</span>
-                </li>
-              ))}
-            </ul>
+              <ul class="logbook chapter-recent">
+                {chapter.outings.slice(0, 3).map(outing => (
+                  <li class="logbook-row">
+                    <span class="entry-date">
+                      {outing.date ? formatCalendarDate(outing.date, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                    </span>
+                    <h3><a href={outingHref(outing)}>{outingName(outing.title)}</a></h3>
+                    <span class="measure">{outing.distance ? `${outing.distance.toFixed(1)} mi` : ''}</span>
+                  </li>
+                ))}
+              </ul>
 
-            <a class="text-link" href={`/places/${chapter.slug}`}>
-              Read the {chapter.name} chapter <span aria-hidden="true">→</span>
+              <a class="text-link" href={`/places/${chapter.slug}`}>
+                Read the {chapter.name} chapter <span aria-hidden="true">→</span>
+              </a>
+            </div>
+
+            <a class="chapter-cover photo-plate" href={`/places/${chapter.slug}`} tabindex="-1" aria-hidden="true">
+              {chapter.cover?.preview_img_url ? (
+                <img src={chapter.cover.preview_img_url} alt="" loading="lazy" width="800" height="600" />
+              ) : (
+                <span class="chapter-cover-empty">{chapter.name}</span>
+              )}
             </a>
-          </div>
-
-          <a class="chapter-cover photo-plate" href={`/places/${chapter.slug}`} tabindex="-1" aria-hidden="true">
-            {chapter.cover?.preview_img_url ? (
-              <img src={chapter.cover.preview_img_url} alt="" loading="lazy" width="800" height="600" />
-            ) : (
-              <span class="chapter-cover-empty">{chapter.name}</span>
-            )}
-          </a>
-        </li>
+          </li>
+        </>
       ))}
     </ol>
+
+    {mapOutings.length > 0 && <PlaceMapSources />}
   </div>
 
   <style>
@@ -101,6 +134,21 @@ function whereLine(chapter: Chapter): string {
 
     .chapter-list {
       list-style: none;
+    }
+
+    .chapter-map {
+      padding: var(--space-xl) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* No ocean or frame here: the coastlines sit straight on the page. */
+    .chapter-map :global(.place-map) {
+      margin-top: 0;
+    }
+
+    .chapter-map :global(.place-map-canvas) {
+      background: none;
+      border: 0;
     }
 
     .chapter-row {

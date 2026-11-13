@@ -1,5 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro'
+import PlaceMap from '../../components/PlaceMap.astro'
+import PlaceMapSources from '../../components/PlaceMapSources.astro'
 import { env } from 'cloudflare:workers'
 import { formatCalendarDate } from '../../lib/dates'
 import { formatNumber, loadJournal, roundedFeet } from '../../lib/journal-data'
@@ -11,6 +13,7 @@ import {
   outingType,
   yearSpan,
 } from '../../lib/places'
+import { loadOutingLocations, type MapOuting } from '../../lib/place-map'
 
 export const prerender = false
 
@@ -33,6 +36,23 @@ const chapter = chapters[index]
 const previous = chapters[index - 1] ?? null
 const next = chapters[index + 1] ?? null
 const years = groupByYear(chapter.outings)
+
+const locations = await loadOutingLocations(env.DB)
+const mapOutings: MapOuting[] = chapter.outings.flatMap(outing => {
+  const location = locations.get(outing.id)
+  if (!location) return []
+  return [
+    {
+      id: outing.id,
+      date: outing.date,
+      title: outing.title,
+      href: outingHref(outing),
+      cover: outing.preview_img_url,
+      latitude: location.latitude,
+      longitude: location.longitude,
+    },
+  ]
+})
 
 let peakRanges: { range: string; peaks: PeakRow[] }[] = []
 let summitCount = 0
@@ -131,6 +151,8 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
       )}
     </header>
 
+    <PlaceMap map={chapter.slug} name={chapter.name} outings={mapOutings} />
+
     {peakRanges.length > 0 && (
       <section class="section" aria-labelledby="peaks-heading">
         <div class="section-head">
@@ -217,6 +239,8 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
         </a>
       ) : <span />}
     </nav>
+
+    {mapOutings.length > 0 && <PlaceMapSources />}
   </div>
 
   <style>
