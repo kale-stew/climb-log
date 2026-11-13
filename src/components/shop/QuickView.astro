@@ -72,13 +72,36 @@ const count = gallery.length
     if (location.hash === `#${slug}`) history.replaceState(history.state, '', location.pathname + location.search)
   }
 
-  function open(slug: string) {
+  // A quick view opened by a click gets its own history entry, so Back closes it instead of
+  // leaving the page. Deep links and switching between quick views reuse the current entry.
+  let pushedSlug: string | null = null
+
+  function open(slug: string, { push = false } = {}) {
     const dialog = dialogFor(slug)
     if (!dialog || dialog.open) return false
     document.querySelectorAll<HTMLDialogElement>('dialog.quick-view[open]').forEach(other => other.close())
     dialog.showModal()
-    if (location.hash !== `#${slug}`) history.replaceState(history.state, '', `#${slug}`)
+    if (location.hash !== `#${slug}`) {
+      if (push && !pushedSlug) {
+        history.pushState(history.state, '', `#${slug}`)
+        pushedSlug = slug
+      } else {
+        history.replaceState(history.state, '', `#${slug}`)
+        if (pushedSlug) pushedSlug = slug
+      }
+    }
     return true
+  }
+
+  function onClose(slug: string) {
+    // Switching quick views: the next one is already open and owns the URL.
+    if (document.querySelector('dialog.quick-view[open]')) return
+    if (pushedSlug === slug && location.hash === `#${slug}`) {
+      pushedSlug = null
+      history.back()
+    } else {
+      clearHash(slug)
+    }
   }
 
   function setupGallery(dialog: HTMLDialogElement) {
@@ -132,7 +155,7 @@ const count = gallery.length
     dialog.addEventListener('click', event => {
       if (event.target === dialog) dialog.close()
     })
-    dialog.addEventListener('close', () => clearHash(slug))
+    dialog.addEventListener('close', () => onClose(slug))
 
     dialog.querySelectorAll<HTMLInputElement>('input[data-href]').forEach(input => {
       input.addEventListener('change', () => {
@@ -146,12 +169,18 @@ const count = gallery.length
 
   document.querySelectorAll<HTMLElement>('[data-quick-view]').forEach(trigger => {
     trigger.addEventListener('click', event => {
-      if (open(trigger.dataset.quickView ?? '')) event.preventDefault()
+      if (open(trigger.dataset.quickView ?? '', { push: true })) event.preventDefault()
     })
   })
 
   const openFromHash = () => {
     const slug = decodeURIComponent(location.hash.slice(1))
+    const current = document.querySelector<HTMLDialogElement>('dialog.quick-view[open]')
+    if (current && current.dataset.slug !== slug) {
+      // Back (or an edited hash) moved off this quick view; the history entry is already gone.
+      pushedSlug = null
+      current.close()
+    }
     if (slug) open(slug)
   }
   window.addEventListener('hashchange', openFromHash)
@@ -172,22 +201,50 @@ const count = gallery.length
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
     overflow: hidden;
   }
-  .quick-view::backdrop {
-    background-color: rgba(20, 16, 13, 0.6);
-    backdrop-filter: blur(4px);
+  /* Opens in 200ms and closes in 120ms. Browsers without discrete transitions open and close instantly. */
+  .quick-view {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    transition:
+      opacity 120ms ease-out,
+      transform 120ms ease-out,
+      overlay 120ms allow-discrete,
+      display 120ms allow-discrete;
   }
   .quick-view[open] {
-    animation: qv-in 180ms ease-out;
+    opacity: 1;
+    transform: none;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   }
-  @keyframes qv-in {
-    from {
+  @starting-style {
+    .quick-view[open] {
       opacity: 0;
       transform: translateY(12px) scale(0.98);
     }
   }
+  .quick-view::backdrop {
+    background-color: rgba(29, 37, 32, 0.6);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition:
+      opacity 120ms ease-out,
+      overlay 120ms allow-discrete,
+      display 120ms allow-discrete;
+  }
+  .quick-view[open]::backdrop {
+    opacity: 1;
+    transition-duration: 200ms;
+  }
+  @starting-style {
+    .quick-view[open]::backdrop {
+      opacity: 0;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
+    .quick-view,
     .quick-view[open] {
-      animation: none;
+      transform: none;
     }
   }
   :global(html:has(dialog.quick-view[open])) {
@@ -207,15 +264,15 @@ const count = gallery.length
     z-index: 2;
     display: grid;
     place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     border: 1px solid var(--color-border);
-    border-radius: 999px;
+    border-radius: var(--border-radius);
     padding: 0;
     background-color: var(--color-bg-card);
     color: var(--color-text-primary);
     cursor: pointer;
-    transition: background-color 150ms ease;
+    transition: background-color 150ms ease, transform var(--transition-fast);
   }
 
   .qv-media {
@@ -257,14 +314,14 @@ const count = gallery.length
     height: 2.5rem;
     transform: translateY(-50%);
     border: 1px solid var(--color-border);
-    border-radius: 999px;
+    border-radius: var(--border-radius);
     background-color: var(--color-bg-card);
     color: var(--color-text-primary);
     padding: 0 0 0.15rem;
     font-size: 1.5rem;
     line-height: 1;
     cursor: pointer;
-    transition: opacity 150ms ease, background-color 150ms ease;
+    transition: opacity 150ms ease, background-color 150ms ease, transform var(--transition-fast);
   }
   .qv-arrow:disabled {
     opacity: 0;
@@ -291,7 +348,15 @@ const count = gallery.length
     overflow: hidden;
     cursor: pointer;
     opacity: 0.7;
-    transition: opacity 150ms ease, border-color 150ms ease;
+    transition: opacity 150ms ease, border-color 150ms ease, transform var(--transition-fast);
+  }
+  .qv-close:active,
+  .qv-thumb:active {
+    transform: scale(0.97);
+  }
+  /* The arrows are centered with translateY, so the press keeps it. */
+  .qv-arrow:active {
+    transform: translateY(-50%) scale(0.97);
   }
   .qv-thumb[aria-current='true'] {
     border-color: var(--color-accent);
@@ -305,6 +370,7 @@ const count = gallery.length
     min-width: 0;
     padding: var(--space-xl) var(--space-xl) var(--space-lg);
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .qv-title {
     margin: 0;
@@ -327,6 +393,7 @@ const count = gallery.length
       height: 100dvh;
       max-height: none;
       overflow-y: auto;
+      overscroll-behavior: contain;
     }
     .qv-close {
       position: fixed;
