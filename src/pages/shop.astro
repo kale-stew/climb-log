@@ -49,8 +49,16 @@ const prints = PRINTS.flatMap(listing => {
 
 function productHref(product: (typeof products)[number]) {
   if (product.checkoutUrl) return product.checkoutUrl
-  const verb = product.status === 'preorder' ? 'Preorder' : 'Notify me'
-  return requestMailto(`${verb}: ${product.name}`, `Hi Kylie! I'd like ${product.name}.\n\nQuantity: 1\nShip to (US only): `)
+  if (product.status === 'coming-soon') {
+    return requestMailto(`Notify me: ${product.name}`, `Hi Kylie! Let me know when the ${product.name} is available.`)
+  }
+  const verb = product.status === 'preorder' ? 'Preorder' : 'Request'
+  return requestMailto(`${verb}: ${product.name}`, `Hi Kylie! I'd like the ${product.name}.\n\nQuantity: 1\nShip to (US only): `)
+}
+
+/** The button already says "Preorder", so a preorder chip carries the ship date instead. */
+function chipLabel(product: (typeof products)[number]) {
+  return product.status === 'preorder' && product.shipNote ? product.shipNote : statusLabel(product.status)
 }
 
 function productCta(product: (typeof products)[number]) {
@@ -59,11 +67,11 @@ function productCta(product: (typeof products)[number]) {
   return 'Request'
 }
 
-function printHref(photo: DisplayPhoto, size?: PrintSize) {
+function printHref(photo: DisplayPhoto, size: PrintSize) {
   const name = photo.title ?? photo.id
   return requestMailto(
-    `Print request: ${name}${size ? ` (${size.label})` : ''}`,
-    `Hi Kylie! I'd like a print of "${name}" (${photo.id}).\n\nSize: ${size?.label ?? ''}\nShip to (US only): `,
+    `Print request: ${name} (${size.label})`,
+    `Hi Kylie! I'd like a print of "${name}" (${photo.id}).\n\nSize: ${size.label}\nShip to (US only): `,
   )
 }
 ---
@@ -75,22 +83,21 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
 >
   <div class="container page">
     <header class="shop-intro">
-      <p class="shop-eyebrow">Kylie's Photos</p>
       <h1>Shop</h1>
-      <p>
+      <p class="page-subtitle">
         Prints, postcards, and calendars from the photos on this site. Everything is packed by hand
         in San Francisco and ships within the US.
       </p>
     </header>
 
     <section aria-labelledby="goods-heading" class="shop-section">
-      <h2 id="goods-heading">Paper goods</h2>
+      <div class="section-head"><h2 id="goods-heading">Paper goods</h2></div>
       <div class="product-grid">
         {products.map(product => (
           <article class="product-card" id={product.qv}>
             {product.gallery[0] && (
               <a class="card-media product-media" href={`#${product.qv}`} data-quick-view={product.qv} aria-label={`Quick view: ${product.name}`}>
-                <ShopImage image={product.gallery[0].image} photo={product.gallery[0].photo} width={800} />
+                <ShopImage image={product.gallery[0].image} photo={product.gallery[0].photo} width={800} eager />
                 <span class="quick-view-hint" aria-hidden="true">
                   Quick view{product.gallery.length > 1 ? ` · ${product.gallery.length} images` : ''}
                 </span>
@@ -101,7 +108,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
                 <h3>
                   <a class="card-title" href={`#${product.qv}`} data-quick-view={product.qv}>{product.name}</a>
                 </h3>
-                <span class={`status status-${product.status}`}>{statusLabel(product.status)}</span>
+                <span class={`status status-${product.status}`}>{chipLabel(product)}</span>
               </div>
               <p>{product.blurb}</p>
               <div class="product-footer">
@@ -115,7 +122,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     </section>
 
     <section aria-labelledby="prints-heading" class="shop-section">
-      <h2 id="prints-heading">Prints</h2>
+      <div class="section-head"><h2 id="prints-heading">Prints</h2></div>
       <p class="section-note">
         Archival fine-art paper, unframed. Sizes are limited to what each original can print sharply.
         Prints are made to order; email me and I'll confirm the details.
@@ -138,7 +145,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
                 <p class="print-from">
                   From {formatPrice(sizes[0].price)} · {sizes[0].label} to {sizes[sizes.length - 1].label}
                 </p>
-                <a class="btn" href={printHref(photo)}>Request this print</a>
+                <a class="btn" href={`#${qv}`} data-quick-view={qv}>Choose a size</a>
               </div>
             </article>
           ))}
@@ -147,7 +154,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     </section>
 
     <section class="shop-section shop-faq" aria-labelledby="faq-heading">
-      <h2 id="faq-heading">Good to know</h2>
+      <div class="section-head"><h2 id="faq-heading">Good to know</h2></div>
       <dl>
         <dt>Shipping</dt>
         <dd>US only for now. Prints ship flat in rigid mailers; postcards and calendars ship in sleeves.</dd>
@@ -164,7 +171,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     <QuickView slug={product.qv} title={product.name} gallery={product.gallery}>
       <div class="qv-meta">
         <span class="price">{formatPrice(product.price)}</span>
-        <span class={`status status-${product.status}`}>{statusLabel(product.status)}</span>
+        <span class={`status status-${product.status}`}>{chipLabel(product)}</span>
       </div>
       <p>{product.blurb}</p>
       {product.details && (
@@ -204,14 +211,6 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     max-width: 42rem;
     margin-bottom: var(--space-2xl);
   }
-  .shop-eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--space-xs);
-  }
   .shop-section {
     margin-bottom: var(--space-3xl);
   }
@@ -220,7 +219,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
   }
   .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
     gap: var(--space-xl);
   }
   .product-card,
@@ -245,49 +244,70 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     aspect-ratio: 4 / 3;
   }
   .card-media :global(img) {
-    transition: transform 300ms ease;
+    transition: transform 300ms ease, filter var(--transition-fast);
   }
-  .card-media:hover :global(img),
   .card-media:focus-visible :global(img) {
     transform: scale(1.02);
   }
+  .card-media:active :global(img) {
+    filter: brightness(0.94);
+  }
+  /* Hover-only: on touch the whole card is the target, so the hint would just cover the photo. */
   .quick-view-hint {
     position: absolute;
     left: var(--space-sm);
     bottom: var(--space-sm);
     padding: 0.25rem 0.6rem;
-    border-radius: 999px;
-    background-color: rgba(20, 16, 13, 0.7);
-    color: #fcf8f2;
+    border-radius: var(--border-radius);
+    background-color: rgba(29, 37, 32, 0.72);
+    color: #f7f8f3;
+    font-family: var(--font-sans);
     font-size: var(--font-size-xs);
-    font-weight: 500;
+    font-weight: 600;
     opacity: 0;
     transform: translateY(4px);
     transition: opacity 150ms ease, transform 150ms ease;
   }
-  .card-media:hover .quick-view-hint,
   .card-media:focus-visible .quick-view-hint {
     opacity: 1;
     transform: none;
-  }
-  @media (hover: none) {
-    .quick-view-hint {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .card-media :global(img),
-    .quick-view-hint {
-      transition: none;
-    }
   }
   .card-title {
     color: inherit;
     text-decoration: none;
   }
-  .card-title:hover {
-    text-decoration: underline;
+  @media (hover: hover) and (pointer: fine) {
+    .card-media:hover :global(img) {
+      transform: scale(1.02);
+    }
+    .card-media:hover .quick-view-hint {
+      opacity: 1;
+      transform: none;
+    }
+    .card-title:hover {
+      text-decoration: underline;
+    }
+    .size-option:hover {
+      border-color: var(--color-border-hover);
+    }
+  }
+  .btn {
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      color var(--transition-fast),
+      transform var(--transition-fast);
+  }
+  .btn:active,
+  .size-option:active {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card-media :global(img),
+    .quick-view-hint,
+    .btn {
+      transition: none;
+    }
   }
   .product-body,
   .print-body {
@@ -312,7 +332,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 0.2rem 0.55rem;
-    border-radius: 999px;
+    border-radius: var(--border-radius-sm);
     border: 1px solid var(--color-border);
     color: var(--color-text-secondary);
     white-space: nowrap;
@@ -382,11 +402,23 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     padding-block: var(--space-md);
     font-size: var(--font-size-base);
   }
+  /* The sticky button sits on a band of page color, with a fade above it, so text never runs under it. */
   @media (max-width: 760px) {
     .qv-cta {
       position: sticky;
-      bottom: var(--space-md);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+      bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+      z-index: 1;
+      box-shadow: 0 0 0 var(--space-md) var(--color-bg-primary);
+    }
+    .qv-cta::before {
+      content: '';
+      position: absolute;
+      left: calc(-1 * var(--space-md));
+      right: calc(-1 * var(--space-md));
+      bottom: calc(100% + var(--space-md));
+      height: 2rem;
+      background: linear-gradient(to bottom, transparent, var(--color-bg-primary));
+      pointer-events: none;
     }
   }
   .qv-fine {
@@ -415,10 +447,7 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
     cursor: pointer;
-    transition: border-color 150ms ease, background-color 150ms ease;
-  }
-  .size-option:hover {
-    border-color: var(--color-border-hover);
+    transition: border-color 150ms ease, background-color 150ms ease, transform var(--transition-fast);
   }
   .size-option:has(input:checked) {
     border-color: var(--color-accent);
@@ -452,5 +481,10 @@ function printHref(photo: DisplayPhoto, size?: PrintSize) {
   }
   .shop-faq dd {
     color: var(--color-text-secondary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .size-option {
+      transition: none;
+    }
   }
 </style>

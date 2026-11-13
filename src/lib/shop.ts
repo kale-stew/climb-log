@@ -23,6 +23,8 @@ export interface ShopProduct {
   details?: string[]
   /** Stripe Payment Link. Falls back to an email request when unset. */
   checkoutUrl?: string
+  /** Short ship-date chip for preorders, such as "Ships early Dec". */
+  shipNote?: string
 }
 
 export interface PrintListing {
@@ -98,6 +100,7 @@ export const PRODUCTS: ShopProduct[] = [
     blurb:
       'Twelve months from the mountains, opening to 11×17. Printed in a small run and packed by hand in San Francisco.',
     status: 'preorder',
+    shipNote: 'Ships early Dec',
     price: 32,
     images: [
       mockup('calendar-cover', 'f6e666c3d224'),
