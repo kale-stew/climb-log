@@ -8,6 +8,7 @@ import { formatNumber, loadJournal, roundedFeet } from '../../lib/journal-data'
 import {
   buildChapters,
   groupByYear,
+  outingAlt,
   outingHref,
   outingName,
   outingType,
@@ -137,7 +138,7 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
       {chapter.cover?.preview_img_url && (
         <figure class="chapter-head-photo">
           <a class="photo-plate" href={outingHref(chapter.cover)}>
-            <img src={chapter.cover.preview_img_url.replace(/w=\d+/, 'w=1600')} alt="" width="1200" height="900" fetchpriority="high" />
+            <img src={chapter.cover.preview_img_url.replace(/w=\d+/, 'w=1600')} alt={outingAlt(chapter.cover)} width="1200" height="900" fetchpriority="high" />
           </a>
           <figcaption class="caption">
             {[
@@ -213,7 +214,7 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
                 </div>
                 {outing.preview_img_url ? (
                   <a class="entry-thumb photo-plate" href={outingHref(outing)} tabindex="-1" aria-hidden="true">
-                    <img src={outing.preview_img_url} alt="" loading="lazy" width="400" height="300" />
+                    <img src={outing.preview_img_url} alt={outingAlt(outing)} loading="lazy" width="400" height="300" />
                   </a>
                 ) : (
                   <span />

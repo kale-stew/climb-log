@@ -176,3 +176,11 @@ export function outingName(title: string | null): string {
   // "Run the Baquiano Trail" leaves "the Baquiano Trail"; capitalize what was mid-sentence.
   return name === title ? name : name.charAt(0).toUpperCase() + name.slice(1)
 }
+
+/** Descriptive alt text for an outing's cover photo: "Mount Etna, Sicily, Italy". */
+export function outingAlt(outing: Pick<ClimbListItem, 'title' | 'area' | 'state'>): string {
+  const name = outing.title ? outingName(outing.title) : null
+  const place = [outing.area, normalizeState(outing.state)].filter(Boolean)
+  const parts = [name, ...place.filter(part => part !== name)]
+  return parts.filter(Boolean).join(', ') || 'Photo from an outing'
+}

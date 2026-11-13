@@ -1,18 +1,24 @@
 ---
+import { AUTHOR_NAME, type JsonLdNode, jsonLdGraph } from '../lib/seo'
+
 export interface Props {
   title: string
   description?: string
   ogImage?: string
   ogImageAlt?: string
+  ogType?: 'website' | 'article' | 'profile'
+  publishedTime?: string
+  jsonLd?: JsonLdNode[]
 }
 
-const { title, description, ogImage, ogImageAlt } = Astro.props
+const { title, description, ogImage, ogImageAlt, ogType = 'website', publishedTime, jsonLd } = Astro.props
 
 const canonicalPath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/+$/, '')
 const canonicalUrl = `https://kylies.photos${canonicalPath}`
 const defaultOgImage = 'https://kylies.photos/open-graph/home.jpg'
 const defaultDescription = 'Photos and notes from outside: mostly mountains, sometimes the ocean, lately anywhere I can get to.'
-const pageTitle = title === 'Home' ? 'Kylie · Proof I went outside' : `${title} · kylies.photos`
+const pageTitle = title === 'Home' ? `${AUTHOR_NAME} · Hiking, climbing, and mountain photos` : `${title} · ${AUTHOR_NAME}`
+const metaDescription = description ?? defaultDescription
 const imageAlt = ogImageAlt ?? 'A photo from Kylie’s journal'
 
 const navLinks = [
@@ -50,19 +56,22 @@ const connectLinks = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{pageTitle}</title>
-    <meta name="description" content={description ?? defaultDescription} />
-    
+    <meta name="description" content={metaDescription} />
+    <meta name="author" content={AUTHOR_NAME} />
+
     <link rel="canonical" href={canonicalUrl} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description ?? ''} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={ogImage ?? defaultOgImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={imageAlt} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
+    {ogType === 'article' && <meta property="article:author" content={AUTHOR_NAME} />}
+    {ogType === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
     <meta property="og:site_name" content="kylies.photos" />
 
     <!-- Twitter / X -->
@@ -70,7 +79,7 @@ const connectLinks = [
     <meta name="twitter:site" content="@kyliestew" />
     <meta name="twitter:creator" content="@kyliestew" />
     <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description ?? ''} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={ogImage ?? defaultOgImage} />
     <meta name="twitter:image:alt" content={imageAlt} />
 
@@ -83,6 +92,10 @@ const connectLinks = [
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/web.manifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json" set:html={jsonLdGraph(jsonLd)} />
     
     <!-- Styles -->
     <link rel="stylesheet" href="/styles/globals.css" />

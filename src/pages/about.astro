@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro'
 import { env } from 'cloudflare:workers'
 import { formatNumber, loadJournal, roundedFeet } from '../lib/journal-data'
 import { buildChapters, normalizeState, yearOf } from '../lib/places'
+import { personRef, websiteRef } from '../lib/seo'
 
 export const prerender = false
 
@@ -67,15 +68,26 @@ function placesLine(places: string[]): string {
 ---
 
 <Layout
-  title="About"
-  description="Meet Kylie, an engineering manager and climber keeping track of her time in the mountains."
+  title="About Kylie Czajkowski"
+  description="Kylie Czajkowski is an engineering manager in San Francisco and a hiker, climber, and photographer keeping track of her time in the mountains."
   ogImage="https://kylies.photos/open-graph/about.jpg"
-  ogImageAlt="Kylie smiling in a climbing helmet on a rocky mountain summit"
+  ogImageAlt="Kylie Czajkowski smiling in a climbing helmet on a rocky mountain summit"
+  ogType="profile"
+  jsonLd={[
+    {
+      '@type': 'ProfilePage',
+      '@id': 'https://kylies.photos/about#page',
+      url: 'https://kylies.photos/about',
+      name: 'About Kylie Czajkowski',
+      isPartOf: websiteRef,
+      mainEntity: personRef,
+    },
+  ]}
 >
   <div class="container page about">
     <section class="intro">
       <div class="intro-text">
-        <h1>Hey, I'm Kylie</h1>
+        <h1>Hey, I'm Kylie Czajkowski</h1>
         <p>
           I'm an engineering manager in San Francisco, and this is where I keep track of my time in
           the mountains: hikes, climbs, photos, and the occasional trip report.
