@@ -1,0 +1,240 @@
+---
+import { formatCalendarDate } from '../lib/dates'
+import { sizedImageUrl } from '../lib/image-url'
+import { clusterPins, type MapOuting, type MapPin, mapFrame } from '../lib/place-map'
+import { outingName } from '../lib/places'
+
+interface Props {
+  slug: string
+  name: string
+  outings: MapOuting[]
+}
+
+const { slug, name, outings } = Astro.props
+const frame = mapFrame(slug)
+
+// Pins are 6% of the map's width (see --pin), so a single merge distance fits
+// every desktop width. Phones hit the 34px floor on a ~330px map, about 10.5%.
+const wide = frame ? clusterPins(frame, outings, 0.062) : []
+const narrow = frame ? clusterPins(frame, outings, 0.105) : []
+
+function label(pin: MapPin): string {
+  const lead = outingName(pin.lead.title)
+  const date = pin.lead.date ? formatCalendarDate(pin.lead.date, { month: 'long', year: 'numeric' }) : null
+  if (pin.count === 1) return [lead, date].filter(Boolean).join(', ')
+  return `${pin.count} outings around here, most recently ${lead}${date ? `, ${date}` : ''}`
+}
+---
+
+{frame && wide.length > 0 && (
+  <figure
+    class="place-map"
+    style={`--map-ratio: ${frame.width / frame.height}; --map-land: url(/maps/${slug}-land.svg); --map-lines: url(/maps/${slug}-lines.svg); --map-contours: url(/maps/${slug}-contours.svg);`}
+    aria-label={`Map of outings in ${name}`}
+  >
+    <div class="place-map-canvas">
+      <div class="place-map-layer place-map-land" aria-hidden="true"></div>
+      <div class="place-map-layer place-map-contours" aria-hidden="true"></div>
+      <div class="place-map-layer place-map-lines" aria-hidden="true"></div>
+      {[
+        ['wide', wide],
+        ['narrow', narrow],
+      ].map(([density, pins]) => (
+        <ul class={`place-map-pins place-map-pins-${density}`}>
+          {(pins as MapPin[]).map(pin => (
+            <li style={`left: ${(pin.x * 100).toFixed(2)}%; top: ${(pin.y * 100).toFixed(2)}%;`}>
+              <a class="place-map-pin" href={pin.lead.href} aria-label={label(pin)} title={label(pin)}>
+                {pin.lead.cover ? (
+                  <img src={sizedImageUrl(pin.lead.cover, 160)} alt="" loading="lazy" width="80" height="80" />
+                ) : (
+                  <span class="place-map-pin-blank"></span>
+                )}
+                {pin.count > 1 && <span class="place-map-count" aria-hidden="true">{pin.count}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+    <figcaption class="place-map-credit">
+      Terrain: Mapzen terrain tiles, from USGS 3DEP, SRTM, and GMTED2010, NOAA ETOPO1, and
+      <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">other sources</a>.
+      Outlines: Natural Earth, US Census.
+    </figcaption>
+  </figure>
+)}
+
+<style>
+  .place-map {
+    margin: var(--space-xl) 0 0;
+  }
+
+  .place-map-canvas {
+    position: relative;
+    width: min(100%, calc(72vh * var(--map-ratio)));
+    aspect-ratio: var(--map-ratio);
+    margin-inline: auto;
+    container-type: inline-size;
+    background: color-mix(in srgb, var(--water) 9%, var(--paper));
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .place-map-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+  }
+
+  .place-map-land {
+    background: var(--paper);
+    mask-image: var(--map-land);
+    -webkit-mask-image: var(--map-land);
+  }
+
+  /* Contours are texture, not information: faint enough that borders and pins lead. */
+  .place-map-contours {
+    background: color-mix(in srgb, var(--contour) 32%, transparent);
+  }
+
+  :global([data-theme='dark']) .place-map-contours {
+    background: color-mix(in srgb, var(--contour) 42%, transparent);
+  }
+
+  .place-map-contours {
+    mask-image: var(--map-contours);
+    -webkit-mask-image: var(--map-contours);
+  }
+
+  .place-map-lines {
+    background: color-mix(in srgb, var(--ink) 50%, transparent);
+    mask-image: var(--map-lines);
+    -webkit-mask-image: var(--map-lines);
+  }
+
+  .place-map-pins {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .place-map-pins li {
+    position: absolute;
+    transform: translate(-50%, -100%);
+  }
+
+  .place-map-pins li:hover,
+  .place-map-pins li:focus-within {
+    z-index: 1;
+  }
+
+  .place-map-pin {
+    --pin: clamp(34px, 6cqw, 64px);
+    position: relative;
+    display: block;
+    width: var(--pin);
+    height: var(--pin);
+    margin-bottom: 7px;
+    background: var(--color-white);
+    border: 2px solid var(--color-white);
+    border-radius: 9px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: transform var(--transition-fast);
+    transform-origin: 50% calc(100% + 7px);
+  }
+
+  /* The tail points at the outing's location. */
+  .place-map-pin::after {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    content: '';
+    border-top: 7px solid var(--color-white);
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    transform: translateX(-50%);
+  }
+
+  .place-map-pin img,
+  .place-map-pin-blank {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: var(--paper-deep);
+    border-radius: 7px;
+  }
+
+  .place-map-count {
+    position: absolute;
+    bottom: 3px;
+    left: 5px;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .place-map-pin:hover {
+      text-decoration: none;
+      transform: scale(1.08);
+    }
+  }
+
+  .place-map-pin:focus-visible {
+    outline: 2px solid var(--tab);
+    outline-offset: 2px;
+  }
+
+  .place-map-pins-narrow {
+    display: none;
+  }
+
+  .place-map-credit {
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    color: var(--ink-faint);
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    .place-map-pins-wide {
+      display: none;
+    }
+
+    .place-map-pins-narrow {
+      display: block;
+    }
+
+    .place-map-pin {
+      border-radius: 7px;
+    }
+
+    .place-map-pin img,
+    .place-map-pin-blank {
+      border-radius: 5px;
+    }
+
+    .place-map-count {
+      font-size: 0.7rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .place-map-pin {
+      transition: none;
+    }
+  }
+</style>

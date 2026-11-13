@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react'
 import { formatCalendarDate } from '../lib/dates'
+import { sizedImageUrl } from '../lib/image-url'
 import { knownOutingType, outingName } from '../lib/places'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
@@ -36,16 +37,6 @@ type SortField = 'date' | 'title' | 'distance' | 'gain' | 'area'
 type SortOrder = 'asc' | 'desc'
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100]
-
-// Previews are stored as 200px thumbnails (older rows as /img/{id}/?w=200). Request
-// the width each surface needs, and drop the trailing slash so the request
-// skips a redirect.
-function sizedImageUrl(url: string, width: number): string {
-  if (!url.startsWith('/img/')) return url
-  const path = url.replace(/\/(?=\?|$)/, '')
-  if (/[?&]w=\d+/.test(path)) return path.replace(/([?&]w=)\d+/, (_, prefix) => `${prefix}${width}`)
-  return `${path}${path.includes('?') ? '&' : '?'}w=${width}`
-}
 
 const NO_CLIMB_IMAGES: Record<string, LightboxPhoto[]> = {}
 

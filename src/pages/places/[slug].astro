@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro'
+import PlaceMap from '../../components/PlaceMap.astro'
 import { env } from 'cloudflare:workers'
 import { formatCalendarDate } from '../../lib/dates'
 import { formatNumber, loadJournal, roundedFeet } from '../../lib/journal-data'
@@ -11,6 +12,7 @@ import {
   outingType,
   yearSpan,
 } from '../../lib/places'
+import type { MapOuting } from '../../lib/place-map'
 
 export const prerender = false
 
@@ -33,6 +35,32 @@ const chapter = chapters[index]
 const previous = chapters[index - 1] ?? null
 const next = chapters[index + 1] ?? null
 const years = groupByYear(chapter.outings)
+
+let mapOutings: MapOuting[] = []
+if (env.DB) {
+  try {
+    const result = await env.DB.prepare(
+      'SELECT climb_id, latitude, longitude FROM climb_locations WHERE hidden = 0',
+    ).all<{ climb_id: string; latitude: number; longitude: number }>()
+    const locations = new Map((result.results ?? []).map(row => [row.climb_id, row]))
+    mapOutings = chapter.outings.flatMap(outing => {
+      const location = locations.get(outing.id)
+      if (!location) return []
+      return [{
+        id: outing.id,
+        date: outing.date,
+        title: outing.title,
+        href: outingHref(outing),
+        cover: outing.preview_img_url,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      }]
+    })
+  } catch (error) {
+    // The map is an extra: a missing table or failed query leaves the page as it was.
+    console.error('Failed to load outing locations:', error)
+  }
+}
 
 let peakRanges: { range: string; peaks: PeakRow[] }[] = []
 let summitCount = 0
@@ -130,6 +158,8 @@ const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAr
         </figure>
       )}
     </header>
+
+    <PlaceMap slug={chapter.slug} name={chapter.name} outings={mapOutings} />
 
     {peakRanges.length > 0 && (
       <section class="section" aria-labelledby="peaks-heading">
