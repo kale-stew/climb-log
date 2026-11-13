@@ -66,6 +66,7 @@ describe('mapClimb', () => {
       area: 'Mount Tamalpais State Park',
       state: 'CA',
       strava: 'https://strava.com/1',
+      summits: 'Mount Tamalpais,Mount Diablo',
     })
   })
 
@@ -245,5 +246,12 @@ describe('syncTable', () => {
     expect(result.deleted).toBe(0)
     expect(result.errors).toHaveLength(1)
     expect(batches).toHaveLength(0)
+  })
+})
+
+describe('summits', () => {
+  it('stores an outing with no summits as null', () => {
+    const page = climbPage({ summits: { type: 'multi_select', multi_select: [] } })
+    expect(mapClimb(page, '2026-11-05')?.summits).toBeNull()
   })
 })

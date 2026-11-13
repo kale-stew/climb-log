@@ -139,6 +139,7 @@ const CLIMB_PROPERTIES = [
   'gain',
   'area',
   'strava',
+  'summits',
 ]
 const PEAK_PROPERTIES = ['peak_name', 'elevation', 'first_completed_on', 'range', 'rank', 'img_url']
 const GEAR_PROPERTIES = [
@@ -179,6 +180,7 @@ export function mapClimb(page: NotionPage, today: string): Row | null {
     area,
     state,
     strava: str(fmt(props.strava)),
+    summits: str(fmt(props.summits)),
   }
 }
 
@@ -249,6 +251,7 @@ export function tableSpecs(today: string): TableSpec[] {
         'area',
         'state',
         'strava',
+        'summits',
       ],
       map: page => mapClimb(page, today),
       // Seeded previews were rewritten to canonical `/img/{id}` paths; keep those
