@@ -5,31 +5,40 @@ import { clusterPins, type MapOuting, type MapPin, mapFrame } from '../lib/place
 import { outingName } from '../lib/places'
 
 interface Props {
-  slug: string
+  /** Which prebuilt map to draw on (a chapter slug). */
+  map: string
   name: string
   outings: MapOuting[]
 }
 
-const { slug, name, outings } = Astro.props
-const frame = mapFrame(slug)
+const { map, name, outings } = Astro.props
+const frame = mapFrame(map)
 
 // Pins are 6% of the map's width (see --pin), so a single merge distance fits
 // every desktop width. Phones hit the 34px floor on a ~330px map, about 10.5%.
 const wide = frame ? clusterPins(frame, outings, 0.062) : []
 const narrow = frame ? clusterPins(frame, outings, 0.105) : []
 
+function when(date: string | null, month: 'short' | 'long' = 'long'): string | null {
+  return date ? formatCalendarDate(date, { month, year: 'numeric' }) : null
+}
+
 function label(pin: MapPin): string {
   const lead = outingName(pin.lead.title)
-  const date = pin.lead.date ? formatCalendarDate(pin.lead.date, { month: 'long', year: 'numeric' }) : null
-  if (pin.count === 1) return [lead, date].filter(Boolean).join(', ')
-  return `${pin.count} outings around here, most recently ${lead}${date ? `, ${date}` : ''}`
+  if (pin.count === 1) return [lead, when(pin.lead.date)].filter(Boolean).join(', ')
+  const where = pin.groups[0] ? ` in ${pin.groups[0].name}` : ' around here'
+  return `${pin.count} outings${where}, most recently ${lead}`
 }
+
+// A single outing on a place page links straight to it; anything else opens a
+// list, so a merged pin never hides the outings under it.
+const opensList = (pin: MapPin) => pin.count > 1 || pin.groups.length > 0
 ---
 
 {frame && wide.length > 0 && (
   <figure
     class="place-map"
-    style={`--map-ratio: ${frame.width / frame.height}; --map-land: url(/maps/${slug}-land.svg); --map-lines: url(/maps/${slug}-lines.svg); --map-contours: url(/maps/${slug}-contours.svg);`}
+    style={`--map-ratio: ${frame.width / frame.height}; --map-land: url(/maps/${map}-land.svg); --map-lines: url(/maps/${map}-lines.svg); --map-contours: url(/maps/${map}-contours.svg);`}
     aria-label={`Map of outings in ${name}`}
   >
     <div class="place-map-canvas">
@@ -41,25 +50,74 @@ function label(pin: MapPin): string {
         ['narrow', narrow],
       ].map(([density, pins]) => (
         <ul class={`place-map-pins place-map-pins-${density}`}>
-          {(pins as MapPin[]).map(pin => (
-            <li style={`left: ${(pin.x * 100).toFixed(2)}%; top: ${(pin.y * 100).toFixed(2)}%;`}>
-              <a class="place-map-pin" href={pin.lead.href} aria-label={label(pin)} title={label(pin)}>
+          {(pins as MapPin[]).map((pin, index) => {
+            const id = `place-map-${map}-${density}-${index}`
+            const face = (
+              <>
                 {pin.lead.cover ? (
                   <img src={sizedImageUrl(pin.lead.cover, 200)} alt="" loading="lazy" width="80" height="80" />
                 ) : (
                   <span class="place-map-pin-blank"></span>
                 )}
                 {pin.count > 1 && <span class="place-map-count" aria-hidden="true">{pin.count}</span>}
-              </a>
-            </li>
-          ))}
+              </>
+            )
+            return (
+              <li style={`left: ${(pin.x * 100).toFixed(2)}%; top: ${(pin.y * 100).toFixed(2)}%;`}>
+                {opensList(pin) ? (
+                  <>
+                    <button type="button" class="place-map-pin" popovertarget={id} aria-label={label(pin)} title={label(pin)}>
+                      {face}
+                    </button>
+                    <div id={id} class="place-map-list" popover="auto" aria-label={label(pin)}>
+                      <div class="place-map-list-head">
+                        <p class="place-map-list-title">
+                          {pin.count} {pin.count === 1 ? 'outing' : 'outings'}
+                          {pin.groups.length === 0 && ' around here'}
+                        </p>
+                        <button type="button" class="place-map-list-close" popovertarget={id} popovertargetaction="hide" aria-label="Close">
+                          &times;
+                        </button>
+                      </div>
+                      {pin.groups.length > 0 && (
+                        <p class="place-map-list-places">
+                          {pin.groups.map(group => (
+                            <a class="text-link" href={group.href}>
+                              {group.name} <span class="measure">{group.count}</span> <span aria-hidden="true">→</span>
+                            </a>
+                          ))}
+                        </p>
+                      )}
+                      <ol class="place-map-list-outings">
+                        {pin.members.map(outing => (
+                          <li>
+                            <a href={outing.href}>
+                              {outing.cover ? (
+                                <img src={sizedImageUrl(outing.cover, 200)} alt="" loading="lazy" width="48" height="48" />
+                              ) : (
+                                <span class="place-map-pin-blank"></span>
+                              )}
+                              <span class="place-map-list-name">{outingName(outing.title)}</span>
+                              <span class="measure">{when(outing.date, 'short')}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  </>
+                ) : (
+                  <a class="place-map-pin" href={pin.lead.href} aria-label={label(pin)} title={label(pin)}>
+                    {face}
+                  </a>
+                )}
+              </li>
+            )
+          })}
         </ul>
       ))}
     </div>
     <figcaption class="place-map-credit">
-      Terrain: Mapzen terrain tiles, from USGS 3DEP, SRTM, and GMTED2010, NOAA ETOPO1, and
-      <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">other sources</a>.
-      Outlines: Natural Earth, US Census.
+      <a href="#map-sources">Map sources<span aria-hidden="true">*</span></a>
     </figcaption>
   </figure>
 )}
@@ -138,6 +196,8 @@ function label(pin: MapPin): string {
     --pin: clamp(34px, 6cqw, 64px);
     position: relative;
     display: block;
+    padding: 0;
+    cursor: pointer;
     width: var(--pin);
     height: var(--pin);
     margin-bottom: 7px;
@@ -206,8 +266,11 @@ function label(pin: MapPin): string {
     margin: 0.4rem auto 0;
     font-family: var(--font-mono);
     font-size: var(--font-size-xs);
-    color: var(--ink-faint);
     text-align: right;
+  }
+
+  .place-map-credit a {
+    color: var(--ink-faint);
   }
 
   @media (max-width: 640px) {
@@ -233,8 +296,118 @@ function label(pin: MapPin): string {
     }
   }
 
+  /* The outing list sits in the top layer, centered, so it never clips at a map edge. */
+  .place-map-list {
+    width: min(26rem, calc(100vw - 2rem));
+    max-height: min(32rem, 75vh);
+    padding: 0;
+    margin: auto;
+    overflow: auto;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 180ms ease,
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      overlay 180ms allow-discrete,
+      display 180ms allow-discrete;
+  }
+
+  @starting-style {
+    .place-map-list:popover-open {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .place-map-list:not(:popover-open) {
+    opacity: 0;
+  }
+
+  .place-map-list::backdrop {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .place-map-list-head {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.6rem 0.6rem 1rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .place-map-list-title {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+  }
+
+  .place-map-list-close {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--ink-soft);
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .place-map-list-places {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .place-map-list-outings {
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+  }
+
+  .place-map-list-outings a {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.4rem 1rem;
+    color: var(--ink);
+  }
+
+  .place-map-list-outings a:hover {
+    text-decoration: none;
+    background: var(--paper-deep);
+  }
+
+  .place-map-list-outings img,
+  .place-map-list-outings .place-map-pin-blank {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+  }
+
+  .place-map-list-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .place-map-pin {
+    .place-map-pin,
+    .place-map-list {
       transition: none;
     }
   }

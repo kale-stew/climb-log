@@ -76,6 +76,26 @@ describe('clusterPins', () => {
     expect(pins[0].lead.id).toBe('photo')
   })
 
+  it('lists every outing in a pin and tallies its places, biggest first', () => {
+    const co = { name: 'Colorado', href: '/places/colorado' }
+    const ut = { name: 'Utah', href: '/places/utah' }
+    const pins = clusterPins(
+      world,
+      [
+        { ...outing('a', '2024-01-01', 39.7, -105), group: ut },
+        { ...outing('b', '2023-01-01', 39.71, -105), group: co },
+        { ...outing('c', '2022-01-01', 39.72, -105), group: co },
+      ],
+      0.05,
+    )
+    expect(pins).toHaveLength(1)
+    expect(pins[0].members.map(member => member.id)).toEqual(['a', 'b', 'c'])
+    expect(pins[0].groups).toEqual([
+      { ...co, count: 2 },
+      { ...ut, count: 1 },
+    ])
+  })
+
   it('keeps outings apart when spacing is small', () => {
     const pins = clusterPins(
       world,

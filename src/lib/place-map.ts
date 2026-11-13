@@ -16,6 +16,8 @@ export interface MapOuting {
   cover: string | null
   latitude: number
   longitude: number
+  /** The place this outing belongs to, for maps that span several places. */
+  group?: { name: string; href: string }
 }
 
 export interface MapPin {
@@ -25,6 +27,10 @@ export interface MapPin {
   count: number
   /** Newest outing in the pin; its cover is the pin's thumbnail. */
   lead: MapOuting
+  /** Every outing in the pin, newest first. */
+  members: MapOuting[]
+  /** Places the pin's outings belong to, most outings first. */
+  groups: { name: string; href: string; count: number }[]
 }
 
 const FRAMES: Record<string, MapFrame> = frames
@@ -71,10 +77,44 @@ export function clusterPins(frame: MapFrame, outings: MapOuting[], size: number)
     else clusters.push({ ...point, members: [outing] })
   }
 
-  return clusters.map(cluster => ({
-    x: cluster.x,
-    y: cluster.y,
-    count: cluster.members.length,
-    lead: cluster.members.find(member => member.cover) ?? cluster.members[0],
-  }))
+  return clusters.map(cluster => {
+    const groups = new Map<string, { name: string; href: string; count: number }>()
+    for (const { group } of cluster.members) {
+      if (!group) continue
+      const entry = groups.get(group.href) ?? { ...group, count: 0 }
+      entry.count++
+      groups.set(group.href, entry)
+    }
+    return {
+      x: cluster.x,
+      y: cluster.y,
+      count: cluster.members.length,
+      lead: cluster.members.find(member => member.cover) ?? cluster.members[0],
+      members: cluster.members,
+      // Stable sort: ties keep first-seen order, which is newest first.
+      groups: [...groups.values()].sort((a, b) => b.count - a.count),
+    }
+  })
+}
+
+export interface OutingLocation {
+  latitude: number
+  longitude: number
+}
+
+/** Visible outing locations by climb id. Empty if the table is missing or the query fails. */
+export async function loadOutingLocations(
+  db: D1Database | undefined,
+): Promise<Map<string, OutingLocation>> {
+  if (!db) return new Map()
+  try {
+    const result = await db
+      .prepare('SELECT climb_id, latitude, longitude FROM climb_locations WHERE hidden = 0')
+      .all<{ climb_id: string; latitude: number; longitude: number }>()
+    return new Map((result.results ?? []).map(row => [row.climb_id, row]))
+  } catch (error) {
+    // The map is an extra: without locations the page renders as it did before.
+    console.error('Failed to load outing locations:', error)
+    return new Map()
+  }
 }

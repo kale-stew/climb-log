@@ -1,0 +1,25 @@
+---
+/** Credits for PlaceMap, rendered as a footnote at the end of the page. */
+---
+
+<p id="map-sources" class="map-sources">
+  <span class="map-sources-mark" aria-hidden="true">*</span>
+  Map terrain from Mapzen terrain tiles (USGS 3DEP, SRTM, and GMTED2010; NOAA ETOPO1; and
+  <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">other sources</a>). Outlines from Natural
+  Earth and the US Census.
+</p>
+
+<style>
+  .map-sources {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    color: var(--ink-faint);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .map-sources-mark {
+    color: var(--contour);
+  }
+</style>
