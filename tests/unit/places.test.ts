@@ -92,7 +92,7 @@ describe('places', () => {
 
   it('links to a trip report when one exists, otherwise to the outing in the journal', () => {
     expect(outingHref({ id: 'x', slug: 'solo-citadel' })).toBe('/blog/hike/solo-citadel')
-    expect(outingHref({ id: 'a b', slug: null })).toBe('/climbs/?outing=a%20b')
+    expect(outingHref({ id: 'a b', slug: null })).toBe('/journal?outing=a%20b')
   })
 
   it('splits the activity type from the outing name', () => {

@@ -50,6 +50,21 @@ if (DB) {
     console.error('Failed to fetch climbs:', e)
   }
 }
+
+// Render the requested page on the server so ?page=N and ?outing= links work
+// without JavaScript. The table's default order (date, newest first) matches
+// the query above.
+const PAGE_SIZE = 50
+const totalPages = Math.max(1, Math.ceil(climbs.length / PAGE_SIZE))
+const outingId = Astro.url.searchParams.get('outing')
+const outingIndex = outingId ? climbs.findIndex(climb => climb.id === outingId) : -1
+const requestedPage = Number.parseInt(Astro.url.searchParams.get('page') ?? '', 10)
+const initialPage =
+  outingIndex >= 0
+    ? Math.floor(outingIndex / PAGE_SIZE) + 1
+    : Number.isFinite(requestedPage)
+      ? Math.min(Math.max(requestedPage, 1), totalPages)
+      : 1
 ---
 
 <Layout
@@ -65,8 +80,8 @@ if (DB) {
       entries are grouped by place in <a href="/places">the route book</a>.
     </p>
 
-    <ClimbTable client:load climbs={climbs} climbImages={climbImages} />
-    <noscript><p>The first 50 outings are shown above. Turn on JavaScript to search, sort, and browse the rest.</p></noscript>
+    <ClimbTable client:load climbs={climbs} climbImages={climbImages} pageSize={PAGE_SIZE} initialPage={initialPage} />
+    <noscript><p>Turn on JavaScript to search, filter, and sort the journal.</p></noscript>
   </div>
 
   <style>

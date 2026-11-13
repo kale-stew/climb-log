@@ -122,7 +122,7 @@ function placesLine(places: string[]): string {
               <div>
                 <h3>First entry in the journal</h3>
                 <p>
-                  <a href={`/climbs/?outing=${encodeURIComponent(firstEntry.id)}`}>{firstEntry.title}</a>{firstEntry.state ? `, ${normalizeState(firstEntry.state)}` : ''}
+                  <a href={`/journal?outing=${encodeURIComponent(firstEntry.id)}`}>{firstEntry.title}</a>{firstEntry.state ? `, ${normalizeState(firstEntry.state)}` : ''}
                 </p>
               </div>
             </li>
