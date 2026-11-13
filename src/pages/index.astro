@@ -149,9 +149,9 @@ function placeOf(area: string | null, state: string | null): string {
         </div>
         <div class="frames">
           {frames.map(photo => (
-            <a class="frame" href="/photos" aria-label={`View photos, including ${photoAlt(photo)}`}>
+            <a class="frame" href={`/photos?photo=${encodeURIComponent(photo.id)}`}>
               <span class="photo-plate frame-image">
-                <img src={`/img/${photo.id}/?w=800`} alt="" loading="lazy" width={photo.width ?? 800} height={photo.height ?? 600} />
+                <img src={`/img/${photo.id}?w=800`} alt={photoAlt(photo)} loading="lazy" width={photo.width ?? 800} height={photo.height ?? 600} />
               </span>
               {(photo.title || photo.area) && <span class="caption">{photo.title || photo.area}</span>}
             </a>

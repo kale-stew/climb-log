@@ -27,7 +27,7 @@ function getCategory(id: string): string {
 
 const category = getCategory(post.id)
 const categoryLabels: Record<string, string> = {
-  hike: 'trip reports',
+  hike: 'reports',
   gear: 'gear',
   thoughts: 'thoughts',
 }
@@ -90,14 +90,14 @@ const postDescription = `${categoryDescriptions[category]}: ${post.data.title}.`
     {(prevPost || nextPost) && (
       <nav class="post-navigation" aria-label="Post navigation">
         {prevPost && (
-          <a href={`/blog/${prevPost.id.replace(/\.md$/, '')}/`} class="nav-link prev">
+          <a href={`/blog/${prevPost.id.replace(/\.md$/, '')}`} class="nav-link prev">
             <span class="nav-label">← Previous Post</span>
             <span class="nav-title">{prevPost.data.title}</span>
             <span class="nav-category">{categoryLabels[getCategory(prevPost.id)]}</span>
           </a>
         )}
         {nextPost && (
-          <a href={`/blog/${nextPost.id.replace(/\.md$/, '')}/`} class="nav-link next">
+          <a href={`/blog/${nextPost.id.replace(/\.md$/, '')}`} class="nav-link next">
             <span class="nav-label">Next Post →</span>
             <span class="nav-title">{nextPost.data.title}</span>
             <span class="nav-category">{categoryLabels[getCategory(nextPost.id)]}</span>

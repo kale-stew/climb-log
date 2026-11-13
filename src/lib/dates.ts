@@ -43,5 +43,7 @@ export function formatRecentDate(value: string, now = new Date()): string {
   const ageInDays = Math.abs(Math.round((nowUtc - dateUtc) / 86_400_000))
 
   if (ageInDays < 60) return formatRelativeDate(value, now)
-  return formatCalendarDate(value, { month: 'short', day: 'numeric' })
+  // Older dates keep the year once they fall outside the current one, so "Dec 26" never sits beside "Feb 15" ambiguously.
+  const sameYear = date.getFullYear() === now.getFullYear()
+  return formatCalendarDate(value, sameYear ? { month: 'short', day: 'numeric' } : { month: 'short', day: 'numeric', year: 'numeric' })
 }

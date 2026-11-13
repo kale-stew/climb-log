@@ -11,7 +11,7 @@ export const GET: APIRoute = async ({ params, request }) => {
   if (prefix !== 'photos' || !photoId) return new Response('Image not found', { status: 404 })
 
   const size = new URL(request.url).searchParams.get('size') ?? ''
-  const location = WIDTHS.has(size) ? `/img/${photoId}/?w=${size}` : `/img/${photoId}/`
+  const location = WIDTHS.has(size) ? `/img/${photoId}?w=${size}` : `/img/${photoId}`
   return new Response(null, {
     status: 301,
     headers: { Location: location, Deprecation: 'true' },

@@ -125,6 +125,21 @@ export default function PhotoGallery({
     setLightboxOpener(opener)
   }
 
+  // Deep links such as /photos?photo=<id> (used by the homepage frames) open that photo once it is on the page.
+  const deepLinkHandled = useRef(false)
+  useEffect(() => {
+    if (deepLinkHandled.current || photos.length === 0) return
+    const target = new URLSearchParams(window.location.search).get('photo')
+    deepLinkHandled.current = true
+    if (!target) return
+    const index = photos.findIndex(photo => photo.id === target)
+    const opener = gridRef.current?.querySelector<HTMLElement>(`[data-photo-id="${CSS.escape(target)}"]`)
+    if (index < 0 || !opener) return
+    opener.scrollIntoView({ block: 'center' })
+    setLightbox({ photos, index })
+    setLightboxOpener(opener)
+  }, [photos])
+
   const closeLightbox = useCallback(() => {
     setLightbox(null)
     setLightboxOpener(null)
@@ -251,10 +266,7 @@ export default function PhotoGallery({
             >
               −
             </button>
-            <span aria-live="polite">
-              <span className="sr-only">Gallery size </span>
-              {gridZoom + 1}
-            </span>
+            <span aria-live="polite">{gridZoom + 1}</span>
             <button
               type="button"
               onClick={() => changeGridZoom(1)}
@@ -303,7 +315,7 @@ export default function PhotoGallery({
           >
             <img
               src={getImageUrl(photo, 'thumb')}
-              alt=""
+              alt={[photo.caption || photo.title, [photo.area, photo.state].filter(Boolean).join(', ')].filter(Boolean).join(', ')}
               loading="lazy"
               width={photo.width ?? 800}
               height={photo.height ?? 600}

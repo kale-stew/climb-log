@@ -45,7 +45,7 @@ export function fillMissingPreviewImages(
       || formalOptions.find(({ photoDate }) => climb.date && photoDate?.slice(0, 10) === calendarDate(climb.date))
       || formalOptions[0]
     if (formal) {
-      climb.preview_img_url = `/img/${formal.photoId}/?w=${width}`
+      climb.preview_img_url = `/img/${formal.photoId}?w=${width}`
       continue
     }
 
@@ -56,6 +56,6 @@ export function fillMissingPreviewImages(
     if (!fallbackPhotoId) continue
 
     usedPhotoIds.add(fallbackPhotoId)
-    climb.preview_img_url = `/img/${fallbackPhotoId}/?w=${width}`
+    climb.preview_img_url = `/img/${fallbackPhotoId}?w=${width}`
   }
 }

@@ -1,5 +1,6 @@
 import { type SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { formatCalendarDate } from '../lib/dates'
+import { outingName, outingType } from '../lib/places'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
 interface Climb {
@@ -26,7 +27,7 @@ type SortOrder = 'asc' | 'desc'
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100]
 
-// Previews are stored as 200px thumbnails, often as /img/{id}/?w=200. Request
+// Previews are stored as 200px thumbnails (older rows as /img/{id}/?w=200). Request
 // the width each surface needs, and drop the trailing slash so the request
 // skips a redirect.
 function sizedImageUrl(url: string, width: number): string {
@@ -66,6 +67,15 @@ function imagesFor(climb: Climb, climbImages: Record<string, LightboxPhoto[]>): 
       date: climb.date,
     },
   ]
+}
+
+/** Strava's chevron mark, sized to the text so the table and cards render the same icon. */
+function StravaMark() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path fill="#FC4C02" d="M15.39 17.94 13.3 13.8h-3.07L15.39 24l5.15-10.2h-3.07M10.15 0 3.3 13.8h4.04l2.81-5.55 2.79 5.55h4.01L10.15 0z" />
+    </svg>
+  )
 }
 
 export default function ClimbTable({
@@ -294,7 +304,7 @@ export default function ClimbTable({
             setCurrentPage(1)
           }}
         >
-          <option value="">All States</option>
+          <option value="">All regions</option>
           {states.map(state => (
             <option key={state} value={state}>
               {state}
@@ -307,7 +317,7 @@ export default function ClimbTable({
           onClick={() => setUseMetric(!useMetric)}
           className={useMetric ? 'filter-btn active' : 'filter-btn'}
         >
-          {useMetric ? 'Metric' : 'Imperial'}
+          {useMetric ? 'Units: km / m' : 'Units: mi / ft'}
         </button>
       </div>
 
@@ -474,7 +484,7 @@ export default function ClimbTable({
                           >
                             <img
                               src={sizedImageUrl(climb.preview_img_url, 200)}
-                              alt=""
+                              alt={outingName(climb.title)}
                               className="climb-thumb"
                               loading="lazy"
                               onError={handleThumbnailError}
@@ -488,10 +498,11 @@ export default function ClimbTable({
                     <td>{formatDate(climb.date)}</td>
                     <td>
                       {climb.slug ? (
-                        <a href={`/blog/hike/${climb.slug}/`}>{climb.title || 'Untitled'}</a>
+                        <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
                       ) : (
-                        climb.title || 'Untitled'
-                      )}
+                        outingName(climb.title)
+                      )}{' '}
+                      <span className="outing-tag">{outingType(climb.title)}</span>
                     </td>
                     <td>
                       {climb.area}
@@ -508,8 +519,10 @@ export default function ClimbTable({
                           target="_blank"
                           rel="noopener noreferrer"
                           title="View on Strava"
+                          aria-label={`View ${outingName(climb.title)} on Strava`}
+                          className="strava-link"
                         >
-                          🏃🏼‍♀️
+                          <StravaMark />
                         </a>
                       )}
                     </td>
@@ -535,8 +548,10 @@ export default function ClimbTable({
                       target="_blank"
                       rel="noopener noreferrer"
                       title="View on Strava"
+                      aria-label={`View ${outingName(climb.title)} on Strava`}
+                      className="strava-link"
                     >
-                      🏃🏼
+                      <StravaMark />
                     </a>
                   )}
                 </div>
@@ -549,7 +564,7 @@ export default function ClimbTable({
                   >
                     <img
                       src={sizedImageUrl(climb.preview_img_url, 800)}
-                      alt=""
+                      alt={outingName(climb.title)}
                       loading="lazy"
                       onError={handleMobilePhotoError}
                     />
@@ -557,10 +572,11 @@ export default function ClimbTable({
                 )}
                 <h3 className="climb-mobile-title">
                   {climb.slug ? (
-                    <a href={`/blog/hike/${climb.slug}/`}>{climb.title || 'Untitled'}</a>
+                    <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
                   ) : (
-                    climb.title || 'Untitled'
-                  )}
+                    outingName(climb.title)
+                  )}{' '}
+                  <span className="outing-tag">{outingType(climb.title)}</span>
                 </h3>
                 <div className="climb-mobile-meta">
                   {climb.area && (
@@ -753,6 +769,14 @@ export default function ClimbTable({
           font-size: var(--font-size-sm);
           color: var(--color-text-tertiary);
         }
+        .outing-tag {
+          font-size: var(--font-size-sm);
+          font-weight: 400;
+          color: var(--color-text-tertiary);
+          text-transform: lowercase;
+          white-space: nowrap;
+        }
+        .strava-link { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; }
         .climb-mobile-title {
           font-size: var(--font-size-lg);
           font-weight: 600;

@@ -28,5 +28,6 @@ describe('calendar dates', () => {
   it('switches to a compact date after 60 days', () => {
     expect(formatRecentDate('2026-02-15', new Date(2026, 9, 14))).toBe('Feb 15')
     expect(formatRecentDate('2026-09-30', new Date(2026, 9, 14))).toBe('2 weeks ago')
+    expect(formatRecentDate('2025-12-26', new Date(2026, 10, 12))).toBe('Dec 26, 2025')
   })
 })

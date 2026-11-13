@@ -153,7 +153,7 @@ export function groupByYear(
 
 export function outingHref(outing: Pick<ClimbListItem, 'id' | 'slug'>): string {
   return outing.slug
-    ? `/blog/hike/${outing.slug}/`
+    ? `/blog/hike/${outing.slug}`
     : `/climbs/?outing=${encodeURIComponent(outing.id)}`
 }
 

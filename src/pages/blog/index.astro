@@ -22,7 +22,7 @@ function getCategory(id: string): string {
 const categories = ['all', 'hike', 'gear', 'thoughts'] as const
 const categoryLabels: Record<string, string> = {
   all: 'all',
-  hike: 'trip reports',
+  hike: 'reports',
   gear: 'gear',
   thoughts: 'thoughts',
 }
@@ -65,7 +65,7 @@ function formatDate(dateStr: string) {
         return (
           <article class="post-card" data-category={category}>
             {post.data.previewImgUrl && (
-              <a href={`/blog/${slug}/`} class="post-image">
+              <a href={`/blog/${slug}`} class="post-image">
                 <img 
                   src={post.data.previewImgUrl} 
                   alt={post.data.title}
@@ -76,7 +76,7 @@ function formatDate(dateStr: string) {
             <div class="post-content">
               <span class={`post-category cat-${category}`}>{categoryLabels[category]}</span>
               <h2>
-                <a href={`/blog/${slug}/`}>{post.data.title}</a>
+                <a href={`/blog/${slug}`}>{post.data.title}</a>
               </h2>
               <time datetime={post.data.date}>{formatDate(post.data.date)}</time>
             </div>
