@@ -39,6 +39,16 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 - `@notionhq/client` v2 defaults to `node-fetch`, which fails on Workers; always pass `fetch` to the client.
 - Preview image values can be external URLs, canonical API URLs, or generated `/img/{id}` fallbacks. Audit all forms before changing resolution behavior.
 
+## Place Maps
+
+- `/places` and `/places/{slug}` draw static maps from `public/maps/` (rebuild with `npm run maps [slug...]`) and pins from `climb_locations`, one approximate position per outing kept outside the Notion-synced `climbs` table. Coordinates are rounded to 2 decimals; never store or publish finer.
+- New outings get no pin until they have a location. After a Notion sync adds outings, locate them with the `photo-locations` skill (Apple Photos, by date), then:
+  1. `curl -s https://kylies.photos/api/climbs/options > outings.json`
+  2. `python3 <skill>/scripts/locate.py outings.json > located.json` (needs `osxphotos` and Full Disk Access)
+  3. `node scripts/outing-locations-sql.mjs outings.json located.json > locations.sql`. It skips points that land outside the outing's state and prints them. Coastal outings often read as "ocean"; check them, then pass `--include id,id`.
+  4. Apply `locations.sql` to `climb-log-db`. The insert is `ON CONFLICT DO NOTHING`, so hand-corrected rows survive reruns.
+- Outings with no geotagged photos that day (or a wrong-state match) need a manual or geocoded row with `source = 'manual'` or `'geocode'`.
+
 ## Deployment
 
 - Production is a Cloudflare Worker with static assets and the `kylies.photos` custom domain.
