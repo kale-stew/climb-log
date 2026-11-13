@@ -53,6 +53,35 @@ const mapOutings: MapOuting[] = chapter.outings.flatMap(outing => {
     },
   ]
 })
+
+let peakRanges: { range: string; peaks: PeakRow[] }[] = []
+let summitCount = 0
+if (chapter.slug === 'colorado' && env.DB) {
+  try {
+    const result = await env.DB.prepare(
+      'SELECT title, elevation, range, first_completed FROM peaks WHERE first_completed IS NOT NULL ORDER BY elevation DESC',
+    ).all<PeakRow>()
+    const peaks = result.results ?? []
+    summitCount = peaks.length
+    const byRange = new Map<string, PeakRow[]>()
+    for (const peak of peaks) {
+      const range = peak.range ? `${peak.range} Range` : 'Other ranges'
+      byRange.set(range, [...(byRange.get(range) ?? []), peak])
+    }
+    peakRanges = [...byRange.entries()]
+      .map(([range, list]) => ({ range, peaks: list }))
+      .sort((a, b) => b.peaks.length - a.peaks.length)
+  } catch (error) {
+    console.error('Failed to load peaks:', error)
+  }
+}
+
+function placeLine(area: string | null, state: string | null): string {
+  if (chapter.regions.length > 1) return [area, state].filter(Boolean).join(', ')
+  return area ?? ''
+}
+
+const listedAreas = chapter.regions.length > 1 ? chapter.regions : chapter.topAreas
 ---
 
 <Layout
