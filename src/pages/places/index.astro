@@ -69,7 +69,6 @@ function whereLine(chapter: Chapter): string {
         <>
           {index === 1 && mapOutings.length > 0 && (
             <li class="chapter-map">
-              <h2 class="chapter-map-title">Everywhere at once</h2>
               <PlaceMap map="elsewhere" name="every place" outings={mapOutings} />
             </li>
           )}
@@ -142,9 +141,14 @@ function whereLine(chapter: Chapter): string {
       border-bottom: 1px solid var(--color-border);
     }
 
-    .chapter-map-title {
-      margin-bottom: 0;
-      font-size: var(--font-size-2xl);
+    /* No ocean or frame here: the coastlines sit straight on the page. */
+    .chapter-map :global(.place-map) {
+      margin-top: 0;
+    }
+
+    .chapter-map :global(.place-map-canvas) {
+      background: none;
+      border: 0;
     }
 
     .chapter-row {

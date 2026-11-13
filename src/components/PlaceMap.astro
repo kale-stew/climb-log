@@ -72,8 +72,7 @@ const opensList = (pin: MapPin) => pin.count > 1 || pin.groups.length > 0
                     <div id={id} class="place-map-list" popover="auto" aria-label={label(pin)}>
                       <div class="place-map-list-head">
                         <p class="place-map-list-title">
-                          {pin.count} {pin.count === 1 ? 'outing' : 'outings'}
-                          {pin.groups.length === 0 && ' around here'}
+                          {`${pin.count} ${pin.count === 1 ? 'outing' : 'outings'}${pin.groups.length === 0 ? ' around here' : ''}`}
                         </p>
                         <button type="button" class="place-map-list-close" popovertarget={id} popovertargetaction="hide" aria-label="Close">
                           &times;
@@ -83,7 +82,11 @@ const opensList = (pin: MapPin) => pin.count > 1 || pin.groups.length > 0
                         <p class="place-map-list-places">
                           {pin.groups.map(group => (
                             <a class="text-link" href={group.href}>
-                              {group.name} <span class="measure">{group.count}</span> <span aria-hidden="true">→</span>
+                              {group.name}
+                              {' '}
+                              <span class="measure">{group.count}</span>
+                              {' '}
+                              <span aria-hidden="true">→</span>
                             </a>
                           ))}
                         </p>
@@ -182,13 +185,13 @@ const opensList = (pin: MapPin) => pin.count > 1 || pin.groups.length > 0
     list-style: none;
   }
 
-  .place-map-pins li {
+  .place-map-pins > li {
     position: absolute;
     transform: translate(-50%, -100%);
   }
 
-  .place-map-pins li:hover,
-  .place-map-pins li:focus-within {
+  .place-map-pins > li:hover,
+  .place-map-pins > li:focus-within {
     z-index: 1;
   }
 
