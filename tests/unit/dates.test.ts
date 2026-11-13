@@ -16,6 +16,11 @@ describe('calendar dates', () => {
     expect(formatCalendarDate('2026-02-15')).toBe('Feb 15, 2026')
   })
 
+  it('keeps a timestamp on its own calendar day in any time zone', () => {
+    // 19:00 Pacific is already May 6 in UTC; the outing still happened May 5.
+    expect(formatCalendarDate('2025-05-05T19:00:00.000-07:00')).toBe('May 5, 2025')
+  })
+
   it('formats old outings as a useful relative age', () => {
     expect(formatRelativeDate('2026-02-15', new Date(2026, 9, 14))).toBe('8 months ago')
   })

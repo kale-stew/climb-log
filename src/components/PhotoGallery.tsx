@@ -133,7 +133,9 @@ export default function PhotoGallery({
     deepLinkHandled.current = true
     if (!target) return
     const index = photos.findIndex(photo => photo.id === target)
-    const opener = gridRef.current?.querySelector<HTMLElement>(`[data-photo-id="${CSS.escape(target)}"]`)
+    const opener = gridRef.current?.querySelector<HTMLElement>(
+      `[data-photo-id="${CSS.escape(target)}"]`,
+    )
     if (index < 0 || !opener) return
     opener.scrollIntoView({ block: 'center' })
     setLightbox({ photos, index })
@@ -315,7 +317,12 @@ export default function PhotoGallery({
           >
             <img
               src={getImageUrl(photo, 'thumb')}
-              alt={[photo.caption || photo.title, [photo.area, photo.state].filter(Boolean).join(', ')].filter(Boolean).join(', ')}
+              alt={[
+                photo.caption || photo.title,
+                [photo.area, photo.state].filter(Boolean).join(', '),
+              ]
+                .filter(Boolean)
+                .join(', ')}
               loading="lazy"
               width={photo.width ?? 800}
               height={photo.height ?? 600}
@@ -368,7 +375,11 @@ export default function PhotoGallery({
         />
       )}
 
-      <style>{`
+      <style
+        // Raw CSS: as a text child, quotes are escaped on the server only, which breaks hydration.
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static stylesheet, no user input
+        dangerouslySetInnerHTML={{
+          __html: `
         .photo-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(var(--photo-min-width), 1fr));
@@ -515,7 +526,9 @@ export default function PhotoGallery({
           .gallery-tools { align-items: flex-start; flex-direction: column; }
           .gallery-status { width: 100%; justify-content: space-between; }
         }
-      `}</style>
+      `,
+        }}
+      />
     </>
   )
 }

@@ -1,6 +1,10 @@
-const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/
+// A bare YYYY-MM-DD, or the date part of an ISO timestamp such as
+// 2025-05-05T19:00:00.000-07:00. The leading date is the calendar day where
+// the outing happened; converting the instant would shift evening outings to
+// the next day on a UTC server and make server and browser disagree.
+const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})(?:$|T)/
 
-/** Parse a YYYY-MM-DD value as a local calendar date, not UTC midnight. */
+/** Parse a date-only value, or a timestamp's own calendar day, as a local date. */
 export function parseCalendarDate(value: string): Date {
   const match = DATE_ONLY_PATTERN.exec(value)
   if (!match) return new Date(value)
