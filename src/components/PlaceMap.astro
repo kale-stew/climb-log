@@ -202,7 +202,8 @@ function label(pin: MapPin): string {
   }
 
   .place-map-credit {
-    margin-top: 0.4rem;
+    width: min(100%, calc(72vh * var(--map-ratio)));
+    margin: 0.4rem auto 0;
     font-family: var(--font-mono);
     font-size: var(--font-size-xs);
     color: var(--ink-faint);
