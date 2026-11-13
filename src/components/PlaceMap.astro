@@ -45,7 +45,7 @@ function label(pin: MapPin): string {
             <li style={`left: ${(pin.x * 100).toFixed(2)}%; top: ${(pin.y * 100).toFixed(2)}%;`}>
               <a class="place-map-pin" href={pin.lead.href} aria-label={label(pin)} title={label(pin)}>
                 {pin.lead.cover ? (
-                  <img src={sizedImageUrl(pin.lead.cover, 160)} alt="" loading="lazy" width="80" height="80" />
+                  <img src={sizedImageUrl(pin.lead.cover, 200)} alt="" loading="lazy" width="80" height="80" />
                 ) : (
                   <span class="place-map-pin-blank"></span>
                 )}
