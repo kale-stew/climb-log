@@ -8,6 +8,7 @@ import {
   chapterSlugFor,
   normalizeState,
   outingHref,
+  outingAlt,
   outingName,
   outingType,
   yearOf,
@@ -65,7 +66,7 @@ function placeOf(area: string | null, state: string | null): string {
             <a class="latest-photo photo-plate" href={outingHref(latest)} tabindex="-1" aria-hidden="true">
               <img
                 src={latest.preview_img_url.replace(/w=\d+/, 'w=1600')}
-                alt=""
+                alt={outingAlt(latest)}
                 width="1200"
                 height="800"
                 fetchpriority="high"
@@ -129,7 +130,7 @@ function placeOf(area: string | null, state: string | null): string {
                 <span class="measure chapter-index-count">{formatNumber(chapter.count)} outings</span>
                 {chapter.cover?.preview_img_url ? (
                   <span class="chapter-index-thumb photo-plate">
-                    <img src={chapter.cover.preview_img_url.replace(/w=\d+/, 'w=400')} alt="" loading="lazy" width="400" height="300" />
+                    <img src={chapter.cover.preview_img_url.replace(/w=\d+/, 'w=400')} alt={outingAlt(chapter.cover)} loading="lazy" width="400" height="300" />
                   </span>
                 ) : (
                   <span />

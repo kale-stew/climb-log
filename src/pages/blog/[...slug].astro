@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro'
 import { getCollection, render } from 'astro:content'
 import { formatCalendarDate } from '../../lib/dates'
+import { absoluteUrl, excerptFromMarkdown, personRef, websiteRef } from '../../lib/seo'
 
 export const prerender = true
 
@@ -51,14 +52,37 @@ const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1]
 
 // Extract headers for table of contents
 const slug = post.id.replace(/\.md$/, '')
-const postDescription = `${categoryDescriptions[category]}: ${post.data.title}.`
+const postDescription =
+  excerptFromMarkdown(post.body) ?? `${categoryDescriptions[category]}: ${post.data.title}.`
+const postUrl = absoluteUrl(`/blog/${slug}`)
+const ogImageUrl = `https://kylies.photos/api/og/${slug}`
+const publishedTime = Number.isNaN(Date.parse(post.data.date)) ? undefined : post.data.date
+const postJsonLd = [
+  {
+    '@type': 'BlogPosting',
+    '@id': `${postUrl}#post`,
+    headline: post.data.title,
+    description: postDescription,
+    url: postUrl,
+    mainEntityOfPage: postUrl,
+    ...(publishedTime && { datePublished: publishedTime }),
+    image: post.data.previewImgUrl ? [ogImageUrl, absoluteUrl(post.data.previewImgUrl)] : ogImageUrl,
+    author: personRef,
+    publisher: personRef,
+    isPartOf: websiteRef,
+    inLanguage: 'en-US',
+  },
+]
 ---
 
 <Layout 
   title={post.data.title} 
   description={postDescription}
-  ogImage={`https://kylies.photos/api/og/${slug}`}
+  ogImage={ogImageUrl}
   ogImageAlt={post.data.ogImageAlt}
+  ogType="article"
+  publishedTime={publishedTime}
+  jsonLd={postJsonLd}
 >
   <article class="container blog-post">
     <header class="post-header">
@@ -70,7 +94,7 @@ const postDescription = `${categoryDescriptions[category]}: ${post.data.title}.`
 
     {post.data.previewImgUrl && (
       <figure class="hero-image">
-        <img src={post.data.previewImgUrl} alt={post.data.title} />
+        <img src={post.data.previewImgUrl} alt={post.data.ogImageAlt || post.data.title} />
       </figure>
     )}
 
