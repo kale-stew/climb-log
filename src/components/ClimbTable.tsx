@@ -1,5 +1,14 @@
-import { type SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  type MouseEvent,
+  type ReactNode,
+  type SyntheticEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { formatCalendarDate } from '../lib/dates'
+import { knownOutingType, outingName } from '../lib/places'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
 interface Climb {
@@ -18,6 +27,8 @@ interface Climb {
 interface ClimbTableProps {
   climbs: Climb[]
   pageSize?: number
+  initialPage?: number
+  basePath?: string
   climbImages?: Record<string, LightboxPhoto[]>
 }
 
@@ -26,7 +37,7 @@ type SortOrder = 'asc' | 'desc'
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100]
 
-// Previews are stored as 200px thumbnails, often as /img/{id}/?w=200. Request
+// Previews are stored as 200px thumbnails (older rows as /img/{id}/?w=200). Request
 // the width each surface needs, and drop the trailing slash so the request
 // skips a redirect.
 function sizedImageUrl(url: string, width: number): string {
@@ -68,9 +79,35 @@ function imagesFor(climb: Climb, climbImages: Record<string, LightboxPhoto[]>): 
   ]
 }
 
+/** Strava's chevron mark, sized to the text so the table and cards render the same icon. */
+function StravaMark() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        fill="#FC4C02"
+        d="M15.39 17.94 13.3 13.8h-3.07L15.39 24l5.15-10.2h-3.07M10.15 0 3.3 13.8h4.04l2.81-5.55 2.79 5.55h4.01L10.15 0z"
+      />
+    </svg>
+  )
+}
+
+/** The activity from the title's prefix. Titles without one get no tag rather than a vague "outing". */
+function OutingTag({ title }: { title: string | null }) {
+  const type = knownOutingType(title)
+  if (!type) return null
+  return (
+    <>
+      {' '}
+      <span className="outing-tag">{type}</span>
+    </>
+  )
+}
+
 export default function ClimbTable({
   climbs,
   pageSize: initialPageSize = 50,
+  initialPage = 1,
+  basePath = '/journal',
   climbImages = NO_CLIMB_IMAGES,
 }: ClimbTableProps) {
   const [sortField, setSortField] = useState<SortField>('date')
@@ -79,7 +116,7 @@ export default function ClimbTable({
   const [areaFilter, setAreaFilter] = useState<string>('')
   const [stateFilter, setStateFilter] = useState<string>('')
   const [useMetric, setUseMetric] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(initialPage)
   const [pageSize, setPageSize] = useState(initialPageSize)
   const [selectedOutingId, setSelectedOutingId] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ photos: LightboxPhoto[]; index: number } | null>(null)
@@ -165,6 +202,17 @@ export default function ClimbTable({
     setCurrentPage(Math.floor(index / pageSize) + 1)
   }, [filteredClimbs, pageSize])
 
+  // Keep ?page=N in the address bar so the current page can be shared or
+  // reloaded. replaceState avoids filling history with every page change.
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const next = currentPage > 1 ? String(currentPage) : null
+    if (url.searchParams.get('page') === next) return
+    if (next) url.searchParams.set('page', next)
+    else url.searchParams.delete('page')
+    window.history.replaceState(window.history.state, '', url)
+  }, [currentPage])
+
   useEffect(() => {
     if (!selectedOutingId || currentPage < 1) return
     const frame = window.requestAnimationFrame(() => {
@@ -175,6 +223,49 @@ export default function ClimbTable({
     })
     return () => window.cancelAnimationFrame(frame)
   }, [selectedOutingId, currentPage])
+
+  // Pagination controls are real links so they work before hydration and
+  // without JavaScript. With JavaScript, a plain click pages in place.
+  const pageHref = (page: number) => (page > 1 ? `${basePath}?page=${page}` : basePath)
+  const goToPage = (event: MouseEvent<HTMLAnchorElement>, page: number) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+      return
+    event.preventDefault()
+    setCurrentPage(page)
+  }
+  const pageLink = (
+    page: number,
+    label: ReactNode,
+    options: {
+      key?: string
+      title?: string
+      disabled?: boolean
+      active?: boolean
+      className?: string
+    } = {},
+  ) =>
+    options.disabled ? (
+      <span
+        key={options.key}
+        className={`pagination-btn is-disabled${options.className ? ` ${options.className}` : ''}`}
+        aria-disabled="true"
+        title={options.title}
+      >
+        {label}
+      </span>
+    ) : (
+      <a
+        key={options.key}
+        href={pageHref(page)}
+        onClick={event => goToPage(event, page)}
+        className={`pagination-btn${options.active ? ' active' : ''}${options.className ? ` ${options.className}` : ''}`}
+        aria-current={options.active ? 'page' : undefined}
+        aria-label={options.title ?? `Page ${page}`}
+        title={options.title}
+      >
+        {label}
+      </a>
+    )
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -279,7 +370,7 @@ export default function ClimbTable({
             setCurrentPage(1)
           }}
         >
-          <option value="">All Areas</option>
+          <option value="">All areas</option>
           {areas.map(area => (
             <option key={area} value={area}>
               {area}
@@ -294,7 +385,7 @@ export default function ClimbTable({
             setCurrentPage(1)
           }}
         >
-          <option value="">All States</option>
+          <option value="">All regions</option>
           {states.map(state => (
             <option key={state} value={state}>
               {state}
@@ -307,7 +398,7 @@ export default function ClimbTable({
           onClick={() => setUseMetric(!useMetric)}
           className={useMetric ? 'filter-btn active' : 'filter-btn'}
         >
-          {useMetric ? 'Metric' : 'Imperial'}
+          {useMetric ? 'Units: km / m' : 'Units: mi / ft'}
         </button>
       </div>
 
@@ -470,11 +561,11 @@ export default function ClimbTable({
                             type="button"
                             className="climb-thumb-button"
                             onClick={event => openLightbox(climb, event.currentTarget)}
-                            aria-label={`View photos from ${climb.title || 'this outing'}`}
+                            aria-label={`View photos from ${outingName(climb.title)}`}
                           >
                             <img
                               src={sizedImageUrl(climb.preview_img_url, 200)}
-                              alt=""
+                              alt={outingName(climb.title)}
                               className="climb-thumb"
                               loading="lazy"
                               onError={handleThumbnailError}
@@ -485,13 +576,14 @@ export default function ClimbTable({
                         <div className="climb-thumb-placeholder" />
                       )}
                     </td>
-                    <td>{formatDate(climb.date)}</td>
+                    <td className="cell-fixed">{formatDate(climb.date)}</td>
                     <td>
                       {climb.slug ? (
-                        <a href={`/blog/hike/${climb.slug}/`}>{climb.title || 'Untitled'}</a>
+                        <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
                       ) : (
-                        climb.title || 'Untitled'
+                        outingName(climb.title)
                       )}
+                      <OutingTag title={climb.title} />
                     </td>
                     <td>
                       {climb.area}
@@ -499,8 +591,8 @@ export default function ClimbTable({
                         <span style={{ color: 'var(--color-text-tertiary)' }}>, {climb.state}</span>
                       )}
                     </td>
-                    <td style={{ textAlign: 'right' }}>{formatDistance(climb.distance)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatGain(climb.gain)}</td>
+                    <td className="cell-fixed cell-number">{formatDistance(climb.distance)}</td>
+                    <td className="cell-fixed cell-number">{formatGain(climb.gain)}</td>
                     <td style={{ textAlign: 'center' }}>
                       {climb.strava && (
                         <a
@@ -508,8 +600,10 @@ export default function ClimbTable({
                           target="_blank"
                           rel="noopener noreferrer"
                           title="View on Strava"
+                          aria-label={`View ${outingName(climb.title)} on Strava`}
+                          className="strava-link"
                         >
-                          🏃🏼‍♀️
+                          <StravaMark />
                         </a>
                       )}
                     </td>
@@ -535,8 +629,10 @@ export default function ClimbTable({
                       target="_blank"
                       rel="noopener noreferrer"
                       title="View on Strava"
+                      aria-label={`View ${outingName(climb.title)} on Strava`}
+                      className="strava-link"
                     >
-                      🏃🏼
+                      <StravaMark />
                     </a>
                   )}
                 </div>
@@ -545,11 +641,11 @@ export default function ClimbTable({
                     type="button"
                     className="climb-mobile-photo"
                     onClick={event => openLightbox(climb, event.currentTarget)}
-                    aria-label={`View photos from ${climb.title || 'this outing'}`}
+                    aria-label={`View photos from ${outingName(climb.title)}`}
                   >
                     <img
                       src={sizedImageUrl(climb.preview_img_url, 800)}
-                      alt=""
+                      alt={outingName(climb.title)}
                       loading="lazy"
                       onError={handleMobilePhotoError}
                     />
@@ -557,10 +653,11 @@ export default function ClimbTable({
                 )}
                 <h3 className="climb-mobile-title">
                   {climb.slug ? (
-                    <a href={`/blog/hike/${climb.slug}/`}>{climb.title || 'Untitled'}</a>
+                    <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
                   ) : (
-                    climb.title || 'Untitled'
+                    outingName(climb.title)
                   )}
+                  <OutingTag title={climb.title} />
                 </h3>
                 <div className="climb-mobile-meta">
                   {climb.area && (
@@ -582,8 +679,9 @@ export default function ClimbTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div
+        <nav
           className="pagination"
+          aria-label="Journal pages"
           style={{
             display: 'flex',
             justifyContent: 'center',
@@ -593,24 +691,11 @@ export default function ClimbTable({
             flexWrap: 'wrap',
           }}
         >
-          <button
-            type="button"
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-            className="pagination-btn"
-            title="First page"
-          >
-            ««
-          </button>
-          <button
-            type="button"
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="pagination-btn"
-            title="Previous page"
-          >
-            «
-          </button>
+          {pageLink(1, '««', {
+            title: 'First page',
+            disabled: currentPage === 1,
+          })}
+          {pageLink(currentPage - 1, '«', { title: 'Previous page', disabled: currentPage === 1 })}
 
           {/* Page numbers */}
           {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -634,40 +719,34 @@ export default function ClimbTable({
             }, [])
             .map(item =>
               item.page === null ? (
-                <span key={item.key} style={{ color: 'var(--color-text-tertiary)' }}>
+                <span
+                  key={item.key}
+                  className="pagination-number"
+                  style={{ color: 'var(--color-text-tertiary)' }}
+                >
                   ...
                 </span>
               ) : (
-                <button
-                  type="button"
-                  key={item.key}
-                  onClick={() => item.page !== null && setCurrentPage(item.page)}
-                  className={`pagination-btn ${currentPage === item.page ? 'active' : ''}`}
-                >
-                  {item.page}
-                </button>
+                pageLink(item.page, item.page, {
+                  key: item.key,
+                  active: currentPage === item.page,
+                  className: 'pagination-number',
+                })
               ),
             )}
+          <span className="pagination-status">
+            Page {currentPage} of {totalPages}
+          </span>
 
-          <button
-            type="button"
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="pagination-btn"
-            title="Next page"
-          >
-            »
-          </button>
-          <button
-            type="button"
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-            className="pagination-btn"
-            title="Last page"
-          >
-            »»
-          </button>
-        </div>
+          {pageLink(currentPage + 1, '»', {
+            title: 'Next page',
+            disabled: currentPage === totalPages,
+          })}
+          {pageLink(totalPages, '»»', {
+            title: 'Last page',
+            disabled: currentPage === totalPages,
+          })}
+        </nav>
       )}
 
       {lightbox && (
@@ -680,7 +759,11 @@ export default function ClimbTable({
         />
       )}
 
-      <style>{`
+      <style
+        // Raw CSS: as a text child, quotes are escaped on the server only, which breaks hydration.
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static stylesheet, no user input
+        dangerouslySetInnerHTML={{
+          __html: `
         .empty-state {
           text-align: center;
           padding: var(--space-2xl) var(--space-lg);
@@ -753,6 +836,16 @@ export default function ClimbTable({
           font-size: var(--font-size-sm);
           color: var(--color-text-tertiary);
         }
+        .outing-tag {
+          font-size: var(--font-size-sm);
+          font-weight: 400;
+          color: var(--color-text-tertiary);
+          text-transform: lowercase;
+          white-space: nowrap;
+        }
+        .strava-link { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; }
+        .cell-fixed { white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .cell-number { text-align: right; }
         .climb-mobile-title {
           font-size: var(--font-size-lg);
           font-weight: 600;
@@ -765,7 +858,7 @@ export default function ClimbTable({
         @media (hover: hover) and (pointer: fine) {
           .climb-mobile-title a:hover { color: var(--color-text-accent); }
           .climb-thumb-link:hover .climb-thumb { transform: scale(1.05); }
-          .pagination-btn:hover:not(:disabled) {
+          .pagination-btn:hover:not(.is-disabled):not(.active) {
             border-color: var(--color-border-hover);
             background: var(--color-bg-secondary);
           }
@@ -819,9 +912,13 @@ export default function ClimbTable({
           border-radius: var(--border-radius);
           cursor: pointer;
           font-size: 0.875rem;
-          transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+          line-height: 1.2;
+          text-decoration: none;
+          display: inline-block;
+          transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.12s ease-out;
         }
-        .pagination-btn:disabled {
+        a.pagination-btn:active { transform: scale(0.97); }
+        .pagination-btn.is-disabled {
           opacity: 0.4;
           cursor: not-allowed;
         }
@@ -839,7 +936,32 @@ export default function ClimbTable({
             display: block;
           }
         }
-      `}</style>
+        /* Fingers need bigger targets than the compact desktop controls. */
+        @media (pointer: coarse) {
+          .pagination-btn {
+            min-width: 44px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .strava-link { min-width: 44px; min-height: 44px; margin: -10px; }
+        }
+        /* Every page number can't fit one row at touch size, so phones get "Page N of M" between the arrows. */
+        .pagination-status { display: none; }
+        @media (max-width: 480px) {
+          .pagination-number { display: none; }
+          .pagination-status {
+            display: inline;
+            padding: 0 var(--space-sm);
+            font-size: 0.875rem;
+            font-variant-numeric: tabular-nums;
+            color: var(--color-text-secondary);
+          }
+        }
+      `,
+        }}
+      />
     </div>
   )
 }

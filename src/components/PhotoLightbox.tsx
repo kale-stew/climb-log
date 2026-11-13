@@ -203,15 +203,13 @@ export default function PhotoLightbox({
         <div className="lightbox-info">
           {photo.caption && <h3>{photo.caption}</h3>}
           <div className="lightbox-meta">
-            {metaParts(photo).map(([kind, value], partIndex) => (
+            {/* The icons mark each part, so wrapped lines never start with a stray separator. */}
+            {metaParts(photo).map(([kind, value]) => (
               <span key={kind} className="meta-part">
-                {partIndex > 0 && <span className="meta-sep">·</span>}
-                <span>
-                  <span className="meta-icon" aria-hidden="true">
-                    {META_ICONS[kind]}
-                  </span>{' '}
-                  {value}
-                </span>
+                <span className="meta-icon" aria-hidden="true">
+                  {META_ICONS[kind]}
+                </span>{' '}
+                {value}
               </span>
             ))}
           </div>
@@ -340,7 +338,7 @@ const LIGHTBOX_CSS = `
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem 0.75rem;
+    gap: 0.25rem 1.25rem;
     margin-top: 0.5rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.8rem;
@@ -348,18 +346,10 @@ const LIGHTBOX_CSS = `
   }
 
   .lightbox-meta .meta-part {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .lightbox-meta .meta-icon { opacity: 0.6; }
-
-  .lightbox-meta .meta-sep {
-    font-weight: 300;
-    color: rgba(255, 255, 255, 0.4);
-  }
 
   .lightbox-counter {
     margin-top: 0.75rem;

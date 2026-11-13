@@ -25,8 +25,62 @@ describe('server-rendered collection pages', () => {
       }),
     )
 
-    expect(html).toContain('Hike Horseplay Canyon')
+    expect(html).toContain('Horseplay Canyon')
+    expect(html).toContain('<span class="outing-tag">hike</span>')
+    expect(html).not.toContain('Hike Horseplay Canyon')
     expect(html).toContain('Garfield County')
+  })
+
+  it('renders the requested page with real page links', () => {
+    const climbs = Array.from({ length: 120 }, (_, index) => ({
+      id: `outing-${index}`,
+      date: '2026-02-15',
+      title: `Hike Outing ${index}`,
+      slug: null,
+      preview_img_url: null,
+      distance: 1,
+      gain: 100,
+      area: 'Garfield County',
+      state: 'Utah',
+      strava: null,
+    }))
+    const html = renderToStaticMarkup(
+      createElement(ClimbTable, { climbs, pageSize: 50, initialPage: 2 }),
+    )
+
+    expect(html).toContain('Showing 51-')
+    expect(html).toContain('href="/journal?page=3"')
+    expect(html).toContain('href="/journal"')
+    expect(html).toContain('aria-current="page"')
+    expect(html).not.toContain('<button type="button" class="pagination-btn')
+    expect(html).toMatch(
+      /<span class="pagination-status">Page (<!-- -->)?2(<!-- -->)? of (<!-- -->)?3<\/span>/,
+    )
+  })
+
+  it('tags only outings whose title names the activity', () => {
+    const climb = {
+      date: '2026-02-15',
+      slug: null,
+      preview_img_url: null,
+      distance: 1,
+      gain: 100,
+      area: 'Pacifica',
+      state: 'California',
+      strava: null,
+    }
+    const html = renderToStaticMarkup(
+      createElement(ClimbTable, {
+        climbs: [
+          { ...climb, id: 'a', title: 'Rainy Mori Point Hike' },
+          { ...climb, id: 'b', title: 'Run the Baquiano Trail' },
+        ],
+      }),
+    )
+
+    expect(html).not.toContain('<span class="outing-tag">outing</span>')
+    expect(html).toContain('The Baquiano Trail')
+    expect(html).toContain('<span class="outing-tag">run</span>')
   })
 
   it('renders the server-provided page and offers more from the collection', () => {
