@@ -236,6 +236,11 @@ const opensList = (pin: MapPin) => pin.count > 1 || pin.groups.length > 0
     border-radius: 7px;
   }
 
+  /* An outing without a photo still reads as a place, not a broken image. */
+  .place-map-pin-blank {
+    background: radial-gradient(circle, var(--contour) 0 4px, transparent 5px), var(--paper-deep);
+  }
+
   .place-map-count {
     position: absolute;
     bottom: 3px;
