@@ -12,6 +12,19 @@ export interface CanonicalPhoto {
   accent_color: string | null
   tags: string | null
   r2_key: string | null
+  visibility?: 'public' | 'unlisted' | 'private'
+  site?: string | null
+  sha256?: string | null
+}
+
+/** Public photos shown on kylies.photos; only these get photo pages. */
+export function showsOnKyliesPhotos(photo: Pick<CanonicalPhoto, 'visibility' | 'site'>): boolean {
+  return photo.visibility === 'public' && (photo.site === 'climb-log' || photo.site === 'both')
+}
+
+/** Short content version for cache-busting image URLs; images can be replaced in place. */
+export function imageVersion(photo: Pick<CanonicalPhoto, 'sha256'>): string | null {
+  return photo.sha256 ? photo.sha256.slice(0, 12) : null
 }
 
 export interface DisplayPhoto extends CanonicalPhoto {
@@ -195,6 +208,22 @@ export async function getCollectionPage(
   const body = (await response.json()) as PhotosResponse & { meta: { total?: number } }
   const photos = body.photos.map(adaptCanonicalPhoto)
   return { photos, total: body.meta.total ?? photos.length }
+}
+
+/** Every photo in a collection. Throws on any failed page so callers never mistake an outage for an empty list. */
+export async function getAllCollectionPhotos(
+  origin: string,
+  slug: string,
+  options: PhotoOptions & { maxPhotos?: number } = {},
+): Promise<DisplayPhoto[]> {
+  const maxPhotos = options.maxPhotos ?? 5000
+  const photos: DisplayPhoto[] = []
+  while (photos.length < maxPhotos) {
+    const page = await getCollectionPage(origin, slug, { limit: PAGE_SIZE, offset: photos.length, fetchFn: options.fetchFn })
+    photos.push(...page.photos)
+    if (page.photos.length < PAGE_SIZE || photos.length >= page.total) break
+  }
+  return photos
 }
 
 export async function getCanonicalPhoto(

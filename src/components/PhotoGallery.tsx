@@ -142,9 +142,78 @@ export default function PhotoGallery({
     setLightboxOpener(opener)
   }, [photos])
 
+  // While the lightbox is open the address bar shows the photo's page, /photos/{slug},
+  // so it can be copied or shared. Opening pushes one history entry; Back closes it.
+  const [slugs, setSlugs] = useState<Record<string, string>>({})
+  const slugsRef = useRef(slugs)
+  slugsRef.current = slugs
+  const lightboxHistory = useRef(false)
+
+  const loadSlugs = useCallback(async (ids: string[], signal?: AbortSignal) => {
+    const missing = ids.filter(id => !(id in slugsRef.current)).slice(0, 60)
+    if (missing.length === 0) return
+    try {
+      const response = await fetch(`/api/photo-slugs?ids=${missing.map(encodeURIComponent).join(',')}`, { signal })
+      if (!response.ok) return
+      const body = (await response.json()) as { slugs?: Record<string, string> }
+      // Remember misses as '' so photos without a page are not requested again.
+      const found = Object.fromEntries(missing.map(id => [id, body.slugs?.[id] ?? '']))
+      setSlugs(current => ({ ...current, ...found }))
+    } catch (_error) {
+      // Without a slug the address bar simply stays on the gallery.
+    }
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    loadSlugs(
+      photos.map(photo => photo.id),
+      controller.signal,
+    )
+    return () => controller.abort()
+  }, [photos, loadSlugs])
+
+  const lightboxPhotoId = lightbox ? (lightbox.photos[lightbox.index]?.id ?? null) : null
+  const lightboxSlug = lightboxPhotoId ? slugs[lightboxPhotoId] : undefined
+  useEffect(() => {
+    if (!lightboxPhotoId) return
+    const slug = lightboxSlug
+    if (!slug) {
+      loadSlugs([lightboxPhotoId])
+      return
+    }
+    const path = `/photos/${slug}`
+    if (!lightboxHistory.current) {
+      lightboxHistory.current = true
+      window.history.pushState({ photoLightbox: true }, '', path)
+    } else if (window.location.pathname !== path) {
+      window.history.replaceState({ photoLightbox: true }, '', path)
+    }
+  }, [lightboxPhotoId, lightboxSlug, loadSlugs])
+
+  useEffect(() => {
+    const onPopState = (event: PopStateEvent) => {
+      const state = event.state as { photoLightbox?: boolean } | null
+      if (lightboxHistory.current && !state?.photoLightbox) {
+        lightboxHistory.current = false
+        setLightbox(null)
+        setLightboxOpener(null)
+      } else if (!lightboxHistory.current && state?.photoLightbox) {
+        // Forward onto a photo entry after closing: show that photo's page.
+        window.location.reload()
+      }
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
   const closeLightbox = useCallback(() => {
     setLightbox(null)
     setLightboxOpener(null)
+    if (lightboxHistory.current) {
+      lightboxHistory.current = false
+      if ((window.history.state as { photoLightbox?: boolean } | null)?.photoLightbox) window.history.back()
+    }
   }, [])
 
   const lightboxSourcePhotos = lightbox?.photos

@@ -1,6 +1,9 @@
 import type { APIRoute } from 'astro'
 import { getCollection } from 'astro:content'
 import { env } from 'cloudflare:workers'
+import { photoPath } from '../lib/photo-pages'
+import { currentSlugs } from '../lib/photo-slugs'
+import { getAllCollectionPhotos } from '../lib/photos-client'
 import { chapterSlugFor } from '../lib/places'
 import { SITE_URL } from '../lib/seo'
 
@@ -43,8 +46,24 @@ async function chapterDates(): Promise<Map<string, string | null>> {
   return latest
 }
 
+/** Photo pages for gallery photos that already have a slug; the nightly sync issues the rest. */
+async function photoEntries(): Promise<SitemapEntry[]> {
+  if (!env.DB || !env.PHOTOS_API_ORIGIN) return []
+  try {
+    const photos = await getAllCollectionPhotos(env.PHOTOS_API_ORIGIN, 'portfolio')
+    const slugs = await currentSlugs(env.DB, photos.map(photo => photo.id))
+    return photos.flatMap(photo => {
+      const slug = slugs.get(photo.id)
+      return slug ? [{ path: photoPath(slug) }] : []
+    })
+  } catch (error) {
+    console.error('sitemap: could not load photo pages', error)
+    return []
+  }
+}
+
 export const GET: APIRoute = async () => {
-  const [posts, chapters] = await Promise.all([getCollection('blog'), chapterDates()])
+  const [posts, chapters, photos] = await Promise.all([getCollection('blog'), chapterDates(), photoEntries()])
   const newestOuting = [...chapters.values()].filter(Boolean).sort().at(-1) ?? null
 
   const entries: SitemapEntry[] = [
@@ -57,6 +76,7 @@ export const GET: APIRoute = async () => {
       path: `/blog/${post.id.replace(/\.md$/, '')}`,
       lastmod: isoDate(post.data.date),
     })),
+    ...photos,
   ]
 
   const body = [
