@@ -8,6 +8,8 @@ import {
   type TableSpec,
   tableSpecs,
 } from '../../lib/notion-sync'
+import { syncPhotoSlugs } from '../../lib/photo-slugs'
+import { getAllCollectionPhotos } from '../../lib/photos-client'
 import type { SyncResult } from '../../lib/types'
 
 export const prerender = false
@@ -154,6 +156,8 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
       }
     }
 
+    results.push(await syncSlugs(DB, runtimeEnv.PHOTOS_API_ORIGIN))
+
     const duration = Date.now() - startTime
     const recordsSynced = results.reduce((sum, r) => sum + r.inserted + r.updated + r.deleted, 0)
     const totalErrors = results.reduce((sum, r) => sum + r.errors.length, 0)
@@ -225,6 +229,32 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
       },
     )
   }
+}
+
+/**
+ * Keep /photos/{slug} URLs current for every gallery photo. Reads photos-api;
+ * writes only climb-log's own photo_slugs table.
+ */
+export async function syncSlugs(
+  DB: D1Database,
+  apiOrigin: string | undefined,
+  fetchFn?: typeof fetch,
+): Promise<SyncResult> {
+  const result: SyncResult = { table: 'photo_slugs', inserted: 0, updated: 0, deleted: 0, errors: [] }
+  if (!apiOrigin) {
+    result.errors.push('PHOTOS_API_ORIGIN is not configured')
+    return result
+  }
+  try {
+    const photos = await getAllCollectionPhotos(apiOrigin, 'portfolio', { fetchFn })
+    const synced = await syncPhotoSlugs(DB, photos)
+    logSync('info', 'Synced photo slugs', { checked: synced.checked, issued: synced.issued })
+    result.inserted = synced.issued
+    result.errors.push(...synced.errors.slice(0, 20))
+  } catch (error) {
+    result.errors.push(`Failed to sync photo slugs: ${formatError(error)}`)
+  }
+  return result
 }
 
 /**

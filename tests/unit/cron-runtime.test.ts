@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { climbPage, fakeDb } from '../fixtures/notion-sync'
+import { sqliteD1 } from '../helpers/sqlite-d1'
 
 const notion = vi.hoisted(() => ({
   options: undefined as Record<string, unknown> | undefined,
@@ -26,7 +27,7 @@ vi.mock('@notionhq/client', () => ({
 const handle = vi.hoisted(() => vi.fn(async (_request: Request) => new Response('{}')))
 vi.mock('@astrojs/cloudflare/handler', () => ({ handle }))
 
-const { runSync } = await import('../../src/pages/api/cron')
+const { runSync, syncSlugs } = await import('../../src/pages/api/cron')
 const worker = (await import('../../src/worker')).default
 
 function env(db: D1Database, overrides: Record<string, unknown> = {}) {
@@ -84,8 +85,38 @@ describe('runSync', () => {
     const response = await runSync(env(db))
     const body = (await response.json()) as { results: Array<{ table: string; errors: string[] }> }
 
-    expect(body.results.map(r => r.table)).toEqual(['climbs', 'peaks', 'gear'])
+    expect(body.results.map(r => r.table)).toEqual(['climbs', 'peaks', 'gear', 'photo_slugs'])
     expect(body.results[0].errors[0]).toMatch(/Failed to write climbs: D1 down/)
+  })
+})
+
+describe('syncSlugs', () => {
+  const portfolio = (photos: Array<{ id: string; title: string; date: string }>) =>
+    (async () =>
+      Response.json({ photos, meta: { count: photos.length, total: photos.length } })) as unknown as typeof fetch
+
+  it('issues slugs for every portfolio photo', async () => {
+    const db = sqliteD1(['migrations/0008_photo_slugs.sql'])
+    const result = await syncSlugs(
+      db,
+      'https://photos.example',
+      portfolio([
+        { id: 'a', title: 'Tunnel View', date: '2019-01-01' },
+        { id: 'b', title: 'Tunnel View', date: '2021-01-01' },
+      ]),
+    )
+    expect(result).toEqual({ table: 'photo_slugs', inserted: 2, updated: 0, deleted: 0, errors: [] })
+    expect(db.sqlite.prepare('SELECT slug FROM photo_slugs ORDER BY slug').all()).toEqual([
+      { slug: 'tunnel-view' },
+      { slug: 'tunnel-view-2021' },
+    ])
+  })
+
+  it('reports a photos-api outage instead of syncing an empty list', async () => {
+    const db = sqliteD1(['migrations/0008_photo_slugs.sql'])
+    const down = (async () => new Response('down', { status: 503 })) as unknown as typeof fetch
+    const result = await syncSlugs(db, 'https://photos.example', down)
+    expect(result.errors[0]).toMatch(/Failed to sync photo slugs: photos-api returned 503/)
   })
 })
 

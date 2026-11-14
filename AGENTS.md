@@ -29,6 +29,14 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 - Canonical rows can come from Notion, desktop imports, or blog assets. Never assume `notion_id` is present or that the legacy Notion Photo Directory is the source of an imported row.
 - Use the date-ordered compatibility list for recent-photo surfaces and the `portfolio` collection endpoint for curated galleries. Collection order is not capture-date order.
 
+## Photo Pages And Slugs
+
+- `/photos/{slug}` pages and `/photos/{slug}.{jpg,webp}` images use title-only slugs stored in climb-log's `photo_slugs` table (`src/lib/photo-slugs.ts`). This table owns only the URL space; photo metadata stays in photos-api.
+- A slug, once issued, always points at the same photo. Never delete rows or reassign a slug: when a title changes the photo gets a new current slug and old slugs 301 to it.
+- Only photos public on kylies.photos (`visibility = 'public'`, `site` of `climb-log` or `both`) get pages. Canonical IDs and legacy aliases at `/photos/{id}` 301 to the slug.
+- The nightly cron issues slugs for the whole `portfolio` collection, oldest photo first, so the earliest photo with a shared title keeps the plain slug. Pages and `/api/photo-slugs` also issue a slug on demand for photos the sync has not reached.
+- Production deploys do not apply migrations. Apply a new migration to `climb-log-db` before merging code that needs it.
+
 ## Generated And Synced Data
 
 - Do not hand-edit generated seed output. Change its source or generator and regenerate it.
