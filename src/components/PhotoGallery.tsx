@@ -160,6 +160,8 @@ export default function PhotoGallery({
         state: photo.state,
         date: photo.date,
         camera: photo.camera,
+        width: photo.width,
+        height: photo.height,
       })),
     [lightboxSourcePhotos],
   )
