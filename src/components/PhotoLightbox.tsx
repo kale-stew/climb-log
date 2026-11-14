@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { formatCalendarDate } from '../lib/dates'
 
 export interface LightboxPhoto {
@@ -11,6 +11,64 @@ export interface LightboxPhoto {
   state?: string | null
   date?: string | null
   camera?: string | null
+  width?: number | null
+  height?: number | null
+}
+
+// Used to size the frame when a photo has no stored dimensions.
+const FALLBACK_RATIO = 3 / 2
+
+function knownRatio(photo: LightboxPhoto) {
+  return photo.width && photo.height ? photo.width / photo.height : null
+}
+
+type LoadState = 'loading' | 'loaded' | 'error'
+
+// The frame is sized from the photo's aspect ratio before the image arrives,
+// so a slow or failed load holds the final footprint instead of collapsing
+// around the alt text and then jumping to full size.
+function LightboxFrame({ photo }: { photo: LightboxPhoto }) {
+  const [state, setState] = useState<LoadState>('loading')
+  const [naturalRatio, setNaturalRatio] = useState<number | null>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
+  const ratio = naturalRatio ?? knownRatio(photo) ?? FALLBACK_RATIO
+
+  // A cached image can finish before React attaches onLoad.
+  useEffect(() => {
+    const image = imageRef.current
+    if (image?.complete && image.naturalWidth) {
+      setNaturalRatio(image.naturalWidth / image.naturalHeight)
+      setState('loaded')
+    }
+  }, [])
+
+  return (
+    <div
+      className="lightbox-frame"
+      data-state={state}
+      style={{ '--lightbox-ratio': ratio } as CSSProperties}
+    >
+      {state === 'error' ? (
+        <p className="lightbox-unavailable" role="img" aria-label={photo.alt}>
+          Photo unavailable
+        </p>
+      ) : (
+        <img
+          ref={imageRef}
+          className="lightbox-image"
+          src={photo.src}
+          alt={photo.alt}
+          onLoad={event => {
+            const image = event.currentTarget
+            if (image.naturalWidth) setNaturalRatio(image.naturalWidth / image.naturalHeight)
+            setState('loaded')
+          }}
+          onError={() => setState('error')}
+        />
+      )}
+      {photo.title && <p className="lightbox-title">{photo.title}</p>}
+    </div>
+  )
 }
 
 const META_ICONS = { area: '📍', state: '🗺️', date: '📅', camera: '📷' } as const
@@ -200,10 +258,7 @@ export default function PhotoLightbox({
       )}
 
       <div className="lightbox-content">
-        <div key={photo.id} className="lightbox-frame">
-          <img className="lightbox-image" src={photo.src} alt={photo.alt} />
-          {photo.title && <p className="lightbox-title">{photo.title}</p>}
-        </div>
+        <LightboxFrame key={photo.id} photo={photo} />
         <div className="lightbox-info">
           {photo.caption && photo.caption !== photo.title && <h3>{photo.caption}</h3>}
           <div className="lightbox-meta">
@@ -304,15 +359,48 @@ const LIGHTBOX_CSS = `
   }
 
   .lightbox-frame {
+    --lightbox-max-width: 90vw;
+    --lightbox-max-height: 75vh;
     position: relative;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(var(--lightbox-max-width), var(--lightbox-max-height) * var(--lightbox-ratio));
+    aspect-ratio: var(--lightbox-ratio);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
     animation: lightbox-reveal 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
   }
 
-  .lightbox-content img {
-    max-width: 90vw;
-    max-height: 75vh;
+  .lightbox-frame[data-state='loading'] {
+    animation:
+      lightbox-reveal 320ms cubic-bezier(0.23, 1, 0.32, 1) both,
+      lightbox-pending 1.6s ease-in-out 400ms infinite;
+  }
+
+  .lightbox-frame[data-state='loaded'] { background: none; }
+
+  .lightbox-frame .lightbox-image {
+    display: block;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+
+  .lightbox-frame[data-state='loaded'] .lightbox-image { opacity: 1; }
+
+  .lightbox-unavailable {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  @keyframes lightbox-pending {
+    50% { background-color: rgba(255, 255, 255, 0.08); }
   }
 
   /* Sits on the photo itself, so a scrim keeps it legible over bright skies and snow. */
@@ -342,7 +430,9 @@ const LIGHTBOX_CSS = `
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .lightbox-frame { animation: none; }
+    .lightbox-frame,
+    .lightbox-frame[data-state='loading'] { animation: none; }
+    .lightbox-frame .lightbox-image { transition: none; }
   }
 
   .lightbox-info {
@@ -391,7 +481,7 @@ const LIGHTBOX_CSS = `
     .lightbox .lightbox-prev { left: calc(env(safe-area-inset-left) + 0.5rem); }
     .lightbox .lightbox-next { right: calc(env(safe-area-inset-right) + 0.5rem); }
     .lightbox-content { max-width: calc(100vw - 5rem); }
-    .lightbox-content img { max-width: calc(100vw - 5rem); }
+    .lightbox-frame { --lightbox-max-width: calc(100vw - 5rem); }
     .lightbox-title { padding: 2.25rem 0.75rem 0.65rem; }
   }
 `

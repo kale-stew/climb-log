@@ -11,7 +11,7 @@ export const prerender = false
 const DB = env.DB
 
 let climbs: ClimbListItem[] = []
-let climbImages: Record<string, Array<{ id: string; src: string; alt: string; title: string | null; caption: string | null; area: string | null; state: string | null; date: string | null; camera: string | null }>> = {}
+let climbImages: Record<string, Array<{ id: string; src: string; alt: string; title: string | null; caption: string | null; area: string | null; state: string | null; date: string | null; camera: string | null; width: number | null; height: number | null }>> = {}
 
 if (DB) {
   try {
@@ -45,6 +45,8 @@ if (DB) {
           state: photo.state,
           date: photo.date,
           camera: null,
+          width: photo.width,
+          height: photo.height,
         }))
     }
   } catch (e) {
