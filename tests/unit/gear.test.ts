@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   buildGearItems,
   categoriesOf,
-  formatTotal,
   formatWeight,
   GEAR_CLIMB_LINKS_SQL,
   GEAR_ROWS_SQL,
@@ -85,16 +84,13 @@ describe('gearImage', () => {
 })
 
 describe('weights', () => {
-  it('shows grams and ounces', () => {
+  it('uses one format for items and totals', () => {
     expect(formatWeight(113)).toBe('113 g · 4 oz')
-    expect(formatWeight(1276)).toBe('1,276 g · 45 oz')
+    expect(formatWeight(581)).toBe('581 g · 20 oz')
+    expect(formatWeight(1276)).toBe('1.28 kg · 2.8 lb')
+    expect(formatWeight(7950)).toBe('7.95 kg · 17.5 lb')
     expect(formatWeight(null)).toBeNull()
     expect(formatWeight(0)).toBeNull()
-  })
-
-  it('switches totals to kilograms and pounds', () => {
-    expect(formatTotal(7950)).toBe('7.95 kg · 17.5 lb')
-    expect(formatTotal(581)).toBe('581 g · 20.5 oz')
   })
 })
 
@@ -175,6 +171,7 @@ describe('filters', () => {
     expect(view.count).toBe(2)
     expect(view.totalGrams).toBe(765)
     expect(view.unweighed).toBe(1)
+    expect(view.groups.map(group => group.unweighed)).toEqual([0, 1])
     expect(view.groups.map(group => group.category.slug)).toEqual(['winter-gear', 'layers'])
   })
 })

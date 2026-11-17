@@ -5,7 +5,6 @@ import Layout from '../layouts/Layout.astro'
 import {
   buildGearItems,
   categoriesOf,
-  formatTotal,
   formatWeight,
   GEAR_CLIMB_LINKS_SQL,
   GEAR_ROWS_SQL,
@@ -44,6 +43,14 @@ const view = filters.list ? packListView(items, filters.list) : null
 const currentGroups = groupByCategory(items.filter(item => item.status === 'current'))
 const retired = items.filter(item => item.status === 'retired')
 const isVisible = (item: GearItem) => matchesFilters(item, filters)
+const statusesByCategory = new Map<string, string[]>()
+for (const item of items) {
+  const statuses = statusesByCategory.get(item.category.slug) ?? []
+  if (!statuses.includes(item.status)) statuses.push(item.status)
+  statusesByCategory.set(item.category.slug, statuses)
+}
+const chipVisible = (slug: string) =>
+  filters.status === 'all' || (statusesByCategory.get(slug) ?? []).includes(filters.status)
 const anyVisible = items.some(isVisible)
 const activeCategory = categories.find(c => c.slug === filters.category)
 
@@ -93,7 +100,10 @@ const statusOptions = [
                 <span>All</span>
               </label>
               {categories.map(category => (
-                <label>
+                <label
+                  data-statuses={statusesByCategory.get(category.slug)?.join(' ')}
+                  hidden={!chipVisible(category.slug)}
+                >
                   <input
                     type="radio"
                     name="cat"
@@ -127,7 +137,6 @@ const statusOptions = [
 
     {view ? (
       <section class="pack-view" aria-labelledby="pack-title">
-        <p class="pack-back"><a href="/gear">← All gear</a></p>
         <h2 id="pack-title" class="pack-title">{view.list.label}</h2>
         <p class="pack-count">
           {view.count === 1 ? '1 item' : `${view.count} items`} on this pack list.
@@ -137,7 +146,12 @@ const statusOptions = [
           <section class="pack-group">
             <h3>
               <span>{group.category.label}</span>
-              {group.grams > 0 && <span class="pack-subtotal">{formatTotal(group.grams)}</span>}
+              {group.grams > 0 && (
+                <span class="pack-subtotal">
+                  {formatWeight(group.grams)}
+                  {group.unweighed > 0 && ` · ${group.unweighed} unweighed`}
+                </span>
+              )}
             </h3>
             <ul class="pack-rows">
               {group.items.map(item => (
@@ -162,7 +176,7 @@ const statusOptions = [
 
         <p class="pack-total">
           <span>Total</span>
-          <strong>{view.totalGrams > 0 ? formatTotal(view.totalGrams) : '—'}</strong>
+          <strong>{view.totalGrams > 0 ? formatWeight(view.totalGrams) : '—'}</strong>
           {view.unweighed > 0 && (
             <span class="pack-unweighed">
               {view.unweighed === 1 ? '1 item unweighed' : `${view.unweighed} items unweighed`}
@@ -220,8 +234,19 @@ const statusOptions = [
     const value = (name: string) =>
       form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? ''
 
+    const chips = [...form.querySelectorAll<HTMLElement>('label[data-statuses]')]
+    const header = document.querySelector<HTMLElement>('.header')
+
     const apply = () => {
       const status = value('status') || 'current'
+      for (const chip of chips) {
+        chip.hidden = status !== 'all' && !(chip.dataset.statuses ?? '').split(' ').includes(status)
+        const input = chip.querySelector('input')
+        if (chip.hidden && input?.checked) {
+          form.querySelector<HTMLInputElement>('input[name="cat"][value=""]')?.click()
+          return
+        }
+      }
       const cat = value('cat')
       let visible = 0
       for (const card of cards) {
@@ -244,6 +269,16 @@ const statusOptions = [
       status === 'current' ? url.searchParams.delete('status') : url.searchParams.set('status', status)
       cat ? url.searchParams.set('cat', cat) : url.searchParams.delete('cat')
       history.replaceState(null, '', url)
+
+      // When the bar is stuck, bring the results back under it.
+      const headerHeight = header?.offsetHeight ?? 0
+      if (form.getBoundingClientRect().top <= headerHeight + 1) {
+        const first = document.querySelector<HTMLElement>('[data-gear-section]:not([hidden]), [data-gear-empty]:not([hidden])')
+        if (first) {
+          const top = first.getBoundingClientRect().top + window.scrollY - headerHeight - form.offsetHeight - 16
+          if (top < window.scrollY) window.scrollTo({ top })
+        }
+      }
     }
 
     form.addEventListener('change', event => {
@@ -270,7 +305,7 @@ const statusOptions = [
 
   :global([data-theme='dark']) .gear-page {
     /* Product cut-outs are often black; keep a light plate in dark mode too. */
-    --gear-plate: #bfc4b5;
+    --gear-plate: #a7ad9c;
   }
 
   .gear-intro {
@@ -299,7 +334,7 @@ const statusOptions = [
     }
   }
 
-  .gear-filters fieldset {
+  :where(.gear-filters fieldset) {
     margin: 0;
     padding: 0;
     border: 0;
@@ -346,7 +381,19 @@ const statusOptions = [
     scrollbar-width: none;
     flex: 1 1 100%;
     order: 3;
-    padding-bottom: 2px;
+    /* Room for the focus ring inside the scroll box. */
+    padding: 4px 4px 4px 2px;
+  }
+
+  @media (pointer: fine) {
+    .gear-chips {
+      flex-wrap: wrap;
+      overflow: visible;
+    }
+  }
+
+  .gear-chips label[hidden] {
+    display: none;
   }
 
   .gear-chips::-webkit-scrollbar {
@@ -375,6 +422,12 @@ const statusOptions = [
     color: var(--ink);
     background-color: color-mix(in srgb, var(--tab) 70%, var(--paper));
     border-color: color-mix(in srgb, var(--tab) 80%, var(--ink));
+  }
+
+  :global([data-theme='dark']) .gear-segmented input:checked + span,
+  :global([data-theme='dark']) .gear-chips input:checked + span {
+    color: var(--paper);
+    background-color: var(--tab);
   }
 
   .gear-filters input:focus-visible + span {
@@ -427,7 +480,7 @@ const statusOptions = [
     color: var(--color-text-secondary);
   }
 
-  .gear-retired {
+  [data-gear-section='current']:not([hidden]) ~ .gear-retired {
     padding-top: var(--space-lg);
     border-top: 1px solid var(--color-border);
   }
@@ -472,16 +525,6 @@ const statusOptions = [
   /* Pack-list view */
   .pack-view {
     max-width: 40rem;
-  }
-
-  .pack-back {
-    margin: 0 0 var(--space-sm);
-    font-family: var(--font-sans);
-    font-size: var(--font-size-sm);
-  }
-
-  .pack-back a {
-    color: var(--color-text-accent);
   }
 
   .pack-title {

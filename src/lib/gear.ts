@@ -144,19 +144,13 @@ export function splitPackLists(value: string | null): string[] {
     : []
 }
 
+/** One weight format everywhere: g and oz under a kilogram, kg and lb above. */
 export function formatWeight(grams: number | null): string | null {
   if (grams === null || !(grams > 0)) return null
+  if (grams >= 1000) return `${(grams / 1000).toFixed(2)} kg · ${(grams / 453.592).toFixed(1)} lb`
   const ounces = grams / GRAMS_PER_OUNCE
   const oz = ounces < 10 ? ounces.toFixed(1).replace(/\.0$/, '') : String(Math.round(ounces))
-  return `${Math.round(grams).toLocaleString('en-US')} g · ${oz} oz`
-}
-
-export function formatTotal(grams: number): string {
-  if (grams >= 1000) {
-    const pounds = grams / 453.592
-    return `${(grams / 1000).toFixed(2)} kg · ${pounds.toFixed(1)} lb`
-  }
-  return `${Math.round(grams)} g · ${(grams / GRAMS_PER_OUNCE).toFixed(1)} oz`
+  return `${Math.round(grams)} g · ${oz} oz`
 }
 
 export function buildGearItems(rows: GearRow[], links: GearClimbLink[] = []): GearItem[] {
@@ -282,7 +276,7 @@ export function matchesFilters(
 
 export interface PackListView {
   list: PackList
-  groups: Array<{ category: GearCategory; items: GearItem[]; grams: number }>
+  groups: Array<{ category: GearCategory; items: GearItem[]; grams: number; unweighed: number }>
   count: number
   totalGrams: number
   unweighed: number
@@ -296,6 +290,7 @@ export function packListView(items: GearItem[], list: PackList): PackListView {
   const groups = groupByCategory(onList).map(group => ({
     ...group,
     grams: group.items.reduce((sum, item) => sum + (item.weightG ?? 0), 0),
+    unweighed: group.items.filter(item => !(item.weightG && item.weightG > 0)).length,
   }))
   return {
     list,
