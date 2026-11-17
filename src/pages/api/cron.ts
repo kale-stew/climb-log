@@ -1,7 +1,9 @@
 import { env } from 'cloudflare:workers'
 import { Client, isNotionClientError } from '@notionhq/client'
 import type { APIRoute } from 'astro'
+import { type GearAssetsRpc, syncGearImages } from '../../lib/gear-images'
 import {
+  expandRelations,
   fetchAllPages,
   type NotionPage,
   syncTable,
@@ -114,6 +116,8 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
       .map(([k]) => k),
   })
 
+  let gearPages: NotionPage[] | null = null
+
   try {
     for (const spec of tableSpecs(today)) {
       const dbId = notionDbIds[spec.table]
@@ -131,6 +135,7 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
       let pages: NotionPage[]
       try {
         pages = await fetchAllPages(notion, dbId)
+        await expandRelations(notion, pages, spec.relations ?? [])
       } catch (error) {
         results.push({
           table: spec.table,
@@ -144,7 +149,9 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
 
       logSync('info', `Syncing ${spec.table}`, { count: pages.length })
       try {
-        results.push(await syncTable(DB, spec, pages))
+        const result = await syncTable(DB, spec, pages)
+        results.push(result)
+        if (spec.table === 'gear' && result.errors.length === 0) gearPages = pages
       } catch (error) {
         results.push({
           table: spec.table,
@@ -155,6 +162,9 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
         })
       }
     }
+
+    const gearImages = await syncGearImageStep(DB, runtimeEnv.GEAR_ASSETS, gearPages)
+    if (gearImages) results.push(gearImages)
 
     results.push(await syncSlugs(DB, runtimeEnv.PHOTOS_API_ORIGIN))
 
@@ -232,6 +242,62 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
 }
 
 /**
+ * Bring gear images up to date in photos-api. Skipped in `astro dev`, whose
+ * remote service binding would otherwise write to production photos-api, and
+ * when the gear table did not sync cleanly.
+ */
+export async function syncGearImageStep(
+  DB: D1Database,
+  rpc: GearAssetsRpc | undefined,
+  gearPages: NotionPage[] | null,
+  isDev = import.meta.env.DEV,
+): Promise<SyncResult | null> {
+  if (isDev) return null
+  if (gearPages === null) {
+    logSync('warn', 'Skipped gear images because the gear table did not sync cleanly')
+    return {
+      table: 'gear_images',
+      inserted: 0,
+      updated: 0,
+      deleted: 0,
+      errors: [],
+      skipped: 'gear table did not sync cleanly',
+    }
+  }
+  if (!rpc) {
+    return {
+      table: 'gear_images',
+      inserted: 0,
+      updated: 0,
+      deleted: 0,
+      errors: ['GEAR_ASSETS service binding is not configured'],
+    }
+  }
+  try {
+    const summary = await syncGearImages(DB, rpc, gearPages)
+    logSync(summary.errors.length ? 'warn' : 'info', 'Synced gear images', {
+      statuses: summary.statuses,
+      needs_review: summary.needs_review,
+    })
+    if (summary.needs_review.length > 0 || summary.unsupported.length > 0) {
+      logSync('warn', 'Gear images need attention', {
+        needs_review: summary.needs_review,
+        unsupported: summary.unsupported,
+      })
+    }
+    return summary
+  } catch (error) {
+    return {
+      table: 'gear_images',
+      inserted: 0,
+      updated: 0,
+      deleted: 0,
+      errors: [`Failed to sync gear images: ${formatError(error)}`],
+    }
+  }
+}
+
+/**
  * Keep /photos/{slug} URLs current for every gallery photo. Reads photos-api;
  * writes only climb-log's own photo_slugs table.
  */
@@ -240,7 +306,13 @@ export async function syncSlugs(
   apiOrigin: string | undefined,
   fetchFn?: typeof fetch,
 ): Promise<SyncResult> {
-  const result: SyncResult = { table: 'photo_slugs', inserted: 0, updated: 0, deleted: 0, errors: [] }
+  const result: SyncResult = {
+    table: 'photo_slugs',
+    inserted: 0,
+    updated: 0,
+    deleted: 0,
+    errors: [],
+  }
   if (!apiOrigin) {
     result.errors.push('PHOTOS_API_ORIGIN is not configured')
     return result

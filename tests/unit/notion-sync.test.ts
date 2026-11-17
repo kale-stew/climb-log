@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  expandRelations,
   fetchAllPages,
+  fmt,
+  gearWeightGrams,
   mapClimb,
   mapGear,
   mapPeak,
@@ -32,12 +35,15 @@ const GEAR_PROPERTY_NAMES = [
   'brand',
   'category',
   'color',
-  'img_slug',
+  'img',
   'more_info',
   'pack_list',
   'product',
   'retired_on',
   'url',
+  'weight_g',
+  'weight_oz',
+  'events',
 ]
 
 function gearPage(id: string, overrides: Record<string, unknown>): NotionPage {
@@ -67,7 +73,19 @@ describe('mapClimb', () => {
       state: 'CA',
       strava: 'https://strava.com/1',
       summits: 'Mount Tamalpais,Mount Diablo',
+      calendar_event_ids: null,
     })
+  })
+
+  it('stores calendar event links as a JSON array of ids', () => {
+    const page = climbPage({
+      'Calendar Event': {
+        type: 'relation',
+        relation: [{ id: 'e1' }, { id: 'e2' }],
+        has_more: false,
+      },
+    })
+    expect(mapClimb(page, '2026-11-05')?.calendar_event_ids).toBe('["e1","e2"]')
   })
 
   it('skips future-dated climbs', () => {
@@ -125,20 +143,43 @@ describe('mapGear', () => {
   const boots = gearPage('g1', {
     title: { type: 'title', title: text('Boots') },
     acquired_on: { type: 'date', date: { start: '2024-01-01' } },
-    img_slug: { type: 'rich_text', rich_text: text('boots') },
+    img: {
+      type: 'files',
+      files: [
+        { file: { url: 'https://prod-files-secure.s3.us-west-2.amazonaws.com/a/b/boots.png?sig' } },
+      ],
+    },
     pack_list: {
       type: 'multi_select',
       multi_select: [{ name: 'alpine ski' }, { name: 'expedition' }],
     },
+    weight_g: { type: 'number', number: null },
+    weight_oz: { type: 'number', number: 32 },
+    events: { type: 'relation', relation: [{ id: 'e1' }], has_more: false },
   })
 
-  it('maps acquired gear with comma-joined pack lists', () => {
+  it('maps acquired gear with pack lists, grams, and event ids', () => {
     expect(mapGear(boots)).toMatchObject({
       id: 'g1',
       title: 'Boots',
-      img: 'boots.png',
       pack_list: 'alpine ski,expedition',
+      weight_g: 907,
+      event_ids: '["e1"]',
     })
+  })
+
+  it('never writes image columns, which the image sync owns', () => {
+    const row = mapGear(boots)
+    expect(row).not.toHaveProperty('img')
+    expect(row).not.toHaveProperty('img_version')
+    const gear = tableSpecs('2026-11-05').find(spec => spec.table === 'gear')
+    expect(gear?.columns).not.toContain('img')
+    expect(gear?.columns).not.toContain('img_version')
+  })
+
+  it('no longer needs img_slug', () => {
+    expect(GEAR_PROPERTY_NAMES).not.toContain('img_slug')
+    expect(mapGear(boots)).not.toBeNull()
   })
 
   it('skips unacquired gear', () => {
@@ -149,6 +190,83 @@ describe('mapGear', () => {
     expect(() => mapGear(gearPage('g3', { acquired_on: boots.properties.acquired_on }))).toThrow(
       /missing a title/,
     )
+  })
+
+  it('throws when the image property is renamed', () => {
+    expect(() => mapGear(without(boots, 'img'))).toThrow('missing Notion properties: img')
+  })
+})
+
+describe('gearWeightGrams', () => {
+  it('prefers grams, falls back to ounces, and ignores zero', () => {
+    expect(gearWeightGrams(312.4, 99)).toBe(312)
+    expect(gearWeightGrams(null, 11)).toBe(312)
+    expect(gearWeightGrams(0, 0)).toBeNull()
+    expect(gearWeightGrams(null, null)).toBeNull()
+  })
+})
+
+describe('relations', () => {
+  it('formats relation ids', () => {
+    expect(fmt({ type: 'relation', relation: [{ id: 'a' }, { id: 'b' }] })).toEqual(['a', 'b'])
+    expect(fmt({ type: 'relation', relation: [] })).toBeNull()
+  })
+
+  it('pages in references past the 25 a database query returns', async () => {
+    const page: NotionPage = {
+      id: 'g1',
+      properties: {
+        events: {
+          type: 'relation',
+          id: 'prop1',
+          relation: [{ id: 'e1' }],
+          has_more: true,
+        },
+      } as NotionPage['properties'],
+    }
+    const calls: unknown[] = []
+    const client = {
+      pages: {
+        properties: {
+          retrieve: async (args: { start_cursor?: string }) => {
+            calls.push(args)
+            return args.start_cursor
+              ? { results: [{ relation: { id: 'e3' } }], has_more: false, next_cursor: null }
+              : {
+                  results: [{ relation: { id: 'e1' } }, { relation: { id: 'e2' } }],
+                  has_more: true,
+                  next_cursor: 'c2',
+                }
+          },
+        },
+      },
+    }
+    await expandRelations(client, [page], ['events'])
+    expect(fmt(page.properties.events)).toEqual(['e1', 'e2', 'e3'])
+    expect(calls).toEqual([
+      { page_id: 'g1', property_id: 'prop1', start_cursor: undefined },
+      { page_id: 'g1', property_id: 'prop1', start_cursor: 'c2' },
+    ])
+  })
+
+  it('leaves complete relations alone', async () => {
+    const page: NotionPage = {
+      id: 'g1',
+      properties: {
+        events: { type: 'relation', relation: [{ id: 'e1' }], has_more: false },
+      } as NotionPage['properties'],
+    }
+    const client = {
+      pages: {
+        properties: {
+          retrieve: async () => {
+            throw new Error('unexpected')
+          },
+        },
+      },
+    }
+    await expandRelations(client, [page], ['events'])
+    expect(fmt(page.properties.events)).toEqual(['e1'])
   })
 })
 

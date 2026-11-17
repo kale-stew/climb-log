@@ -5,6 +5,12 @@ import { defineConfig } from 'astro/config'
 export default defineConfig({
   output: 'server',
   trailingSlash: 'never',
+  // Older posts linked gear posts under /gear; they live under /blog/gear.
+  redirects: {
+    '/gear/14er-pack-list': '/blog/gear/14er-pack-list',
+    '/gear/first-winter-peak': '/blog/gear/first-winter-peak',
+    '/gear/car-camping': '/blog/gear/car-camping',
+  },
   adapter: cloudflare(),
   integrations: [react()],
   vite: {

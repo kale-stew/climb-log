@@ -12,6 +12,8 @@ export interface CloudflareEnv {
   ALLOWED_WIDTHS: string
   PHOTOS_API_ORIGIN: string
   PHOTOS_API?: Fetcher
+  /** photos-api `GearAssets` RPC entrypoint (service binding only). */
+  GEAR_ASSETS?: import('./lib/gear-images').GearAssetsRpc
   CRON_SECRET?: string
   NOTION_TOKEN?: string
   NOTION_CLIMBS_DB_ID?: string

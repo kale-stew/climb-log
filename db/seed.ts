@@ -24,6 +24,7 @@ interface Climb {
   state: string | null
   strava: string | null
   summits: string | null
+  calendar_event_ids?: string | null
 }
 
 interface Peak {
@@ -43,12 +44,15 @@ interface Gear {
   brand: string | null
   category: string | null
   color: string | null
-  img: string | null
+  /** Legacy hand-copied file name; synced images use img_version instead. */
+  img?: string | null
   more_info: string | null
   pack_list: string | null
   product_str: string | null
   retired_on: string | null
   url: string | null
+  weight_g?: number | null
+  event_ids?: string | null
 }
 
 interface Photo {
@@ -127,7 +131,7 @@ async function main() {
   })
   sql += '-- Climbs\n'
   sql += generateInsertSQL('climbs', climbsWithCleanImages, [
-    'id', 'date', 'title', 'slug', 'preview_img_url', 'distance', 'gain', 'area', 'state', 'strava', 'summits'
+    'id', 'date', 'title', 'slug', 'preview_img_url', 'distance', 'gain', 'area', 'state', 'strava', 'summits', 'calendar_event_ids'
   ])
   sql += '\n\n'
 
@@ -141,7 +145,7 @@ async function main() {
   // Gear
   sql += '-- Gear\n'
   sql += generateInsertSQL('gear', gear, [
-    'id', 'title', 'acquired_on', 'brand', 'category', 'color', 'img', 'more_info', 'pack_list', 'product_str', 'retired_on', 'url'
+    'id', 'title', 'acquired_on', 'brand', 'category', 'color', 'img', 'more_info', 'pack_list', 'product_str', 'retired_on', 'url', 'weight_g', 'event_ids'
   ])
   sql += '\n\n'
 

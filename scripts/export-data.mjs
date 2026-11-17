@@ -5,10 +5,10 @@
  */
 
 import { Client } from '@notionhq/client'
+import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import dotenv from 'dotenv'
 
 dotenv.config()
 
@@ -38,7 +38,9 @@ function fmt(field) {
     case 'file':
       return field.file?.url ?? null
     case 'files':
-      return field.files?.length > 0 ? field.files[0]?.file?.url ?? field.files[0]?.external?.url : null
+      return field.files?.length > 0
+        ? (field.files[0]?.file?.url ?? field.files[0]?.external?.url)
+        : null
     case 'formula':
       return field.formula?.string ?? field.formula?.number ?? null
     case 'multi_select':
@@ -61,12 +63,49 @@ function fmt(field) {
   }
 }
 
+/** Relation ids as a JSON array, matching src/lib/notion-sync.ts. */
+function jsonIds(ids) {
+  return Array.isArray(ids) && ids.length > 0 ? JSON.stringify(ids) : null
+}
+
+/** Grams from either weight property, matching src/lib/notion-sync.ts. */
+function gearWeightGrams(grams, ounces) {
+  if (grams > 0) return Math.round(grams)
+  if (ounces > 0) return Math.round(ounces * 28.3495)
+  return null
+}
+
+/**
+ * Database queries cap relations at 25 references; page in the rest so join
+ * keys match the sync (src/lib/notion-sync.ts expandRelations).
+ */
+async function expandRelations(pages, name) {
+  for (const page of pages) {
+    const property = page.properties[name]
+    if (property?.type !== 'relation' || !property.has_more) continue
+    const ids = []
+    let cursor
+    do {
+      const response = await notion.pages.properties.retrieve({
+        page_id: page.id,
+        property_id: property.id,
+        start_cursor: cursor,
+      })
+      for (const item of response.results ?? [])
+        if (item.relation?.id) ids.push({ id: item.relation.id })
+      cursor = response.has_more ? response.next_cursor : undefined
+    } while (cursor)
+    property.relation = ids
+    property.has_more = false
+  }
+}
+
 /**
  * Query all pages from a Notion database with pagination
  */
 async function queryAllPages(databaseId, sorts = []) {
   const results = []
-  let cursor = undefined
+  let cursor
 
   do {
     const response = await notion.databases.query({
@@ -146,6 +185,7 @@ function formatClimbs(pages) {
         state: area.state,
         strava: fmt(props.strava),
         summits: fmt(props.summits)?.join(',') ?? null,
+        calendar_event_ids: jsonIds(fmt(props['Calendar Event'])),
       }
     })
     .filter(Boolean)
@@ -187,12 +227,13 @@ function formatGear(pages) {
         brand: fmt(props.brand),
         category: fmt(props.category),
         color: fmt(props.color),
-        img: fmt(props.img_slug) ? `${fmt(props.img_slug)}.png` : null,
         more_info: fmt(props.more_info),
         pack_list: fmt(props.pack_list),
         product_str: fmt(props.product),
         retired_on: fmt(props.retired_on),
         url: fmt(props.url),
+        weight_g: gearWeightGrams(fmt(props.weight_g), fmt(props.weight_oz)),
+        event_ids: jsonIds(fmt(props.events)),
       }
     })
     .sort((a, b) => (b.acquired_on ?? '').localeCompare(a.acquired_on ?? ''))
@@ -235,28 +276,38 @@ async function main() {
 
   // Export climbs
   console.log('  Fetching climbs...')
-  const climbPages = await queryAllPages(DATABASES.climbs, [{ property: 'date', direction: 'descending' }])
+  const climbPages = await queryAllPages(DATABASES.climbs, [
+    { property: 'date', direction: 'descending' },
+  ])
+  await expandRelations(climbPages, 'Calendar Event')
   const climbs = formatClimbs(climbPages)
   fs.writeFileSync(path.join(DATA_DIR, 'climbs.json'), JSON.stringify(climbs, null, 2))
   console.log(`    ${climbs.length} climbs exported`)
 
   // Export peaks
   console.log('  Fetching peaks...')
-  const peakPages = await queryAllPages(DATABASES.peaks, [{ property: 'elevation', direction: 'descending' }])
+  const peakPages = await queryAllPages(DATABASES.peaks, [
+    { property: 'elevation', direction: 'descending' },
+  ])
   const peaks = formatPeaks(peakPages)
   fs.writeFileSync(path.join(DATA_DIR, 'peaks.json'), JSON.stringify(peaks, null, 2))
   console.log(`    ${peaks.length} peaks exported`)
 
   // Export gear
   console.log('  Fetching gear...')
-  const gearPages = await queryAllPages(DATABASES.gear, [{ property: 'acquired_on', direction: 'descending' }])
+  const gearPages = await queryAllPages(DATABASES.gear, [
+    { property: 'acquired_on', direction: 'descending' },
+  ])
+  await expandRelations(gearPages, 'events')
   const gear = formatGear(gearPages)
   fs.writeFileSync(path.join(DATA_DIR, 'gear.json'), JSON.stringify(gear, null, 2))
   console.log(`    ${gear.length} gear items exported`)
 
   // Export photos
   console.log('  Fetching photos...')
-  const photoPages = await queryAllPages(DATABASES.photos, [{ property: 'taken_on', direction: 'descending' }])
+  const photoPages = await queryAllPages(DATABASES.photos, [
+    { property: 'taken_on', direction: 'descending' },
+  ])
   const photos = formatPhotos(photoPages)
   fs.writeFileSync(path.join(DATA_DIR, 'photos.json'), JSON.stringify(photos, null, 2))
   console.log(`    ${photos.length} photos exported`)

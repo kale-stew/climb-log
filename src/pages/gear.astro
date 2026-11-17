@@ -1,250 +1,651 @@
 ---
-import Layout from '../layouts/Layout.astro'
 import { env } from 'cloudflare:workers'
+import GearCard from '../components/GearCard.astro'
+import Layout from '../layouts/Layout.astro'
+import {
+  buildGearItems,
+  categoriesOf,
+  formatWeight,
+  GEAR_CLIMB_LINKS_SQL,
+  GEAR_ROWS_SQL,
+  type GearClimbLink,
+  type GearItem,
+  type GearRow,
+  groupByCategory,
+  matchesFilters,
+  packListsOf,
+  packListView,
+  parseGearFilters,
+} from '../lib/gear'
 
 export const prerender = false
 
 const DB = env.DB as D1Database | undefined
 
-let gear: any[] = []
-let categories: string[] = []
-
+let rows: GearRow[] = []
+let links: GearClimbLink[] = []
 if (DB) {
-  const result = await DB.prepare(`
-    SELECT id, title, brand, category, img, url, more_info, acquired_on, retired_on
-    FROM gear 
-    ORDER BY category, title
-  `).all()
-  gear = result.results || []
-
-  // Get unique categories
-  const catSet = new Set(gear.map(g => g.category).filter(Boolean))
-  categories = Array.from(catSet).sort()
+  rows = (await DB.prepare(GEAR_ROWS_SQL).all<GearRow>()).results ?? []
+  try {
+    links = (await DB.prepare(GEAR_CLIMB_LINKS_SQL).all<GearClimbLink>()).results ?? []
+  } catch (error) {
+    // Climb links are an enhancement; never fail the page over them.
+    console.warn('Gear climb links unavailable:', error)
+  }
 }
 
-function getStatusClass(item: any) {
-  if (item.retired_on) return 'status-retired'
-  if (item.acquired_on) return 'status-own'
-  return ''
-}
+const items = buildGearItems(rows, links)
+const categories = categoriesOf(items)
+const lists = packListsOf(items)
+const filters = parseGearFilters(Astro.url.searchParams, categories, lists)
+const view = filters.list ? packListView(items, filters.list) : null
 
-function getStatus(item: any) {
-  if (item.retired_on) return 'Retired'
-  if (item.acquired_on) return 'Own'
-  return null
+const currentGroups = groupByCategory(items.filter(item => item.status === 'current'))
+const retired = items.filter(item => item.status === 'retired')
+const isVisible = (item: GearItem) => matchesFilters(item, filters)
+const statusesByCategory = new Map<string, string[]>()
+for (const item of items) {
+  const statuses = statusesByCategory.get(item.category.slug) ?? []
+  if (!statuses.includes(item.status)) statuses.push(item.status)
+  statusesByCategory.set(item.category.slug, statuses)
 }
+const chipVisible = (slug: string) =>
+  filters.status === 'all' || (statusesByCategory.get(slug) ?? []).includes(filters.status)
+const anyVisible = items.some(isVisible)
+const activeCategory = categories.find(c => c.slug === filters.category)
+
+const statusOptions = [
+  { value: 'current', label: 'Current' },
+  { value: 'retired', label: 'Retired' },
+  { value: 'all', label: 'All' },
+] as const
+
 ---
 
 <Layout
-  title="Gear"
+  title={view ? `${view.list.label} pack list · Gear` : 'Gear'}
   description="The hiking, climbing, and camping gear I use now, plus a few things I've retired."
   ogImage="https://kylies.photos/open-graph/gear-list.jpg"
   ogImageAlt="An orange tent below a rocky mountain glowing at sunrise"
 >
-  <div class="container page">
+  <div class="container page gear-page">
     <h1>Gear</h1>
-    <p class="page-subtitle" style="color: var(--color-text-secondary); margin-bottom: var(--space-xl);">
-      My current hiking and climbing gear, plus items I've used in the past.
+    <p class="page-subtitle gear-intro">
+      What I carry now, what goes in which pack, and what happened to the things I've retired.
     </p>
 
-    {categories.map((category) => {
-      const categoryGear = gear.filter(g => g.category === category)
-      return (
-        <section class="mb-xl">
-          <h2>{category}</h2>
-          <div class="gear-grid">
-            {categoryGear.map((item) => (
-              <div class={`gear-card ${getStatusClass(item)} ${item.img ? '' : 'no-image'}`}>
-                {item.img && (
-                  <div class="gear-image-wrapper">
-                    <img 
-                      src={`/gear/${item.img}`}
-                      alt={item.title}
-                      loading="lazy"
-                      class="gear-image"
-                      onerror="this.style.display='none'"
-                    />
-                  </div>
-                )}
-                <div class="gear-content">
-                  <h3>{item.title}</h3>
-                  {item.brand && <p class="gear-brand">{item.brand}</p>}
-                  {getStatus(item) && <span class={`gear-status ${getStatusClass(item)}`}>{getStatus(item)}</span>}
-                  {item.url && (
-                    <a class="gear-external" href={item.url} target="_blank" rel="noopener noreferrer">
-                      View product <span aria-hidden="true">↗</span>
-                      <span class="sr-only"> (opens an external site)</span>
-                    </a>
-                  )}
-                </div>
-                {item.more_info && (
-                  <div class="gear-story">
-                    <span>What happened</span>
-                    <p>{item.more_info}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )
-    })}
+    {items.length > 0 && (
+      <form class="gear-filters" method="get" action="/gear" data-gear-filters>
+        {!view && (
+          <>
+            <fieldset class="gear-segmented">
+              <legend class="sr-only">Show</legend>
+              {statusOptions.map(option => (
+                <label>
+                  <input
+                    type="radio"
+                    name="status"
+                    value={option.value}
+                    checked={filters.status === option.value}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </fieldset>
 
-    {gear.length === 0 && (
-      <p>No gear found.</p>
+            <fieldset class="gear-chips">
+              <legend class="sr-only">Category</legend>
+              <label>
+                <input type="radio" name="cat" value="" checked={!filters.category} />
+                <span>All</span>
+              </label>
+              {categories.map(category => (
+                <label
+                  data-statuses={statusesByCategory.get(category.slug)?.join(' ')}
+                  hidden={!chipVisible(category.slug)}
+                >
+                  <input
+                    type="radio"
+                    name="cat"
+                    value={category.slug}
+                    checked={filters.category === category.slug}
+                  />
+                  <span>{category.label}</span>
+                </label>
+              ))}
+            </fieldset>
+          </>
+        )}
+
+        {lists.length > 0 && (
+          <label class="gear-list-select">
+            <span class="sr-only">Pack list</span>
+            <select name="list" data-gear-list>
+              <option value="">{view ? 'All gear' : 'Pack lists'}</option>
+              {lists.map(list => (
+                <option value={list.slug} selected={filters.list?.slug === list.slug}>
+                  {list.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
+        <button type="submit" class="filter-btn gear-apply">Apply</button>
+      </form>
     )}
+
+    {view ? (
+      <section class="pack-view" aria-labelledby="pack-title">
+        <h2 id="pack-title" class="pack-title">{view.list.label}</h2>
+        <p class="pack-count">
+          {view.count === 1 ? '1 item' : `${view.count} items`} on this pack list.
+        </p>
+
+        {view.groups.map(group => (
+          <section class="pack-group">
+            <h3>
+              <span>{group.category.label}</span>
+              {group.grams > 0 && (
+                <span class="pack-subtotal">
+                  {formatWeight(group.grams)}
+                  {group.unweighed > 0 && ` · ${group.unweighed} unweighed`}
+                </span>
+              )}
+            </h3>
+            <ul class="pack-rows">
+              {group.items.map(item => (
+                <li class="pack-row">
+                  <div class="pack-thumb">
+                    {item.image ? (
+                      <img src={item.image.thumb} alt="" width="48" height="48" loading="lazy" decoding="async" />
+                    ) : (
+                      <span aria-hidden="true">{item.category.emoji}</span>
+                    )}
+                  </div>
+                  <div class="pack-name">
+                    {item.brand && <span class="pack-brand">{item.brand}</span>}
+                    <span class="pack-item-title">{item.title}</span>
+                  </div>
+                  <span class="pack-weight">{formatWeight(item.weightG) ?? '—'}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+
+        <p class="pack-total">
+          <span>Total</span>
+          <strong>{view.totalGrams > 0 ? formatWeight(view.totalGrams) : '—'}</strong>
+          {view.unweighed > 0 && (
+            <span class="pack-unweighed">
+              {view.unweighed === 1 ? '1 item unweighed' : `${view.unweighed} items unweighed`}
+            </span>
+          )}
+        </p>
+      </section>
+    ) : (
+      <>
+        {currentGroups.map(group => (
+          <section class="gear-section" data-gear-section="current" hidden={!group.items.some(isVisible)}>
+            <h2>
+              <span class="gear-section-emoji" aria-hidden="true">{group.category.emoji}</span>
+              {group.category.label}
+            </h2>
+            <ul class="gear-grid">
+              {group.items.map(item => <GearCard item={item} hidden={!isVisible(item)} />)}
+            </ul>
+          </section>
+        ))}
+
+        {retired.length > 0 && (
+          <section class="gear-section gear-retired" data-gear-section="retired" hidden={!retired.some(isVisible)}>
+            <h2>Retired</h2>
+            <p class="gear-section-note">Gear I've moved on from, and what happened to it.</p>
+            <ul class="gear-grid">
+              {retired.map(item => <GearCard item={item} hidden={!isVisible(item)} />)}
+            </ul>
+          </section>
+        )}
+
+        <p class="gear-empty" data-gear-empty hidden={anyVisible || items.length === 0}>
+          <span data-gear-empty-text>
+            No {filters.status === 'all' ? '' : `${filters.status} `}gear{activeCategory ? ` in ${activeCategory.label}` : ''}.
+          </span>{' '}
+          <a href="/gear">Show all current gear</a>
+        </p>
+      </>
+    )}
+
+    {items.length === 0 && <p>No gear found.</p>}
   </div>
+</Layout>
 
-  <style>
-    .gear-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: var(--space-md);
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-gear-filters]')
+  if (form) {
+    form.classList.add('is-enhanced')
+    const cards = [...document.querySelectorAll<HTMLElement>('.gear-card')]
+    const sections = [...document.querySelectorAll<HTMLElement>('[data-gear-section]')]
+    const empty = document.querySelector<HTMLElement>('[data-gear-empty]')
+    const emptyText = document.querySelector<HTMLElement>('[data-gear-empty-text]')
+    const list = form.querySelector('[data-gear-list]') as HTMLSelectElement | null
+
+    const value = (name: string) =>
+      form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? ''
+
+    const chips = [...form.querySelectorAll<HTMLElement>('label[data-statuses]')]
+    const header = document.querySelector<HTMLElement>('.header')
+
+    const apply = () => {
+      const status = value('status') || 'current'
+      for (const chip of chips) {
+        chip.hidden = status !== 'all' && !(chip.dataset.statuses ?? '').split(' ').includes(status)
+        const input = chip.querySelector('input')
+        if (chip.hidden && input?.checked) {
+          form.querySelector<HTMLInputElement>('input[name="cat"][value=""]')?.click()
+          return
+        }
+      }
+      const cat = value('cat')
+      let visible = 0
+      for (const card of cards) {
+        const show =
+          (status === 'all' || card.dataset.status === status) && (!cat || card.dataset.cat === cat)
+        card.hidden = !show
+        if (show) visible++
+      }
+      for (const section of sections) {
+        section.hidden = !section.querySelector('.gear-card:not([hidden])')
+      }
+      if (empty && emptyText) {
+        empty.hidden = visible > 0
+        const label = form.querySelector<HTMLInputElement>(`input[name="cat"][value="${cat}"]`)
+          ?.nextElementSibling?.textContent
+        emptyText.textContent = `No ${status === 'all' ? '' : `${status} `}gear${cat && label ? ` in ${label}` : ''}.`
+      }
+      const url = new URL(window.location.href)
+      url.searchParams.delete('list')
+      status === 'current' ? url.searchParams.delete('status') : url.searchParams.set('status', status)
+      cat ? url.searchParams.set('cat', cat) : url.searchParams.delete('cat')
+      history.replaceState(null, '', url)
+
+      // When the bar is stuck, bring the results back under it.
+      const headerHeight = header?.offsetHeight ?? 0
+      if (form.getBoundingClientRect().top <= headerHeight + 1) {
+        const first = document.querySelector<HTMLElement>('[data-gear-section]:not([hidden]), [data-gear-empty]:not([hidden])')
+        if (first) {
+          const top = first.getBoundingClientRect().top + window.scrollY - headerHeight - form.offsetHeight - 16
+          if (top < window.scrollY) window.scrollTo({ top })
+        }
+      }
     }
 
-    .gear-card {
-      background: var(--color-bg-primary);
-      border-radius: var(--border-radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--color-border);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      display: grid;
-      grid-template-columns: 82px minmax(0, 1fr);
-      align-content: start;
-      align-self: start;
-    }
+    form.addEventListener('change', event => {
+      if (list && event.target === list) {
+        const url = new URL('/gear', window.location.origin)
+        if (list.value) url.searchParams.set('list', list.value)
+        window.location.assign(url)
+        return
+      }
+      apply()
+    })
+    form.addEventListener('submit', event => {
+      event.preventDefault()
+      apply()
+    })
+  }
+</script>
 
-    .gear-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+<style>
+  .gear-page {
+    --gear-plate: #e3e6dc;
+    --gear-gap: var(--space-sm);
+  }
+
+  :global([data-theme='dark']) .gear-page {
+    /* Product cut-outs are often black; keep a light plate in dark mode too. */
+    --gear-plate: #a7ad9c;
+  }
+
+  .gear-intro {
+    max-width: 38rem;
+    margin-bottom: var(--space-lg);
+    color: var(--color-text-secondary);
+  }
+
+  /* Filters */
+  .gear-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+    margin: 0 calc(-1 * var(--space-md)) var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--paper);
+  }
+
+  @media (min-width: 768px) {
+    .gear-filters {
+      position: sticky;
+      top: var(--header-height);
+      z-index: 10;
+      box-shadow: 0 10px 12px -10px color-mix(in srgb, var(--ink) 18%, transparent);
+    }
+  }
+
+  :where(.gear-filters fieldset) {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .gear-filters label {
+    position: relative;
+  }
+
+  .gear-filters input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .gear-segmented {
+    display: inline-flex;
+    border: 1px solid var(--color-border-hover);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  .gear-segmented span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 0.85rem;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .gear-segmented label + label span {
+    border-left: 1px solid var(--color-border);
+  }
+
+  .gear-chips {
+    display: flex;
+    gap: var(--space-xs);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1 1 100%;
+    order: 3;
+    /* Room for the focus ring inside the scroll box. */
+    padding: 4px 4px 4px 2px;
+  }
+
+  @media (pointer: fine) {
+    .gear-chips {
+      flex-wrap: wrap;
+      overflow: visible;
+    }
+  }
+
+  .gear-chips label[hidden] {
+    display: none;
+  }
+
+  .gear-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gear-chips label {
+    flex-shrink: 0;
+  }
+
+  .gear-chips span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .gear-segmented input:checked + span,
+  .gear-chips input:checked + span {
+    color: var(--ink);
+    background-color: color-mix(in srgb, var(--tab) 70%, var(--paper));
+    border-color: color-mix(in srgb, var(--tab) 80%, var(--ink));
+  }
+
+  :global([data-theme='dark']) .gear-segmented input:checked + span,
+  :global([data-theme='dark']) .gear-chips input:checked + span {
+    color: var(--paper);
+    background-color: var(--tab);
+  }
+
+  .gear-filters input:focus-visible + span {
+    outline: 2px solid var(--water);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .gear-segmented input:not(:checked):hover + span,
+    .gear-chips input:not(:checked):hover + span {
+      color: var(--color-text);
       border-color: var(--color-border-hover);
     }
+  }
 
-    .gear-image-wrapper {
-      width: 82px;
-      height: 96px;
-      background: var(--color-bg-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-sm);
-    }
+  .gear-list-select select {
+    min-height: 36px;
+    min-width: 11rem;
+    font-size: 1rem;
+  }
 
-    .gear-image {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-
-    .gear-content {
-      padding: 0.75rem 0.75rem 0.65rem;
-      min-width: 0;
-    }
-
-    .gear-card.no-image .gear-content { grid-column: 1 / -1; }
-
-    .gear-content h3 {
-      font-family: var(--font-sans);
+  @media (min-width: 768px) {
+    .gear-list-select select {
       font-size: var(--font-size-sm);
-      font-weight: 600;
-      line-height: 1.3;
-      margin: 0 0 var(--space-xs);
     }
+  }
 
-    .gear-brand {
-      font-size: var(--font-size-sm);
-      color: var(--color-text-tertiary);
-      margin: 0 0 0.35rem;
-    }
+  .gear-filters.is-enhanced .gear-apply {
+    display: none;
+  }
 
-    .gear-meta {
-      display: flex;
-      gap: var(--space-md);
-      font-size: var(--font-size-sm);
-      color: var(--color-text-secondary);
-      margin-bottom: var(--space-sm);
-    }
+  /* Sections */
+  .gear-section {
+    margin-bottom: var(--space-xl);
+  }
 
-    .gear-rating {
-      color: var(--color-accent);
-      letter-spacing: 2px;
-      margin-bottom: var(--space-sm);
-    }
+  .gear-section h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4em;
+    margin-bottom: var(--space-md);
+  }
 
-    .gear-status {
-      display: inline-block;
-      font-size: var(--font-size-xs);
-      font-weight: 600;
-      text-transform: uppercase;
-      padding: 0.125rem 0.5rem;
-      border-radius: 0.25rem;
-      background: var(--color-bg-tertiary);
-    }
+  .gear-section-emoji {
+    font-size: 0.8em;
+  }
 
-    .gear-status.status-own {
-      background: #22c55e20;
-      color: #22c55e;
-    }
+  .gear-section-note {
+    margin: calc(-1 * var(--space-sm)) 0 var(--space-md);
+    color: var(--color-text-secondary);
+  }
 
-    .gear-status.status-sold {
-      background: #ef444420;
-      color: #ef4444;
-    }
+  [data-gear-section='current']:not([hidden]) ~ .gear-retired {
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
 
-    .gear-status.status-wishlist {
-      background: #3b82f620;
-      color: #3b82f6;
-    }
+  /* Grid and cards */
+  .gear-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md) var(--gear-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 
-    .gear-status.status-retired {
-      background: #6b728020;
-      color: #6b7280;
-    }
+  @media (min-width: 480px) {
+    .gear-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
 
-    .gear-external {
-      display: block;
-      width: fit-content;
-      margin-top: 0.55rem;
-      font-size: 0.72rem;
-      color: var(--color-text-accent);
-    }
+  @media (min-width: 768px) {
+    .gear-page { --gear-gap: var(--space-md); }
+    .gear-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
 
-    .gear-external:hover { text-decoration: underline; }
+  @media (min-width: 1024px) {
+    .gear-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
 
-    .gear-story {
-      grid-column: 1 / -1;
-      padding: 0.7rem 0.85rem 0.8rem;
-      border-top: 1px solid var(--color-border);
-      background: color-mix(in srgb, var(--color-bg-secondary) 70%, transparent);
-    }
+  @media (min-width: 1280px) {
+    .gear-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
 
-    .gear-story > span {
-      display: block;
-      margin-bottom: 0.2rem;
-      color: var(--color-text-tertiary);
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
+  .gear-empty {
+    padding: var(--space-xl) 0;
+    color: var(--color-text-secondary);
+  }
 
-    .gear-story p {
-      margin: 0;
-      color: var(--color-text-secondary);
-      font-size: 0.78rem;
-      line-height: 1.45;
-    }
+  .gear-empty a {
+    color: var(--color-text-accent);
+    text-decoration: underline;
+  }
 
-    .gear-notes {
-      font-size: var(--font-size-sm);
-      color: var(--color-text-secondary);
-      margin-top: var(--space-sm);
-      margin-bottom: 0;
-    }
+  /* Pack-list view */
+  .pack-view {
+    max-width: 40rem;
+  }
 
-    .gear-card.status-sold,
-    .gear-card.status-retired {
-      opacity: 0.6;
-    }
-  </style>
-</Layout>
+  .pack-title {
+    margin: 0;
+  }
+
+  .pack-count {
+    margin: var(--space-xs) 0 var(--space-lg);
+    color: var(--color-text-secondary);
+  }
+
+  .pack-group {
+    margin-bottom: var(--space-lg);
+  }
+
+  .pack-group h3 {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-md);
+    margin: 0 0 var(--space-xs);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .pack-subtotal {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pack-rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pack-row {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+    padding: var(--space-xs) 0;
+  }
+
+  .pack-thumb {
+    width: 3rem;
+    height: 3rem;
+    background: var(--gear-plate);
+    border-radius: var(--border-radius-lg);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .pack-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .pack-name {
+    min-width: 0;
+  }
+
+  .pack-brand {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .pack-item-title {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .pack-weight {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .pack-total {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs) var(--space-md);
+    margin: var(--space-lg) calc(-1 * var(--space-md)) 0;
+    padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + env(safe-area-inset-bottom));
+    background: var(--paper);
+    box-shadow: 0 -10px 12px -10px color-mix(in srgb, var(--ink) 18%, transparent);
+    font-family: var(--font-sans);
+  }
+
+  .pack-total strong {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pack-unweighed {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+  }
+</style>
