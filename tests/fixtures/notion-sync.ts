@@ -28,6 +28,7 @@ export function climbPage(
         type: 'multi_select',
         multi_select: [{ name: 'Mount Tamalpais' }, { name: 'Mount Diablo' }],
       },
+      'Calendar Event': { type: 'relation', relation: [], has_more: false },
       ...overrides,
     } as NotionPage['properties'],
   }

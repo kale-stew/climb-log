@@ -45,7 +45,7 @@ Some free resources you can use to learn more about recreating in avalanche terr
 
 ### The Essentials
 
-In addition to the standard safety and shelter items I outline in my [post about packing for a 14er](https://www.kylies.photos/gear/14er-pack-list), I’ve found the following items to be essential on my successful winter summits:
+In addition to the standard safety and shelter items I outline in my [post about packing for a 14er](/blog/gear/14er-pack-list), I’ve found the following items to be essential on my successful winter summits:
 
 - **Water bottle** (_not_ a bladder). I learned how quickly a straw will freeze on my first winter hike. After trying to drink from the opening of my Camelbak bladder and spilling it all down my coat instead, I have not forgotten to opt for an insulated Nalgene since.
 
@@ -55,7 +55,7 @@ In addition to the standard safety and shelter items I outline in my [post about
 
 - **Avalanche beacon & probe**, for every member of your winter climbing team. Ideally everyone in the group has their own, but it can be nice to own two or more as a solo climber so you can loan one out if someone forgets or doesn’t own one themselves. You don't only have to use probes in an emergency situation, either. It can be helpful to poke at the snow at various points as you're going along to gauge depth and density.
 
-- A wide **variety of snacks**. The same rules apply as [packing for a regular 14er](https://www.kylies.photos/gear/14er-pack-list) here, if not more so: pack what you think you’ll eat. I’ve found it’s harder to maintain an appetite in lower temperatures, so making sure you have items you’ll actually want to ingest is crucial in the winter. Also consider what might not keep well in the cooler temps (fruit snacks, for example, can get too hard to chew, but I've found applesauce pouches don't freeze above 0℉).
+- A wide **variety of snacks**. The same rules apply as [packing for a regular 14er](/blog/gear/14er-pack-list) here, if not more so: pack what you think you’ll eat. I’ve found it’s harder to maintain an appetite in lower temperatures, so making sure you have items you’ll actually want to ingest is crucial in the winter. Also consider what might not keep well in the cooler temps (fruit snacks, for example, can get too hard to chew, but I've found applesauce pouches don't freeze above 0℉).
 
 - Extra **hand warmers**, as they don’t last quite as long when the temperatures are that far below freezing. I’ve gotten lucky enough to find boxes of these for sale at Costco at the beginning of the season, which makes it even easier to ensure I’ve got extras in every pack, pocket, and car we own.
 

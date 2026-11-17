@@ -27,6 +27,12 @@
       "binding": "PHOTOS_API",
       "service": "photos-api",
       "remote": true
+    },
+    {
+      "binding": "GEAR_ASSETS",
+      "service": "photos-api",
+      "entrypoint": "GearAssets",
+      "remote": true
     }
   ],
   "vars": {
@@ -59,6 +65,12 @@
           "binding": "PHOTOS_API",
           "service": "photos-api",
           "remote": true
+        },
+        {
+          "binding": "GEAR_ASSETS",
+          "service": "photos-api",
+          "entrypoint": "GearAssets",
+          "remote": true
         }
       ],
       "vars": {
@@ -76,6 +88,12 @@
         {
           "binding": "PHOTOS_API",
           "service": "photos-api",
+          "remote": true
+        },
+        {
+          "binding": "GEAR_ASSETS",
+          "service": "photos-api",
+          "entrypoint": "GearAssets",
           "remote": true
         }
       ],

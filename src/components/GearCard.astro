@@ -1,0 +1,180 @@
+---
+import { formatWeight, type GearItem } from '../lib/gear'
+
+interface Props {
+  item: GearItem
+  hidden: boolean
+}
+
+const { item, hidden } = Astro.props
+
+const IMAGE_SIZES =
+  '(max-width: 479px) 46vw, (max-width: 767px) 31vw, (max-width: 1023px) 23vw, 13rem'
+const MAX_CLIMB_LINKS = 2
+
+const detail = item.status === 'retired'
+  ? item.retiredYear && `Retired ${item.retiredYear}`
+  : formatWeight(item.weightG)
+const productLabel = `${item.brand ? `${item.brand} ` : ''}${item.title} product page (opens an external site)`
+---
+
+<li class="gear-card" data-status={item.status} data-cat={item.category.slug} hidden={hidden}>
+  <div class="gear-frame gear-plate">
+    {item.image ? (
+      <img
+        src={item.image.src}
+        srcset={item.image.srcset ?? undefined}
+        sizes={item.image.srcset ? IMAGE_SIZES : undefined}
+        alt=""
+        width="800"
+        height="800"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <span class="gear-placeholder" aria-hidden="true">{item.category.emoji}</span>
+    )}
+  </div>
+  <div class="gear-meta">
+    <div class="gear-text">
+      {item.brand && <p class="gear-brand">{item.brand}</p>}
+      <h3 class="gear-title">{item.title}</h3>
+      {detail && <p class="gear-detail">{detail}</p>}
+      {item.climbs.length > 0 && (
+        <p class="gear-used">
+          Used on{' '}
+          {item.climbs.slice(0, MAX_CLIMB_LINKS).map((climb, index) => (
+            <>
+              {index > 0 && ', '}
+              <a href={`/journal?outing=${encodeURIComponent(climb.id)}`}>{climb.title}</a>
+            </>
+          ))}
+          {item.climbs.length > MAX_CLIMB_LINKS && ` +${item.climbs.length - MAX_CLIMB_LINKS} more`}
+        </p>
+      )}
+    </div>
+    {item.url && (
+      <a class="gear-product" href={item.url} target="_blank" rel="noopener noreferrer" aria-label={productLabel}>
+        <span aria-hidden="true">↗</span>
+      </a>
+    )}
+  </div>
+  {item.story && item.status === 'retired' && <p class="gear-story">{item.story}</p>}
+</li>
+
+<style>
+  .gear-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .gear-card[hidden] {
+    display: none;
+  }
+
+  .gear-frame {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: var(--gear-plate);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .gear-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .gear-placeholder {
+    font-size: 2rem;
+    opacity: 0.55;
+  }
+
+  .gear-meta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--space-xs);
+    padding-top: var(--space-sm);
+  }
+
+  .gear-brand {
+    margin: 0 0 0.1rem;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    overflow-wrap: anywhere;
+  }
+
+  .gear-title {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .gear-detail {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gear-used {
+    margin: 0.3rem 0 0;
+    font-size: var(--font-size-xs);
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+  }
+
+  .gear-used a {
+    color: var(--color-text-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .gear-product {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-accent);
+    font-size: var(--font-size-sm);
+    line-height: 1;
+    touch-action: manipulation;
+  }
+
+  .gear-product:active {
+    transform: scale(0.96);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .gear-product:hover {
+      border-color: var(--color-text-accent);
+      background: color-mix(in srgb, var(--water) 10%, transparent);
+    }
+  }
+
+  .gear-story {
+    margin: var(--space-sm) 0 0;
+    padding-left: var(--space-sm);
+    border-left: 2px solid var(--color-border-hover);
+    font-family: var(--font-serif);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+  }
+</style>

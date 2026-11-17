@@ -25,6 +25,18 @@ export interface NotionQueryClient {
   }
 }
 
+export interface NotionPropertyClient {
+  pages: {
+    properties: {
+      retrieve(args: {
+        page_id: string
+        property_id: string
+        start_cursor?: string
+      }): Promise<unknown>
+    }
+  }
+}
+
 type Value = string | number | null
 type Row = { id: string } & Record<string, Value>
 
@@ -42,6 +54,7 @@ export function fmt(
     formula?: { string?: string | null; number?: number | null }
     multi_select?: Array<{ name: string }>
     number?: number | null
+    relation?: Array<{ id: string }>
     rich_text?: RichText
     select?: { name?: string } | null
     title?: RichText
@@ -64,6 +77,8 @@ export function fmt(
       return f.multi_select && f.multi_select.length > 0 ? f.multi_select.map(s => s.name) : null
     case 'number':
       return f.number ?? null
+    case 'relation':
+      return f.relation && f.relation.length > 0 ? f.relation.map(r => r.id) : null
     case 'rich_text':
       return joined(f.rich_text)
     case 'select':
@@ -81,6 +96,11 @@ function str(value: ReturnType<typeof fmt>): string | null {
   if (value === null || value === undefined || value === '') return null
   // Arrays (multi_select) are stored comma-joined, matching the seed output.
   return Array.isArray(value) ? value.join(',') : String(value)
+}
+
+/** Relation ids as a JSON array; they are join keys, never display text. */
+function jsonIds(value: ReturnType<typeof fmt>): string | null {
+  return Array.isArray(value) && value.length > 0 ? JSON.stringify(value) : null
 }
 
 function num(value: ReturnType<typeof fmt>): number | null {
@@ -140,6 +160,7 @@ const CLIMB_PROPERTIES = [
   'area',
   'strava',
   'summits',
+  'Calendar Event',
 ]
 const PEAK_PROPERTIES = ['peak_name', 'elevation', 'first_completed_on', 'range', 'rank', 'img_url']
 const GEAR_PROPERTIES = [
@@ -148,13 +169,24 @@ const GEAR_PROPERTIES = [
   'brand',
   'category',
   'color',
-  'img_slug',
+  'img',
   'more_info',
   'pack_list',
   'product',
   'retired_on',
   'url',
+  'weight_g',
+  'weight_oz',
+  'events',
 ]
+
+const GRAMS_PER_OUNCE = 28.3495
+
+export function gearWeightGrams(grams: number | null, ounces: number | null): number | null {
+  if (grams !== null && grams > 0) return Math.round(grams)
+  if (ounces !== null && ounces > 0) return Math.round(ounces * GRAMS_PER_OUNCE)
+  return null
+}
 
 export function mapClimb(page: NotionPage, today: string): Row | null {
   requireProperties(page, CLIMB_PROPERTIES)
@@ -181,6 +213,7 @@ export function mapClimb(page: NotionPage, today: string): Row | null {
     state,
     strava: str(fmt(props.strava)),
     summits: str(fmt(props.summits)),
+    calendar_event_ids: jsonIds(fmt(props['Calendar Event'])),
   }
 }
 
@@ -211,7 +244,8 @@ export function mapGear(page: NotionPage): Row | null {
   const title = str(fmt(props.title))
   // title is NOT NULL in D1; treat a gap as an error so the row is not deleted.
   if (!title) throw new Error('gear is missing a title')
-  const imgSlug = str(fmt(props.img_slug))
+  // Images are synced separately (photos-api keyed by page id), so `img` and
+  // `img_version` are not written here.
   return {
     id: page.id,
     title,
@@ -219,12 +253,13 @@ export function mapGear(page: NotionPage): Row | null {
     brand: str(fmt(props.brand)),
     category: str(fmt(props.category)),
     color: str(fmt(props.color)),
-    img: imgSlug ? `${imgSlug}.png` : null,
     more_info: str(fmt(props.more_info)),
     pack_list: str(fmt(props.pack_list)),
     product_str: str(fmt(props.product)),
     retired_on: str(fmt(props.retired_on)),
     url: str(fmt(props.url)),
+    weight_g: gearWeightGrams(num(fmt(props.weight_g)), num(fmt(props.weight_oz))),
+    event_ids: jsonIds(fmt(props.events)),
   }
 }
 
@@ -234,6 +269,8 @@ export interface TableSpec {
   map: (page: NotionPage) => Row | null
   /** Per-column SQL used on conflict instead of `excluded.<column>`. */
   updateOverrides?: Record<string, string>
+  /** Relation properties whose references must be complete (see expandRelations). */
+  relations?: string[]
 }
 
 export function tableSpecs(today: string): TableSpec[] {
@@ -252,8 +289,10 @@ export function tableSpecs(today: string): TableSpec[] {
         'state',
         'strava',
         'summits',
+        'calendar_event_ids',
       ],
       map: page => mapClimb(page, today),
+      relations: ['Calendar Event'],
       // Seeded previews were rewritten to canonical `/img/{id}` paths; keep those
       // rather than reverting them to the external URL stored in Notion.
       updateOverrides: {
@@ -275,14 +314,16 @@ export function tableSpecs(today: string): TableSpec[] {
         'brand',
         'category',
         'color',
-        'img',
         'more_info',
         'pack_list',
         'product_str',
         'retired_on',
         'url',
+        'weight_g',
+        'event_ids',
       ],
       map: mapGear,
+      relations: ['events'],
     },
   ]
 }
@@ -306,6 +347,49 @@ export async function fetchAllPages(
     cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined
   } while (cursor)
   return pages
+}
+
+type RelationProperty = {
+  id?: string
+  type: string
+  relation?: Array<{ id: string }>
+  has_more?: boolean
+}
+
+/**
+ * Database queries return at most 25 references per relation and flag the rest
+ * with `has_more`. Page through the property endpoint so join keys are complete.
+ */
+export async function expandRelations(
+  notion: NotionPropertyClient,
+  pages: NotionPage[],
+  names: string[],
+): Promise<void> {
+  for (const page of pages) {
+    for (const name of names) {
+      const property = page.properties[name] as RelationProperty | undefined
+      if (!property || property.type !== 'relation' || !property.has_more) continue
+      if (!property.id) throw new Error(`relation ${name} on ${page.id} has no property id`)
+      const ids: Array<{ id: string }> = []
+      let cursor: string | undefined
+      do {
+        const response = (await notion.pages.properties.retrieve({
+          page_id: page.id,
+          property_id: property.id,
+          start_cursor: cursor,
+        })) as {
+          results?: Array<{ relation?: { id: string } }>
+          has_more?: boolean
+          next_cursor?: string | null
+        }
+        for (const item of response.results ?? [])
+          if (item.relation?.id) ids.push({ id: item.relation.id })
+        cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined
+      } while (cursor)
+      property.relation = ids
+      property.has_more = false
+    }
+  }
 }
 
 /** Refuse deletions that look like a broken source rather than real removals. */
