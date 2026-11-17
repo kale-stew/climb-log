@@ -206,6 +206,7 @@ describe('gear queries', () => {
     const result = await db.prepare(GEAR_CLIMB_LINKS_SQL).all<Record<string, unknown>>()
     expect(result.results).toHaveLength(2)
     expect(result.results.map(r => r.id).sort()).toEqual(['c1', 'c2'])
-    for (const link of result.results) expect(Object.keys(link).sort()).toEqual(['date', 'gear_id', 'id', 'title'])
+    for (const link of result.results)
+      expect(Object.keys(link).sort()).toEqual(['date', 'gear_id', 'id', 'title'])
   })
 })

@@ -252,7 +252,18 @@ export async function syncGearImageStep(
   gearPages: NotionPage[] | null,
   isDev = import.meta.env.DEV,
 ): Promise<SyncResult | null> {
-  if (isDev || gearPages === null) return null
+  if (isDev) return null
+  if (gearPages === null) {
+    logSync('warn', 'Skipped gear images because the gear table did not sync cleanly')
+    return {
+      table: 'gear_images',
+      inserted: 0,
+      updated: 0,
+      deleted: 0,
+      errors: [],
+      skipped: 'gear table did not sync cleanly',
+    }
+  }
   if (!rpc) {
     return {
       table: 'gear_images',
@@ -268,8 +279,11 @@ export async function syncGearImageStep(
       statuses: summary.statuses,
       needs_review: summary.needs_review,
     })
-    if (summary.needs_review.length > 0) {
-      logSync('warn', 'Gear images need review', { ids: summary.needs_review })
+    if (summary.needs_review.length > 0 || summary.unsupported.length > 0) {
+      logSync('warn', 'Gear images need attention', {
+        needs_review: summary.needs_review,
+        unsupported: summary.unsupported,
+      })
     }
     return summary
   } catch (error) {

@@ -6,6 +6,7 @@ import {
   syncGearImages,
 } from '../../src/lib/gear-images'
 import type { NotionPage } from '../../src/lib/notion-sync'
+import { proxyGearImage } from '../../src/lib/photo-proxy'
 import { text } from '../fixtures/notion-sync'
 import { sqliteD1 } from '../helpers/sqlite-d1'
 
@@ -113,6 +114,7 @@ describe('syncGearImages', () => {
     const summary = await syncGearImages(db, rpc, [gearPage(1), gearPage(2), gearPage(3)])
     expect(summary.errors).toEqual([`gear image ${id(3)}: source returned 403`])
     expect(summary.statuses).toEqual({ pending: 1, unsupported: 1, failed: 1 })
+    expect(summary.unsupported).toEqual([id(2)])
     for (const n of [1, 2, 3]) expect(versionOf(db, n).img_version).toBe('aaaaaaaaaaaa')
   })
 
@@ -155,9 +157,11 @@ describe('syncGearImageStep', () => {
     expect(calls).toEqual([])
   })
 
-  it('is skipped when the gear table did not sync cleanly', async () => {
+  it('reports a skip when the gear table did not sync cleanly', async () => {
     const { rpc, calls } = rpcReturning([])
-    expect(await syncGearImageStep(dbWith([]), rpc, null, false)).toBeNull()
+    const result = await syncGearImageStep(dbWith([]), rpc, null, false)
+    expect(result?.errors).toEqual([])
+    expect(result?.skipped).toMatch(/did not sync cleanly/)
     expect(calls).toEqual([])
   })
 
@@ -179,5 +183,34 @@ describe('syncGearImageStep', () => {
       false,
     )
     expect(result?.errors[0]).toMatch(/Failed to sync gear images: entrypoint not found/)
+  })
+})
+
+describe('proxyGearImage', () => {
+  const file = '0123456789ab.webp'
+
+  it('forwards only Accept and rewrites redirects to the same-origin path', async () => {
+    let seen: Request | undefined
+    const binding = {
+      fetch: async (request: Request) => {
+        seen = request
+        return new Response(null, {
+          status: 302,
+          headers: { Location: `/gear/${id(1)}/bbbbbbbbbbbb.webp?w=400` },
+        })
+      },
+    } as unknown as Fetcher
+    const visitor = new Request(`https://kylies.photos/gear/img/${id(1)}/${file}?w=400`, {
+      headers: { Accept: 'image/webp', Cookie: 'session=secret' },
+    })
+    const response = await proxyGearImage(visitor, id(1), file, '?w=400', {
+      PHOTOS_API_ORIGIN: 'https://photos.example',
+      PHOTOS_API: binding,
+    })
+    expect(seen?.url).toBe(`https://photos.example/gear/${id(1)}/${file}?w=400`)
+    expect(seen?.headers.get('Accept')).toBe('image/webp')
+    expect(seen?.headers.get('Cookie')).toBeNull()
+    expect(response.status).toBe(302)
+    expect(response.headers.get('Location')).toBe(`/gear/img/${id(1)}/bbbbbbbbbbbb.webp?w=400`)
   })
 })

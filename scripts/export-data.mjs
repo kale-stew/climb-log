@@ -76,6 +76,31 @@ function gearWeightGrams(grams, ounces) {
 }
 
 /**
+ * Database queries cap relations at 25 references; page in the rest so join
+ * keys match the sync (src/lib/notion-sync.ts expandRelations).
+ */
+async function expandRelations(pages, name) {
+  for (const page of pages) {
+    const property = page.properties[name]
+    if (property?.type !== 'relation' || !property.has_more) continue
+    const ids = []
+    let cursor
+    do {
+      const response = await notion.pages.properties.retrieve({
+        page_id: page.id,
+        property_id: property.id,
+        start_cursor: cursor,
+      })
+      for (const item of response.results ?? [])
+        if (item.relation?.id) ids.push({ id: item.relation.id })
+      cursor = response.has_more ? response.next_cursor : undefined
+    } while (cursor)
+    property.relation = ids
+    property.has_more = false
+  }
+}
+
+/**
  * Query all pages from a Notion database with pagination
  */
 async function queryAllPages(databaseId, sorts = []) {
@@ -254,6 +279,7 @@ async function main() {
   const climbPages = await queryAllPages(DATABASES.climbs, [
     { property: 'date', direction: 'descending' },
   ])
+  await expandRelations(climbPages, 'Calendar Event')
   const climbs = formatClimbs(climbPages)
   fs.writeFileSync(path.join(DATA_DIR, 'climbs.json'), JSON.stringify(climbs, null, 2))
   console.log(`    ${climbs.length} climbs exported`)
@@ -272,6 +298,7 @@ async function main() {
   const gearPages = await queryAllPages(DATABASES.gear, [
     { property: 'acquired_on', direction: 'descending' },
   ])
+  await expandRelations(gearPages, 'events')
   const gear = formatGear(gearPages)
   fs.writeFileSync(path.join(DATA_DIR, 'gear.json'), JSON.stringify(gear, null, 2))
   console.log(`    ${gear.length} gear items exported`)

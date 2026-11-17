@@ -70,8 +70,14 @@ export async function proxyGearImage(
     runtimeEnv.PHOTOS_API_ORIGIN,
   )
   upstreamUrl.search = search
+  // Forward only what content negotiation needs; never visitor cookies.
+  const accept = request.headers.get('Accept')
   const upstream = () =>
-    new Request(upstreamUrl, { method: 'GET', headers: request.headers, redirect: 'manual' })
+    new Request(upstreamUrl, {
+      method: 'GET',
+      headers: accept ? { Accept: accept } : {},
+      redirect: 'manual',
+    })
   const usable = (response: Response) =>
     response.ok || (response.status >= 300 && response.status < 400) || response.status === 404
 

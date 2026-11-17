@@ -23,7 +23,10 @@ export interface GearImageResult {
   error?: string
 }
 
-/** Typed view of photos-api's `GearAssets` RPC entrypoint. */
+/**
+ * Typed view of photos-api's `GearAssets` RPC entrypoint. Keep in step with
+ * photos-api `src/gear-assets.ts` (GearImageItem, GearImageResult, options).
+ */
 export interface GearAssetsRpc {
   syncGearImages(
     items: Array<{ id: string; url: string | null }>,
@@ -69,6 +72,8 @@ export function gearImageItems(pages: NotionPage[]): Array<{ id: string; url: st
 export interface GearImageSummary extends SyncResult {
   statuses: Partial<Record<GearImageStatus, number>>
   needs_review: string[]
+  /** Pages whose image isn't a Notion upload (for example an external link); they keep their old version. */
+  unsupported: string[]
 }
 
 /**
@@ -89,6 +94,7 @@ export async function syncGearImages(
     errors: [],
     statuses: {},
     needs_review: [],
+    unsupported: [],
   }
   const items = gearImageItems(pages)
   if (items.length === 0) return summary
@@ -114,6 +120,8 @@ export async function syncGearImages(
       if (existing !== result.version) sets.push({ id: result.id, version: result.version })
     } else if (result.status === 'missing') {
       if (existing !== null) clears.push(result.id)
+    } else if (result.status === 'unsupported') {
+      summary.unsupported.push(result.id)
     } else if (result.status === 'failed') {
       summary.errors.push(`gear image ${result.id}: ${result.error ?? 'failed'}`)
     }

@@ -1,6 +1,6 @@
 /**
  * Shared type definitions for the climb-log application.
- * 
+ *
  * These interfaces match the D1 database schema defined in migrations/.
  */
 
@@ -155,4 +155,6 @@ export interface SyncResult {
   updated: number
   deleted: number
   errors: string[]
+  /** Why a step did not run, when that is not an error. */
+  skipped?: string
 }
