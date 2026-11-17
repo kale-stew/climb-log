@@ -44,8 +44,6 @@ interface Gear {
   brand: string | null
   category: string | null
   color: string | null
-  /** Legacy hand-copied file name; synced images use img_version instead. */
-  img?: string | null
   more_info: string | null
   pack_list: string | null
   product_str: string | null
@@ -145,7 +143,7 @@ async function main() {
   // Gear
   sql += '-- Gear\n'
   sql += generateInsertSQL('gear', gear, [
-    'id', 'title', 'acquired_on', 'brand', 'category', 'color', 'img', 'more_info', 'pack_list', 'product_str', 'retired_on', 'url', 'weight_g', 'event_ids'
+    'id', 'title', 'acquired_on', 'brand', 'category', 'color', 'more_info', 'pack_list', 'product_str', 'retired_on', 'url', 'weight_g', 'event_ids'
   ])
   sql += '\n\n'
 

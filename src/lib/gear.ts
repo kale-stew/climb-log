@@ -10,7 +10,6 @@ export interface GearRow {
   title: string
   brand: string | null
   category: string | null
-  img: string | null
   img_version: string | null
   url: string | null
   more_info: string | null
@@ -38,9 +37,8 @@ export interface GearCategory {
 
 export interface GearImage {
   src: string
-  srcset: string | null
+  srcset: string
   thumb: string
-  legacy: boolean
 }
 
 export interface GearItem {
@@ -117,22 +115,14 @@ export function categoryRank(slug: string): number {
   return index === -1 ? CATEGORY_ORDER.length : index
 }
 
-export function gearImage(row: Pick<GearRow, 'id' | 'img' | 'img_version'>): GearImage | null {
-  if (isGearImageVersion(row.img_version)) {
-    const version = row.img_version
-    return {
-      src: gearImagePath(row.id, version, 400),
-      srcset: GEAR_IMAGE_WIDTHS.map(w => `${gearImagePath(row.id, version, w)} ${w}w`).join(', '),
-      thumb: gearImagePath(row.id, version, 200),
-      legacy: false,
-    }
+export function gearImage(row: Pick<GearRow, 'id' | 'img_version'>): GearImage | null {
+  if (!isGearImageVersion(row.img_version)) return null
+  const version = row.img_version
+  return {
+    src: gearImagePath(row.id, version, 400),
+    srcset: GEAR_IMAGE_WIDTHS.map(w => `${gearImagePath(row.id, version, w)} ${w}w`).join(', '),
+    thumb: gearImagePath(row.id, version, 200),
   }
-  // Transition only: hand-copied PNGs until every row has a synced version.
-  if (row.img && /^[\w.-]+\.png$/i.test(row.img)) {
-    const src = `/gear/${row.img}`
-    return { src, srcset: null, thumb: src, legacy: true }
-  }
-  return null
 }
 
 export function splitPackLists(value: string | null): string[] {
@@ -315,7 +305,7 @@ export const GEAR_CLIMB_LINKS_SQL = `
 `
 
 export const GEAR_ROWS_SQL = `
-  SELECT id, title, brand, category, img, img_version, url, more_info,
+  SELECT id, title, brand, category, img_version, url, more_info,
          acquired_on, retired_on, pack_list, weight_g
   FROM gear
 `

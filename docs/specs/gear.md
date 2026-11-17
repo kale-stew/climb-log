@@ -1,6 +1,6 @@
 # Gear: Synced Images, Normalized Frames, And A Filterable Page
 
-> **Status: plan, reviewed 2026-11-16 (reviewer findings folded in).** Measured against the Notion gear database
+> **Status: shipped 2026-11-17.** photos-api #12 and climb-log #131 are live. The production backfill finished with 133 images ready and 3 pages without an image. `public/gear/` and the legacy fallback were removed in the follow-up cleanup PR. The legacy `gear.img` column is no longer read or written. It stays in the schema rather than being dropped with a destructive migration. Measured against the Notion gear database
 > and production `kylies.photos` on 2026-11-16.
 
 ## Goal
@@ -166,7 +166,7 @@ ALTER TABLE gear ADD COLUMN event_ids TEXT;            -- JSON array of dashed P
 ALTER TABLE climbs ADD COLUMN calendar_event_ids TEXT; -- JSON array, same ids
 ```
 
-The legacy `gear.img` column stops being written. It's dropped together with `public/gear/` in the deletion PR.
+The legacy `gear.img` column stopped being written and, after the cleanup PR, is no longer read either. It's left in place.
 
 ### Sync
 
@@ -196,7 +196,7 @@ The legacy `gear.img` column stops being written. It's dropped together with `pu
 
 - Proxies to photos-api through `PHOTOS_API`, mirroring `proxyPhotoImage`, and passes 302s through.
 - Validates `id` (UUID), `version` (`[0-9a-f]{12}`), and `w` (200, 400, 800).
-- **Transition:** until the deletion PR, the page renders the legacy `/gear/{img}` file when `img_version` is NULL, so a deploy that lands before the sync can't blank images.
+- **Transition (removed in the cleanup PR):** the page rendered the legacy `/gear/{img}` file when `img_version` was NULL, until the production backfill finished.
 - **Redirect:** `/gear/14er-pack-list` and `/gear/first-winter-peak` 301 to `/blog/gear/{slug}` for outside links. The internal links are fixed in the posts.
 
 ### Climb links

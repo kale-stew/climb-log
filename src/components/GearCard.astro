@@ -23,8 +23,8 @@ const productLabel = `${item.brand ? `${item.brand} ` : ''}${item.title} product
     {item.image ? (
       <img
         src={item.image.src}
-        srcset={item.image.srcset ?? undefined}
-        sizes={item.image.srcset ? IMAGE_SIZES : undefined}
+        srcset={item.image.srcset}
+        sizes={IMAGE_SIZES}
         alt=""
         width="800"
         height="800"
