@@ -24,7 +24,6 @@ function row(overrides: Partial<GearRow> = {}): GearRow {
     title: 'Crampons',
     brand: 'Petzl',
     category: '❄️ Winter Gear',
-    img: null,
     img_version: null,
     url: null,
     more_info: null,
@@ -63,23 +62,15 @@ describe('gearStatus', () => {
 
 describe('gearImage', () => {
   it('prefers the synced, versioned image with a srcset', () => {
-    const image = gearImage({ id: ID, img: 'old.png', img_version: '0123456789ab' })
+    const image = gearImage({ id: ID, img_version: '0123456789ab' })
     expect(image?.src).toBe(`/gear/img/${ID}/0123456789ab.webp?w=400`)
     expect(image?.thumb).toBe(`/gear/img/${ID}/0123456789ab.webp?w=200`)
     expect(image?.srcset).toContain('?w=800 800w')
   })
 
-  it('falls back to the hand-copied file until the first sync', () => {
-    expect(gearImage({ id: ID, img: 'boots.png', img_version: null })).toEqual({
-      src: '/gear/boots.png',
-      srcset: null,
-      thumb: '/gear/boots.png',
-      legacy: true,
-    })
-  })
-
-  it('ignores invalid versions and file names', () => {
-    expect(gearImage({ id: ID, img: '../x.png', img_version: 'nope' })).toBeNull()
+  it('shows no image without a valid synced version', () => {
+    expect(gearImage({ id: ID, img_version: 'nope' })).toBeNull()
+    expect(gearImage({ id: ID, img_version: null })).toBeNull()
   })
 })
 
