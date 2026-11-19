@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { countSummits, latestFeature } from '../../src/lib/journal-data'
+import { countSummits, latestFeature, recentFrames } from '../../src/lib/journal-data'
 import type { DisplayPhoto } from '../../src/lib/photos-client'
 import type { ClimbListItem } from '../../src/lib/types'
 
@@ -74,5 +74,23 @@ describe('latestFeature', () => {
   it('shows the outing without a photo when there are none', () => {
     expect(latestFeature([outing('new', '2026-08-31')], [])?.image).toBeNull()
     expect(latestFeature([], [])).toBeNull()
+  })
+})
+
+describe('recentFrames', () => {
+  it('leaves out the photo the hero borrowed', () => {
+    const photos = [
+      photo('borrowed', '2026-08-31'),
+      photo('a', '2026-08-30'),
+      photo('b', '2026-08-29'),
+    ]
+    const feature = latestFeature([outing('new', '2026-08-31')], photos)
+    expect(recentFrames(photos, feature, 2).map(p => p.id)).toEqual(['a', 'b'])
+  })
+
+  it('keeps every photo when the hero uses its own preview', () => {
+    const photos = [photo('a', '2026-08-30'), photo('b', '2026-08-29')]
+    const feature = latestFeature([outing('new', '2026-08-31', '/img/own?w=800')], photos)
+    expect(recentFrames(photos, feature).map(p => p.id)).toEqual(['a', 'b'])
   })
 })

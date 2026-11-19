@@ -127,6 +127,16 @@ export function latestFeature(
   return { outing, image: { src: `${photo.url}?w=1600`, alt: photoAlt(photo), photoId: photo.id } }
 }
 
+/** The home page's recent photos, minus one the hero borrowed so it doesn't show twice. */
+export function recentFrames(
+  photos: DisplayPhoto[],
+  feature: LatestFeature | null,
+  count = 6,
+): DisplayPhoto[] {
+  const borrowed = feature?.image?.photoId
+  return photos.filter(photo => photo.id !== borrowed).slice(0, count)
+}
+
 export function photoAlt(photo: DisplayPhoto): string {
   return (
     photo.caption ||

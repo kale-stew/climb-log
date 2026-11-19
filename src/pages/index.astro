@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import { env } from 'cloudflare:workers'
 import { formatCalendarDate, formatRecentDate } from '../lib/dates'
-import { formatNumber, latestFeature, loadJournal, photoAlt, roundedFeet } from '../lib/journal-data'
+import { formatNumber, latestFeature, loadJournal, photoAlt, recentFrames, roundedFeet } from '../lib/journal-data'
 import {
   buildChapters,
   chapterSlugFor,
@@ -24,7 +24,7 @@ const latest = feature?.outing
 const rest = journal.outings.filter(outing => outing.id !== latest?.id)
 const lately = rest.slice(0, 7)
 const latestChapter = latest ? chapters.find(chapter => chapter.slug === chapterSlugFor(latest.state)) : null
-const frames = journal.photos.filter(photo => photo.id !== feature?.image?.photoId).slice(0, 6)
+const frames = recentFrames(journal.photos, feature)
 const sinceYear = yearOf(journal.totals.firstDate)
 
 function placeOf(area: string | null, state: string | null): string {

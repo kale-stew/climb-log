@@ -153,7 +153,10 @@ export default function PhotoGallery({
     const missing = ids.filter(id => !(id in slugsRef.current)).slice(0, 60)
     if (missing.length === 0) return
     try {
-      const response = await fetch(`/api/photo-slugs?ids=${missing.map(encodeURIComponent).join(',')}`, { signal })
+      const response = await fetch(
+        `/api/photo-slugs?ids=${missing.map(encodeURIComponent).join(',')}`,
+        { signal },
+      )
       if (!response.ok) return
       const body = (await response.json()) as { slugs?: Record<string, string> }
       // Remember misses as '' so photos without a page are not requested again.
@@ -212,7 +215,8 @@ export default function PhotoGallery({
     setLightboxOpener(null)
     if (lightboxHistory.current) {
       lightboxHistory.current = false
-      if ((window.history.state as { photoLightbox?: boolean } | null)?.photoLightbox) window.history.back()
+      if ((window.history.state as { photoLightbox?: boolean } | null)?.photoLightbox)
+        window.history.back()
     }
   }, [])
 
@@ -561,21 +565,37 @@ export default function PhotoGallery({
           object-fit: cover;
         }
 
+        /* Overlay text is sized in em off one value per zoom level, so it grows and shrinks with the tiles. */
+        .photo-grid[data-grid-zoom='2'] { --overlay-size: 0.62rem; }
+        .photo-grid[data-grid-zoom='3'] { --overlay-size: 0.7rem; }
+        .photo-grid[data-grid-zoom='4'] { --overlay-size: 0.8rem; }
+
         .photo-overlay {
           position: absolute;
           bottom: 0;
           left: 0;
           right: 0;
-          padding: 1.5rem;
-          background: linear-gradient(transparent 25%, rgba(0,0,0,0.88));
+          max-height: 100%;
+          padding: 2.5em 1.2em 1em;
+          background: linear-gradient(transparent, rgba(0,0,0,0.85) 60%);
           color: white;
-          font-size: 0.8rem;
+          font-size: var(--overlay-size, 0.7rem);
+          line-height: 1.25;
           opacity: 0;
           transition: opacity 0.3s ease;
         }
 
-        .photo-overlay strong { display: block; font-family: var(--font-serif); font-size: 1.35rem; font-weight: 400; }
-        .photo-overlay span { display: block; margin-top: 0.25rem; color: rgba(255,255,255,0.65); }
+        .photo-overlay strong {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
+          font-family: var(--font-serif);
+          font-size: 1.5em;
+          font-weight: 400;
+          line-height: 1.2;
+        }
+        .photo-overlay span { display: block; margin-top: 0.3em; color: rgba(255,255,255,0.7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .load-more-wrap { display: flex; justify-content: center; padding-top: 3rem; }
         .load-more { border-radius: 999px; padding: 0.8rem 1.5rem; }

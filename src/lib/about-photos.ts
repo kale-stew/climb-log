@@ -4,7 +4,7 @@
  * sync asks photos-api to add newly tagged photos; photos-api owns the membership.
  */
 
-import { type DisplayPhoto, getAllCollectionPhotos } from './photos-client'
+import { type DisplayPhoto, getAllCollectionPhotos, showsOnKyliesPhotos } from './photos-client'
 import type { SyncResult } from './types'
 
 export const ABOUT_COLLECTION = 'about'
@@ -12,6 +12,21 @@ export const ABOUT_COLLECTION = 'about'
 /** Typed view of photos-api's `PhotoCollections` RPC entrypoint (`src/about-collection.ts`). */
 export interface PhotoCollectionsRpc {
   fillAboutCollection(options?: { dryRun?: boolean }): Promise<{ added: string[]; total: number }>
+}
+
+/** Exact, case-insensitive `kylie` tag, matching photos-api's collection rule. */
+export function hasAboutTag(tags: string | null): boolean {
+  if (!tags) return false
+  let list: unknown
+  try {
+    list = JSON.parse(tags)
+  } catch {
+    list = tags.split(',')
+  }
+  return (
+    Array.isArray(list) &&
+    list.some(tag => typeof tag === 'string' && tag.trim().toLowerCase() === 'kylie')
+  )
 }
 
 /**
@@ -25,16 +40,18 @@ export async function aboutPhotoPool(
 ): Promise<DisplayPhoto[]> {
   if (origin) {
     try {
-      const photos = await getAllCollectionPhotos(origin, ABOUT_COLLECTION, {
+      // Membership only grows, so a photo later moved off kylies.photos is filtered here.
+      const collection = await getAllCollectionPhotos(origin, ABOUT_COLLECTION, {
         fetchFn,
         maxPhotos: 500,
       })
+      const photos = collection.filter(showsOnKyliesPhotos)
       if (photos.length > 0) return photos
     } catch (error) {
       console.error('Failed to load the about collection:', error)
     }
   }
-  const tagged = fallback.filter(photo => photo.tags?.toLowerCase().includes('kylie'))
+  const tagged = fallback.filter(photo => hasAboutTag(photo.tags))
   return tagged.length > 0 ? tagged : fallback
 }
 

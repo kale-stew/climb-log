@@ -1,11 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { aboutPhotoPool, fillAboutStep, type PhotoCollectionsRpc } from '../../src/lib/about-photos'
+import {
+  aboutPhotoPool,
+  fillAboutStep,
+  hasAboutTag,
+  type PhotoCollectionsRpc,
+} from '../../src/lib/about-photos'
 import type { DisplayPhoto } from '../../src/lib/photos-client'
 
 const photo = (id: string, tags: string | null = null) => ({ id, tags }) as DisplayPhoto
-const general = [photo('a', '["kylie"]'), photo('b', '["ridge"]')]
+const general = [photo('a', '["kylie"]'), photo('b', '["ridge"]'), photo('c', '["kylies-photos"]')]
+const shown = (id: string, site = 'climb-log') => ({ id, visibility: 'public', site })
 
-function collectionFetch(photos: Array<{ id: string }>, status = 200): typeof fetch {
+function collectionFetch(
+  photos: Array<{ id: string; visibility?: string; site?: string }>,
+  status = 200,
+): typeof fetch {
   return (async () =>
     new Response(JSON.stringify({ photos, meta: { count: photos.length, total: photos.length } }), {
       status,
@@ -17,9 +26,9 @@ describe('aboutPhotoPool', () => {
     const pool = await aboutPhotoPool(
       'https://photos.test',
       general,
-      collectionFetch([{ id: 'hidden' }]),
+      collectionFetch([shown('hidden'), shown('both', 'both')]),
     )
-    expect(pool.map(p => p.id)).toEqual(['hidden'])
+    expect(pool.map(p => p.id)).toEqual(['hidden', 'both'])
   })
 
   it('falls back to kylie-tagged photos when the collection is empty or down', async () => {
@@ -31,6 +40,22 @@ describe('aboutPhotoPool', () => {
         p => p.id,
       ),
     ).toEqual(['a'])
+  })
+})
+
+describe('about rotation rules', () => {
+  it('drops collection photos no longer shown on kylies.photos', async () => {
+    const fetchFn = collectionFetch([shown('kept'), shown('moved', 'kylieis-online')])
+    expect((await aboutPhotoPool('https://photos.test', general, fetchFn)).map(p => p.id)).toEqual([
+      'kept',
+    ])
+  })
+
+  it('matches the kylie tag exactly', () => {
+    expect(hasAboutTag('["Kylie","ridge"]')).toBe(true)
+    expect(hasAboutTag('kylie, ridge')).toBe(true)
+    expect(hasAboutTag('["kylies-photos"]')).toBe(false)
+    expect(hasAboutTag(null)).toBe(false)
   })
 })
 
