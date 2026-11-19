@@ -28,7 +28,8 @@ This repository deploys `kylies.photos`, including climbs, long-form content, ge
 - Do not copy canonical originals or transforms into `climb-log-images`.
 - Canonical rows can come from Notion, desktop imports, or blog assets. Never assume `notion_id` is present or that the legacy Notion Photo Directory is the source of an imported row.
 - Use the date-ordered compatibility list for recent-photo surfaces and the `portfolio` collection endpoint for curated galleries. Collection order is not capture-date order.
-- /about rotates through photos-api's `about` collection (`src/lib/about-photos.ts`), falling back to `kylie`-tagged photos in the compatibility list. The collection includes hidden photos, so a photo can rotate on /about without appearing elsewhere. The nightly cron asks photos-api to add newly tagged photos through the `PhotoCollections` RPC (`PHOTO_COLLECTIONS` binding); like the gear step, it is skipped under `astro dev`.
+- /about rotates through photos-api's `about` collection (`src/lib/about-photos.ts`), falling back to `kylie`-tagged photos in the compatibility list. About is a photos-api feature: Link-only photos can be featured there, so a photo can rotate on /about without appearing elsewhere. The nightly cron asks photos-api to add newly tagged photos through the `PhotoCollections` RPC (`PHOTO_COLLECTIONS` binding); like the gear step, it is skipped under `astro dev`.
+- Blog images become figures at build time (`src/lib/blog-figures.ts`). The caption is the photo's photos-api caption, else the Markdown text, never the photo title. Captions are fixed at build, so admin caption edits reach posts on the next deploy; `npm run build` uses `--force` so the content cache never serves stale captions.
 - The home page always features the newest outing. Without its own preview it borrows the newest photo taken on or before its date (`latestFeature` in `src/lib/journal-data.ts`).
 
 ## Photo Pages And Slugs

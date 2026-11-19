@@ -95,14 +95,15 @@ export async function addFigures(tree: HastRoot, lookup: CaptionLookup): Promise
   collectParagraphs(tree, found)
 
   const pending = Promise.all(
-    found.map(async ({ parent, index, img }) => {
+    found.map(async ({ parent, index, img }, position) => {
       const alt = parseAlt(String(img.properties.alt ?? ''))
       const id = photoIdFromSrc(String(img.properties.src ?? ''))
       const stored = id ? await lookup(id).catch(() => null) : null
       const caption = (stored ? parseAlt(stored).text : '') || alt.text
 
       img.properties.alt = alt.text || caption
-      img.properties.loading = 'lazy'
+      // The first image can be the largest thing on screen; let it load right away.
+      if (position > 0) img.properties.loading = 'lazy'
       if (alt.width && alt.height) {
         img.properties.width = alt.width
         img.properties.height = alt.height
@@ -138,12 +139,22 @@ export function photosApiCaptions(origin: string, fetchFn: typeof fetch = fetch)
         headers: { Accept: 'application/json' },
         signal: AbortSignal.timeout(8000),
       })
-        .then(async response =>
-          response.ok
-            ? (((await response.json()) as { caption?: string | null }).caption ?? null)
-            : null,
-        )
-        .catch(() => null)
+        .then(async response => {
+          if (response.ok)
+            return ((await response.json()) as { caption?: string | null }).caption ?? null
+          // A 404 is a photo that is private or gone; anything else means captions may be stale.
+          if (response.status !== 404)
+            console.warn(
+              `[blog-figures] photos-api ${response.status} for ${id}; using the Markdown caption`,
+            )
+          return null
+        })
+        .catch(error => {
+          console.warn(
+            `[blog-figures] caption lookup failed for ${id} (${error}); using the Markdown caption`,
+          )
+          return null
+        })
       cache.set(id, caption)
     }
     return caption

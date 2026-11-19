@@ -107,3 +107,20 @@ describe('inline images', () => {
     expect(inline.properties).toMatchObject({ alt: 'Riskier line?', width: 768, height: 341 })
   })
 })
+
+describe('loading', () => {
+  it('loads the first figure eagerly and the rest lazily', async () => {
+    const [first, second] = await render([
+      paragraph(img('/img/a1/', 'One')),
+      paragraph(img('/img/a2/', 'Two')),
+    ])
+    expect(
+      (first as { children: Array<{ properties: Record<string, unknown> }> }).children[0].properties
+        .loading,
+    ).toBeUndefined()
+    expect(
+      (second as { children: Array<{ properties: Record<string, unknown> }> }).children[0]
+        .properties.loading,
+    ).toBe('lazy')
+  })
+})
