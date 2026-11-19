@@ -4,7 +4,7 @@
  * sync asks photos-api to add newly tagged photos; photos-api owns the membership.
  */
 
-import { type DisplayPhoto, getAllCollectionPhotos, showsOnKyliesPhotos } from './photos-client'
+import { type DisplayPhoto, getAllCollectionPhotos } from './photos-client'
 import type { SyncResult } from './types'
 
 export const ABOUT_COLLECTION = 'about'
@@ -12,6 +12,17 @@ export const ABOUT_COLLECTION = 'about'
 /** Typed view of photos-api's `PhotoCollections` RPC entrypoint (`src/about-collection.ts`). */
 export interface PhotoCollectionsRpc {
   fillAboutCollection(options?: { dryRun?: boolean }): Promise<{ added: string[]; total: number }>
+}
+
+/**
+ * The collection is a feature, so Link-only photos rotate here too. Membership only grows,
+ * so photos later made private or moved off kylies.photos are filtered out.
+ */
+export function isAboutFeatureVisible(photo: Pick<DisplayPhoto, 'visibility' | 'site'>): boolean {
+  return (
+    (photo.visibility === 'public' || photo.visibility === 'unlisted') &&
+    (photo.site === 'climb-log' || photo.site === 'both')
+  )
 }
 
 /** Exact, case-insensitive `kylie` tag, matching photos-api's collection rule. */
@@ -40,12 +51,11 @@ export async function aboutPhotoPool(
 ): Promise<DisplayPhoto[]> {
   if (origin) {
     try {
-      // Membership only grows, so a photo later moved off kylies.photos is filtered here.
       const collection = await getAllCollectionPhotos(origin, ABOUT_COLLECTION, {
         fetchFn,
         maxPhotos: 500,
       })
-      const photos = collection.filter(showsOnKyliesPhotos)
+      const photos = collection.filter(isAboutFeatureVisible)
       if (photos.length > 0) return photos
     } catch (error) {
       console.error('Failed to load the about collection:', error)
