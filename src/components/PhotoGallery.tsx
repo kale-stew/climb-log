@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { columnCount, masonryColumns } from '../lib/masonry'
 import { getCollectionPage } from '../lib/photos-client'
 import PhotoLightbox, { type LightboxPhoto } from './PhotoLightbox'
 
@@ -44,6 +45,8 @@ function getImageUrl(photo: Photo, size: 'thumb' | 'full' = 'thumb') {
 
 const GRID_MIN_WIDTHS = [64, 96, 160, 260, 420]
 const GRID_GAPS = ['1px', '2px', '0.35rem', '0.65rem', '1rem']
+/** Zoom levels from here up use the masonry layout; below it, a square grid. */
+const MASONRY_ZOOM = 2
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export default function PhotoGallery({
@@ -243,6 +246,28 @@ export default function PhotoGallery({
   const gridMinWidth = GRID_MIN_WIDTHS[gridZoom]
   const gridGap = GRID_GAPS[gridZoom]
 
+  // Masonry zoom levels place photos in explicit columns once measured, so "Load more"
+  // only adds to the column bottoms. Until then (and on the server) CSS columns lay them out.
+  const [gridWidth, setGridWidth] = useState<number | null>(null)
+  const [rootFontSize, setRootFontSize] = useState(16)
+  useEffect(() => {
+    const grid = gridRef.current
+    if (!grid) return
+    setRootFontSize(Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16)
+    const observer = new ResizeObserver(([entry]) => setGridWidth(entry.contentRect.width))
+    observer.observe(grid)
+    return () => observer.disconnect()
+  }, [])
+  const gapPx = gridGap.endsWith('rem')
+    ? Number.parseFloat(gridGap) * rootFontSize
+    : Number.parseFloat(gridGap)
+  const masonryCount =
+    gridZoom >= MASONRY_ZOOM && gridWidth ? columnCount(gridWidth, gridMinWidth, gapPx) : null
+  const masonry = useMemo(
+    () => (masonryCount ? masonryColumns(visiblePhotos, masonryCount) : null),
+    [visiblePhotos, masonryCount],
+  )
+
   const captureVisibleTiles = () => {
     const tiles = gridRef.current?.querySelectorAll<HTMLElement>('[data-photo-id]')
     if (!tiles) return
@@ -306,6 +331,43 @@ export default function PhotoGallery({
     [],
   )
 
+  const renderTile = (photo: Photo, index: number) => (
+    <button
+      type="button"
+      key={photo.id}
+      className="photo-item"
+      data-photo-id={photo.id}
+      onClick={event => openLightbox(index, event.currentTarget)}
+      aria-label={`View photo: ${photo.caption || photo.title || 'Mountain photo'}`}
+      style={photo.accent_color ? { backgroundColor: photo.accent_color } : undefined}
+    >
+      <img
+        src={getImageUrl(photo, 'thumb')}
+        alt={[photo.caption || photo.title, [photo.area, photo.state].filter(Boolean).join(', ')]
+          .filter(Boolean)
+          .join(', ')}
+        loading="lazy"
+        width={photo.width ?? 800}
+        height={photo.height ?? 600}
+        onError={e => {
+          // If image fails to load, hide it to show the background/accent color
+          e.currentTarget.style.display = 'none'
+        }}
+      />
+      {(photo.caption || photo.title) && (
+        <div className="photo-overlay">
+          <strong>{photo.title || photo.caption}</strong>
+          {photo.area && (
+            <span title={[photo.area, photo.state].filter(Boolean).join(', ')}>
+              {photo.area}
+              {photo.state && `, ${photo.state}`}
+            </span>
+          )}
+        </div>
+      )}
+    </button>
+  )
+
   const getTouchDistance = (touches: ArrayLike<{ clientX: number; clientY: number }>) => {
     const first = touches[0]
     const second = touches[1]
@@ -361,7 +423,7 @@ export default function PhotoGallery({
       {/* Gallery Grid */}
       <div
         ref={gridRef}
-        className="photo-grid"
+        className={masonry ? 'photo-grid is-masonry' : 'photo-grid'}
         data-grid-zoom={gridZoom}
         style={
           { '--photo-min-width': `${gridMinWidth}px`, '--photo-gap': gridGap } as CSSProperties
@@ -381,45 +443,14 @@ export default function PhotoGallery({
           pinchStartDistance.current = null
         }}
       >
-        {visiblePhotos.map((photo, index) => (
-          <button
-            type="button"
-            key={photo.id}
-            className="photo-item"
-            data-photo-id={photo.id}
-            onClick={event => openLightbox(index, event.currentTarget)}
-            aria-label={`View photo: ${photo.caption || photo.title || 'Mountain photo'}`}
-            style={photo.accent_color ? { backgroundColor: photo.accent_color } : undefined}
-          >
-            <img
-              src={getImageUrl(photo, 'thumb')}
-              alt={[
-                photo.caption || photo.title,
-                [photo.area, photo.state].filter(Boolean).join(', '),
-              ]
-                .filter(Boolean)
-                .join(', ')}
-              loading="lazy"
-              width={photo.width ?? 800}
-              height={photo.height ?? 600}
-              onError={e => {
-                // If image fails to load, hide it to show the background/accent color
-                e.currentTarget.style.display = 'none'
-              }}
-            />
-            {(photo.caption || photo.title) && (
-              <div className="photo-overlay">
-                <strong>{photo.title || photo.caption}</strong>
-                {photo.area && (
-                  <span title={[photo.area, photo.state].filter(Boolean).join(', ')}>
-                    {photo.area}
-                    {photo.state && `, ${photo.state}`}
-                  </span>
-                )}
+        {masonry
+          ? masonry.map((column, columnIndex) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional
+              <div className="photo-column" key={columnIndex}>
+                {column.map(index => renderTile(visiblePhotos[index], index))}
               </div>
-            )}
-          </button>
-        ))}
+            ))
+          : visiblePhotos.map((photo, index) => renderTile(photo, index))}
       </div>
 
       {!isLoading && photos.length === 0 && !loadError && (
@@ -440,7 +471,6 @@ export default function PhotoGallery({
           </button>
         </div>
       )}
-
       {lightbox && (
         <PhotoLightbox
           photos={lightboxPhotos}
@@ -469,6 +499,15 @@ export default function PhotoGallery({
           columns: var(--photo-min-width);
           column-gap: var(--photo-gap);
         }
+
+        .photo-grid.is-masonry[data-grid-zoom] {
+          display: flex;
+          align-items: flex-start;
+          gap: var(--photo-gap);
+          columns: auto;
+        }
+
+        .photo-column { flex: 1 1 0; min-width: 0; }
 
         .gallery-tools {
           display: flex;
