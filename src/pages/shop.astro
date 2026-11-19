@@ -547,6 +547,17 @@ function printHref(photo: DisplayPhoto, size: PrintSize) {
     grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
     gap: var(--space-sm);
   }
+  /* One line per option on phones, so every shape group fits above the sticky button. */
+  @media (max-width: 760px) {
+    .size-option {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      min-height: 2.75rem;
+      padding: 0.6rem 0.65rem;
+    }
+  }
   .size-note {
     margin: 0;
     font-family: var(--font-sans);
