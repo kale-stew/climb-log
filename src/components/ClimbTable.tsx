@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { hikePostPath } from '../lib/blog-posts'
 import { formatCalendarDate } from '../lib/dates'
 import { sizedImageUrl } from '../lib/image-url'
 import { knownOutingType, outingName } from '../lib/places'
@@ -570,8 +571,10 @@ export default function ClimbTable({
                     </td>
                     <td className="cell-fixed">{formatDate(climb.date)}</td>
                     <td>
-                      {climb.slug ? (
-                        <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
+                      {hikePostPath(climb.slug) ? (
+                        <a href={hikePostPath(climb.slug) ?? undefined}>
+                          {outingName(climb.title)}
+                        </a>
                       ) : (
                         outingName(climb.title)
                       )}
@@ -644,8 +647,8 @@ export default function ClimbTable({
                   </button>
                 )}
                 <h3 className="climb-mobile-title">
-                  {climb.slug ? (
-                    <a href={`/blog/hike/${climb.slug}`}>{outingName(climb.title)}</a>
+                  {hikePostPath(climb.slug) ? (
+                    <a href={hikePostPath(climb.slug) ?? undefined}>{outingName(climb.title)}</a>
                   ) : (
                     outingName(climb.title)
                   )}

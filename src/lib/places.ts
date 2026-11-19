@@ -1,3 +1,4 @@
+import { hikePostPath } from './blog-posts'
 import type { ClimbListItem } from './types'
 
 export interface ChapterDefinition {
@@ -152,9 +153,7 @@ export function groupByYear(
 }
 
 export function outingHref(outing: Pick<ClimbListItem, 'id' | 'slug'>): string {
-  return outing.slug
-    ? `/blog/hike/${outing.slug}`
-    : `/journal?outing=${encodeURIComponent(outing.id)}`
+  return hikePostPath(outing.slug) ?? `/journal?outing=${encodeURIComponent(outing.id)}`
 }
 
 const OUTING_TYPE =
