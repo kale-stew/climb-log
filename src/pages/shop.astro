@@ -225,9 +225,11 @@ function printHref(photo: DisplayPhoto, size: PrintSize) {
       )}
       <a class="btn btn-primary qv-cta" href={productHref(product)}>{ctaLabel(product)}</a>
       <p class="qv-fine">
-        {opensEmail(product)
-          ? `Opens an email to ${SHOP_EMAIL}. US shipping only; I’ll reply to confirm before you pay.`
-          : 'US shipping only. Checkout is handled by Stripe.'}
+        {product.state === 'coming-soon' || product.state === 'preorder-closed'
+          ? `Opens an email to ${SHOP_EMAIL}. I’ll write back when it’s available.`
+          : opensEmail(product)
+            ? `Opens an email to ${SHOP_EMAIL}. US shipping only; I’ll reply to confirm before you pay.`
+            : 'US shipping only. Checkout is handled by Stripe.'}
       </p>
     </QuickView>
   ))}
@@ -549,7 +551,7 @@ function printHref(photo: DisplayPhoto, size: PrintSize) {
   }
   /* One line per option on phones, so every shape group fits above the sticky button. */
   @media (max-width: 760px) {
-    .size-option {
+    .size-options .size-option {
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
