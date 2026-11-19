@@ -1,3 +1,4 @@
+import { hikePostPath } from './blog-posts'
 import type { ClimbListItem } from './types'
 
 export interface ChapterDefinition {
@@ -152,13 +153,11 @@ export function groupByYear(
 }
 
 export function outingHref(outing: Pick<ClimbListItem, 'id' | 'slug'>): string {
-  return outing.slug
-    ? `/blog/hike/${outing.slug}`
-    : `/journal?outing=${encodeURIComponent(outing.id)}`
+  return hikePostPath(outing.slug) ?? `/journal?outing=${encodeURIComponent(outing.id)}`
 }
 
 const OUTING_TYPE =
-  /^(Trail Run|Rock Climb|Hike|Climb|Backpack|Ski|Scramble|Run|Attempt|Sunrise Hike|Sunset Hike|Sunset Run)\b\s*(?:in\s+)?/i
+  /^(Solo Climb|Solo Hike|Solo Trail Run|Solo Run|Trail Run|Rock Climb|Hike|Climb|Backpack|Ski|Scramble|Run|Attempt|Sunrise Hike|Sunset Hike|Sunset Run)\b\s*(?:in\s+)?/i
 
 /** The leading activity in a title ("Trail Run …" → "trail run"), or null when the title has none. */
 export function knownOutingType(title: string | null): string | null {

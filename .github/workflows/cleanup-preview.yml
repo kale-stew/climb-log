@@ -30,9 +30,11 @@ jobs:
 
       - name: Generate preview name from PR title
         id: slug
+        # The title is untrusted input: pass it through env, never paste it into the script.
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          TITLE="${{ github.event.pull_request.title }}"
-          WORD=$(echo "$TITLE" | sed -E 's/^(fix|feat|chore|docs|refactor|test|ci|style|perf|build|revert|rewrite|add|update|remove|delete)(\([^)]*\))?[:!]?\s*//i' | awk '{print $1}' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g' | cut -c1-12)
+          WORD=$(printf '%s\n' "$PR_TITLE" | sed -E 's/^(fix|feat|chore|docs|refactor|test|ci|style|perf|build|revert|rewrite|add|update|remove|delete)(\([^)]*\))?[:!]?\s*//i' | awk '{print $1}' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g' | cut -c1-12)
           [ -z "$WORD" ] && WORD="pr${{ github.event.pull_request.number }}"
           echo "name=climb-log-${WORD}-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
 
