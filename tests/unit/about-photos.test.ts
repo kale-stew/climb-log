@@ -9,7 +9,7 @@ import type { DisplayPhoto } from '../../src/lib/photos-client'
 
 const photo = (id: string, tags: string | null = null) => ({ id, tags }) as DisplayPhoto
 const general = [photo('a', '["kylie"]'), photo('b', '["ridge"]'), photo('c', '["kylies-photos"]')]
-const shown = (id: string, site = 'climb-log') => ({ id, visibility: 'public', site })
+const shown = (id: string, site = 'climb-log', visibility = 'public') => ({ id, visibility, site })
 
 function collectionFetch(
   photos: Array<{ id: string; visibility?: string; site?: string }>,
@@ -45,9 +45,15 @@ describe('aboutPhotoPool', () => {
 
 describe('about rotation rules', () => {
   it('drops collection photos no longer shown on kylies.photos', async () => {
-    const fetchFn = collectionFetch([shown('kept'), shown('moved', 'kylieis-online')])
+    const fetchFn = collectionFetch([
+      shown('kept'),
+      shown('link-only', 'climb-log', 'unlisted'),
+      shown('moved', 'kylieis-online'),
+      shown('private', 'climb-log', 'private'),
+    ])
     expect((await aboutPhotoPool('https://photos.test', general, fetchFn)).map(p => p.id)).toEqual([
       'kept',
+      'link-only',
     ])
   })
 

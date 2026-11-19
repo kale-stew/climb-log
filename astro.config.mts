@@ -1,9 +1,15 @@
 import cloudflare from '@astrojs/cloudflare'
 import react from '@astrojs/react'
 import { defineConfig } from 'astro/config'
+import { rehypeBlogFigures } from './src/lib/blog-figures'
+
+const PHOTOS_API_ORIGIN = process.env.PHOTOS_API_ORIGIN ?? 'https://photos-api.kylieski.workers.dev'
 
 export default defineConfig({
   output: 'server',
+  markdown: {
+    rehypePlugins: [[rehypeBlogFigures, { origin: PHOTOS_API_ORIGIN }]],
+  },
   trailingSlash: 'never',
   // Older posts linked gear posts under /gear; they live under /blog/gear.
   redirects: {

@@ -19,7 +19,7 @@ There are wildflowers aplenty if you're hiking this in the early summer. Late Ju
 
 After turning left at the lake and heading up a narrow trail to a marshy area, you'll lose sight of cairns. As is the case with many 13ers, there's another path visible gaining the shoulder that I chose to cut the edge of the marsh to get to, but I'm sure there are alternatives that will take you directly to this path. For what it's worth, I did try to target that trail on my descent but did not find any well-traveled or marked connection back to the main path. You will need to bushwhack a little bit to get to this peak.
 
-![Looking out towards Mount Bethel after leaving the basin to gain The Citadel's southern shoulder. {768x527}](/img/a268559b/))
+![Looking out towards Mount Bethel after leaving the basin to gain The Citadel's southern shoulder. {768x527}](/img/a268559b/)
 
 Once you gain the saddle between Hagar and The Citadel, Golden Bear and a section of the CDT come into view. The ridgeline connecting the two unofficially named peaks ("The Citadel" and "Golden Bear") looks daunting but doable. I made a mental note to come back here someday to see how doable it actually is.
 
@@ -57,7 +57,7 @@ Gaining the second summit was easier than descending the first. The summit itsel
 
 The views of the surrounding peaks from this summit is expansive and the first high point I had come over looked like a single, sharp tooth from the higher angle. The sharp lines contrasted with wide basins makes this summit feel more like an Elk peak than a Front range one.
 
-![Looking back to the first high point from Citadel's true summit. {591x768}](/img/5563a4b8/))
+![Looking back to the first high point from Citadel's true summit. {591x768}](/img/5563a4b8/)
 
 Descending the gully to The Citadel's west was as loose and unsupported as I had expected. I carefully planned my line and moved slowly on the way down, but still managed to kick some rocks free. This was where I managed to bruise myself the most all day, it's easy to kick medium sized rocks into your feet on this side of the mountain. Finally returning to solid ground after 22 minutes of cautious navigation was a big relief.
 

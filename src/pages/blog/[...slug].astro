@@ -244,6 +244,21 @@ const postJsonLd = [
     margin: var(--space-lg) 0;
   }
 
+  .prose :global(.post-figure) {
+    margin: var(--space-lg) 0;
+  }
+
+  .prose :global(.post-figure img) {
+    margin: 0;
+  }
+
+  .prose :global(.post-figure figcaption) {
+    margin-top: var(--space-sm);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--color-text-tertiary);
+  }
+
   .prose :global(blockquote) {
     border-left: 3px solid var(--color-accent);
     padding-left: var(--space-lg);
