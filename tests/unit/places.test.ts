@@ -112,6 +112,15 @@ describe('places', () => {
     expect(outingName('Hike Inspiration Point')).toBe('Inspiration Point')
   })
 
+  it('parses solo climbs, hikes, and runs', () => {
+    expect(outingType('Solo Hike Bear & South Boulder Peaks')).toBe('solo hike')
+    expect(outingName('Solo Hike Bear & South Boulder Peaks')).toBe('Bear & South Boulder Peaks')
+    expect(outingType("Solo Climb 'The Citadel'")).toBe('solo climb')
+    expect(outingName("Solo Climb 'The Citadel'")).toBe("'The Citadel'")
+    expect(outingType('Solo Run Mount Falcon')).toBe('solo run')
+    expect(knownOutingType('Solo Snowshoe Castle Peak')).toBeNull()
+  })
+
   it('capitalizes a name that started mid-sentence', () => {
     expect(outingName('Run the Baquiano Trail')).toBe('The Baquiano Trail')
     expect(outingName('the Silver Couloir')).toBe('the Silver Couloir')
