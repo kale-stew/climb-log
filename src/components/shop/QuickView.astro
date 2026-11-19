@@ -1,17 +1,25 @@
 ---
 import type { DisplayPhoto } from '../../lib/photos-client'
-import type { ShopImage as ShopImageType } from '../../lib/shop'
+import type { ResolvedImage } from '../../lib/shop'
 import ShopImage from './ShopImage.astro'
 
 interface Props {
   slug: string
   title: string
-  gallery: Array<{ image: ShopImageType; photo: DisplayPhoto | null }>
+  gallery: Array<ResolvedImage<DisplayPhoto>>
+  /**
+   * Pixel size of the first image. Slides take its shape instead of a fixed height, and the first
+   * slide gets a crop guide that the print size picker drives.
+   */
+  frame?: { width: number; height: number }
 }
 
-const { slug, title, gallery } = Astro.props
+const { slug, title, gallery, frame } = Astro.props
 const titleId = `qv-${slug}-title`
 const count = gallery.length
+const frameStyle = frame
+  ? `--qv-ratio: ${frame.width} / ${frame.height}; --qv-ratio-n: ${(frame.width / frame.height).toFixed(4)}`
+  : undefined
 ---
 
 <dialog class="quick-view" id={`qv-${slug}`} data-slug={slug} aria-labelledby={titleId}>
@@ -22,10 +30,15 @@ const count = gallery.length
 
     <div class="qv-media">
       <div class="qv-main">
-        <div class="qv-track" data-qv-track tabindex="0" role="region" aria-label={`${title} images`}>
-          {gallery.map(({ image, photo }, index) => (
+        <div class="qv-track" data-qv-track data-framed={frame ? '' : undefined} style={frameStyle} tabindex="0" role="region" aria-label={`${title} images`}>
+          {gallery.map(({ image, photo, behind }, index) => (
             <div class="qv-slide" aria-label={`Image ${index + 1} of ${count}`} role="group">
-              <ShopImage image={image} photo={photo} width={1600} fit="contain" />
+              <ShopImage image={image} photo={photo} behind={behind} width={1600} fit="contain" />
+              {frame && index === 0 && (
+                <div class="qv-crop-frame" aria-hidden="true">
+                  <div class="qv-crop" data-qv-crop hidden />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -38,7 +51,7 @@ const count = gallery.length
       </div>
       {count > 1 && (
         <div class="qv-thumbs">
-          {gallery.map(({ image, photo }, index) => (
+          {gallery.map(({ image, photo, behind }, index) => (
             <button
               type="button"
               class="qv-thumb"
@@ -46,7 +59,7 @@ const count = gallery.length
               aria-label={`Show image ${index + 1} of ${count}`}
               aria-current={index === 0 ? 'true' : undefined}
             >
-              <ShopImage image={image} photo={photo} width={200} decorative />
+              <ShopImage image={image} photo={photo} behind={behind} width={200} decorative />
             </button>
           ))}
         </div>
@@ -157,12 +170,32 @@ const count = gallery.length
     })
     dialog.addEventListener('close', () => onClose(slug))
 
+    const crop = dialog.querySelector<HTMLElement>('[data-qv-crop]')
+    const cropNote = dialog.querySelector<HTMLElement>('[data-qv-crop-note]')
+    const track = dialog.querySelector<HTMLElement>('[data-qv-track]')
+
+    // The guide shows only for sizes that trim the photo; a full-frame size has nothing to show.
+    const showSize = (input: HTMLInputElement) => {
+      const cta = dialog.querySelector<HTMLAnchorElement>('[data-qv-cta]')
+      if (cta && input.dataset.href) cta.href = input.dataset.href
+      const price = dialog.querySelector<HTMLElement>('[data-qv-price]')
+      if (price && input.dataset.price) price.textContent = input.dataset.price
+      if (cropNote && input.dataset.cropNote) cropNote.textContent = input.dataset.cropNote
+      if (crop) {
+        const width = Number(input.dataset.cropW ?? 1)
+        const height = Number(input.dataset.cropH ?? 1)
+        crop.hidden = width >= 1 && height >= 1
+        crop.style.width = `${width * 100}%`
+        crop.style.height = `${height * 100}%`
+      }
+    }
+
     dialog.querySelectorAll<HTMLInputElement>('input[data-href]').forEach(input => {
+      if (input.checked) showSize(input)
       input.addEventListener('change', () => {
-        const cta = dialog.querySelector<HTMLAnchorElement>('[data-qv-cta]')
-        if (cta && input.dataset.href) cta.href = input.dataset.href
-        const price = dialog.querySelector<HTMLElement>('[data-qv-price]')
-        if (price && input.dataset.price) price.textContent = input.dataset.price
+        showSize(input)
+        // The guide lives on the first image, so bring it back into view.
+        if (crop && track && track.scrollLeft > 0) track.scrollTo({ left: 0, behavior: 'auto' })
       })
     })
   })
@@ -303,15 +336,45 @@ const count = gallery.length
     outline-offset: 2px;
   }
   .qv-slide {
+    position: relative;
     flex: 0 0 100%;
     height: min(36rem, calc(100dvh - 12rem));
     scroll-snap-align: start;
   }
+  /* A print's slides take the photo's shape, so no space is spent letterboxing it. */
+  .qv-track[data-framed] .qv-slide {
+    height: auto;
+    aspect-ratio: var(--qv-ratio);
+    max-height: min(36rem, calc(100dvh - 12rem));
+    container-type: size;
+  }
+  /* Matches the photo's rendered box (object-fit: contain) even when max-height letterboxes it. */
+  .qv-crop-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(100cqw, 100cqh * var(--qv-ratio-n));
+    aspect-ratio: var(--qv-ratio);
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .qv-crop {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    outline: 1px dashed rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 100vmax rgba(15, 20, 17, 0.55);
+  }
+  .qv-crop[hidden] {
+    display: none;
+  }
   .qv-arrow {
     position: absolute;
     top: 50%;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     transform: translateY(-50%);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
@@ -358,6 +421,10 @@ const count = gallery.length
   .qv-arrow:active {
     transform: translateY(-50%) scale(0.97);
   }
+  .qv-thumb:focus-visible {
+    outline-offset: 2px;
+    opacity: 1;
+  }
   .qv-thumb[aria-current='true'] {
     border-color: var(--color-text-accent);
     opacity: 1;
@@ -372,10 +439,12 @@ const count = gallery.length
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+  /* Clears the close button (2.75rem at --space-sm from the edge) beyond the column's own padding. */
   .qv-title {
     margin: 0;
-    padding-right: var(--space-xl);
+    padding-right: max(0px, calc(2.75rem + var(--space-sm) - var(--space-xl)));
     font-size: var(--font-size-3xl);
+    text-wrap: pretty;
   }
 
   @media (max-width: 760px) {
@@ -406,6 +475,10 @@ const count = gallery.length
     }
     .qv-slide {
       height: min(46dvh, 26rem);
+    }
+    .qv-track[data-framed] .qv-slide {
+      height: auto;
+      max-height: min(46dvh, 26rem);
     }
     .qv-info {
       padding: var(--space-lg) var(--space-md);

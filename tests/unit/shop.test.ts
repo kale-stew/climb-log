@@ -2,8 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   asset,
   calendarMonth,
+  cropFraction,
+  cropNote,
+  defaultPrintSize,
   effectiveDpi,
+  formatShortDate,
+  groupPrintSizes,
   imagePhotoIds,
+  isFullFrame,
+  largestPrintSize,
   MIN_PRINT_DPI,
   mockup,
   PRINT_SIZES,
@@ -11,9 +18,12 @@ import {
   PRODUCTS,
   photo,
   printableSizes,
+  productCta,
+  productState,
   quickViewSlug,
   requestMailto,
   resolveImages,
+  sizeShape,
 } from '../../src/lib/shop'
 
 const size = (label: string) => {
@@ -150,5 +160,118 @@ describe('requestMailto', () => {
     expect(href).toMatch(/^mailto:hi@kylies\.photos\?/)
     expect(href).not.toContain('+')
     expect(href).toContain('Preorder%3A%202027%20Wall%20Calendar')
+  })
+})
+
+describe('print size shapes', () => {
+  it('labels shapes as reduced ratios', () => {
+    expect(sizeShape(size('16×24'))).toBe('2:3')
+    expect(sizeShape(size('8×10'))).toBe('4:5')
+    expect(sizeShape(size('18×24'))).toBe('3:4')
+  })
+
+  it('recognizes full-frame sizes in either orientation', () => {
+    expect(isFullFrame(6000, 4000, size('8×12'))).toBe(true)
+    expect(isFullFrame(4000, 6000, size('8×12'))).toBe(true)
+    expect(isFullFrame(6000, 4000, size('8×10'))).toBe(false)
+  })
+
+  it('defaults to the smallest full-frame size, not the smallest size', () => {
+    expect(defaultPrintSize(6000, 4000, PRINT_SIZES)?.label).toBe('8×12')
+    expect(defaultPrintSize(4032, 3024, PRINT_SIZES)?.label).toBe('12×16')
+  })
+
+  it('falls back to the smallest size when no shape matches', () => {
+    expect(defaultPrintSize(9000, 3000, PRINT_SIZES)?.label).toBe('8×10')
+  })
+
+  it('puts full-frame groups first', () => {
+    const groups = groupPrintSizes(6000, 4000, PRINT_SIZES)
+    expect(groups[0]).toMatchObject({ shape: '2:3', fullFrame: true })
+    expect(groups[0].sizes.map(entry => entry.label)).toEqual(['8×12', '12×18', '16×24', '20×30'])
+    expect(groups.slice(1).every(group => !group.fullFrame)).toBe(true)
+  })
+
+  it('finds the largest size by area', () => {
+    expect(largestPrintSize(PRINT_SIZES)?.label).toBe('20×30')
+  })
+})
+
+describe('cropFraction', () => {
+  it('keeps the whole frame for a matching shape', () => {
+    expect(cropFraction(6000, 4000, size('12×18'))).toEqual({ width: 1, height: 1 })
+  })
+
+  it('trims the sides of a landscape photo printed squarer', () => {
+    const crop = cropFraction(6000, 4000, size('8×10'))
+    expect(crop.height).toBe(1)
+    expect(crop.width).toBeCloseTo(1.25 / 1.5)
+  })
+
+  it('trims top and bottom of a portrait photo printed squarer', () => {
+    const crop = cropFraction(4000, 6000, size('8×10'))
+    expect(crop.width).toBe(1)
+    expect(crop.height).toBeCloseTo(1.25 / 1.5)
+  })
+
+  it('trims the sides of a 2:1 panorama printed at 2:3', () => {
+    expect(cropFraction(4000, 2000, size('8×12'))).toEqual({ width: 0.75, height: 1 })
+  })
+
+  it('describes the trim in plain words', () => {
+    expect(cropNote(6000, 4000, size('8×10'))).toBe(
+      '8×10 trims about 17% from the left and right edges.',
+    )
+    expect(cropNote(6000, 4000, size('8×12'))).toBe('8×12 prints the full photo.')
+  })
+})
+
+describe('productState', () => {
+  const calendar = { status: 'preorder' as const, preorderCloses: '2026-11-30' }
+
+  it('stays open through the end of the closing day, Pacific time', () => {
+    expect(productState(calendar, new Date('2026-12-01T07:59:00Z'))).toBe('preorder')
+  })
+
+  it('closes after the closing day', () => {
+    expect(productState(calendar, new Date('2026-12-01T08:00:00Z'))).toBe('preorder-closed')
+  })
+
+  it('leaves preorders without a date and other statuses alone', () => {
+    expect(productState({ status: 'preorder' }, new Date('2030-01-01'))).toBe('preorder')
+    expect(productState({ status: 'coming-soon', preorderCloses: '2020-01-01' })).toBe(
+      'coming-soon',
+    )
+  })
+
+  it('formats the closing date for the card', () => {
+    expect(formatShortDate('2026-11-30')).toBe('Nov 30')
+  })
+})
+
+describe('productCta', () => {
+  it('says the button opens an email until checkout exists', () => {
+    expect(productCta('preorder', false)).toBe('Email to preorder')
+    expect(productCta('by-request', false)).toBe('Email to request')
+    expect(productCta('preorder', true)).toBe('Preorder')
+  })
+
+  it('offers a notify-me email once a preorder closes or before launch', () => {
+    expect(productCta('preorder-closed', true)).toBe('Email me when it’s ready')
+    expect(productCta('coming-soon', false)).toBe('Email me when it’s ready')
+  })
+})
+
+describe('postcard stacks', () => {
+  it('fetches and resolves the cards behind the top one, skipping missing ones', () => {
+    const stack = mockup('postcard-stack', 'aaaaaaaaaaaa', {
+      behind: ['bbbbbbbbbbbb', 'cccccccccccc'],
+    })
+    expect(imagePhotoIds([stack])).toEqual(['aaaaaaaaaaaa', 'bbbbbbbbbbbb', 'cccccccccccc'])
+    const photos = new Map([
+      ['aaaaaaaaaaaa', { id: 'a' }],
+      ['cccccccccccc', { id: 'c' }],
+    ])
+    expect(resolveImages([stack], photos)[0].behind).toEqual([{ id: 'c' }])
   })
 })

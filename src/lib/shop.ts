@@ -1,5 +1,8 @@
 export type ProductStatus = 'preorder' | 'by-request' | 'coming-soon'
 
+/** What a product shows right now: a preorder past its close date reads as closed. */
+export type ProductState = ProductStatus | 'preorder-closed'
+
 export interface PrintSize {
   label: string
   /** Short edge in inches. */
@@ -23,8 +26,10 @@ export interface ShopProduct {
   details?: string[]
   /** Stripe Payment Link. Falls back to an email request when unset. */
   checkoutUrl?: string
-  /** Short ship-date chip for preorders, such as "Ships early Dec". */
+  /** Short ship-date chip for preorders, such as "Ships mid-Dec". */
   shipNote?: string
+  /** Last day to preorder (YYYY-MM-DD, Pacific time). The preorder closes at the end of this day. */
+  preorderCloses?: string
 }
 
 export interface PrintListing {
@@ -40,6 +45,7 @@ export type MockupTemplate =
   | 'calendar-month'
   | 'postcard-front'
   | 'postcard-back'
+  | 'postcard-stack'
 
 /**
  * One image in a product gallery.
@@ -55,6 +61,8 @@ export type ShopImage =
       photoId: string
       /** 1–12; the month shown on a `calendar-month` page. */
       month?: number
+      /** Cards stacked behind the front one on a `postcard-stack`, back to front. */
+      behind?: string[]
       alt?: string
     }
   | { kind: 'asset'; src: string; alt: string; width: number; height: number }
@@ -64,7 +72,7 @@ export const photo = (photoId: string, alt?: string): ShopImage => ({ kind: 'pho
 export const mockup = (
   template: MockupTemplate,
   photoId: string,
-  options: { month?: number; alt?: string } = {},
+  options: { month?: number; behind?: string[]; alt?: string } = {},
 ): ShopImage => ({ kind: 'mockup', template, photoId, ...options })
 
 export const asset = (src: string, alt: string, width: number, height: number): ShopImage => ({
@@ -97,10 +105,10 @@ export const PRODUCTS: ShopProduct[] = [
   {
     slug: 'calendar-2027',
     name: '2027 Wall Calendar',
-    blurb:
-      'Twelve months from the mountains, opening to 11×17. Printed in a small run and packed by hand in San Francisco.',
+    blurb: 'Twelve months from the mountains, opening to 11×17. Printed in a small run.',
     status: 'preorder',
-    shipNote: 'Ships early Dec',
+    shipNote: 'Ships mid-Dec',
+    preorderCloses: '2026-11-30',
     price: 32,
     images: [
       mockup('calendar-cover', 'f6e666c3d224'),
@@ -112,7 +120,7 @@ export const PRODUCTS: ShopProduct[] = [
       '11×8.5 closed, opens to 11×17',
       'Thirteen photos: a cover and one per month',
       'Wire-bound, with a hanging hole',
-      'Ships the first week of December',
+      'Preorders close November 30 and ship in mid-December',
     ],
   },
   {
@@ -123,6 +131,7 @@ export const PRODUCTS: ShopProduct[] = [
     status: 'coming-soon',
     price: 18,
     images: [
+      mockup('postcard-stack', 'cc4957db86c2', { behind: ['f968ed549f84', '882e9f19715c'] }),
       mockup('postcard-front', 'cc4957db86c2'),
       mockup('postcard-front', '882e9f19715c'),
       mockup('postcard-front', 'f968ed549f84'),
@@ -148,21 +157,35 @@ export const PRINTS: PrintListing[] = [
 
 /** Canonical photo IDs a gallery needs fetched. Assets need none. */
 export function imagePhotoIds(images: ShopImage[]): string[] {
-  return images.flatMap(image => (image.kind === 'asset' ? [] : [image.photoId]))
+  return images.flatMap(image => {
+    if (image.kind === 'asset') return []
+    if (image.kind === 'mockup') return [image.photoId, ...(image.behind ?? [])]
+    return [image.photoId]
+  })
 }
 
 /**
  * Pairs each image with its fetched photo and drops images whose photo could not be loaded,
  * so a missing photo hides one gallery entry rather than breaking the product.
  */
+export interface ResolvedImage<P> {
+  image: ShopImage
+  photo: P | null
+  /** Photos for the cards behind a `postcard-stack`, back to front; missing ones are skipped. */
+  behind: P[]
+}
+
 export function resolveImages<P>(
   images: ShopImage[],
   photos: ReadonlyMap<string, P>,
-): Array<{ image: ShopImage; photo: P | null }> {
-  return images.flatMap((image): Array<{ image: ShopImage; photo: P | null }> => {
-    if (image.kind === 'asset') return [{ image, photo: null }]
+): Array<ResolvedImage<P>> {
+  return images.flatMap((image): Array<ResolvedImage<P>> => {
+    if (image.kind === 'asset') return [{ image, photo: null, behind: [] }]
     const found = photos.get(image.photoId)
-    return found ? [{ image, photo: found }] : []
+    if (!found) return []
+    const behind =
+      image.kind === 'mockup' ? (image.behind ?? []).flatMap(id => photos.get(id) ?? []) : []
+    return [{ image, photo: found, behind }]
   })
 }
 
@@ -204,6 +227,94 @@ export function effectiveDpi(widthPx: number, heightPx: number, size: PrintSize)
   return Math.floor(Math.min(cropLong / size.long, cropShort / size.short))
 }
 
+/** A size's shape as a short ratio label, such as "2:3" for 8×12 or 16×24. */
+export function sizeShape(size: Pick<PrintSize, 'short' | 'long'>): string {
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
+  const divisor = gcd(size.short, size.long)
+  return `${size.short / divisor}:${size.long / divisor}`
+}
+
+/** Whether a print size has the photo's own shape, so it prints the full frame. */
+export function isFullFrame(
+  widthPx: number,
+  heightPx: number,
+  size: PrintSize,
+  tolerance = 0.02,
+): boolean {
+  const photoAspect = Math.max(widthPx, heightPx) / Math.min(widthPx, heightPx)
+  return Math.abs(photoAspect - size.long / size.short) / photoAspect <= tolerance
+}
+
+/**
+ * The centered region of the photo a size keeps, as fractions of the photo's width and height,
+ * printed in the photo's own orientation.
+ */
+export function cropFraction(
+  widthPx: number,
+  heightPx: number,
+  size: PrintSize,
+): { width: number; height: number } {
+  const photoAspect = widthPx / heightPx
+  const printAspect = widthPx >= heightPx ? size.long / size.short : size.short / size.long
+  if (isFullFrame(widthPx, heightPx, size)) return { width: 1, height: 1 }
+  return printAspect < photoAspect
+    ? { width: printAspect / photoAspect, height: 1 }
+    : { width: 1, height: photoAspect / printAspect }
+}
+
+/** Plain-language note for what a size does to the photo. */
+export function cropNote(widthPx: number, heightPx: number, size: PrintSize): string {
+  const crop = cropFraction(widthPx, heightPx, size)
+  if (crop.width === 1 && crop.height === 1) return `${size.label} prints the full photo.`
+  const lost = Math.round((1 - Math.min(crop.width, crop.height)) * 100)
+  const edges = crop.width < 1 ? 'left and right edges' : 'top and bottom'
+  return `${size.label} trims about ${lost}% from the ${edges}.`
+}
+
+export interface PrintSizeGroup {
+  shape: string
+  fullFrame: boolean
+  sizes: PrintSize[]
+}
+
+/** Groups sizes by shape, full-frame shapes first, each smallest first. */
+export function groupPrintSizes(
+  widthPx: number,
+  heightPx: number,
+  sizes: PrintSize[],
+): PrintSizeGroup[] {
+  const groups = new Map<string, PrintSizeGroup>()
+  for (const size of sizes) {
+    const shape = sizeShape(size)
+    const group = groups.get(shape) ?? {
+      shape,
+      fullFrame: isFullFrame(widthPx, heightPx, size),
+      sizes: [],
+    }
+    group.sizes.push(size)
+    groups.set(shape, group)
+  }
+  return [...groups.values()].sort((a, b) => Number(b.fullFrame) - Number(a.fullFrame))
+}
+
+/** The size picked first: the smallest full-frame size, or the smallest size when none matches. */
+export function defaultPrintSize(
+  widthPx: number,
+  heightPx: number,
+  sizes: PrintSize[],
+): PrintSize | undefined {
+  return sizes.find(size => isFullFrame(widthPx, heightPx, size)) ?? sizes[0]
+}
+
+/** The largest size by area, for "up to" copy. */
+export function largestPrintSize(sizes: PrintSize[]): PrintSize | undefined {
+  return sizes.reduce<PrintSize | undefined>(
+    (largest, size) =>
+      !largest || size.short * size.long > largest.short * largest.long ? size : largest,
+    undefined,
+  )
+}
+
 /** Print sizes this image can fill at or above `minDpi`, smallest first. */
 export function printableSizes(
   widthPx: number | null,
@@ -224,13 +335,54 @@ export function requestMailto(subject: string, body = ''): string {
   return `mailto:${SHOP_EMAIL}?${params.toString().replaceAll('+', '%20')}`
 }
 
-export function statusLabel(status: ProductStatus): string {
-  switch (status) {
+/** The end of a Pacific calendar day, as an instant. PST (UTC−8) is close enough for a preorder cutoff. */
+function endOfPacificDay(isoDate: string): number {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  return Date.UTC(year, month - 1, day + 1, 8)
+}
+
+export function productState(
+  product: Pick<ShopProduct, 'status' | 'preorderCloses'>,
+  now: Date = new Date(),
+): ProductState {
+  if (
+    product.status === 'preorder' &&
+    product.preorderCloses &&
+    now.getTime() >= endOfPacificDay(product.preorderCloses)
+  )
+    return 'preorder-closed'
+  return product.status
+}
+
+/** "Nov 30" from "2026-11-30". */
+export function formatShortDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+export function statusLabel(state: ProductState): string {
+  switch (state) {
     case 'preorder':
       return 'Preorder'
+    case 'preorder-closed':
+      return 'Preorders closed'
     case 'by-request':
       return 'By request'
     case 'coming-soon':
       return 'Coming soon'
   }
+}
+
+/**
+ * Button text. Without a checkout link the button starts an email, so it says so;
+ * a "Preorder" button that opens a mail client reads like a broken checkout.
+ */
+export function productCta(state: ProductState, hasCheckout: boolean): string {
+  if (state === 'coming-soon' || state === 'preorder-closed') return 'Email me when it’s ready'
+  if (hasCheckout) return state === 'preorder' ? 'Preorder' : 'Buy'
+  return state === 'preorder' ? 'Email to preorder' : 'Email to request'
 }

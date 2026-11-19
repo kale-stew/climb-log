@@ -5,6 +5,8 @@ import { CALENDAR_YEAR, calendarMonth, type ShopImage } from '../../lib/shop'
 interface Props {
   image: ShopImage
   photo: DisplayPhoto | null
+  /** Photos for the cards behind a `postcard-stack`, back to front. */
+  behind?: DisplayPhoto[]
   /** Requested transform width in CSS pixels for photo-backed images. */
   width: number
   /** `cover` fills the stage with photos; `contain` letterboxes them. Mockups always sit centered. */
@@ -14,7 +16,7 @@ interface Props {
   decorative?: boolean
 }
 
-const { image, photo, width, fit = 'cover', eager = false, decorative = false } = Astro.props
+const { image, photo, behind = [], width, fit = 'cover', eager = false, decorative = false } = Astro.props
 const loading = eager ? 'eager' : 'lazy'
 const title = photo?.title ?? 'a mountain photo'
 const src = photo ? `/img/${photo.id}?w=${width}` : image.kind === 'asset' ? image.src : ''
@@ -35,6 +37,8 @@ function defaultAlt(): string {
       return `Postcard of ${title}`
     case 'postcard-back':
       return `Back of a postcard, captioned ${title}`
+    case 'postcard-stack':
+      return `A stack of postcards, with ${title} on top`
   }
 }
 
@@ -59,7 +63,7 @@ const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
           <img src={src} alt="" loading={loading} style={accent} />
           <div class="cover-band">
             <span class="cover-year">{CALENDAR_YEAR}</span>
-            <span class="cover-brand">Kylie's Photos</span>
+            <span class="cover-brand">kylies·photos</span>
           </div>
         </>
       )}
@@ -83,6 +87,19 @@ const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
       )}
 
       {image.template === 'postcard-front' && <img src={src} alt="" loading={loading} style={accent} />}
+
+      {image.template === 'postcard-stack' && (
+        <>
+          {behind.map((card, index) => (
+            <span class={`stack-card stack-behind stack-behind-${behind.length - index}`}>
+              <img src={`/img/${card.id}?w=${width}`} alt="" loading={loading} style={card.accent_color ? `background-color: ${card.accent_color}` : undefined} />
+            </span>
+          ))}
+          <span class="stack-card stack-front">
+            <img src={src} alt="" loading={loading} style={accent} />
+          </span>
+        </>
+      )}
 
       {image.template === 'postcard-back' && (
         <>
@@ -119,6 +136,11 @@ const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
   }
   .shop-stage:has(.mockup-calendar-month) {
     padding: 4% 8%;
+  }
+  /* In the quick view the stage already sits on a tinted panel, so mockups drop the second tint and most of the inset. */
+  .shop-stage[data-fit='contain'][data-kind='mockup'] {
+    padding: 4%;
+    background-color: transparent;
   }
   .shop-stage[data-fit='contain'][data-kind='photo'],
   .shop-stage[data-fit='contain'][data-kind='asset'] {
@@ -197,9 +219,9 @@ const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
     line-height: 1;
   }
   .cover-brand {
-    font-size: 2.6cqi;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--font-serif);
+    font-size: 3cqi;
+    font-weight: 600;
     color: var(--ink-soft);
   }
 
@@ -269,6 +291,36 @@ const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
   .mockup-postcard-front img {
     height: 100%;
+  }
+
+  /* The stack itself is transparent; each card carries the paper and shadow. */
+  .mockup-postcard-stack {
+    overflow: visible;
+    background: none;
+    box-shadow: none;
+    width: min(100cqw * 0.82, 100cqh * var(--ratio) * 0.82);
+  }
+  .stack-card {
+    position: absolute;
+    inset: 0;
+    padding: 1.5cqi;
+    background-color: var(--paper);
+    border-radius: 0.6cqi;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.12),
+      0 6px 18px rgba(0, 0, 0, 0.16);
+  }
+  .stack-card img {
+    height: 100%;
+  }
+  .stack-behind-1 {
+    transform: translate(5%, -6%) rotate(5deg);
+  }
+  .stack-behind-2 {
+    transform: translate(-6%, -3%) rotate(-6deg);
+  }
+  .stack-behind-3 {
+    transform: translate(2%, -9%) rotate(-2deg);
   }
 
   .mockup-postcard-back {
