@@ -1,0 +1,623 @@
+---
+import Layout from '../layouts/Layout.astro'
+import QuickView from '../components/shop/QuickView.astro'
+import ShopImage from '../components/shop/ShopImage.astro'
+import { env } from 'cloudflare:workers'
+import { getCanonicalPhoto, type DisplayPhoto } from '../lib/photos-client'
+import {
+  PRINTS,
+  PRINT_SIZES,
+  PRODUCTS,
+  SHOP_EMAIL,
+  cropFraction,
+  cropNote,
+  defaultPrintSize,
+  formatPrice,
+  formatShortDate,
+  groupPrintSizes,
+  imagePhotoIds,
+  largestPrintSize,
+  photo as photoImage,
+  printableSizes,
+  productCta,
+  productState,
+  quickViewSlug,
+  requestMailto,
+  resolveImages,
+  statusLabel,
+  type PrintSize,
+} from '../lib/shop'
+
+export const prerender = false
+
+const photoIds = [
+  ...new Set([
+    ...PRODUCTS.flatMap(product => imagePhotoIds(product.images)),
+    ...PRINTS.flatMap(print => [print.photoId, ...imagePhotoIds(print.images ?? [])]),
+  ]),
+]
+// The catalog is fixed, so cache lookups per isolate and never let one slow photo hold up the page.
+const fetched = await Promise.all(
+  photoIds.map(id => getCanonicalPhoto(env.PHOTOS_API_ORIGIN, id, { ttlMs: 10 * 60_000, timeoutMs: 3000 })),
+)
+const photos = new Map<string, DisplayPhoto>()
+fetched.forEach((photo, index) => {
+  if (photo) photos.set(photoIds[index], photo)
+})
+
+const now = new Date()
+const products = PRODUCTS.map(product => ({
+  ...product,
+  state: productState(product, now),
+  qv: quickViewSlug(product),
+  gallery: resolveImages(product.images, photos),
+}))
+
+const prints = PRINTS.flatMap(listing => {
+  const photo = photos.get(listing.photoId)
+  if (!photo) return []
+  const sizes = printableSizes(photo.width, photo.height)
+  if (sizes.length === 0 || !photo.width || !photo.height) return []
+  const width = photo.width
+  const height = photo.height
+  const gallery = resolveImages([photoImage(listing.photoId), ...(listing.images ?? [])], photos)
+  return [
+    {
+      ...listing,
+      qv: quickViewSlug(listing),
+      photo,
+      frame: { width, height },
+      groups: groupPrintSizes(width, height, sizes),
+      initial: defaultPrintSize(width, height, sizes) ?? sizes[0],
+      largest: largestPrintSize(sizes) ?? sizes[sizes.length - 1],
+      gallery,
+    },
+  ]
+})
+
+const startingPrice = Math.min(...PRINT_SIZES.map(size => size.price))
+
+type Product = (typeof products)[number]
+
+function productHref(product: Product) {
+  if (product.state === 'coming-soon' || product.state === 'preorder-closed') {
+    return requestMailto(`Notify me: ${product.name}`, `Hi Kylie! Let me know when the ${product.name} is available.`)
+  }
+  if (product.checkoutUrl) return product.checkoutUrl
+  const verb = product.state === 'preorder' ? 'Preorder' : 'Request'
+  return requestMailto(`${verb}: ${product.name}`, `Hi Kylie! I'd like the ${product.name}.\n\nQuantity: 1\nShip to (US only): `)
+}
+
+/** The button already says "preorder", so an open preorder's chip carries the ship date instead. */
+function chipLabel(product: Product) {
+  return product.state === 'preorder' && product.shipNote ? product.shipNote : statusLabel(product.state)
+}
+
+function ctaLabel(product: Product) {
+  return productCta(product.state, Boolean(product.checkoutUrl))
+}
+
+/** True when the button opens an email rather than a checkout page. */
+function opensEmail(product: Product) {
+  return !product.checkoutUrl || product.state === 'coming-soon' || product.state === 'preorder-closed'
+}
+
+function printHref(photo: DisplayPhoto, size: PrintSize) {
+  const name = photo.title ?? photo.id
+  return requestMailto(
+    `Print request: ${name} (${size.label})`,
+    `Hi Kylie! I'd like a print of "${name}" (${photo.id}).\n\nSize: ${size.label}\nShip to (US only): `,
+  )
+}
+---
+
+<Layout
+  title="Shop"
+  description="Prints, postcards, and calendars from Kylie's photos, packed by hand in San Francisco."
+  ogImageAlt="A photo from Kylie's shop"
+>
+  <div class="container page">
+    <header class="shop-intro">
+      <h1>Shop</h1>
+      <p class="page-subtitle">
+        Prints, postcards, and calendars from the photos on this site. Everything is packed by hand
+        in San Francisco and ships within the US.
+      </p>
+    </header>
+
+    <section aria-labelledby="goods-heading" class="shop-section">
+      <div class="section-head"><h2 id="goods-heading">Paper goods</h2></div>
+      <div class="product-grid">
+        {products.map(product => (
+          <article class={`product-card${product.state === 'coming-soon' || product.state === 'preorder-closed' ? ' is-upcoming' : ''}`} id={product.qv}>
+            {product.gallery[0] && (
+              <a class="card-media product-media" href={`#${product.qv}`} data-quick-view={product.qv} aria-label={`Quick view: ${product.name}`}>
+                <ShopImage image={product.gallery[0].image} photo={product.gallery[0].photo} behind={product.gallery[0].behind} width={800} eager />
+                <span class="quick-view-hint" aria-hidden="true">
+                  Quick view{product.gallery.length > 1 ? ` · ${product.gallery.length} images` : ''}
+                </span>
+              </a>
+            )}
+            <div class="product-body">
+              <div class="product-heading">
+                <h3>
+                  <a class="card-title" href={`#${product.qv}`} data-quick-view={product.qv}>{product.name}</a>
+                </h3>
+                <span class={`status status-${product.state}`}>{chipLabel(product)}</span>
+              </div>
+              <p>{product.blurb}</p>
+              {product.state === 'preorder' && product.preorderCloses && (
+                <p class="product-deadline">Preorder by {formatShortDate(product.preorderCloses)}</p>
+              )}
+              <div class="product-footer">
+                <span class="price">{formatPrice(product.price)}</span>
+                <a class={`btn${product.state === 'preorder' || product.state === 'by-request' ? ' btn-primary' : ''}`} href={productHref(product)}>{ctaLabel(product)}</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="prints-heading" class="shop-section">
+      <div class="section-head"><h2 id="prints-heading">Prints</h2></div>
+      <p class="section-note">
+        Archival fine-art paper, unframed, from {formatPrice(startingPrice)}. Each photo is offered only
+        in sizes its original can print sharply. Prints are made to order.
+      </p>
+      {prints.length === 0 ? (
+        <p class="empty">
+          Prints can’t be shown right now. Try again in a few minutes, or email
+          <a href={requestMailto('Print request')}>{SHOP_EMAIL}</a>.
+        </p>
+      ) : (
+        <div class="print-grid">
+          {prints.map(({ photo, largest, note, qv, gallery }) => (
+            <article class="print-card" id={qv}>
+              <a class="card-media print-media" href={`#${qv}`} data-quick-view={qv} aria-label={`Quick view: ${photo.title ?? 'Print'}`}>
+                <ShopImage image={gallery[0].image} photo={gallery[0].photo} width={800} />
+                <span class="quick-view-hint" aria-hidden="true">Quick view</span>
+              </a>
+              <div class="print-body">
+                <h3>
+                  <a class="card-title" href={`#${qv}`} data-quick-view={qv}>{photo.title ?? 'Untitled'}</a>
+                </h3>
+                {(note || photo.location) && <p class="print-meta">{note ?? photo.location}</p>}
+                <p class="print-from">Up to {largest.label}</p>
+                <a class="btn" href={`#${qv}`} data-quick-view={qv}>Choose a size</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <section class="shop-section shop-faq" aria-labelledby="faq-heading">
+      <div class="section-head"><h2 id="faq-heading">Good to know</h2></div>
+      <dl>
+        <dt>Shipping</dt>
+        <dd>US only for now. Prints ship flat in rigid mailers; postcards and calendars ship in sleeves.</dd>
+        <dt>How ordering works</dt>
+        <dd>
+          Checkout isn’t open yet, so buttons start an email to {SHOP_EMAIL} with the details filled
+          in. I’ll reply to confirm everything before you pay.
+        </dd>
+        <dt>Want something else?</dt>
+        <dd>
+          Any photo in the <a href="/photos">gallery</a> may be printable. Email
+          <a href={requestMailto('Custom print request')}>{SHOP_EMAIL}</a> with the photo and size.
+        </dd>
+      </dl>
+    </section>
+  </div>
+
+  {products.map(product => (
+    <QuickView slug={product.qv} title={product.name} gallery={product.gallery}>
+      <div class="qv-meta">
+        <span class="price">{formatPrice(product.price)}</span>
+        <span class={`status status-${product.state}`}>{chipLabel(product)}</span>
+      </div>
+      <p>{product.blurb}</p>
+      {product.details && (
+        <ul class="qv-details">
+          {product.details.map(detail => <li>{detail}</li>)}
+        </ul>
+      )}
+      <a class="btn btn-primary qv-cta" href={productHref(product)}>{ctaLabel(product)}</a>
+      <p class="qv-fine">
+        {product.state === 'coming-soon' || product.state === 'preorder-closed'
+          ? `Opens an email to ${SHOP_EMAIL}. I’ll write back when it’s available.`
+          : opensEmail(product)
+            ? `Opens an email to ${SHOP_EMAIL}. US shipping only; I’ll reply to confirm before you pay.`
+            : 'US shipping only. Checkout is handled by Stripe.'}
+      </p>
+    </QuickView>
+  ))}
+
+  {prints.map(({ photo, frame, groups, initial, note, qv, gallery }) => (
+    <QuickView slug={qv} title={photo.title ?? 'Untitled'} gallery={gallery} frame={frame}>
+      {(note || photo.location) && <p class="print-meta qv-location">{note ?? photo.location}</p>}
+      <span class="price" data-qv-price>{formatPrice(initial.price)}</span>
+      <fieldset class="size-picker">
+        <legend>Size</legend>
+        {groups.map(group => (
+          <div class="size-group">
+            <p class="size-group-label">{group.fullFrame ? 'Full photo' : `Trimmed to ${group.shape}`}</p>
+            <div class="size-options">
+              {group.sizes.map(size => {
+                const crop = cropFraction(frame.width, frame.height, size)
+                return (
+                  <label class="size-option">
+                    <input
+                      type="radio"
+                      name={`size-${qv}`}
+                      value={size.label}
+                      data-href={printHref(photo, size)}
+                      data-price={formatPrice(size.price)}
+                      data-crop-w={crop.width.toFixed(4)}
+                      data-crop-h={crop.height.toFixed(4)}
+                      data-crop-note={cropNote(frame.width, frame.height, size)}
+                      checked={size === initial}
+                    />
+                    <span class="size-label">{size.label}</span>
+                    <span class="size-price">{formatPrice(size.price)}</span>
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+      </fieldset>
+      <p class="size-note" data-qv-crop-note aria-live="polite">{cropNote(frame.width, frame.height, initial)}</p>
+      <a class="btn btn-primary qv-cta" href={printHref(photo, initial)} data-qv-cta>Email to request this print</a>
+      <p class="qv-fine">
+        Opens an email to {SHOP_EMAIL}. Archival fine-art paper, unframed, US shipping only; I’ll reply
+        to confirm before you pay.
+      </p>
+    </QuickView>
+  ))}
+</Layout>
+
+<style>
+  .shop-intro {
+    max-width: 42rem;
+    margin-bottom: var(--space-2xl);
+  }
+  .shop-section {
+    margin-bottom: var(--space-3xl);
+  }
+  .section-note {
+    max-width: 42rem;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-xl);
+  }
+  .product-card,
+  .print-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+  .card-media {
+    position: relative;
+    display: block;
+    color: inherit;
+  }
+  .product-media {
+    aspect-ratio: 3 / 2;
+  }
+  /* Something you can order now gets more room than something that's coming. Both covers share a
+     height so the titles line up. */
+  @media (min-width: 56rem) {
+    .product-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .product-card {
+      grid-column: span 3;
+    }
+    .product-card.is-upcoming {
+      grid-column: span 2;
+    }
+    .product-media {
+      aspect-ratio: auto;
+      height: clamp(15rem, 26vw, 22rem);
+    }
+  }
+  .print-media {
+    aspect-ratio: 4 / 3;
+  }
+  .card-media :global(img) {
+    transition: transform 300ms ease, filter var(--transition-fast);
+  }
+  /* The card clips overflow, so pull the ring inside the image instead of losing it. */
+  .card-media:focus-visible {
+    outline-offset: -3px;
+  }
+  .card-media:focus-visible :global(img) {
+    transform: scale(1.02);
+  }
+  .card-media:active :global(img) {
+    filter: brightness(0.94);
+  }
+  /* Hover-only: on touch the whole card is the target, so the hint would just cover the photo. */
+  .quick-view-hint {
+    position: absolute;
+    left: var(--space-sm);
+    bottom: var(--space-sm);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--border-radius);
+    background-color: rgba(29, 37, 32, 0.72);
+    color: #f7f8f3;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 150ms ease, transform 150ms ease;
+  }
+  .card-media:focus-visible .quick-view-hint {
+    opacity: 1;
+    transform: none;
+  }
+  .card-title {
+    color: inherit;
+    text-decoration: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .card-media:hover :global(img) {
+      transform: scale(1.02);
+    }
+    .card-media:hover .quick-view-hint {
+      opacity: 1;
+      transform: none;
+    }
+    .card-title:hover {
+      text-decoration: underline;
+    }
+    .size-option:hover {
+      border-color: var(--color-border-hover);
+    }
+  }
+  .btn {
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      color var(--transition-fast),
+      transform var(--transition-fast);
+  }
+  .btn:active,
+  .size-option:active {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card-media :global(img),
+    .quick-view-hint,
+    .btn {
+      transition: none;
+    }
+  }
+  .product-body,
+  .print-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: var(--space-lg);
+  }
+  /* The chip always sits on its own line, so cards line up whatever the title length. */
+  .product-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+  }
+  .product-heading h3 {
+    margin: 0;
+  }
+  .product-deadline {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .product-footer .btn,
+  .print-body .btn {
+    min-height: 2.75rem;
+  }
+  .status {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+  .status-preorder {
+    color: var(--color-white);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .product-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-top: auto;
+  }
+  .price {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .print-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--space-lg);
+  }
+  .print-body h3 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-xs);
+  }
+  .print-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-sm);
+  }
+  .print-from {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-md);
+  }
+  .print-body .btn {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  .qv-location {
+    margin: calc(-1 * var(--space-sm)) 0 0;
+  }
+  .qv-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  .qv-details {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+  .qv-details li + li {
+    margin-top: var(--space-xs);
+  }
+  .qv-cta {
+    align-self: stretch;
+    padding-block: var(--space-md);
+    font-size: var(--font-size-base);
+  }
+  /* The sticky button sits on a band of page color, with a fade above it, so text never runs under it. */
+  @media (max-width: 760px) {
+    .qv-cta {
+      position: sticky;
+      bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+      z-index: 1;
+      box-shadow: 0 0 0 var(--space-md) var(--color-bg-primary);
+    }
+    .qv-cta::before {
+      content: '';
+      position: absolute;
+      left: calc(-1 * var(--space-md));
+      right: calc(-1 * var(--space-md));
+      bottom: calc(100% + var(--space-md));
+      height: 2rem;
+      background: linear-gradient(to bottom, transparent, var(--color-bg-primary));
+      pointer-events: none;
+    }
+  }
+  .qv-fine {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+  }
+  .size-picker {
+    display: grid;
+    gap: var(--space-md);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .size-group-label {
+    margin: 0 0 var(--space-xs);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+  }
+  .size-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: var(--space-sm);
+  }
+  /* One line per option on phones, so every shape group fits above the sticky button. */
+  @media (max-width: 760px) {
+    .size-options .size-option {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      min-height: 2.75rem;
+      padding: 0.6rem 0.65rem;
+    }
+  }
+  .size-note {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+  .size-picker legend {
+    margin-bottom: var(--space-xs);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+  .size-option {
+    position: relative;
+    font-family: var(--font-sans);
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease, transform var(--transition-fast);
+  }
+  .size-option:has(input:checked) {
+    border-color: var(--color-text-accent);
+    box-shadow: inset 0 0 0 1px var(--color-text-accent);
+    background-color: var(--color-bg-secondary);
+  }
+  .size-option:has(input:focus-visible) {
+    outline: 2px solid var(--color-text-accent);
+    outline-offset: 2px;
+  }
+  .size-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .size-label {
+    font-weight: 600;
+  }
+  .size-price {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .shop-faq dl {
+    max-width: 42rem;
+  }
+  .shop-faq dt {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-top: var(--space-md);
+  }
+  .shop-faq dd {
+    color: var(--color-text-secondary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .size-option {
+      transition: none;
+    }
+  }
+</style>

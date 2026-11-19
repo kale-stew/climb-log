@@ -94,6 +94,35 @@ describe('photos client', () => {
     )
   })
 
+  it('caches a found photo only when asked to', async () => {
+    const fetchFn = vi.fn(async () => Response.json(photo)) as typeof fetch
+
+    await getCanonicalPhoto('https://photos.example', 'canonical-1', { fetchFn })
+    await getCanonicalPhoto('https://photos.example', 'canonical-1', { fetchFn })
+    expect(fetchFn).toHaveBeenCalledTimes(2)
+
+    await getCanonicalPhoto('https://photos.example', 'canonical-1', { fetchFn, ttlMs: 60_000 })
+    await expect(
+      getCanonicalPhoto('https://photos.example', 'canonical-1', { fetchFn, ttlMs: 60_000 }),
+    ).resolves.toMatchObject({ id: 'canonical-1' })
+    expect(fetchFn).toHaveBeenCalledTimes(3)
+  })
+
+  it('treats a lookup that outlasts its timeout as missing', async () => {
+    const fetchFn = vi.fn(
+      (_url: URL, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(init.signal?.reason))
+        }),
+    ) as unknown as typeof fetch
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    await expect(
+      getCanonicalPhoto('https://photos.example', 'slow', { fetchFn, timeoutMs: 10 }),
+    ).resolves.toBeNull()
+    error.mockRestore()
+  })
+
   it('requests one collection page with search and returns the total', async () => {
     const fetchFn = vi.fn(async () =>
       Response.json({ photos: [photo], meta: { count: 1, total: 847 } }),
