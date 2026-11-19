@@ -226,21 +226,37 @@ export async function getAllCollectionPhotos(
   return photos
 }
 
+interface SinglePhotoOptions extends PhotoOptions {
+  /** Cache found photos in this isolate for this long. Off by default. */
+  ttlMs?: number
+  /** Give up on a slow lookup after this long and treat the photo as missing. */
+  timeoutMs?: number
+}
+
+const photoCache = new Map<string, { expiresAt: number; photo: DisplayPhoto }>()
+
 export async function getCanonicalPhoto(
   origin: string | undefined,
   identifier: string,
-  options: PhotoOptions = {},
+  options: SinglePhotoOptions = {},
 ): Promise<DisplayPhoto | null> {
   if (!origin) return null
 
   try {
     const url = new URL(`/api/photos/${encodeURIComponent(identifier)}`, normalizeOrigin(origin))
+    const cacheKey = url.href
+    const cached = options.ttlMs ? photoCache.get(cacheKey) : undefined
+    if (cached && cached.expiresAt > Date.now()) return cached.photo
+
     const response = await (options.fetchFn ?? fetch)(url, {
       headers: { Accept: 'application/json' },
+      signal: options.timeoutMs ? AbortSignal.timeout(options.timeoutMs) : undefined,
     })
     if (response.status === 404) return null
     if (!response.ok) throw new Error(`photos-api returned ${response.status}`)
-    return adaptCanonicalPhoto((await response.json()) as CanonicalPhoto)
+    const photo = adaptCanonicalPhoto((await response.json()) as CanonicalPhoto)
+    if (options.ttlMs) photoCache.set(cacheKey, { expiresAt: Date.now() + options.ttlMs, photo })
+    return photo
   } catch (error) {
     console.error('Failed to fetch canonical photo:', error)
     return null
@@ -287,5 +303,6 @@ export async function getClimbPhotoAssignments(
 
 export function clearPhotosCache(): void {
   cache.clear()
+  photoCache.clear()
   assignmentCache.clear()
 }
