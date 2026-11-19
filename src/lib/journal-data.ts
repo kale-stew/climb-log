@@ -96,6 +96,47 @@ export function roundedFeet(value: number): string {
   return formatNumber(value)
 }
 
+export interface LatestFeature {
+  outing: ClimbListItem
+  /** Present unless there are no photos at all. `photoId` is set when the photo is borrowed. */
+  image: { src: string; alt: string | null; photoId?: string } | null
+}
+
+/**
+ * The newest outing, always. It shows its own preview when it has one; otherwise the
+ * newest photo taken on or before its date, or the closest later one if none is older.
+ * `alt` is null for the outing's own preview so the page can describe the outing.
+ */
+export function latestFeature(
+  outings: ClimbListItem[],
+  photos: DisplayPhoto[],
+): LatestFeature | null {
+  const outing = outings[0]
+  if (!outing) return null
+  if (outing.preview_img_url) {
+    return { outing, image: { src: outing.preview_img_url.replace(/w=\d+/, 'w=1600'), alt: null } }
+  }
+
+  const day = outing.date?.slice(0, 10)
+  const dated = photos.filter(photo => photo.date)
+  const nearest = day
+    ? (dated.find(candidate => (candidate.date ?? '').slice(0, 10) <= day) ?? dated.at(-1))
+    : undefined
+  const photo = nearest ?? photos[0]
+  if (!photo) return { outing, image: null }
+  return { outing, image: { src: `${photo.url}?w=1600`, alt: photoAlt(photo), photoId: photo.id } }
+}
+
+/** The home page's recent photos, minus one the hero borrowed so it doesn't show twice. */
+export function recentFrames(
+  photos: DisplayPhoto[],
+  feature: LatestFeature | null,
+  count = 6,
+): DisplayPhoto[] {
+  const borrowed = feature?.image?.photoId
+  return photos.filter(photo => photo.id !== borrowed).slice(0, count)
+}
+
 export function photoAlt(photo: DisplayPhoto): string {
   return (
     photo.caption ||
