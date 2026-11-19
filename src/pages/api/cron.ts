@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:workers'
 import { Client, isNotionClientError } from '@notionhq/client'
 import type { APIRoute } from 'astro'
+import { fillAboutStep } from '../../lib/about-photos'
 import { type GearAssetsRpc, syncGearImages } from '../../lib/gear-images'
 import {
   expandRelations,
@@ -167,6 +168,9 @@ export async function runSync(runtimeEnv: Cloudflare.Env): Promise<Response> {
     if (gearImages) results.push(gearImages)
 
     results.push(await syncSlugs(DB, runtimeEnv.PHOTOS_API_ORIGIN))
+
+    const aboutPhotos = await fillAboutStep(runtimeEnv.PHOTO_COLLECTIONS)
+    if (aboutPhotos) results.push(aboutPhotos)
 
     const duration = Date.now() - startTime
     const recordsSynced = results.reduce((sum, r) => sum + r.inserted + r.updated + r.deleted, 0)

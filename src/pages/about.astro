@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { env } from 'cloudflare:workers'
+import { aboutPhotoPool } from '../lib/about-photos'
 import { formatNumber, loadJournal, roundedFeet } from '../lib/journal-data'
 import { buildChapters, normalizeState, yearOf } from '../lib/places'
 import { personRef, websiteRef } from '../lib/seo'
@@ -24,8 +25,7 @@ const california = chapterFor('california')
 const coloradoIsLongest = Boolean(colorado && chapters.every(chapter => chapter.count <= colorado.count))
 const firstEntry = journal.outings.filter(outing => outing.date).at(-1) ?? null
 
-const taggedKyliePhotos = journal.photos.filter(photo => photo.tags?.toLowerCase().includes('kylie'))
-const kyliePhotoPool = taggedKyliePhotos.length > 0 ? taggedKyliePhotos : journal.photos
+const kyliePhotoPool = await aboutPhotoPool(env.PHOTOS_API_ORIGIN, journal.photos)
 const fieldPhoto = kyliePhotoPool[Math.floor(Math.random() * kyliePhotoPool.length)] ?? null
 
 interface YearRow {
