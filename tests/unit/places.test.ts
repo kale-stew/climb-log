@@ -118,6 +118,9 @@ describe('places', () => {
     expect(outingType("Solo Climb 'The Citadel'")).toBe('solo climb')
     expect(outingName("Solo Climb 'The Citadel'")).toBe("'The Citadel'")
     expect(outingType('Solo Run Mount Falcon')).toBe('solo run')
+    expect(outingType('Solo Trail Run Mount Falcon')).toBe('solo trail run')
+    expect(outingName('Solo Trail Run Mount Falcon')).toBe('Mount Falcon')
+    expect(outingType('trail run Mount Falcon')).toBe('trail run')
     expect(knownOutingType('Solo Snowshoe Castle Peak')).toBeNull()
   })
 
