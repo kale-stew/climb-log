@@ -411,7 +411,7 @@ export default function PhotoGallery({
               <div className="photo-overlay">
                 <strong>{photo.title || photo.caption}</strong>
                 {photo.area && (
-                  <span>
+                  <span title={[photo.area, photo.state].filter(Boolean).join(', ')}>
                     {photo.area}
                     {photo.state && `, ${photo.state}`}
                   </span>
@@ -577,7 +577,8 @@ export default function PhotoGallery({
           right: 0;
           max-height: 100%;
           padding: 2.5em 1.2em 1em;
-          background: linear-gradient(transparent, rgba(0,0,0,0.85) 60%);
+          background: linear-gradient(transparent, rgba(0,0,0,0.85) 45%);
+          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
           color: white;
           font-size: var(--overlay-size, 0.7rem);
           line-height: 1.25;
@@ -595,7 +596,7 @@ export default function PhotoGallery({
           font-weight: 400;
           line-height: 1.2;
         }
-        .photo-overlay span { display: block; margin-top: 0.3em; color: rgba(255,255,255,0.7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .photo-overlay span { display: block; margin-top: 0.3em; font-size: max(0.6875rem, 1em); color: rgba(255,255,255,0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .load-more-wrap { display: flex; justify-content: center; padding-top: 3rem; }
         .load-more { border-radius: 999px; padding: 0.8rem 1.5rem; }
