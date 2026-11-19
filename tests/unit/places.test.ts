@@ -105,6 +105,13 @@ describe('places', () => {
     expect(outingName('Mount Dana')).toBe('Mount Dana')
   })
 
+  it('parses rock climbs and drops a leading "in"', () => {
+    expect(outingType('Rock climb in Monte Cofano')).toBe('rock climb')
+    expect(outingName('Rock climb in Monte Cofano')).toBe('Monte Cofano')
+    expect(outingName('Hike in Yosemite Valley')).toBe('Yosemite Valley')
+    expect(outingName('Hike Inspiration Point')).toBe('Inspiration Point')
+  })
+
   it('capitalizes a name that started mid-sentence', () => {
     expect(outingName('Run the Baquiano Trail')).toBe('The Baquiano Trail')
     expect(outingName('the Silver Couloir')).toBe('the Silver Couloir')
